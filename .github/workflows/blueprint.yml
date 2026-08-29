@@ -28,17 +28,23 @@ jobs:
 
       # blueprint.sty ships in blueprint/src, so TeX Live supplies nothing
       # beyond its standard packages. plasTeX and its two plugins are pinned to
-      # the versions the site was written against; pygraphviz is compiled
-      # against the graphviz that draws the dependency graph.
+      # the versions the site was written against. The image is the Debian one:
+      # pygraphviz publishes manylinux wheels only, so on the Alpine image it is
+      # built from source, and that link step wants graphviz plugin libraries
+      # which Alpine graphviz-dev does not carry. Debian trixie already provides
+      # graphviz and python3, leaving the virtual environment to install.
       - name: Build the pdf and the web version
         uses: xu-cheng/texlive-action@22c04326a5d855880f9d39bb955138bf11c6df80 # v3
         with:
           texlive_version: 2025
+          os: debian
           run: |
-            apk add --no-cache python3 python3-dev py3-pip gcc musl-dev pkgconfig graphviz graphviz-dev
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get update
+            apt-get install -y --no-install-recommends python3-venv
             python3 -m venv /tmp/venv
             . /tmp/venv/bin/activate
-            pip install --upgrade pip wheel
+            pip install --upgrade pip
             pip install pygraphviz==2.0.1
             pip install plasTeX==3.1 plastexdepgraph==0.0.5 plastexshowmore==0.0.2 leanblueprint==0.0.20
             cd blueprint/src
