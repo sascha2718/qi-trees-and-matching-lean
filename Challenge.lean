@@ -123,6 +123,142 @@ noncomputable def Tlaw (h : ℕ) : PMF (FullLab (V × ℕ) h) :=
 
 end VaryingCounter
 
+/-! ## The i.i.d. label field on the binary tree -/
+
+section Iid
+variable {V : Type*}
+
+/-- Leaf labellings of the binary tree of height `h`. -/
+def Leaf (V : Type*) : ℕ → Type _
+  | 0 => V
+  | h + 1 => Leaf V h × Leaf V h
+
+/-- `Aut(𝔹_h)` as the swap group: a swap bit and the two subtree automorphisms. -/
+def Aut : ℕ → Type
+  | 0 => Unit
+  | h + 1 => Bool × Aut h × Aut h
+
+def matchesA (R₀ : V → V → Prop) : (h : ℕ) → Aut h → Leaf V h → Leaf V h → Prop
+  | 0, _, x, y => R₀ x y
+  | h + 1, π, x, y =>
+      matchesA R₀ h π.2.1 x.1 (bif π.1 then y.2 else y.1)
+        ∧ matchesA R₀ h π.2.2 x.2 (bif π.1 then y.1 else y.2)
+
+/-- Two leaf labellings are matched by some automorphism of the tree. -/
+def leafSim (R₀ : V → V → Prop) (h : ℕ) (x y : Leaf V h) : Prop :=
+  ∃ π : Aut h, matchesA R₀ h π x y
+
+def fullMatchesA (R₀ : V → V → Prop) : (h : ℕ) → Aut h → FullLab V h → FullLab V h → Prop
+  | 0, _, x, y => R₀ x y
+  | h + 1, π, x, y =>
+      R₀ x.1 y.1
+        ∧ fullMatchesA R₀ h π.2.1 x.2.1 (bif π.1 then y.2.2 else y.2.1)
+        ∧ fullMatchesA R₀ h π.2.2 x.2.2 (bif π.1 then y.2.1 else y.2.2)
+
+/-- Two full labellings are matched at every vertex by some automorphism. -/
+def fullSimIid (R₀ : V → V → Prop) (h : ℕ) (x y : FullLab V h) : Prop :=
+  ∃ π : Aut h, fullMatchesA R₀ h π x y
+
+/-- The i.i.d. leaf law. -/
+noncomputable def leafMu (μ : PMF V) : (h : ℕ) → PMF (Leaf V h)
+  | 0 => μ
+  | h + 1 => prodPMF (leafMu μ h) (leafMu μ h)
+
+/-- The i.i.d. full law. -/
+noncomputable def fullMu (μ : PMF V) : (h : ℕ) → PMF (FullLab V h)
+  | 0 => μ
+  | h + 1 => prodPMF μ (prodPMF (fullMu μ h) (fullMu μ h))
+
+/-- The one-site potential `Φ(R,μ) = 𝔼 φ_{5/2}(q(X))`. -/
+noncomputable def PhiIid (μ : PMF V) (R : V → V → Prop) : ℝ≥0∞ :=
+  ∑' x, μ x * ENNReal.ofReal (phi (5 / 2) (q μ R x))
+
+/-- Compatibility in a label graph: `d_G(v,w) ≤ 1`. -/
+def compat (G : SimpleGraph V) (v w : V) : Prop := v = w ∨ G.Adj v w
+
+/-- The compatible mass `b(v) = μ(B_G(v,1))`. -/
+noncomputable def gdeg (μ : PMF V) (G : SimpleGraph V) (v : V) : ℝ :=
+  (rE μ (compat G) v).toReal
+
+/-- The graph potential `η_{G,5/2}(μ) = ∑_v μ(v) (1-b(v))/b(v)^{5/2}`. -/
+noncomputable def etaGraph (μ : PMF V) (G : SimpleGraph V) : ℝ≥0∞ :=
+  ∑' v, μ v * ENNReal.ofReal ((1 - gdeg μ G v) / gdeg μ G v ^ (5 / 2 : ℝ))
+
+/-- Restriction of a height-`h+1` labelling to height `h`. -/
+def restrictLab : (h : ℕ) → FullLab V (h + 1) → FullLab V h
+  | 0, x => x.1
+  | h + 1, x => (x.1, restrictLab h x.2.1, restrictLab h x.2.2)
+
+/-- The label at the vertex addressed by a word. -/
+def coord : (h : ℕ) → FullLab V h → List Bool → V
+  | 0, x, _ => x
+  | _ + 1, x, [] => x.1
+  | h + 1, x, false :: t => coord h x.2.1 t
+  | h + 1, x, true :: t => coord h x.2.2 t
+
+/-- Adjacency in the infinite rooted binary tree, on words. -/
+def treeAdj (s t : List Bool) : Prop := (∃ c, t = s ++ [c]) ∨ (∃ c, s = t ++ [c])
+
+/-- A root-fixing automorphism of the infinite binary tree. -/
+def IsTreeAut (g : List Bool ≃ List Bool) : Prop :=
+  g [] = [] ∧ ∀ s t, treeAdj s t ↔ treeAdj (g s) (g t)
+
+/-- Full labellings carry the product measurable structure. -/
+instance instMeasurableFullLab {V : Type*} [MeasurableSpace V] :
+    (h : ℕ) → MeasurableSpace (FullLab V h)
+  | 0 => ‹MeasurableSpace V›
+  | h + 1 =>
+      let inst := instMeasurableFullLab (V := V) h
+      @Prod.instMeasurableSpace V (FullLab V h × FullLab V h) _
+        (@Prod.instMeasurableSpace (FullLab V h) (FullLab V h) inst inst)
+
+end Iid
+
+/-! ## The two-value family -/
+
+section TwoValue
+
+/-- Vertices of the binary tree, as words over `Bool`. -/
+abbrev Word : Type := List Bool
+
+/-- The common prefix of two words. -/
+def wedge : Word → Word → Word
+  | [], _ => []
+  | _, [] => []
+  | a :: x, b :: y => if a = b then a :: wedge x y else []
+
+/-- The tree distance: `|x| + |y| - 2|x ∧ y|`. -/
+def treeDist (x y : Word) : ℕ := x.length + y.length - 2 * (wedge x y).length
+
+/-- The sample tree of the offspring field `χ`: the root, one child `v·1` always,
+and a second child `v·2` exactly when `χ v = true`. -/
+inductive InTree (χ : Word → Bool) : Word → Prop
+  | root : InTree χ []
+  | one {v : Word} : InTree χ v → InTree χ (v ++ [false])
+  | two {v : Word} : InTree χ v → χ v = true → InTree χ (v ++ [true])
+
+/-- A `K`-quasi-isometry between two subtrees. -/
+structure IsQIWith (K : ℕ) (T T' : Word → Prop) (f : Word → Word) : Prop where
+  maps : ∀ x, T x → T' (f x)
+  upper : ∀ x y, T x → T y → treeDist (f x) (f y) ≤ K * treeDist x y + K
+  lower : ∀ x y, T x → T y → treeDist x y ≤ K * treeDist (f x) (f y) + K * K
+  dense : ∀ y', T' y' → ∃ x, T x ∧ treeDist (f x) y' ≤ K
+
+/-- The Bernoulli law on `Bool` with success probability `t`. -/
+noncomputable def bernoulliLaw {t : ℝ} (ht : 0 ≤ t) (ht1 : t ≤ 1) : Measure Bool :=
+  ProbabilityTheory.bernoulliMeasure true false ⟨t, ht, ht1⟩
+
+instance instIsProbabilityBernoulliLaw {t : ℝ} (ht : 0 ≤ t) (ht1 : t ≤ 1) :
+    IsProbabilityMeasure (bernoulliLaw ht ht1) :=
+  inferInstanceAs
+    (IsProbabilityMeasure (ProbabilityTheory.bernoulliMeasure true false ⟨t, ht, ht1⟩))
+
+/-- The i.i.d. Bernoulli field indexed by the vertices of the tree. -/
+noncomputable def bernoulliField {t : ℝ} (ht : 0 ≤ t) (ht1 : t ≤ 1) : Measure (Word → Bool) :=
+  Measure.infinitePi (fun _ : Word => bernoulliLaw ht ht1)
+
+end TwoValue
+
 /-! ## The constants -/
 
 noncomputable def genCW (T : ℝ≥0∞) : ℝ≥0∞ := 32 * T + 4
@@ -141,7 +277,10 @@ noncomputable def genSmallC (cN cS nA : ℕ) (T : ℝ≥0∞) : ℝ≥0∞ :=
   4 + 3 * genKcC cN cS T
     + (1 + 8 * T) * (12 * (genKcC cN cS T * genXiC cN T)
         + 2 * (((nA : ℝ≥0∞) * genXiC cN T) * ((nA : ℝ≥0∞) * genXiC cN T)))
-    + 160 * (genKcC cN cS T * genKcC cN cS T)
+    + (160 * (genKcC cN cS T * genKcC cN cS T)
+        + 4 * ((T * cS) * (genXiC cN T * genXiC cN T)))
+    + 85 * (genKcC cN cS T + 12 * genXiC cN T
+        + 8 * ((T * cS) * genXiC cN T) + 1)
 
 /-! ## The general matching theorem -/
 
@@ -166,5 +305,44 @@ theorem audit_main_matching_failure_le {V : Type} (Rv : V → V → Prop) (μ : 
           * qE (Tlaw μ ν v0 h) (fullSim (labRel Rv) h) x)
         ≤ genKcC ((2 * N + 3) * 2 ^ (2 * N + 3) * (2 * N + 4)) S.card T
             * etaG (5 / 2) Rv μ := sorry
+
+/-! ## The i.i.d. matching theorem -/
+
+/-- `thm:matching`(1): the leaf bound. -/
+theorem audit_graph_leaf_matching_bound {V : Type u} (μ : PMF V) (G : SimpleGraph V)
+    (h0 : etaGraph μ G ≤ 1 / 256) (h : ℕ) :
+    ∑' x, leafMu μ h x * qE (leafMu μ h) (leafSim (compat G) h) x
+      ≤ (253 / 256) ^ h * etaGraph μ G := sorry
+
+/-- `thm:matching`(2): the full bound. -/
+theorem audit_graph_full_matching_bound {V : Type u} (μ : PMF V) (G : SimpleGraph V)
+    (hη : etaGraph μ G ≤ 1 / 10000) (h : ℕ) :
+    ∑' x, fullMu μ h x * qE (fullMu μ h) (fullSimIid (compat G) h) x
+      ≤ 16 * etaGraph μ G := sorry
+
+/-- `thm:matching`, the infinite tree: the matching automorphism as a root-fixing
+automorphism of the infinite binary tree. -/
+theorem audit_exists_infinite_tree_matching_graphAut {V : Type u} (μ : PMF V)
+    [MeasurableSpace V] [MeasurableSingletonClass V] [Countable V] (R₀ : V → V → Prop)
+    (hrefl : ∀ v, R₀ v v) (hsymm : ∀ a b, R₀ a b → R₀ b a)
+    (hη : PhiIid μ R₀ ≤ 1 / 10000) :
+    ∃ (Ω : Type u) (_ : MeasurableSpace Ω) (P : Measure Ω) (_ : IsProbabilityMeasure P)
+      (X Y : (h : ℕ) → Ω → FullLab V h),
+      (∀ h ω, restrictLab h (X (h + 1) ω) = X h ω) ∧
+      (∀ h ω, restrictLab h (Y (h + 1) ω) = Y h ω) ∧
+      (∀ h, Measurable (fun ω => (X h ω, Y h ω))) ∧
+      (∀ h, P.map (fun ω => (X h ω, Y h ω))
+        = (prodPMF (fullMu μ h) (fullMu μ h)).toMeasure) ∧
+      1 - 16 * PhiIid μ R₀ ≤ P {ω | ∃ g : List Bool ≃ List Bool, IsTreeAut g ∧
+        ∀ s : List Bool, R₀ (coord (g s).length (X (g s).length ω) (g s))
+          (coord s.length (Y s.length ω) s)} := sorry
+
+/-! ## Universality in the two-value family -/
+
+/-- `thm:twovalue`: two independent Galton--Watson trees whose offspring law is
+supported on `{1,2}` are almost surely quasi-isometric. -/
+theorem audit_twovalue_ae_tree_family {t : ℝ} (ht0 : 0 ≤ t) (ht1 : t ≤ 1) :
+    ((bernoulliField ht0 ht1).prod (bernoulliField ht0 ht1))
+      {ω | ¬ ∃ (K : ℕ) (f : Word → Word), IsQIWith K (InTree ω.1) (InTree ω.2) f} = 0 := sorry
 
 end Challenge

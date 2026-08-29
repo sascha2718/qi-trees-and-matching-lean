@@ -36,8 +36,17 @@ lake build ChainClasses.AxCheck
 lake build Challenge Solution
 ```
 
-`ChainClasses/AxCheck.lean` contains the detailed axiom audit. `Challenge.lean`,
-`Solution.lean`, and `comparator-config.json` define the independent headline-theorem audit.
+`ChainClasses/AxCheck.lean` contains the detailed axiom audit.
+
+`Challenge.lean`, `Solution.lean` and `comparator-config.json` define the independent
+headline-theorem audit, run with `./comparator-audit.sh` under
+[comparator](https://github.com/leanprover/comparator). `Challenge.lean` imports Mathlib and
+nothing else: every definition its statements use is restated there, so auditing the claim
+means reading that one file against Mathlib, with none of the four libraries trusted. It
+contains definitions and `sorry`s only. `Solution.lean` is the untrusted side; it repeats those
+definitions and discharges each statement from the libraries. Five theorems are audited: the
+general matching theorem, the three parts of the i.i.d. matching theorem, and universality in
+the two-value family.
 
 ## License
 

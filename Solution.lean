@@ -1,164 +1,415 @@
 /-
-Comparator solution file: the headline theorems of the four libraries,
-restated with the same text as `Challenge.lean` and proved by the library
-declarations.  Comparator checks each statement against `Challenge.lean`,
-audits the axioms of the proofs, and replays them through the kernel.  The
-statement text must stay character-for-character identical to
-`Challenge.lean`.
+Comparator solution file: the headline theorems of `Challenge.lean`, proved.
+
+This file repeats the challenge's definitions verbatim, so that the declarations
+its statements use carry the same names and the same bodies as the challenge's,
+and then discharges each theorem from the libraries. Comparator compares the two
+exported environments declaration by declaration; the challenge is never imported.
 -/
+import GraphMarkovMatching.Closure.Numeric
 import GraphMatching.Graph
 import GraphMatching.Kolmogorov
 import GraphMatching.AutBridge
-import GraphMarkovMatching.Closure.Infinite
-import GraphMarkovMatching.Closure.Numeric
-import GraphMarkovMatching.Composite.Numeric
-import BranchingProcess.Law
-import BranchingProcess.Field
 import ChainClasses.TwoValue
-import ChainClasses.CrossLaw
-import ChainClasses.ThreeRays
-import ChainClasses.ShapeCouplingBuild
-import ChainClasses.ShapePairEta
-import ChainClasses.Classification
-
-/-! ### `GraphMatching`: `thm:matching` of `graph_matching_selfcontained.tex` -/
-
-namespace GraphMatching
-
-open scoped ENNReal Classical
-open MeasureTheory
 
 universe u
 
-/-- `graph_leaf_matching_bound` (`thm:matching`(1)). -/
-theorem audit_graph_leaf_matching_bound {V : Type u} (μ : PMF V) (G : SimpleGraph V)
-    (h0 : etaG μ G ≤ 1 / 256) (h : ℕ) :
-    ∑' x, leafMu μ h x * qE (leafMu μ h) (leafSim (compat G) h) x
-      ≤ (253 / 256) ^ h * etaG μ G :=
-  graph_leaf_matching_bound μ G h0 h
+namespace Challenge
 
-/-- `graph_full_matching_bound` (`thm:matching`(2)). -/
-theorem audit_graph_full_matching_bound {V : Type u} (μ : PMF V) (G : SimpleGraph V)
-    (hη : etaG μ G ≤ 1 / 10000) (h : ℕ) :
-    ∑' x, fullMu μ h x * qE (fullMu μ h) (fullSim (compat G) h) x ≤ 16 * etaG μ G :=
-  graph_full_matching_bound μ G hη h
-
-/-- `exists_infinite_tree_matching` (`thm:matching`, infinite tree, with the two level
-processes consistent under restriction, jointly measurable, and carrying the i.i.d. pair
-law at every height). -/
-theorem audit_exists_infinite_tree_matching {V : Type u} (μ : PMF V) [MeasurableSpace V]
-    [MeasurableSingletonClass V]
-    [Countable V] (R₀ : V → V → Prop) (hrefl : ∀ v, R₀ v v) (hsymm : ∀ a b, R₀ a b → R₀ b a)
-    (hη : Phi μ R₀ ≤ 1 / 10000) :
-    ∃ (Ω : Type u) (_ : MeasurableSpace Ω) (P : Measure Ω) (_ : IsProbabilityMeasure P)
-      (X Y : (h : ℕ) → Ω → FullLab V h),
-      (∀ h ω, restrictLab h (X (h + 1) ω) = X h ω) ∧
-      (∀ h ω, restrictLab h (Y (h + 1) ω) = Y h ω) ∧
-      (∀ h, Measurable (fun ω => (X h ω, Y h ω))) ∧
-      (∀ h, P.map (fun ω => (X h ω, Y h ω))
-        = (prodPMF (fullMu μ h) (fullMu μ h)).toMeasure) ∧
-      1 - 16 * Phi μ R₀ ≤ P {ω | InfMatch R₀ (fun h => X h ω) (fun h => Y h ω)} :=
-  exists_infinite_tree_matching μ R₀ hrefl hsymm hη
-
-
-/-- `exists_infinite_tree_matching_graphAut` (`thm:matching`, infinite tree, the
-automorphism as a root-fixing graph automorphism of the infinite binary tree). -/
-theorem audit_exists_infinite_tree_matching_graphAut {V : Type u} (μ : PMF V)
-    [MeasurableSpace V] [MeasurableSingletonClass V] [Countable V] (R₀ : V → V → Prop)
-    (hrefl : ∀ v, R₀ v v) (hsymm : ∀ a b, R₀ a b → R₀ b a)
-    (hη : Phi μ R₀ ≤ 1 / 10000) :
-    ∃ (Ω : Type u) (_ : MeasurableSpace Ω) (P : Measure Ω) (_ : IsProbabilityMeasure P)
-      (X Y : (h : ℕ) → Ω → FullLab V h),
-      (∀ h ω, restrictLab h (X (h + 1) ω) = X h ω) ∧
-      (∀ h ω, restrictLab h (Y (h + 1) ω) = Y h ω) ∧
-      (∀ h, Measurable (fun ω => (X h ω, Y h ω))) ∧
-      (∀ h, P.map (fun ω => (X h ω, Y h ω))
-        = (prodPMF (fullMu μ h) (fullMu μ h)).toMeasure) ∧
-      1 - 16 * Phi μ R₀ ≤ P {ω | ∃ g : treeGraphInf ≃g treeGraphInf, g [] = [] ∧
-        ∀ s : List Bool, R₀ (coord (g s).length (X (g s).length ω) (g s))
-          (coord s.length (Y s.length ω) s)} :=
-  exists_infinite_tree_matching_graphAut μ R₀ hrefl hsymm hη
-
-end GraphMatching
-
-/-! ### `GraphMarkovMatching`: the engine of `arbitrary_offspring_matching.tex` -/
-
-namespace GraphMarkovMatching
-
-open GraphMarkovMatching.Support
 open scoped ENNReal Classical
 open MeasureTheory
 
-/-- `varyingMatching_infinite` (`thm:konig`, feeding `thm:main-matching`). -/
-theorem audit_varyingMatching_infinite {V : Type} (Rv : V → V → Prop) (μ : PMF V)
-    (ν : PMF ℕ) (v0 : V) {Ω : Type*} [MeasurableSpace Ω]
-    (Pm : Measure Ω) [IsProbabilityMeasure Pm] [Countable V]
-    [MeasurableSpace V] [MeasurableSingletonClass V]
-    (eps : ℝ≥0∞)
-    (hfail : ∀ n, (∑' x, Tlaw μ ν v0 n x
-        * qE (Tlaw μ ν v0 n) (fullSim (labRel Rv) n) x) ≤ eps)
-    (X Y : (n : ℕ) → Ω → FullLab (V × ℕ) n)
-    (hX : ∀ n ω, restrictLab n (X (n + 1) ω) = X n ω)
-    (hY : ∀ n ω, restrictLab n (Y (n + 1) ω) = Y n ω)
-    (hpair : ∀ n, Measurable (fun ω => (X n ω, Y n ω)))
-    (hlaw : ∀ n, Pm.map (fun ω => (X n ω, Y n ω))
-        = (prodPMF (Tlaw μ ν v0 n) (Tlaw μ ν v0 n)).toMeasure) :
-    1 - eps
-      ≤ Pm {ω | InfMatch (labRel Rv)
-          (fun n => X n ω) (fun n => Y n ω)} :=
-  varyingMatching_infinite Rv μ ν v0 Pm eps hfail X Y hX hY hpair hlaw
+/-! ## Shared notions -/
+
+/-- The product of two laws. -/
+noncomputable def prodPMF {X Y : Type*} (μ : PMF X) (ν : PMF Y) : PMF (X × Y) :=
+  μ.bind fun x => ν.map fun y => (x, y)
+
+section Potential
+variable {X : Type*}
+
+/-- The good degree `r(x) = μ{y : x R y}`. -/
+noncomputable def rE (μ : PMF X) (R : X → X → Prop) (x : X) : ℝ≥0∞ :=
+  ∑' y, if R x y then μ y else 0
+
+/-- The bad degree `q(x) = μ{y : ¬ x R y}`. -/
+noncomputable def qE (μ : PMF X) (R : X → X → Prop) (x : X) : ℝ≥0∞ :=
+  ∑' y, if R x y then 0 else μ y
+
+noncomputable def q (μ : PMF X) (R : X → X → Prop) (x : X) : ℝ := (qE μ R x).toReal
+
+/-- The weight `φ_α t = t / (1-t)^α`. -/
+noncomputable def phi (α t : ℝ) : ℝ := t / (1 - t) ^ α
+
+/-- The weight in `ℝ≥0∞`, infinite off `[0,1)`. -/
+noncomputable def phiE (α t : ℝ) : ℝ≥0∞ :=
+  if t < 1 then ENNReal.ofReal (phi α t) else ⊤
+
+/-- The directed potential `Φ_α(μ → ν; R) = ∑_x μ(x) φ_α(q_ν(x))`. -/
+noncomputable def PhiD (α : ℝ) (μ ν : PMF X) (R : X → X → Prop) : ℝ≥0∞ :=
+  ∑' x, μ x * phiE α (q ν R x)
+
+end Potential
+
+/-- The label-graph potential `η_α = Φ_α(μ → μ; R)`. -/
+noncomputable def etaG {V : Type*} (α : ℝ) (Rv : V → V → Prop) (μ : PMF V) : ℝ≥0∞ :=
+  PhiD α μ μ Rv
+
+/-! ## The tree-indexed process -/
+
+section Process
+variable {S : Type*}
+
+/-- Full labellings of the binary tree of height `n`. -/
+def FullLab (S : Type*) : ℕ → Type _
+  | 0 => S
+  | n + 1 => S × (FullLab S n × FullLab S n)
+
+def leaf (s : S) : FullLab S 0 := s
+
+def branch {n : ℕ} (s : S) (p : FullLab S n × FullLab S n) : FullLab S (n + 1) := (s, p.1, p.2)
+
+/-- The law of the height-`n` sample rooted at `s`, for the kernel `P`. -/
+noncomputable def muM (P : S → PMF (S × S)) : S → (n : ℕ) → PMF (FullLab S n)
+  | s, 0 => PMF.pure (leaf s)
+  | s, n + 1 => ((P s).bind fun στ => prodPMF (muM P στ.1 n) (muM P στ.2 n)).map (branch s)
+
+/-- `AutK k m n`: the restricted automorphism group of the height-`n` tree when the
+root sits at swap distance `m`; a swap bit is available exactly at distance `0`. -/
+def AutK (k : ℕ) : ℕ → ℕ → Type
+  | _, 0 => Unit
+  | 0, n + 1 => Bool × AutK k (k - 1) n × AutK k (k - 1) n
+  | m + 1, n + 1 => AutK k m n × AutK k m n
+
+def fullMatchesK (R₀ : S → S → Prop) (k : ℕ) :
+    (m : ℕ) → (n : ℕ) → AutK k m n → FullLab S n → FullLab S n → Prop
+  | _, 0, _, x, y => R₀ x y
+  | 0, n + 1, π, x, y =>
+      R₀ x.1 y.1
+        ∧ fullMatchesK R₀ k (k - 1) n π.2.1 x.2.1 (bif π.1 then y.2.2 else y.2.1)
+        ∧ fullMatchesK R₀ k (k - 1) n π.2.2 x.2.2 (bif π.1 then y.2.1 else y.2.2)
+  | m + 1, n + 1, π, x, y =>
+      R₀ x.1 y.1
+        ∧ fullMatchesK R₀ k m n π.1 x.2.1 y.2.1
+        ∧ fullMatchesK R₀ k m n π.2 x.2.2 y.2.2
+
+def fullSimK (R₀ : S → S → Prop) (k m n : ℕ) (x y : FullLab S n) : Prop :=
+  ∃ π : AutK k m n, fullMatchesK R₀ k m n π x y
+
+/-- Matching of two height-`n` labellings by an automorphism of the tree. -/
+def fullSim (R₀ : S → S → Prop) (n : ℕ) : FullLab S n → FullLab S n → Prop :=
+  fullSimK R₀ 1 0 n
+
+end Process
+
+section VaryingCounter
+variable {V : Type} (μ : PMF V) (ν : PMF ℕ) (v0 : V)
+
+/-- Two labels are compatible when their states are. -/
+def labRel {V : Type*} (Rv : V → V → Prop) : V × ℕ → V × ℕ → Prop := fun s t => Rv s.1 t.1
+
+/-- The fresh law `Q = μ ⊗ ν`. -/
+noncomputable def freshQ : PMF (V × ℕ) := prodPMF μ ν
+
+/-- The varying-counter kernel: a counter of at least `4` halves, a counter of `3`
+forces one child and frees the other, and a smaller counter refreshes both. -/
+noncomputable def varyK : V × ℕ → PMF ((V × ℕ) × (V × ℕ)) := fun s =>
+  if 4 ≤ s.2 then PMF.pure ((v0, s.2 / 2), (v0, s.2 - s.2 / 2))
+  else if s.2 = 3 then (freshQ μ ν).map fun f => ((v0, 2), f)
+  else prodPMF (freshQ μ ν) (freshQ μ ν)
+
+/-- The height-`h` law of the process rooted at a fresh sample. -/
+noncomputable def Tlaw (h : ℕ) : PMF (FullLab (V × ℕ) h) :=
+  (freshQ μ ν).bind fun s => muM (varyK μ ν v0) s h
+
+end VaryingCounter
+
+/-! ## The i.i.d. label field on the binary tree -/
+
+section Iid
+variable {V : Type*}
+
+/-- Leaf labellings of the binary tree of height `h`. -/
+def Leaf (V : Type*) : ℕ → Type _
+  | 0 => V
+  | h + 1 => Leaf V h × Leaf V h
+
+/-- `Aut(𝔹_h)` as the swap group: a swap bit and the two subtree automorphisms. -/
+def Aut : ℕ → Type
+  | 0 => Unit
+  | h + 1 => Bool × Aut h × Aut h
+
+def matchesA (R₀ : V → V → Prop) : (h : ℕ) → Aut h → Leaf V h → Leaf V h → Prop
+  | 0, _, x, y => R₀ x y
+  | h + 1, π, x, y =>
+      matchesA R₀ h π.2.1 x.1 (bif π.1 then y.2 else y.1)
+        ∧ matchesA R₀ h π.2.2 x.2 (bif π.1 then y.1 else y.2)
+
+/-- Two leaf labellings are matched by some automorphism of the tree. -/
+def leafSim (R₀ : V → V → Prop) (h : ℕ) (x y : Leaf V h) : Prop :=
+  ∃ π : Aut h, matchesA R₀ h π x y
+
+def fullMatchesA (R₀ : V → V → Prop) : (h : ℕ) → Aut h → FullLab V h → FullLab V h → Prop
+  | 0, _, x, y => R₀ x y
+  | h + 1, π, x, y =>
+      R₀ x.1 y.1
+        ∧ fullMatchesA R₀ h π.2.1 x.2.1 (bif π.1 then y.2.2 else y.2.1)
+        ∧ fullMatchesA R₀ h π.2.2 x.2.2 (bif π.1 then y.2.1 else y.2.2)
+
+/-- Two full labellings are matched at every vertex by some automorphism. -/
+def fullSimIid (R₀ : V → V → Prop) (h : ℕ) (x y : FullLab V h) : Prop :=
+  ∃ π : Aut h, fullMatchesA R₀ h π x y
+
+/-- The i.i.d. leaf law. -/
+noncomputable def leafMu (μ : PMF V) : (h : ℕ) → PMF (Leaf V h)
+  | 0 => μ
+  | h + 1 => prodPMF (leafMu μ h) (leafMu μ h)
+
+/-- The i.i.d. full law. -/
+noncomputable def fullMu (μ : PMF V) : (h : ℕ) → PMF (FullLab V h)
+  | 0 => μ
+  | h + 1 => prodPMF μ (prodPMF (fullMu μ h) (fullMu μ h))
+
+/-- The one-site potential `Φ(R,μ) = 𝔼 φ_{5/2}(q(X))`. -/
+noncomputable def PhiIid (μ : PMF V) (R : V → V → Prop) : ℝ≥0∞ :=
+  ∑' x, μ x * ENNReal.ofReal (phi (5 / 2) (q μ R x))
+
+/-- Compatibility in a label graph: `d_G(v,w) ≤ 1`. -/
+def compat (G : SimpleGraph V) (v w : V) : Prop := v = w ∨ G.Adj v w
+
+/-- The compatible mass `b(v) = μ(B_G(v,1))`. -/
+noncomputable def gdeg (μ : PMF V) (G : SimpleGraph V) (v : V) : ℝ :=
+  (rE μ (compat G) v).toReal
+
+/-- The graph potential `η_{G,5/2}(μ) = ∑_v μ(v) (1-b(v))/b(v)^{5/2}`. -/
+noncomputable def etaGraph (μ : PMF V) (G : SimpleGraph V) : ℝ≥0∞ :=
+  ∑' v, μ v * ENNReal.ofReal ((1 - gdeg μ G v) / gdeg μ G v ^ (5 / 2 : ℝ))
+
+/-- Restriction of a height-`h+1` labelling to height `h`. -/
+def restrictLab : (h : ℕ) → FullLab V (h + 1) → FullLab V h
+  | 0, x => x.1
+  | h + 1, x => (x.1, restrictLab h x.2.1, restrictLab h x.2.2)
+
+/-- The label at the vertex addressed by a word. -/
+def coord : (h : ℕ) → FullLab V h → List Bool → V
+  | 0, x, _ => x
+  | _ + 1, x, [] => x.1
+  | h + 1, x, false :: t => coord h x.2.1 t
+  | h + 1, x, true :: t => coord h x.2.2 t
+
+/-- Adjacency in the infinite rooted binary tree, on words. -/
+def treeAdj (s t : List Bool) : Prop := (∃ c, t = s ++ [c]) ∨ (∃ c, s = t ++ [c])
+
+/-- A root-fixing automorphism of the infinite binary tree. -/
+def IsTreeAut (g : List Bool ≃ List Bool) : Prop :=
+  g [] = [] ∧ ∀ s t, treeAdj s t ↔ treeAdj (g s) (g t)
+
+/-- Full labellings carry the product measurable structure. -/
+instance instMeasurableFullLab {V : Type*} [MeasurableSpace V] :
+    (h : ℕ) → MeasurableSpace (FullLab V h)
+  | 0 => ‹MeasurableSpace V›
+  | h + 1 =>
+      let inst := instMeasurableFullLab (V := V) h
+      @Prod.instMeasurableSpace V (FullLab V h × FullLab V h) _
+        (@Prod.instMeasurableSpace (FullLab V h) (FullLab V h) inst inst)
+
+end Iid
+
+/-! ## The two-value family -/
+
+section TwoValue
+
+/-- Vertices of the binary tree, as words over `Bool`. -/
+abbrev Word : Type := List Bool
+
+/-- The common prefix of two words. -/
+def wedge : Word → Word → Word
+  | [], _ => []
+  | _, [] => []
+  | a :: x, b :: y => if a = b then a :: wedge x y else []
+
+/-- The tree distance: `|x| + |y| - 2|x ∧ y|`. -/
+def treeDist (x y : Word) : ℕ := x.length + y.length - 2 * (wedge x y).length
+
+/-- The sample tree of the offspring field `χ`: the root, one child `v·1` always,
+and a second child `v·2` exactly when `χ v = true`. -/
+inductive InTree (χ : Word → Bool) : Word → Prop
+  | root : InTree χ []
+  | one {v : Word} : InTree χ v → InTree χ (v ++ [false])
+  | two {v : Word} : InTree χ v → χ v = true → InTree χ (v ++ [true])
+
+/-- A `K`-quasi-isometry between two subtrees. -/
+structure IsQIWith (K : ℕ) (T T' : Word → Prop) (f : Word → Word) : Prop where
+  maps : ∀ x, T x → T' (f x)
+  upper : ∀ x y, T x → T y → treeDist (f x) (f y) ≤ K * treeDist x y + K
+  lower : ∀ x y, T x → T y → treeDist x y ≤ K * treeDist (f x) (f y) + K * K
+  dense : ∀ y', T' y' → ∃ x, T x ∧ treeDist (f x) y' ≤ K
+
+/-- The Bernoulli law on `Bool` with success probability `t`. -/
+noncomputable def bernoulliLaw {t : ℝ} (ht : 0 ≤ t) (ht1 : t ≤ 1) : Measure Bool :=
+  ProbabilityTheory.bernoulliMeasure true false ⟨t, ht, ht1⟩
+
+instance instIsProbabilityBernoulliLaw {t : ℝ} (ht : 0 ≤ t) (ht1 : t ≤ 1) :
+    IsProbabilityMeasure (bernoulliLaw ht ht1) :=
+  inferInstanceAs
+    (IsProbabilityMeasure (ProbabilityTheory.bernoulliMeasure true false ⟨t, ht, ht1⟩))
+
+/-- The i.i.d. Bernoulli field indexed by the vertices of the tree. -/
+noncomputable def bernoulliField {t : ℝ} (ht : 0 ≤ t) (ht1 : t ≤ 1) : Measure (Word → Bool) :=
+  Measure.infinitePi (fun _ : Word => bernoulliLaw ht ht1)
+
+end TwoValue
+
+/-! ## The constants -/
+
+noncomputable def genCW (T : ℝ≥0∞) : ℝ≥0∞ := 32 * T + 4
+
+noncomputable def genGeomC (cN : ℕ) (T : ℝ≥0∞) : ℝ≥0∞ :=
+  ((cN : ℝ≥0∞) + 1) * (genCW T * cN) ^ cN
+
+noncomputable def genUC (T : ℝ≥0∞) : ℝ≥0∞ := 16 * T + 4
+
+noncomputable def genXiC (cN : ℕ) (T : ℝ≥0∞) : ℝ≥0∞ := genGeomC cN T * genUC T
+
+noncomputable def genKcC (cN cS : ℕ) (T : ℝ≥0∞) : ℝ≥0∞ :=
+  120 + (72 + 48 * (T * cS)) * genXiC cN T
+
+noncomputable def genSmallC (cN cS nA : ℕ) (T : ℝ≥0∞) : ℝ≥0∞ :=
+  4 + 3 * genKcC cN cS T
+    + (1 + 8 * T) * (12 * (genKcC cN cS T * genXiC cN T)
+        + 2 * (((nA : ℝ≥0∞) * genXiC cN T) * ((nA : ℝ≥0∞) * genXiC cN T)))
+    + (160 * (genKcC cN cS T * genKcC cN cS T)
+        + 4 * ((T * cS) * (genXiC cN T * genXiC cN T)))
+    + 85 * (genKcC cN cS T + 12 * genXiC cN T
+        + 8 * ((T * cS) * genXiC cN T) + 1)
+
+/-! ## Bridge to the library -/
+
+/-- The challenge's product law is the library's. -/
+lemma prodPMF_eq {X Y : Type*} (μ : PMF X) (ν : PMF Y) :
+    prodPMF μ ν = GraphMarkovMatching.Support.prodPMF μ ν := by
+  ext p
+  show (μ.bind fun x => ν.map fun y => (x, y)) p = μ p.1 * ν p.2
+  rw [PMF.bind_apply, tsum_eq_single p.1]
+  · rw [PMF.map_apply, tsum_eq_single p.2]
+    · simp
+    · intro b hb
+      exact if_neg (by simp [Prod.ext_iff, Ne.symm hb])
+  · intro a ha
+    rw [PMF.map_apply]
+    refine mul_eq_zero_of_right _ ?_
+    refine (tsum_congr fun y => ?_).trans tsum_zero
+    exact if_neg (by simp [Prod.ext_iff]; intro h; exact absurd h.symm ha)
 
 
-/-- `varying_matching_le_traj` (`thm:main-matching`, `eq:main-bound-infinite`, on the
-constructed product of two trajectory measures). -/
-theorem audit_varying_matching_le_traj {V : Type} (Rv : V → V → Prop) (μ : PMF V) (v0 : V)
-    [Countable V] [MeasurableSpace V] [MeasurableSingletonClass V]
+/-- The challenge's labelling type is the library's, coordinatewise. -/
+def toLib (S : Type u) : (n : ℕ) → FullLab S n ≃ GraphMarkovMatching.Support.FullLab S n
+  | 0 => Equiv.refl S
+  | n + 1 => Equiv.prodCongr (Equiv.refl S) (Equiv.prodCongr (toLib S n) (toLib S n))
+
+/-- The challenge's automorphism group is the library's. -/
+def autToLib (k : ℕ) : (m n : ℕ) → AutK k m n ≃ GraphMarkovMatching.Support.AutK k m n
+  | _, 0 => Equiv.refl Unit
+  | 0, n + 1 => Equiv.prodCongr (Equiv.refl Bool)
+      (Equiv.prodCongr (autToLib k (k - 1) n) (autToLib k (k - 1) n))
+  | m + 1, n + 1 => Equiv.prodCongr (autToLib k m n) (autToLib k m n)
+
+@[simp] lemma toLib_succ_apply (S : Type u) (n : ℕ) (a : S) (l r : FullLab S n) :
+    toLib S (n + 1) (a, l, r) = (a, toLib S n l, toLib S n r) := rfl
+
+@[simp] lemma autToLib_zero_succ_apply (k n : ℕ) (b : Bool) (l r : AutK k (k - 1) n) :
+    autToLib k 0 (n + 1) (b, l, r) = (b, autToLib k (k - 1) n l, autToLib k (k - 1) n r) := rfl
+
+@[simp] lemma autToLib_succ_succ_apply (k m n : ℕ) (l r : AutK k m n) :
+    autToLib k (m + 1) (n + 1) (l, r) = (autToLib k m n l, autToLib k m n r) := rfl
+
+open GraphMarkovMatching in
+/-- Matching under an automorphism transports along the two equivalences. -/
+lemma fullMatchesK_iff {S : Type u} (R : S → S → Prop) (k : ℕ) :
+    ∀ (m n : ℕ) (π : AutK k m n) (x y : FullLab S n),
+      fullMatchesK R k m n π x y ↔
+        Support.fullMatchesK R k m n (autToLib k m n π) (toLib S n x) (toLib S n y)
+  | _, 0, _, _, _ => Iff.rfl
+  | 0, n + 1, π, x, y => by
+      obtain ⟨b, πl, πr⟩ := π
+      obtain ⟨xr, xl, xrr⟩ := x
+      obtain ⟨yr, yl, yrr⟩ := y
+      cases b <;>
+        simp [fullMatchesK, Support.fullMatchesK, fullMatchesK_iff R k (k - 1) n]
+  | m + 1, n + 1, π, x, y => by
+      obtain ⟨πl, πr⟩ := π
+      obtain ⟨xr, xl, xrr⟩ := x
+      obtain ⟨yr, yl, yrr⟩ := y
+      simp [fullMatchesK, Support.fullMatchesK, fullMatchesK_iff R k m n]
+
+/-- The challenge's matching relation is the library's, along `toLib`. -/
+lemma fullSim_iff {S : Type u} (R : S → S → Prop) (n : ℕ) (x y : FullLab S n) :
+    fullSim R n x y ↔ GraphMarkovMatching.fullSim R n (toLib S n x) (toLib S n y) := by
+  constructor
+  · rintro ⟨π, hπ⟩
+    exact ⟨autToLib 1 0 n π, (fullMatchesK_iff R 1 0 n π x y).1 hπ⟩
+  · rintro ⟨σ, hσ⟩
+    refine ⟨(autToLib 1 0 n).symm σ, ?_⟩
+    rw [fullMatchesK_iff R 1 0 n]
+    simpa using hσ
+
+
+/-- Mapping a product law coordinatewise. -/
+lemma map_prodPMF {X Y X' Y' : Type*} (μ : PMF X) (ν : PMF Y) (f : X → X') (g : Y → Y') :
+    (prodPMF μ ν).map (Prod.map f g) = prodPMF (μ.map f) (ν.map g) := by
+  simp [prodPMF, PMF.map_bind, PMF.bind_map, PMF.map_comp, Function.comp_def]
+
+/-- The challenge's process law is the library's, along `toLib`. -/
+lemma muM_eq {S : Type u} (P : S → PMF (S × S)) (s : S) :
+    ∀ n, (muM P s n).map (toLib S n) = GraphMarkovMatching.muM P s n
+  | 0 => by
+      simp only [muM, GraphMarkovMatching.muM, PMF.pure_map]
+      rfl
+  | n + 1 => by
+      have hl : ∀ t : S, (muM P t n).map (toLib S n) = GraphMarkovMatching.muM P t n :=
+        fun t => muM_eq P t n
+      simp only [muM, GraphMarkovMatching.muM, PMF.map_bind, PMF.map_comp, Function.comp_def]
+      congr 1
+      funext στ
+      rw [show (fun p : FullLab S n × FullLab S n => toLib S (n + 1) (branch s p))
+            = (fun p => GraphMarkovMatching.branch s p) ∘ Prod.map (toLib S n) (toLib S n) from rfl,
+        ← PMF.map_comp, map_prodPMF, hl στ.1, hl στ.2, prodPMF_eq]
+
+/-- The challenge's varying-counter kernel is the library's. -/
+lemma varyK_eq {V : Type} (μ : PMF V) (ν : PMF ℕ) (v0 : V) :
+    varyK μ ν v0 = GraphMarkovMatching.varyK μ ν v0 := by
+  funext s
+  simp only [varyK, GraphMarkovMatching.varyK,
+    show freshQ μ ν = GraphMarkovMatching.freshQ μ ν from prodPMF_eq μ ν, prodPMF_eq]
+
+/-- The challenge's fresh-rooted law is the library's, along `toLib`. -/
+lemma Tlaw_eq {V : Type} (μ : PMF V) (ν : PMF ℕ) (v0 : V) (h : ℕ) :
+    (Tlaw μ ν v0 h).map (toLib (V × ℕ) h) = GraphMarkovMatching.Tlaw μ ν v0 h := by
+  simp only [Tlaw, GraphMarkovMatching.Tlaw, PMF.map_bind]
+  rw [show freshQ μ ν = GraphMarkovMatching.freshQ μ ν from prodPMF_eq μ ν]
+  congr 1
+  funext s
+  rw [muM_eq, varyK_eq]
+
+/-- The pointwise form: the equivalence carries the mass across. -/
+lemma Tlaw_apply {V : Type} (μ : PMF V) (ν : PMF ℕ) (v0 : V) (h : ℕ)
+    (x : FullLab (V × ℕ) h) :
+    Tlaw μ ν v0 h x = GraphMarkovMatching.Tlaw μ ν v0 h (toLib (V × ℕ) h x) := by
+  conv_rhs => rw [← Tlaw_eq μ ν v0 h]
+  rw [PMF.map_apply, tsum_eq_single x]
+  · simp
+  · intro b hb
+    exact if_neg fun hh => hb ((toLib (V × ℕ) h).injective hh.symm)
+
+/-- The potential and the constants are literally the library's. -/
+lemma etaG_eq : @etaG = @GraphMarkovMatching.etaG := rfl
+lemma genKcC_eq : @genKcC = @GraphMarkovMatching.genKcC := rfl
+lemma genSmallC_eq : @genSmallC = @GraphMarkovMatching.genSmallC := rfl
+
+/-! ## The general matching theorem -/
+
+theorem audit_main_matching_failure_le {V : Type} (Rv : V → V → Prop) (μ : PMF V) (v0 : V)
     (ν : PMF ℕ) (N : ℕ) (S : Finset ℕ)
-    (hrefl : ∀ v, Rv v v) (hsymm : ∀ a b, Rv a b → Rv b a)
-    (hhalf : 2⁻¹ ≤ μ v0)
-    (hN : 2 ≤ N) (hS : ∀ k ∈ S, k ≤ N) (hSne : S.Nonempty)
-    (hSsupp : ∀ i : ℕ, (ν i : ℝ≥0∞) ≠ 0 ↔ i ∈ S)
-    (T : ℝ≥0∞)
-    (hT : (∑' i, if (ν i : ℝ≥0∞) = 0 then 0
-        else (ν i : ℝ≥0∞) ^ (-(5 / 2 : ℝ))) ≤ T)
-    (cN nA : ℕ) (hcN : (scrIndex N S).card ≤ cN)
-    (hnA : (tgtUniv N).card ≤ nA)
-    (hsmall : genSmallC cN S.card nA T * etaG (5 / 2) Rv μ ≤ 1) :
-    1 - genKcC cN S.card T * etaG (5 / 2) Rv μ
-      ≤ TlawPair μ ν v0 {ω | InfMatch (labRel Rv)
-          (fun n => consLab n ω.1) (fun n => consLab n ω.2)} :=
-  varying_matching_le_traj Rv μ v0 ν N S hrefl hsymm hhalf hN hS hSne hSsupp
-    T hT cN nA hcN hnA hsmall
-
-
-/-- `varying_failure_le` with `genKcC_le_third` (`thm:main-matching`, `eq:main-bound` at
-every finite height, uniformly in the height, with the `1/3` barrier giving the `2/3`
-clause). -/
-theorem audit_varying_failure_le {V : Type} (Rv : V → V → Prop) (μ : PMF V) (v0 : V)
-    (ν : PMF ℕ) (N : ℕ) (S : Finset ℕ)
-    (hrefl : ∀ v, Rv v v) (hsymm : ∀ a b, Rv a b → Rv b a)
-    (hhalf : 2⁻¹ ≤ μ v0)
-    (hN : 2 ≤ N) (hS : ∀ k ∈ S, k ≤ N) (hSne : S.Nonempty)
-    (hSsupp : ∀ i : ℕ, (ν i : ℝ≥0∞) ≠ 0 ↔ i ∈ S)
-    (T : ℝ≥0∞)
-    (hT : (∑' i, if (ν i : ℝ≥0∞) = 0 then 0
-        else (ν i : ℝ≥0∞) ^ (-(5 / 2 : ℝ))) ≤ T)
-    (cN nA : ℕ) (hcN : (scrIndex N S).card ≤ cN)
-    (hnA : (tgtUniv N).card ≤ nA)
-    (hsmall : genSmallC cN S.card nA T * etaG (5 / 2) Rv μ ≤ 1) :
-    genKcC cN S.card T * etaG (5 / 2) Rv μ ≤ 3⁻¹
-      ∧ ∀ h, (∑' x, Tlaw μ ν v0 h x
-          * qE (Tlaw μ ν v0 h) (fullSim (labRel Rv) h) x)
-        ≤ genKcC cN S.card T * etaG (5 / 2) Rv μ :=
-  ⟨genKcC_le_third cN S.card nA T (etaG (5 / 2) Rv μ) hsmall,
-    varying_failure_le Rv μ v0 ν N S hrefl hsymm hhalf hN hS hSne hSsupp
-      T hT cN nA hcN hnA hsmall⟩
-
-
-/-- `main_matching_failure_le` (`thm:main-matching` at the constants of
-`eq:card-constants` and `eq:K-eps`, with the threshold in the form `η ≤ ε_ν`). -/
-theorem audit_main_matching_failure_le {V : Type} (Rv : V → V → Prop) (μ : PMF V)
-    (v0 : V) (ν : PMF ℕ) (N : ℕ) (S : Finset ℕ)
     (hrefl : ∀ v, Rv v v) (hsymm : ∀ a b, Rv a b → Rv b a)
     (hhalf : 2⁻¹ ≤ μ v0)
     (hN : 2 ≤ N) (hS : ∀ k ∈ S, k ≤ N) (hSne : S.Nonempty)
@@ -174,545 +425,312 @@ theorem audit_main_matching_failure_le {V : Type} (Rv : V → V → Prop) (μ : 
       ∧ ∀ h, (∑' x, Tlaw μ ν v0 h x
           * qE (Tlaw μ ν v0 h) (fullSim (labRel Rv) h) x)
         ≤ genKcC ((2 * N + 3) * 2 ^ (2 * N + 3) * (2 * N + 4)) S.card T
-            * etaG (5 / 2) Rv μ :=
-  main_matching_failure_le Rv μ v0 ν N S hrefl hsymm hhalf hN hS hSne hSsupp T hT heta
+            * etaG (5 / 2) Rv μ := by
+  rw [etaG_eq, genSmallC_eq] at heta
+  rw [etaG_eq, genKcC_eq]
+  obtain ⟨h1, h2⟩ := GraphMarkovMatching.main_matching_failure_le (Rv := Rv) (μ := μ) (v0 := v0)
+    ν N S hrefl hsymm hhalf hN hS hSne hSsupp T hT heta
+  refine ⟨h1, fun h => ?_⟩
+  refine le_of_eq_of_le ?_ (h2 h)
+  rw [← (toLib (V × ℕ) h).tsum_eq]
+  refine tsum_congr fun x => ?_
+  rw [Tlaw_apply μ ν v0 h x]
+  congr 1
+  rw [qE, GraphMarkovMatching.Support.qE, ← (toLib (V × ℕ) h).tsum_eq]
+  refine tsum_congr fun y => ?_
+  rw [Tlaw_apply μ ν v0 h y, fullSim_iff]
+  rfl
 
 
-/-- `main_matching_le_traj` (`thm:main-matching`, `eq:main-bound-infinite` at
-`eq:card-constants` and `eq:K-eps`, on the constructed trajectory space). -/
-theorem audit_main_matching_le_traj {V : Type} (Rv : V → V → Prop) (μ : PMF V) (v0 : V)
-    [Countable V] [MeasurableSpace V] [MeasurableSingletonClass V]
-    (ν : PMF ℕ) (N : ℕ) (S : Finset ℕ)
-    (hrefl : ∀ v, Rv v v) (hsymm : ∀ a b, Rv a b → Rv b a)
-    (hhalf : 2⁻¹ ≤ μ v0)
-    (hN : 2 ≤ N) (hS : ∀ k ∈ S, k ≤ N) (hSne : S.Nonempty)
-    (hSsupp : ∀ i : ℕ, (ν i : ℝ≥0∞) ≠ 0 ↔ i ∈ S)
-    (T : ℝ≥0∞)
-    (hT : (∑' i, if (ν i : ℝ≥0∞) = 0 then 0
-        else (ν i : ℝ≥0∞) ^ (-(5 / 2 : ℝ))) ≤ T)
-    (heta : etaG (5 / 2) Rv μ
-      ≤ (genSmallC ((2 * N + 3) * 2 ^ (2 * N + 3) * (2 * N + 4)) S.card
-          (2 * N + 3) T)⁻¹) :
-    1 - genKcC ((2 * N + 3) * 2 ^ (2 * N + 3) * (2 * N + 4)) S.card T
-        * etaG (5 / 2) Rv μ
-      ≤ TlawPair μ ν v0 {ω | InfMatch (labRel Rv)
-          (fun n => consLab n ω.1) (fun n => consLab n ω.2)} :=
-  main_matching_le_traj Rv μ v0 ν N S hrefl hsymm hhalf hN hS hSne hSsupp T hT heta
 
-namespace Composite
+/-! ## Bridge for the i.i.d. block -/
 
-private lemma audit_mu0_ne_zero {V : Type} (μ : PMF V) (v0 : V)
-    (hhalf : 2⁻¹ ≤ μ v0) : μ v0 ≠ 0 :=
-  ne_of_gt (lt_of_lt_of_le (by norm_num) hhalf)
+/-- The challenge's leaf type is the library's. -/
+def leafToLib (S : Type u) : (n : ℕ) → Leaf S n ≃ GraphMatching.Leaf S n
+  | 0 => Equiv.refl S
+  | n + 1 => Equiv.prodCongr (leafToLib S n) (leafToLib S n)
 
-/-- `composite_matching_bound_massfree_no_exceptions` (`thm:composite-matching`
-at empty exceptional charts, the one-law specialisation of `thm:main-matching`). -/
-theorem audit_composite_matching_bound_massfree_no_exceptions
-    {V : Type} (Rv : V → V → Prop) (μ : PMF V) (v0 : V)
-    {Omega : Type*}
-    [Countable V] [MeasurableSpace V] [MeasurableSingletonClass V]
-    [MeasurableSpace Omega] (Pm : Measure Omega)
-    [IsProbabilityMeasure Pm]
-    (hRv : ∀ v, Rv v v) (hsymm : ∀ a b, Rv a b → Rv b a)
-    (hhalf : 2⁻¹ ≤ μ v0)
-    (ν : PMF ℕ) (K : Finset ℕ)
-    (hsup : ∀ k, (ν k : ℝ≥0∞) ≠ 0 ↔ k ∈ K)
-    (heta : etaG (5 / 2) Rv μ
-      ≤ compEtaStarM (fun _ => none) (fun _ => none) ν ν K K
-          (K.sup id))
-    (Xs Ys : (n : ℕ) → Omega → FullLab (CState V) n)
-    (hXs : ∀ n omega, restrictLab n (Xs (n + 1) omega) = Xs n omega)
-    (hYs : ∀ n omega, restrictLab n (Ys (n + 1) omega) = Ys n omega)
-    (hpairM : ∀ n, Measurable (fun omega => (Xs n omega, Ys n omega)))
-    (hlaw : ∀ n, Pm.map (fun omega => (Xs n omega, Ys n omega)) =
-      (prodPMF (cT (fun _ => none) μ ν v0 n)
-        (cT (fun _ => none) μ ν v0 n)).toMeasure) :
-    compKcFinalM (fun _ => none) (fun _ => none) ν ν K K (K.sup id)
-        * etaG (5 / 2) Rv μ ≤ 2⁻¹
-      ∧ 1 - compKcFinalM (fun _ => none) (fun _ => none) ν ν K K
-            (K.sup id) * etaG (5 / 2) Rv μ
-        ≤ Pm {omega | InfMatch (cRel Rv)
-            (fun n => Xs n omega) (fun n => Ys n omega)} :=
-  composite_matching_bound_massfree_no_exceptions Rv μ v0 Pm hRv hsymm
-    (audit_mu0_ne_zero μ v0 hhalf) hhalf ν K hsup heta Xs Ys hXs hYs hpairM hlaw
+/-- The challenge's full-labelling type is the i.i.d. library's. -/
+def fullToLib (S : Type u) : (n : ℕ) → FullLab S n ≃ GraphMatching.FullLab S n
+  | 0 => Equiv.refl S
+  | n + 1 => Equiv.prodCongr (Equiv.refl S) (Equiv.prodCongr (fullToLib S n) (fullToLib S n))
 
-/-- `composite_matching_bound_massfree_traj` (`thm:composite-matching`,
-`eq:composite-bound-infinite`, on the constructed product of two trajectory measures). -/
-theorem audit_composite_matching_bound_massfree_traj
-    {V : Type} (Rv : V → V → Prop) (μ : PMF V) (v0 : V)
-    (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ)
-    (K1 K2 S : Finset ℕ) (E1 E2 : Finset (ℕ × ℕ)) (N : ℕ)
-    [Countable V] [MeasurableSpace V] [MeasurableSingletonClass V]
-    (hRv : ∀ v, Rv v v) (hsymm : ∀ a b, Rv a b → Rv b a)
-    (hhalf : 2⁻¹ ≤ μ v0)
-    (hN : ∀ j, j ≤ N → exc1 j = none ∧ exc2 j = none)
-    (hdeclN1 : ∀ k p, exc1 k = some p →
-      p.1 ≤ N ∧ p.2 ≤ N ∧ ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0)
-    (hcharged1 : ∀ k, ν1 k ≠ 0 → exc1 k = none → k ≤ N ∧ ν2 k ≠ 0)
-    (hdeclN2 : ∀ k p, exc2 k = some p →
-      p.1 ≤ N ∧ p.2 ≤ N ∧ ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
-    (hcharged2 : ∀ k, ν2 k ≠ 0 → exc2 k = none → k ≤ N ∧ ν1 k ≠ 0)
-    (hpair1 : ∀ k p, exc1 k = some p → ∀ j, j ≤ p.1 → exc1 j = none)
-    (hpair2 : ∀ k p, exc2 k = some p → ∀ j, j ≤ p.1 → exc2 j = none)
-    (hdecl1 : ∀ k p, exc1 k = some p → ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
-    (hdecl2 : ∀ k p, exc2 k = some p → ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0)
-    (hsup1 : ∀ k, (ν1 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K1)
-    (hsup2 : ∀ k, (ν2 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K2)
-    (hS1 : ∀ k, k ∈ S ↔ ((ν1 k : ℝ≥0∞) ≠ 0 ∧ exc1 k = none))
-    (hSne : S.Nonempty)
-    (hEg1 : ∀ p, p ∈ E1 ↔ ∃ z, (ν1 z : ℝ≥0∞) ≠ 0 ∧ exc1 z = some p)
-    (hEg2 : ∀ p, p ∈ E2 ↔ ∃ z, (ν2 z : ℝ≥0∞) ≠ 0 ∧ exc2 z = some p)
-    (heta : etaG (5 / 2) Rv μ
-      ≤ compEtaStarM exc1 exc2 ν1 ν2 K1 K2 N) :
-    compKcFinalM exc1 exc2 ν1 ν2 K1 K2 N * etaG (5 / 2) Rv μ ≤ 2⁻¹
-      ∧ 1 - compKcFinalM exc1 exc2 ν1 ν2 K1 K2 N * etaG (5 / 2) Rv μ
-        ≤ cTPair μ v0 exc1 exc2 ν1 ν2 {omega | InfMatch (cRel Rv)
-            (fun n => consLab n omega.1) (fun n => consLab n omega.2)} :=
-  composite_matching_bound_massfree_traj Rv μ v0 exc1 exc2 ν1 ν2 K1 K2 S E1 E2 N
-    hRv hsymm (audit_mu0_ne_zero μ v0 hhalf) hhalf hN hdeclN1 hcharged1 hdeclN2
-    hcharged2 hpair1 hpair2
-    hdecl1 hdecl2 hsup1 hsup2 hS1 hSne hEg1 hEg2 heta
+/-- The challenge's swap group is the library's. -/
+def autToLibIid : (n : ℕ) → Aut n ≃ GraphMatching.Aut n
+  | 0 => Equiv.refl Unit
+  | n + 1 => Equiv.prodCongr (Equiv.refl Bool)
+      (Equiv.prodCongr (autToLibIid n) (autToLibIid n))
 
-/-- `composite_matching_bound_massfree_no_exceptions_traj` (`thm:main-matching` as a
-special case of `thm:composite-matching`, on the constructed product of two trajectory
-measures). -/
-theorem audit_composite_matching_bound_massfree_no_exceptions_traj
-    {V : Type} (Rv : V → V → Prop) (μ : PMF V) (v0 : V)
-    [Countable V] [MeasurableSpace V] [MeasurableSingletonClass V]
-    (hRv : ∀ v, Rv v v) (hsymm : ∀ a b, Rv a b → Rv b a)
-    (hhalf : 2⁻¹ ≤ μ v0)
-    (ν : PMF ℕ) (K : Finset ℕ)
-    (hsup : ∀ k, (ν k : ℝ≥0∞) ≠ 0 ↔ k ∈ K)
-    (heta : etaG (5 / 2) Rv μ
-      ≤ compEtaStarM (fun _ => none) (fun _ => none) ν ν K K
-          (K.sup id)) :
-    compKcFinalM (fun _ => none) (fun _ => none) ν ν K K (K.sup id)
-        * etaG (5 / 2) Rv μ ≤ 2⁻¹
-      ∧ 1 - compKcFinalM (fun _ => none) (fun _ => none) ν ν K K
-            (K.sup id) * etaG (5 / 2) Rv μ
-        ≤ cTPair μ v0 (fun _ => none) (fun _ => none) ν ν {omega | InfMatch (cRel Rv)
-            (fun n => consLab n omega.1) (fun n => consLab n omega.2)} :=
-  composite_matching_bound_massfree_no_exceptions_traj Rv μ v0 hRv hsymm
-    (audit_mu0_ne_zero μ v0 hhalf) hhalf ν K hsup heta
+@[simp] lemma leafToLib_succ_apply (S : Type u) (n : ℕ) (l r : Leaf S n) :
+    leafToLib S (n + 1) (l, r) = (leafToLib S n l, leafToLib S n r) := rfl
 
-/-- `composite_failure_bound_massfree` with `compKcFinalM_mul_le_half`
-(`thm:composite-matching`, `eq:composite-bound` at every finite height, uniformly in the
-height, with the half barrier). -/
-theorem audit_composite_failure_bound_massfree
-    {V : Type} (Rv : V → V → Prop) (μ : PMF V) (v0 : V)
-    (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ)
-    (K1 K2 S : Finset ℕ) (E1 E2 : Finset (ℕ × ℕ)) (N : ℕ)
-    (hRv : ∀ v, Rv v v) (hsymm : ∀ a b, Rv a b → Rv b a)
-    (hhalf : 2⁻¹ ≤ μ v0)
-    (hN : ∀ j, j ≤ N → exc1 j = none ∧ exc2 j = none)
-    (hdeclN1 : ∀ k p, exc1 k = some p →
-      p.1 ≤ N ∧ p.2 ≤ N ∧ ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0)
-    (hcharged1 : ∀ k, ν1 k ≠ 0 → exc1 k = none → k ≤ N ∧ ν2 k ≠ 0)
-    (hdeclN2 : ∀ k p, exc2 k = some p →
-      p.1 ≤ N ∧ p.2 ≤ N ∧ ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
-    (hcharged2 : ∀ k, ν2 k ≠ 0 → exc2 k = none → k ≤ N ∧ ν1 k ≠ 0)
-    (hpair1 : ∀ k p, exc1 k = some p → ∀ j, j ≤ p.1 → exc1 j = none)
-    (hpair2 : ∀ k p, exc2 k = some p → ∀ j, j ≤ p.1 → exc2 j = none)
-    (hdecl1 : ∀ k p, exc1 k = some p → ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
-    (hdecl2 : ∀ k p, exc2 k = some p → ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0)
-    (hsup1 : ∀ k, (ν1 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K1)
-    (hsup2 : ∀ k, (ν2 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K2)
-    (hS1 : ∀ k, k ∈ S ↔ ((ν1 k : ℝ≥0∞) ≠ 0 ∧ exc1 k = none))
-    (hSne : S.Nonempty)
-    (hEg1 : ∀ p, p ∈ E1 ↔ ∃ z, (ν1 z : ℝ≥0∞) ≠ 0 ∧ exc1 z = some p)
-    (hEg2 : ∀ p, p ∈ E2 ↔ ∃ z, (ν2 z : ℝ≥0∞) ≠ 0 ∧ exc2 z = some p)
-    (heta : etaG (5 / 2) Rv μ
-      ≤ compEtaStarM exc1 exc2 ν1 ν2 K1 K2 N) :
-    compKcFinalM exc1 exc2 ν1 ν2 K1 K2 N * etaG (5 / 2) Rv μ ≤ 2⁻¹
-      ∧ ∀ h, failureD (cT exc1 μ ν1 v0 h) (cT exc2 μ ν2 v0 h)
-          (fullSim (cRel Rv) h)
-        ≤ compKcFinalM exc1 exc2 ν1 ν2 K1 K2 N * etaG (5 / 2) Rv μ :=
-  ⟨compKcFinalM_mul_le_half exc1 exc2 ν1 ν2 K1 K2 N heta,
-    composite_failure_bound_massfree Rv μ v0 exc1 exc2 ν1 ν2 K1 K2 S E1 E2 N
-      hRv hsymm (audit_mu0_ne_zero μ v0 hhalf) hhalf hN hdeclN1 hcharged1 hdeclN2
-      hcharged2 hpair1 hpair2
-      hdecl1 hdecl2 hsup1 hsup2 hS1 hSne hEg1 hEg2 heta⟩
+@[simp] lemma fullToLib_succ_apply (S : Type u) (n : ℕ) (a : S) (l r : FullLab S n) :
+    fullToLib S (n + 1) (a, l, r) = (a, fullToLib S n l, fullToLib S n r) := rfl
 
-/-- `compEtaStarM_pos` (`thm:composite-matching`, the clause `ε_ν⃗ > 0`). -/
-theorem audit_compEtaStarM_pos
-    (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ)
-    (K1 K2 : Finset ℕ) (N : ℕ)
-    (hsup1 : ∀ k, (ν1 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K1)
-    (hdecl1 : ∀ k p, exc1 k = some p → ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
-    (hsup2 : ∀ k, (ν2 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K2)
-    (hdecl2 : ∀ k p, exc2 k = some p → ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0) :
-    0 < compEtaStarM exc1 exc2 ν1 ν2 K1 K2 N :=
-  compEtaStarM_pos exc1 exc2 ν1 ν2 K1 K2 N hsup1 hdecl1 hsup2 hdecl2
+@[simp] lemma autToLibIid_succ_apply (n : ℕ) (b : Bool) (l r : Aut n) :
+    autToLibIid (n + 1) (b, l, r) = (b, autToLibIid n l, autToLibIid n r) := rfl
 
-/-- `compEtaStarMT_pos` (`thm:composite-matching`, the clause `ε_ν⃗(T) > 0`
-at an arbitrary finite tilt budget). -/
-theorem audit_compEtaStarMT_pos (T : ℝ≥0∞) (hT : T ≠ ⊤)
-    (K1 K2 : Finset ℕ) (N : ℕ) :
-    0 < compEtaStarMT T K1 K2 N :=
-  compEtaStarMT_pos hT K1 K2 N
+lemma matchesA_iff {S : Type u} (R : S → S → Prop) :
+    ∀ (n : ℕ) (π : Aut n) (x y : Leaf S n),
+      matchesA R n π x y ↔
+        GraphMatching.matchesA R n (autToLibIid n π) (leafToLib S n x) (leafToLib S n y)
+  | 0, _, _, _ => Iff.rfl
+  | n + 1, π, x, y => by
+      obtain ⟨b, πl, πr⟩ := π
+      obtain ⟨xl, xr⟩ := x
+      obtain ⟨yl, yr⟩ := y
+      cases b <;> simp [matchesA, GraphMatching.matchesA, matchesA_iff R n]
 
-/-- `cLetterBox_card` (`eq:composite-cardinals`, the alphabet count
-`n_A = (N+1)³ + N + 2`). -/
-theorem audit_cLetterBox_card (N : ℕ) :
-    (cLetterBox N).card = (N + 1) ^ 3 + N + 2 :=
-  cLetterBox_card N
+lemma fullMatchesA_iff {S : Type u} (R : S → S → Prop) :
+    ∀ (n : ℕ) (π : Aut n) (x y : FullLab S n),
+      fullMatchesA R n π x y ↔
+        GraphMatching.fullMatchesA R n (autToLibIid n π) (fullToLib S n x) (fullToLib S n y)
+  | 0, _, _, _ => Iff.rfl
+  | n + 1, π, x, y => by
+      obtain ⟨b, πl, πr⟩ := π
+      obtain ⟨xa, xl, xr⟩ := x
+      obtain ⟨ya, yl, yr⟩ := y
+      cases b <;> simp [fullMatchesA, GraphMatching.fullMatchesA, fullMatchesA_iff R n]
 
-/-- `cRank_eq` (`eq:composite-cardinals`, the rank `r = n_A · 2^{n_A} · (n_A + 1)`). -/
-theorem audit_cRank_eq (N : ℕ) :
-    cRank N = ((N + 1) ^ 3 + N + 2) * 2 ^ ((N + 1) ^ 3 + N + 2)
-      * ((N + 1) ^ 3 + N + 2 + 1) :=
-  cRank_eq N
+lemma leafSim_iff {S : Type u} (R : S → S → Prop) (n : ℕ) (x y : Leaf S n) :
+    leafSim R n x y ↔ GraphMatching.leafSim R n (leafToLib S n x) (leafToLib S n y) := by
+  constructor
+  · rintro ⟨π, hπ⟩; exact ⟨autToLibIid n π, (matchesA_iff R n π x y).1 hπ⟩
+  · rintro ⟨σ, hσ⟩
+    refine ⟨(autToLibIid n).symm σ, ?_⟩
+    rw [matchesA_iff R n]; simpa using hσ
 
-/-- `compCM_eq` (`eq:composite-K-eps`, the closed form for `C_W`). -/
-theorem audit_compCM_eq (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ)
-    (K1 K2 : Finset ℕ) :
-    compCM exc1 exc2 ν1 ν2 K1 K2
-      = 32 * (cMx K1 K2 : ℝ≥0∞)
-        + 256 * (cMx K1 K2 : ℝ≥0∞) ^ 2 * compT exc1 exc2 ν1 ν2 K1 K2 :=
-  compCM_eq exc1 exc2 ν1 ν2 K1 K2
+lemma fullSimIid_iff {S : Type u} (R : S → S → Prop) (n : ℕ) (x y : FullLab S n) :
+    fullSimIid R n x y ↔ GraphMatching.fullSim R n (fullToLib S n x) (fullToLib S n y) := by
+  constructor
+  · rintro ⟨π, hπ⟩; exact ⟨autToLibIid n π, (fullMatchesA_iff R n π x y).1 hπ⟩
+  · rintro ⟨σ, hσ⟩
+    refine ⟨(autToLibIid n).symm σ, ?_⟩
+    rw [fullMatchesA_iff R n]; simpa using hσ
 
-/-- `compXM_eq` (`eq:composite-K-eps`, the closed form for `Xi`). -/
-theorem audit_compXM_eq (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ)
-    (K1 K2 : Finset ℕ) (N : ℕ) :
-    compXM exc1 exc2 ν1 ν2 K1 K2 N
-      = 2 * (16 * compT exc1 exc2 ν1 ν2 K1 K2 + 3)
-        * ∑ j : Fin (cRank N), (2 * compCM exc1 exc2 ν1 ν2 K1 K2) ^ (j : ℕ) :=
-  compXM_eq exc1 exc2 ν1 ν2 K1 K2 N
+lemma prodPMF_eq_iid {X Y : Type*} (μ : PMF X) (ν : PMF Y) :
+    prodPMF μ ν = GraphMatching.prodPMF μ ν := by
+  ext p
+  show (μ.bind fun x => ν.map fun y => (x, y)) p = μ p.1 * ν p.2
+  rw [PMF.bind_apply, tsum_eq_single p.1]
+  · rw [PMF.map_apply, tsum_eq_single p.2]
+    · simp
+    · intro b hb
+      exact if_neg (by simp [Prod.ext_iff, Ne.symm hb])
+  · intro a ha
+    rw [PMF.map_apply]
+    refine mul_eq_zero_of_right _ ?_
+    refine (tsum_congr fun y => ?_).trans tsum_zero
+    exact if_neg (by simp [Prod.ext_iff]; intro h; exact absurd h.symm ha)
 
-/-- `compKcFinalM_eq` (`eq:composite-K-eps`, the closed form for `K`). -/
-theorem audit_compKcFinalM_eq (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ)
-    (K1 K2 : Finset ℕ) (N : ℕ) :
-    compKcFinalM exc1 exc2 ν1 ν2 K1 K2 N
-      = 6 * (4 + (25 / 4 + 4 * compT exc1 exc2 ν1 ν2 K1 K2 * (cMx K1 K2 : ℝ≥0∞))
-          * compXM exc1 exc2 ν1 ν2 K1 K2 N) :=
-  compKcFinalM_eq exc1 exc2 ν1 ν2 K1 K2 N
+lemma leafMu_eq {V : Type u} (μ : PMF V) :
+    ∀ n, (leafMu μ n).map (leafToLib V n) = GraphMatching.leafMu μ n
+  | 0 => by
+      show μ.map id = μ
+      exact PMF.map_id μ
+  | n + 1 => by
+      have hl : (leafMu μ n).map (leafToLib V n) = GraphMatching.leafMu μ n := leafMu_eq μ n
+      show (prodPMF (leafMu μ n) (leafMu μ n)).map (Prod.map (leafToLib V n) (leafToLib V n))
+        = GraphMatching.prodPMF (GraphMatching.leafMu μ n) (GraphMatching.leafMu μ n)
+      rw [map_prodPMF, hl, prodPMF_eq_iid]
 
-/-- `compB2Of_eq` (`eq:composite-K-eps`, the closed form for `B`). -/
-theorem audit_compB2Of_eq (T kappa X : ℝ≥0∞) :
-    compB2Of T kappa X
-      = 160 * compKcOf T kappa X ^ 2
-        + 12 * compKcOf T kappa X * X * (1 + T * kappa) + 4 * T * kappa * X ^ 2 :=
-  compB2Of_eq T kappa X
+lemma fullMu_eq {V : Type u} (μ : PMF V) :
+    ∀ n, (fullMu μ n).map (fullToLib V n) = GraphMatching.fullMu μ n
+  | 0 => by
+      show μ.map id = μ
+      exact PMF.map_id μ
+  | n + 1 => by
+      have hl : (fullMu μ n).map (fullToLib V n) = GraphMatching.fullMu μ n := fullMu_eq μ n
+      show (prodPMF μ (prodPMF (fullMu μ n) (fullMu μ n))).map
+            (Prod.map id (Prod.map (fullToLib V n) (fullToLib V n)))
+        = GraphMatching.prodPMF μ
+            (GraphMatching.prodPMF (GraphMatching.fullMu μ n) (GraphMatching.fullMu μ n))
+      rw [map_prodPMF, map_prodPMF, hl, PMF.map_id, prodPMF_eq_iid, prodPMF_eq_iid]
 
-/-- `compAM_eq` (`eq:composite-K-eps`, the closed form for `A`). -/
-theorem audit_compAM_eq (T kappa X : ℝ≥0∞) :
-    compC2Of T kappa X + compC3Of T kappa X + 1
-      = 16 * compB2Of T kappa X
-        + 15 * (compKcOf T kappa X + (25 / 4 + 4 * T * kappa) * X) + 1 :=
-  compAM_eq T kappa X
+/-- Transporting a law along an equivalence, pointwise. -/
+lemma map_equiv_apply {α β : Type*} (e : α ≃ β) (p : PMF α) (x : α) :
+    p x = (p.map e) (e x) := by
+  rw [PMF.map_apply, tsum_eq_single x]
+  · simp
+  · intro b hb
+    exact if_neg fun hh => hb (e.injective hh.symm)
 
-/-- `compHuCOf_eq` (`eq:composite-K-eps`, the closed form for `H`). -/
-theorem audit_compHuCOf_eq (T kappa X : ℝ≥0∞) (nA m : ℕ) :
-    compHuCOf T kappa X (2 * (nA * m))
-      = 3 * compKcOf T kappa X
-        + (1 + 8 * T) * (24 * (compKcOf T kappa X * X)
-            + 16 * ((nA : ℝ≥0∞) * (m : ℝ≥0∞) * X) ^ 2) :=
-  compHuCOf_eq T kappa X nA m
+lemma etaGraph_eq : @etaGraph = @GraphMatching.etaG := rfl
+lemma PhiIid_eq : @PhiIid = @GraphMatching.Phi := rfl
+lemma compat_eq : @compat = @GraphMatching.compat := rfl
 
-/-- `compEtaStarM_eq` (`eq:composite-K-eps`, the closed form for `epsilon`). -/
-theorem audit_compEtaStarM_eq (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ)
-    (K1 K2 : Finset ℕ) (N : ℕ) :
-    compEtaStarM exc1 exc2 ν1 ν2 K1 K2 N
-      = (max (compC2Of (compT exc1 exc2 ν1 ν2 K1 K2) (cMx K1 K2 : ℝ≥0∞)
-            (compXM exc1 exc2 ν1 ν2 K1 K2 N)
-          + compC3Of (compT exc1 exc2 ν1 ν2 K1 K2) (cMx K1 K2 : ℝ≥0∞)
-              (compXM exc1 exc2 ν1 ν2 K1 K2 N) + 1)
-        (max (compHuCOf (compT exc1 exc2 ν1 ν2 K1 K2) (cMx K1 K2 : ℝ≥0∞)
-            (compXM exc1 exc2 ν1 ν2 K1 K2 N) (cLz N K1 K2))
-          (2 * compKcFinalM exc1 exc2 ν1 ν2 K1 K2 N)))⁻¹ :=
-  compEtaStarM_eq exc1 exc2 ν1 ν2 K1 K2 N
+/-- The transport of full labellings is measurable. -/
+lemma measurable_fullToLib {V : Type u} [MeasurableSpace V] :
+    ∀ n, Measurable (fullToLib V n)
+  | 0 => measurable_id
+  | n + 1 => by
+      have h := measurable_fullToLib (V := V) n
+      exact (measurable_fst.prodMk
+        (((h.comp measurable_fst).comp measurable_snd).prodMk
+          ((h.comp measurable_snd).comp measurable_snd)))
 
-/-- `compKcFinalM_mul_le_half` (the half barrier of `eq:composite-bound`). -/
-theorem audit_compKcFinalM_mul_le_half (exc1 exc2 : ℕ → Option (ℕ × ℕ))
-    (ν1 ν2 : PMF ℕ) (K1 K2 : Finset ℕ) (N : ℕ) {eta : ℝ≥0∞}
-    (heta : eta ≤ compEtaStarM exc1 exc2 ν1 ν2 K1 K2 N) :
-    compKcFinalM exc1 exc2 ν1 ν2 K1 K2 N * eta ≤ 2⁻¹ :=
-  compKcFinalM_mul_le_half exc1 exc2 ν1 ν2 K1 K2 N heta
+lemma measurable_fullToLib_symm {V : Type u} [MeasurableSpace V] :
+    ∀ n, Measurable (fullToLib V n).symm
+  | 0 => measurable_id
+  | n + 1 => by
+      have h := measurable_fullToLib_symm (V := V) n
+      exact (measurable_fst.prodMk
+        (((h.comp measurable_fst).comp measurable_snd).prodMk
+          ((h.comp measurable_snd).comp measurable_snd)))
 
-/-- `composite_failure_bound_massfree_T` (`thm:composite-matching` at any tilt budget
-`T` bounding the two floor sums of `eq:composite-tilt`, with the constants of
-`eq:composite-K-eps` built from `T`: the half barrier and `eq:composite-bound` at
-every finite height, uniformly in the height). -/
-theorem audit_composite_failure_bound_massfree_T
-    {V : Type} (Rv : V → V → Prop) (μ : PMF V) (v0 : V)
-    (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ)
-    (K1 K2 S : Finset ℕ) (E1 E2 : Finset (ℕ × ℕ)) (N : ℕ)
-    (T : ℝ≥0∞)
-    (hT1 : compTiltBound exc1 ν1 K1 ≤ T)
-    (hT2 : compTiltBound exc2 ν2 K2 ≤ T)
-    (hRv : ∀ v, Rv v v) (hsymm : ∀ a b, Rv a b → Rv b a)
-    (hhalf : 2⁻¹ ≤ μ v0)
-    (hN : ∀ j, j ≤ N → exc1 j = none ∧ exc2 j = none)
-    (hdeclN1 : ∀ k p, exc1 k = some p →
-      p.1 ≤ N ∧ p.2 ≤ N ∧ ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0)
-    (hcharged1 : ∀ k, ν1 k ≠ 0 → exc1 k = none → k ≤ N ∧ ν2 k ≠ 0)
-    (hdeclN2 : ∀ k p, exc2 k = some p →
-      p.1 ≤ N ∧ p.2 ≤ N ∧ ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
-    (hcharged2 : ∀ k, ν2 k ≠ 0 → exc2 k = none → k ≤ N ∧ ν1 k ≠ 0)
-    (hpair1 : ∀ k p, exc1 k = some p → ∀ j, j ≤ p.1 → exc1 j = none)
-    (hpair2 : ∀ k p, exc2 k = some p → ∀ j, j ≤ p.1 → exc2 j = none)
-    (hdecl1 : ∀ k p, exc1 k = some p → ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
-    (hdecl2 : ∀ k p, exc2 k = some p → ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0)
-    (hsup1 : ∀ k, (ν1 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K1)
-    (hsup2 : ∀ k, (ν2 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K2)
-    (hS1 : ∀ k, k ∈ S ↔ ((ν1 k : ℝ≥0∞) ≠ 0 ∧ exc1 k = none))
-    (hSne : S.Nonempty)
-    (hEg1 : ∀ p, p ∈ E1 ↔ ∃ z, (ν1 z : ℝ≥0∞) ≠ 0 ∧ exc1 z = some p)
-    (hEg2 : ∀ p, p ∈ E2 ↔ ∃ z, (ν2 z : ℝ≥0∞) ≠ 0 ∧ exc2 z = some p)
-    (heta : etaG (5 / 2) Rv μ ≤ compEtaStarMT T K1 K2 N) :
-    compKcFinalMT T K1 K2 N * etaG (5 / 2) Rv μ ≤ 2⁻¹
-      ∧ ∀ h, failureD (cT exc1 μ ν1 v0 h) (cT exc2 μ ν2 v0 h)
-          (fullSim (cRel Rv) h)
-        ≤ compKcFinalMT T K1 K2 N * etaG (5 / 2) Rv μ :=
-  composite_failure_bound_massfree_T Rv μ v0 exc1 exc2 ν1 ν2 K1 K2 S E1 E2 N T hT1 hT2
-    hRv hsymm (audit_mu0_ne_zero μ v0 hhalf) hhalf hN hdeclN1 hcharged1 hdeclN2
-    hcharged2 hpair1 hpair2
-    hdecl1 hdecl2 hsup1 hsup2 hS1 hSne hEg1 hEg2 heta
+/-- Restriction commutes with the transport. -/
+lemma restrictLab_toLib {V : Type u} :
+    ∀ (n : ℕ) (x : FullLab V (n + 1)),
+      fullToLib V n (restrictLab n x) = GraphMatching.restrictLab n (fullToLib V (n + 1) x)
+  | 0, _ => rfl
+  | n + 1, x => by
+      obtain ⟨a, l, r⟩ := x
+      simp [restrictLab, GraphMatching.restrictLab, restrictLab_toLib n]
 
-/-- `composite_matching_bound_massfree_traj_T` (`thm:composite-matching`,
-`eq:composite-bound-infinite` at any tilt budget `T` bounding the two floor sums,
-on the constructed product of two trajectory measures). -/
-theorem audit_composite_matching_bound_massfree_traj_T
-    {V : Type} (Rv : V → V → Prop) (μ : PMF V) (v0 : V)
-    (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ)
-    (K1 K2 S : Finset ℕ) (E1 E2 : Finset (ℕ × ℕ)) (N : ℕ)
-    [Countable V] [MeasurableSpace V] [MeasurableSingletonClass V]
-    (T : ℝ≥0∞)
-    (hT1 : compTiltBound exc1 ν1 K1 ≤ T)
-    (hT2 : compTiltBound exc2 ν2 K2 ≤ T)
-    (hRv : ∀ v, Rv v v) (hsymm : ∀ a b, Rv a b → Rv b a)
-    (hhalf : 2⁻¹ ≤ μ v0)
-    (hN : ∀ j, j ≤ N → exc1 j = none ∧ exc2 j = none)
-    (hdeclN1 : ∀ k p, exc1 k = some p →
-      p.1 ≤ N ∧ p.2 ≤ N ∧ ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0)
-    (hcharged1 : ∀ k, ν1 k ≠ 0 → exc1 k = none → k ≤ N ∧ ν2 k ≠ 0)
-    (hdeclN2 : ∀ k p, exc2 k = some p →
-      p.1 ≤ N ∧ p.2 ≤ N ∧ ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
-    (hcharged2 : ∀ k, ν2 k ≠ 0 → exc2 k = none → k ≤ N ∧ ν1 k ≠ 0)
-    (hpair1 : ∀ k p, exc1 k = some p → ∀ j, j ≤ p.1 → exc1 j = none)
-    (hpair2 : ∀ k p, exc2 k = some p → ∀ j, j ≤ p.1 → exc2 j = none)
-    (hdecl1 : ∀ k p, exc1 k = some p → ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
-    (hdecl2 : ∀ k p, exc2 k = some p → ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0)
-    (hsup1 : ∀ k, (ν1 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K1)
-    (hsup2 : ∀ k, (ν2 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K2)
-    (hS1 : ∀ k, k ∈ S ↔ ((ν1 k : ℝ≥0∞) ≠ 0 ∧ exc1 k = none))
-    (hSne : S.Nonempty)
-    (hEg1 : ∀ p, p ∈ E1 ↔ ∃ z, (ν1 z : ℝ≥0∞) ≠ 0 ∧ exc1 z = some p)
-    (hEg2 : ∀ p, p ∈ E2 ↔ ∃ z, (ν2 z : ℝ≥0∞) ≠ 0 ∧ exc2 z = some p)
-    (heta : etaG (5 / 2) Rv μ ≤ compEtaStarMT T K1 K2 N) :
-    compKcFinalMT T K1 K2 N * etaG (5 / 2) Rv μ ≤ 2⁻¹
-      ∧ 1 - compKcFinalMT T K1 K2 N * etaG (5 / 2) Rv μ
-        ≤ cTPair μ v0 exc1 exc2 ν1 ν2 {omega | InfMatch (cRel Rv)
-            (fun n => consLab n omega.1) (fun n => consLab n omega.2)} :=
-  composite_matching_bound_massfree_traj_T Rv μ v0 exc1 exc2 ν1 ν2 K1 K2 S E1 E2 N T hT1 hT2
-    hRv hsymm (audit_mu0_ne_zero μ v0 hhalf) hhalf hN hdeclN1 hcharged1 hdeclN2
-    hcharged2 hpair1 hpair2
-    hdecl1 hdecl2 hsup1 hsup2 hS1 hSne hEg1 hEg2 heta
+/-- The coordinate map commutes with the transport. -/
+lemma coord_toLib {V : Type u} :
+    ∀ (n : ℕ) (x : FullLab V n) (w : List Bool),
+      coord n x w = GraphMatching.coord n (fullToLib V n x) w
+  | 0, _, _ => rfl
+  | n + 1, x, [] => rfl
+  | n + 1, x, false :: t => by
+      obtain ⟨a, l, r⟩ := x
+      simpa [coord, GraphMatching.coord] using coord_toLib n l t
+  | n + 1, x, true :: t => by
+      obtain ⟨a, l, r⟩ := x
+      simpa [coord, GraphMatching.coord] using coord_toLib n r t
 
-end Composite
+/-! ## The i.i.d. matching theorem -/
 
-end GraphMarkovMatching
+/-- `thm:matching`(1): the leaf bound. -/
+theorem audit_graph_leaf_matching_bound {V : Type u} (μ : PMF V) (G : SimpleGraph V)
+    (h0 : etaGraph μ G ≤ 1 / 256) (h : ℕ) :
+    ∑' x, leafMu μ h x * qE (leafMu μ h) (leafSim (compat G) h) x
+      ≤ (253 / 256) ^ h * etaGraph μ G := by
+  rw [etaGraph_eq] at h0 ⊢
+  refine le_of_eq_of_le ?_ (GraphMatching.graph_leaf_matching_bound μ G h0 h)
+  rw [← (leafToLib V h).tsum_eq]
+  refine tsum_congr fun x => ?_
+  rw [map_equiv_apply (leafToLib V h) (leafMu μ h) x, leafMu_eq]
+  congr 1
+  rw [qE, GraphMatching.qE, ← (leafToLib V h).tsum_eq]
+  refine tsum_congr fun y => ?_
+  rw [map_equiv_apply (leafToLib V h) (leafMu μ h) y, leafMu_eq, leafSim_iff]
+  rfl
 
-/-! ### `BranchingProcess`: the Galton-Watson foundation -/
+/-- `thm:matching`(2): the full bound. -/
+theorem audit_graph_full_matching_bound {V : Type u} (μ : PMF V) (G : SimpleGraph V)
+    (hη : etaGraph μ G ≤ 1 / 10000) (h : ℕ) :
+    ∑' x, fullMu μ h x * qE (fullMu μ h) (fullSimIid (compat G) h) x
+      ≤ 16 * etaGraph μ G := by
+  rw [etaGraph_eq] at hη ⊢
+  refine le_of_eq_of_le ?_ (GraphMatching.graph_full_matching_bound μ G hη h)
+  rw [← (fullToLib V h).tsum_eq]
+  refine tsum_congr fun x => ?_
+  rw [map_equiv_apply (fullToLib V h) (fullMu μ h) x, fullMu_eq]
+  congr 1
+  rw [qE, GraphMatching.qE, ← (fullToLib V h).tsum_eq]
+  refine tsum_congr fun y => ?_
+  rw [map_equiv_apply (fullToLib V h) (fullMu μ h) y, fullMu_eq, fullSimIid_iff]
+  rfl
 
-namespace BranchingProcess
-
-open MeasureTheory ProbabilityTheory Filter Topology ENNReal
-
-universe u
-
-/-- `gen_extinctionProb`: the extinction probability is a fixed point of the
-generating function. -/
-theorem audit_gen_extinctionProb {J N : ℕ} (θ : Offspring J) (hJN : J ≤ N) :
-    Offspring.gen θ (sampleMeasure (N := N) θ {c : Word N → ℕ | ¬ Survives c}).toReal
-      = (sampleMeasure (N := N) θ {c : Word N → ℕ | ¬ Survives c}).toReal :=
-  gen_extinctionProb θ hJN
-
-/-- `exists_bernoulli_field`: the i.i.d. Bernoulli field in the packaged shape. -/
-theorem audit_exists_bernoulli_field (ι : Type u) {t : ℝ} (ht : 0 ≤ t) (ht1 : t ≤ 1) :
+/-- `thm:matching`, the infinite tree: the matching automorphism as a root-fixing
+automorphism of the infinite binary tree. -/
+theorem audit_exists_infinite_tree_matching_graphAut {V : Type u} (μ : PMF V)
+    [MeasurableSpace V] [MeasurableSingletonClass V] [Countable V] (R₀ : V → V → Prop)
+    (hrefl : ∀ v, R₀ v v) (hsymm : ∀ a b, R₀ a b → R₀ b a)
+    (hη : PhiIid μ R₀ ≤ 1 / 10000) :
     ∃ (Ω : Type u) (_ : MeasurableSpace Ω) (P : Measure Ω) (_ : IsProbabilityMeasure P)
-      (X : ι → Ω → Bool),
-      (∀ i, Measurable (X i)) ∧ iIndepFun X P ∧
-      (∀ i, P {ω | X i ω = true} = ENNReal.ofReal t) :=
-  exists_bernoulli_field ι ht ht1
+      (X Y : (h : ℕ) → Ω → FullLab V h),
+      (∀ h ω, restrictLab h (X (h + 1) ω) = X h ω) ∧
+      (∀ h ω, restrictLab h (Y (h + 1) ω) = Y h ω) ∧
+      (∀ h, Measurable (fun ω => (X h ω, Y h ω))) ∧
+      (∀ h, P.map (fun ω => (X h ω, Y h ω))
+        = (prodPMF (fullMu μ h) (fullMu μ h)).toMeasure) ∧
+      1 - 16 * PhiIid μ R₀ ≤ P {ω | ∃ g : List Bool ≃ List Bool, IsTreeAut g ∧
+        ∀ s : List Bool, R₀ (coord (g s).length (X (g s).length ω) (g s))
+          (coord s.length (Y s.length ω) s)} := by
+  rw [PhiIid_eq] at hη ⊢
+  obtain ⟨Ω, mΩ, P, hP, X, Y, hX, hY, hmeas, hlaw, hmatch⟩ :=
+    GraphMatching.exists_infinite_tree_matching_graphAut μ R₀ hrefl hsymm hη
+  refine ⟨Ω, mΩ, P, hP, fun h ω => (fullToLib V h).symm (X h ω),
+    fun h ω => (fullToLib V h).symm (Y h ω), ?_, ?_, ?_, ?_, ?_⟩
+  · intro h ω
+    refine (fullToLib V h).injective ?_
+    rw [restrictLab_toLib, Equiv.apply_symm_apply, Equiv.apply_symm_apply, hX]
+  · intro h ω
+    refine (fullToLib V h).injective ?_
+    rw [restrictLab_toLib, Equiv.apply_symm_apply, Equiv.apply_symm_apply, hY]
+  · intro h
+    exact ((measurable_fullToLib_symm h).comp measurable_fst).prodMk
+      ((measurable_fullToLib_symm h).comp measurable_snd) |>.comp (hmeas h)
+  · intro h
+    have hmm : Measurable (Prod.map (fullToLib V h).symm (fullToLib V h).symm) :=
+      ((measurable_fullToLib_symm h).comp measurable_fst).prodMk
+        ((measurable_fullToLib_symm h).comp measurable_snd)
+    have : (fun ω => ((fullToLib V h).symm (X h ω), (fullToLib V h).symm (Y h ω)))
+        = (Prod.map (fullToLib V h).symm (fullToLib V h).symm) ∘ fun ω => (X h ω, Y h ω) := rfl
+    rw [this, ← Measure.map_map hmm (hmeas h), hlaw, PMF.toMeasure_map _ _ hmm,
+      ← prodPMF_eq_iid, map_prodPMF, ← fullMu_eq, PMF.map_comp, Equiv.symm_comp_self,
+      PMF.map_id]
+  · refine le_trans hmatch (measure_mono ?_)
+    rintro ω ⟨g, hroot, hg⟩
+    refine ⟨g.toEquiv, ⟨hroot, fun s t => ?_⟩, fun s => ?_⟩
+    · exact ⟨fun h => (g.map_adj_iff).2 h, fun h => (g.map_adj_iff).1 h⟩
+    · simpa [coord_toLib, Equiv.apply_symm_apply] using hg s
 
-end BranchingProcess
+/-! ## Bridge for the two-value block -/
 
-/-! ### `ChainClasses`: quasi-isometry classification endpoints -/
+lemma wedge_eq : ∀ x y : Word, wedge x y = ChainClasses.wedge x y
+  | [], _ => rfl
+  | _ :: _, [] => rfl
+  | a :: x, b :: y => by
+      simp only [wedge, ChainClasses.wedge, wedge_eq x y]
 
-namespace ChainClasses
+lemma treeDist_eq (x y : Word) : treeDist x y = ChainClasses.treeDist x y := by
+  simp [treeDist, ChainClasses.treeDist, wedge_eq]
 
-section
+lemma inTree_iff (χ : Word → Bool) (v : Word) : InTree χ v ↔ ChainClasses.InTree χ v := by
+  constructor
+  · intro h; induction h with
+    | root => exact .root
+    | one _ ih => exact .one ih
+    | two _ hχ ih => exact .two ih hχ
+  · intro h; induction h with
+    | root => exact .root
+    | one _ ih => exact .one ih
+    | two _ hχ ih => exact .two ih hχ
 
-open MeasureTheory ProbabilityTheory GraphMatching
-open scoped ENNReal
+lemma isQIWith_iff (K : ℕ) (T T' : Word → Prop) (f : Word → Word) :
+    IsQIWith K T T' f ↔ ChainClasses.IsQIWith K T T' f := by
+  constructor
+  · rintro ⟨m, u, l, d⟩
+    exact ⟨m, by simpa [treeDist_eq] using u, by simpa [treeDist_eq] using l,
+      by simpa [treeDist_eq] using d⟩
+  · rintro ⟨m, u, l, d⟩
+    exact ⟨m, by simpa [treeDist_eq] using u, by simpa [treeDist_eq] using l,
+      by simpa [treeDist_eq] using d⟩
 
-/-- `twovalue_ae_tree` (`thm:twovalue` on the sample trees). -/
-theorem audit_twovalue_ae_tree {t : ℝ} (ht : 0 < t) (ht1 : t < 1) :
-    twoSampleMeasure ht ht1.le
-        {ω | ¬ ∃ (K : ℕ) (f : Word → Word), IsQIWith K (InTree ω.1) (InTree ω.2) f} = 0 :=
-  twovalue_ae_tree ht ht1
+lemma inTree_eq (χ : Word → Bool) : InTree χ = ChainClasses.InTree χ := by
+  funext v; exact propext (inTree_iff χ v)
 
+lemma isQIWith_eq : @IsQIWith = @ChainClasses.IsQIWith := by
+  funext K T T' f; exact propext (isQIWith_iff K T T' f)
 
-/-- `twovalue_ae_tree_family` (`thm:twovalue` on the whole two-value family, the
-endpoints included). -/
+lemma bernoulliField_eq {t : ℝ} (ht : 0 ≤ t) (ht1 : t ≤ 1) :
+    bernoulliField ht ht1 = BranchingProcess.bernoulliField (ι := Word) ht ht1 := rfl
+
+/-! ## Universality in the two-value family -/
+
+/-- `thm:twovalue`: two independent Galton--Watson trees whose offspring law is
+supported on `{1,2}` are almost surely quasi-isometric. -/
 theorem audit_twovalue_ae_tree_family {t : ℝ} (ht0 : 0 ≤ t) (ht1 : t ≤ 1) :
-    ((BranchingProcess.bernoulliField (ι := Word) ht0 ht1).prod
-        (BranchingProcess.bernoulliField ht0 ht1))
-      {ω | ¬ ∃ (K : ℕ) (f : Word → Word), IsQIWith K (InTree ω.1) (InTree ω.2) f} = 0 :=
-  twovalue_ae_tree_family ht0 ht1
+    ((bernoulliField ht0 ht1).prod (bernoulliField ht0 ht1))
+      {ω | ¬ ∃ (K : ℕ) (f : Word → Word), IsQIWith K (InTree ω.1) (InTree ω.2) f} = 0 := by
+  rw [bernoulliField_eq]
+  refine Eq.trans ?_ (ChainClasses.twovalue_ae_tree_family ht0 ht1)
+  congr 1
+  ext ω
+  simp only [Set.mem_setOf_eq, inTree_eq, isQIWith_eq]
 
-
-/-- `exists_twovalue_rate_tree` (`eq:rate` past one threshold). -/
-theorem audit_exists_twovalue_rate_tree {t : ℝ} (ht : 0 < t) (ht1 : t < 1) :
-    ∃ D₀ : ℕ, ∀ D : ℕ, D₀ ≤ D →
-      twoSampleMeasure ht ht1.le
-          {ω | ¬ ∃ f : Word → Word, IsQIWith (D ^ 2 + 3) (InTree ω.1) (InTree ω.2) f}
-        ≤ ENNReal.ofReal (256 * qBound (1 - t) D) :=
-  exists_twovalue_rate_tree ht ht1
-
-/-- `crosslaw_ae_tree` (`thm:cross-law` on the sample trees). -/
-theorem audit_crosslaw_ae_tree {t t' : ℝ} (ht : 0 < t) (ht1 : t < 1) (ht' : 0 < t')
-    (ht1' : t' < 1) :
-    crossMeasure ht ht1.le ht' ht1'.le
-        {ω | ¬ ∃ (K : ℕ) (f : Word → Word), IsQIWith K (InTree ω.1) (InTree ω.2.1) f} = 0 :=
-  crosslaw_ae_tree ht ht1 ht' ht1'
-
-
-/-- `exists_crosslaw_rate_tree` (`eq:rate-cross` past one threshold, at the real
-constant `gammaStar · D² + 3`). -/
-theorem audit_exists_crosslaw_rate_tree {t t' : ℝ} (ht : 0 < t) (ht1 : t < 1)
-    (ht' : 0 < t') (ht1' : t' < 1) :
-    ∃ D₁ : ℕ, ∀ D : ℕ, D₁ ≤ D →
-      crossMeasure ht ht1.le ht' ht1'.le
-          {ω | ¬ ∃ f : Word → Word, IsQIWithR (gammaStar (1 - t) (1 - t') * (D : ℝ) ^ 2 + 3)
-            (InTree ω.1) (InTree ω.2.1) f}
-        ≤ ENNReal.ofReal (256 * qBound (1 - t) D) :=
-  exists_crosslaw_rate_tree ht ht1 ht' ht1'
-
-end
-
-section
-
-open MeasureTheory ProbabilityTheory
-open BranchingProcess (QuasiIsometric rayGraph)
-
-/-- `converse_ae` (`thm:converse` on the constructed space). -/
-theorem audit_converse_ae {t : ℝ} (ht : 0 < t) (ht1 : t < 1) :
-    ∀ᵐ ω ∂(chainMeasure ht ht1.le),
-      ¬ QuasiIsometric (wordGraph (InTree ω)) (wordGraph fun _ : Word => True)
-        ∧ ¬ QuasiIsometric (wordGraph (InTree ω)) rayGraph :=
-  converse_ae ht ht1
-
-/-- `simple_classification` (`thm:trichotomy-simple`, the four simple-support classes). -/
-theorem audit_trichotomy_simple
-    (r r' : Regime) (hr : r.Valid) (hr' : r'.Valid) :
-    (r.kind = r'.kind → ∀ᵐ ω ∂((r.sampleLaw hr).law.prod (r'.sampleLaw hr').law),
-        PairQI (r.sampleLaw hr) (r'.sampleLaw hr') ω)
-      ∧ (r.kind ≠ r'.kind → ∀ᵐ ω ∂((r.sampleLaw hr).law.prod (r'.sampleLaw hr').law),
-        ¬ PairQI (r.sampleLaw hr) (r'.sampleLaw hr') ω)
-      ∧ (r ≠ Regime.ray → ∀ᵐ ω ∂(r.sampleLaw hr).law,
-          ¬ QuasiIsometric ((r.sampleLaw hr).graph ω) rayGraph) :=
-  simple_classification r r' hr hr'
-
-end
-
-section
-
-open MeasureTheory ProbabilityTheory GraphMatching
-open BranchingProcess (sample survivalMeasure Offspring)
-open scoped ENNReal Classical
-
-/-- `hairy_ae_shape_tree_two_law` (`thm:hairy` across two laws). -/
-theorem audit_hairy_ae_shape_tree_two_law (θ θ' : Offspring 2) (hq : θ.extinction < 1)
-    (hq0 : 0 < θ.extinction) (h2 : 0 < θ 2) (hq' : θ'.extinction < 1)
-    (hq0' : 0 < θ'.extinction) (h2' : 0 < θ' 2) :
-    twoHairyMeasure θ θ'
-      {ω | ¬ ∃ (L : ℝ) (F : {v : Amb // v ∈ sample ω.1.1} → {v : Amb // v ∈ sample ω.2.1}),
-        IsSampleQI L F} = 0 :=
-  hairy_ae_shape_tree_two_law θ θ' hq hq0 h2 hq' hq0' h2'
-
-
-/-- `hairy_rate_two_law` (`eq:hairy-rate` across two laws). -/
-theorem audit_hairy_rate_two_law (θ θ' : Offspring 2) (hq : θ.extinction < 1)
-    (hq0 : 0 < θ.extinction) (h2 : 0 < θ 2) (hq' : θ'.extinction < 1)
-    (hq0' : 0 < θ'.extinction) (h2' : 0 < θ' 2) :
-    ∃ c₃ : ℝ, 0 < c₃ ∧ ∃ D₁ : ℕ, ∀ D : ℕ, D₁ ≤ D → ∃ π : PMF (Shape × Shape),
-      IsShapeCoupling (D : ℝ) (shapePMF θ hq hq0 h2) (shapePMF θ' hq' hq0' h2') π ∧
-      twoHairyMeasure θ θ'
-          {ω | ¬ ∃ F : {v : Amb // v ∈ sample ω.1.1} → {v : Amb // v ∈ sample ω.2.1},
-            IsSampleQI (8 * 972 ^ 2 * (D : ℝ) ^ 8) F}
-        ≤ 16 * etaG π (pairNetS π (D : ℝ)) ∧
-      etaG π (pairNetS π (D : ℝ)) ≤ ENNReal.ofReal (Real.exp (-(c₃ * (D : ℝ) ^ 2))) :=
-  hairy_rate_two_law θ θ' hq hq0 h2 hq' hq0' h2'
-
-end
-
-section
-
-open MeasureTheory ProbabilityTheory
-open BranchingProcess (sample survivalMeasure Offspring QuasiIsometric)
-
-/-- `chainSeparation` (`thm:chain-separation`), the hypothesis `ChainSeparation`
-unfolded. -/
-theorem audit_chainSeparation {J J' N N' : ℕ} (θ : Offspring J) (hJN : J ≤ N)
-    (hθ0 : θ 0 = 0) (hθ1 : 0 < θ 1) (hθ1' : θ 1 < 1) (hJ2 : 2 ≤ J) (hθJ : 0 < θ J)
-    (θ' : Offspring J') (hJN' : J' ≤ N') (hθ0' : θ' 0 = 0) (hθ1'₀ : 0 < θ' 1)
-    (hθ1'' : θ' 1 < 1) (hJ2' : 2 ≤ J') (hθJ' : 0 < θ' J')
-    (hsem : AddSubmonoid.closure (shiftSupp θ : Set ℕ)
-      ≠ AddSubmonoid.closure (shiftSupp θ' : Set ℕ)) :
-    ∀ᵐ cc ∂((survivalMeasure (N := N) θ).prod (survivalMeasure (N := N') θ')),
-      ¬ QuasiIsometric (wordGraphN (· ∈ sample cc.1))
-        (wordGraphN (· ∈ sample cc.2)) :=
-    chainSeparation θ hJN hθ0 hθ1 hθ1' hJ2 hθJ θ' hJN' hθ0' hθ1'₀ hθ1'' hJ2' hθJ' hsem
-
-/-- `classification_ae_iff` (`thm:trichotomy`, with the same-class and different-class conclusions
-retained eventwise). -/
-theorem audit_trichotomy (R R' : GRegime) :
-    ∀ᵐ ω ∂(R.sampleLaw.law.prod R'.sampleLaw.law),
-      GPairQI R.sampleLaw R'.sampleLaw ω ↔
-        (R.kind = R'.kind ∧
-          (R.IsChain → R'.IsChain → R.semigroup = R'.semigroup)) :=
-  classification_ae_iff R R'
-
-/-- `classification_not_ray_ae` (a one-sample corollary of the different-class clause). -/
-theorem audit_trichotomy_not_ray (R : GRegime) (hR : R.kind ≠ 0) :
-    ∀ᵐ omega ∂R.sampleLaw.law,
-      ¬ QuasiIsometric (R.sampleLaw.graph omega) BranchingProcess.rayGraph :=
-  classification_not_ray_ae R hR
-
-/-- `offspring_classification_ae_iff` (`thm:trichotomy` quantified over raw offspring laws
-written with their true top support). -/
-theorem audit_trichotomy_exact {J J' N N' : ℕ}
-    (theta : Offspring J) (hJN : J ≤ N)
-    (hvalid : theta.IsSupercritical ∨ theta 1 = 1)
-    (htop : theta 1 = 1 ∨ (2 ≤ J ∧ 0 < theta J))
-    (theta' : Offspring J') (hJN' : J' ≤ N')
-    (hvalid' : theta'.IsSupercritical ∨ theta' 1 = 1)
-    (htop' : theta' 1 = 1 ∨ (2 ≤ J' ∧ 0 < theta' J')) :
-    let R := GRegime.ofExact theta hJN hvalid htop
-    let R' := GRegime.ofExact theta' hJN' hvalid' htop'
-    ∀ᵐ omega ∂(R.sampleLaw.law.prod R'.sampleLaw.law),
-      GPairQI R.sampleLaw R'.sampleLaw omega ↔
-        (theta 1 = 1 ∧ theta' 1 = 1) ∨
-        (theta 0 = 0 ∧ theta 1 = 0 ∧ theta' 0 = 0 ∧ theta' 1 = 0) ∨
-        ((theta 0 = 0 ∧ 0 < theta 1 ∧ theta 1 < 1) ∧
-          (theta' 0 = 0 ∧ 0 < theta' 1 ∧ theta' 1 < 1) ∧
-          AddSubmonoid.closure (shiftSupp theta : Set ℕ) =
-            AddSubmonoid.closure (shiftSupp theta' : Set ℕ)) ∨
-        (0 < theta 0 ∧ 0 < theta' 0) :=
-  offspring_classification_ae_iff theta hJN hvalid htop theta' hJN' hvalid' htop'
-
-/-- `offspring_classification_not_ray_ae` (the raw-law form of the one-sample corollary). -/
-theorem audit_trichotomy_exact_not_ray {J N : ℕ}
-    (theta : Offspring J) (hJN : J ≤ N)
-    (hvalid : theta.IsSupercritical ∨ theta 1 = 1)
-    (htop : theta 1 = 1 ∨ (2 ≤ J ∧ 0 < theta J)) (h1 : theta 1 ≠ 1) :
-    let R := GRegime.ofExact theta hJN hvalid htop
-    ∀ᵐ omega ∂R.sampleLaw.law,
-      ¬ QuasiIsometric (R.sampleLaw.graph omega) BranchingProcess.rayGraph :=
-  offspring_classification_not_ray_ae theta hJN hvalid htop h1
-
-end
-
-end ChainClasses
+end Challenge
