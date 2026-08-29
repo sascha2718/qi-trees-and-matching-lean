@@ -148,6 +148,15 @@ coordinates are related. With $\Phi_i:=\Phi(R_i,\mu_i)$ and any $\alpha\geq1$, t
 potential of the product is controlled by $\Phi_1$ and $\Phi_2$ at exponent $2\alpha$.
 \end{lemma}
 
+\begin{proof}
+\leanok
+\uses{def:potential}
+Fix a point of the product support. Under the product relation the good degree is the
+product of the two good degrees, so the bad degree is $q_1+(1-q_1)q_2$. The splitting bound for
+$\phi_\alpha$ separates the two coordinates, and summing against the product measure gives the
+bound at exponent $2\alpha$.
+\end{proof}
+
 \section{Reduction to the one-site potential}
 
 \begin{theorem}[Reduction]
@@ -216,11 +225,18 @@ $\mathfrak K=16$.
 \label{thm:infinite}
 \lean{GraphMatching.exists_infinite_tree_matching_graphAut}
 \leanok
-\uses{thm:matching}
 Under the hypothesis of the second part of \cref{thm:matching}, the same lower bound holds
 for the existence of a single automorphism matching every vertex of two independent
 infinite labelled rooted binary trees.
 \end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:matching, thm:reduction}
+The finite-height bounds are uniform in $h$ and the matching relations are consistent under
+restriction, so a compactness argument over the levels produces a single automorphism matching
+every vertex. The measure layer carries the bound through the projective limit.
+\end{proof}
 
 \begin{corollary}[Local-dominance condition]
 \label{thm:dominance}
@@ -240,6 +256,13 @@ Fix $0\in V$ with $\mu(0)>0$ and put
 Then $\eta_{G,\alpha}(\mu)\leq\cD_{G,\alpha}(\mu,0)$.
 \end{corollary}
 
+\begin{proof}
+\leanok
+Split the sum defining $\eta_{G,\alpha}$ at the distinguished vertex. The term at $0$ is
+bounded by the mass outside $B_G(0,1)$ divided by $(1-\varepsilon_0)^\alpha$, and every other
+term by $\mu(v)/\mu(B_G(v,1))^\alpha$, since $1-b(v)\leq1$.
+\end{proof}
+
 \section{The integer alphabet}
 
 Specialise to the path graph $\mathsf P$ on the integers, whose potential we write
@@ -249,7 +272,6 @@ $\eta_{\mathsf P,\alpha}$.
 \label{thm:double-exp}
 \lean{GraphMatching.double_exp_matching}
 \leanok
-\uses{thm:matching, thm:dominance}
 Let $\alpha=5/2$. For $D\geq5$ put $p_j=e^{-D^j}$ for $j\geq1$ and
 $p_0=1-\sum_{j\geq1}e^{-D^j}$. Then $p_0>\tfrac12$ and
 \[
@@ -259,3 +281,11 @@ Consequently the full matching probability is at least
 $1-16\eta_{\mathsf P,5/2}(p)\geq1-64\,e^{-D(D-5/2)}>0.9996$, uniformly in the height and
 for the infinite tree.
 \end{corollary}
+
+\begin{proof}
+\leanok
+\uses{thm:matching, thm:dominance}
+The ratios $a_{j+1}/a_j\leq e^{-20}<\tfrac12$ make the tail sums geometric, so $p_0>\tfrac12$
+and the two neighbouring masses exceed $\tfrac12$. Local dominance then bounds the potential by
+$4e^{-D(D-5/2)}$, which is below $10^{-4}$ for $D\geq5$.
+\end{proof}

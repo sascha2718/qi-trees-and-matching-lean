@@ -24,23 +24,46 @@ $0\leq l\leq\lambda(w)-1$. If $w$ is not a prefix of $w'$, then the ray
 $\set{\iota(w)1^{j}\colon j\geq0}$ is disjoint from the chain of $w'$.
 \end{lemma}
 
+\begin{proof}
+\leanok
+The chain recursion only appends letters, so prefixes in $\bbB$ map to prefixes in $\cT$.
+A vertex therefore determines the last branch point at or above it and its offset along that
+chain, which gives the representation and its uniqueness. If $w$ is not a prefix of $w'$ the
+two rays separate at their common ancestor.
+\end{proof}
+
 \begin{lemma}[The chain lengths are i.i.d.\ geometric]
 \label{thm:geometric}
 \lean{ChainClasses.label_iIndepFun}
 \leanok
-\uses{thm:chains}
 The random variables $\lambda(w)$, $w\in\bbB$, are independent and geometrically distributed,
 with $\bbP(\lambda(w)=n)=\theta_1^{n-1}\theta_2$ for $n\geq1$.
 \end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:chains}
+Compute the joint law on a finite prefix-closed set of branch points by exploring the tree in
+prefix order: each chain contributes $\theta_1^{n_w-1}\theta_2$ independently of what has already
+been revealed. The product formula over all such sets is exactly independence with the geometric
+marginal.
+\end{proof}
 
 \begin{lemma}[Relabelling is an isometry]
 \label{thm:isometry}
 \lean{ChainClasses.isometry_of_relabel}
 \leanok
-\uses{thm:chains}
 Let $\pi\in\Aut(\bbB)$ and let $\lambda$ be a labelling with associated tree $\cT$. The tree
 $\cT'$ associated with $\lambda'(w)=\lambda(\pi^{-1}w)$ is isometric to $\cT$.
 \end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:chains}
+An automorphism of $\bbB$ preserves word length and common prefixes. Writing each vertex of
+$\cT$ in its normal form along the chain decomposition and applying $\pi$ to the branch-point
+part gives a bijection that preserves the tree distance.
+\end{proof}
 
 \begin{lemma}[Transfer]
 \label{thm:transfer}
@@ -71,20 +94,32 @@ Write $\ell_D(n):=\floor{\log_D n}$ for the level of $n\geq1$ at scale $D$.
 Let $D\geq2$ and $m,m'\in\bbN$. If $\abs{\ell_D(m)-\ell_D(m')}\leq1$ then $D^{-2}m'<m<D^2m'$.
 \end{lemma}
 
+\begin{proof}
+\leanok
+With $j=\ell_D(m)$ and $j'=\ell_D(m')$ we have $D^j\leq m<D^{j+1}$ and likewise for
+$m'$. From $j\leq j'+1$ it follows that $m<D^{j'+2}\leq D^2m'$, and the lower bound is the
+same argument with the roles exchanged.
+\end{proof}
+
 \begin{lemma}[The quantised law]
 \label{thm:quantised-law}
 \lean{ChainClasses.qF_le}
 \leanok
-\uses{thm:geometric}
 Let $p^{(D)}$ be the image under $\ell_D$ of the geometric law $\theta_1^{n-1}\theta_2$,
 $n\geq1$. Then $p^{(D)}_0=1-\theta_1^{D-1}$ and $p^{(D)}_j\leq\theta_1^{D^j-1}$ for $j\geq1$.
 \end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:geometric}
+The geometric law has tail $\theta_1^{m-1}$ at $m$, and $p^{(D)}_j$ is the difference of
+the tails at $D^j$ and $D^{j+1}$.
+\end{proof}
 
 \begin{lemma}[Chain classes]
 \label{thm:chain-classes}
 \lean{ChainClasses.quantised_label_iIndepFun}
 \leanok
-\uses{thm:geometric, thm:quantised-law}
 Let $\theta_1+\theta_2=1$ with $0<\theta_1<1$, let $D\geq2$ be an integer, and put
 $\cC_k=\set{n\in\bbN\colon D^k\leq n<D^{k+1}}$. The classes $\cC_k$ partition $\bbN$, any two
 $n,m\in\cC_k$ satisfy $D^{-1}<n/m<D$, and the quantised labels $\ell_D(\lambda(w))$,
@@ -94,11 +129,18 @@ $w\in\bbB$, are independent with common law
 \]
 \end{lemma}
 
+\begin{proof}
+\leanok
+\uses{thm:geometric, thm:quantised-law}
+The classes are the fibres of $\ell_D$, hence a partition of $\bbN$, and dividing the
+defining inequalities by $D^k$ gives the two ratio bounds. Independence is inherited from the
+labels, and the class masses are the tail differences of the geometric law.
+\end{proof}
+
 \begin{lemma}[Chain coupling across two laws]
 \label{thm:chain-coupling}
 \lean{ChainClasses.coupling_law}
 \leanok
-\uses{thm:chain-classes}
 Let $\theta_1,\theta_1'\in(0,1)$, put $\gamma=\log\theta_1/\log\theta_1'>0$, and let $D\geq2$
 be an integer with $\gamma(D-1)\geq1$. Let $q$ be the law of \cref{thm:chain-classes} for
 $\theta_1$ and $D$, let $\lambda'$ be geometric with parameter $\theta_1'$, and let $U$ be
@@ -107,6 +149,15 @@ $1=D_0'<D_1'<D_2'<\cdots$ at which consecutive classes of the second law meet, a
 $\ell'\colon\bbN\times[0,1)\to\bbN_0$, nondecreasing in its first argument, presenting the
 second law's classes against the first with a controlled ratio at every level.
 \end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:chain-classes}
+Since $\theta_1=(\theta_1')^{\gamma}$, the tail of the second law reaches at
+$t_k=1+\gamma(D^k-1)$ the value that the first law's tail reaches at $D^k$. Rounding the
+$t_k$ to integers gives the cut points, and reading the uniform variable as position inside an
+atom that straddles a cut point defines $\ell'$.
+\end{proof}
 
 \section{The bushy regime}
 
@@ -125,6 +176,14 @@ subcritical law. Both halves hold as equalities of laws on trees, together with 
 form.
 \end{proposition}
 
+\begin{proof}
+\leanok
+The extinction probability is the root in $[0,1)$ of $s=\theta_0+\theta_1s+\theta_2s^2$,
+which factors as $(s-1)(\theta_2s-\theta_0)$ and so equals $\theta_0/\theta_2$. Conditioning
+each child on founding a surviving subtree, independently of its siblings, splits the tree into
+the skeleton under the reduced law and the dying bushes under the conjugate law.
+\end{proof}
+
 \begin{definition}[Shapes]
 \label{def:shape}
 \lean{ChainClasses.Shape}
@@ -141,7 +200,7 @@ for the countable set of shapes.
 \label{thm:shape-iid}
 \lean{ChainClasses.shape_decomposition}
 \leanok
-\uses{thm:harris, def:shape}
+\uses{def:shape}
 Conditioned on infinite diameter, the shapes $S(w)$, $w\in\bbB$, are i.i.d.\ with the law
 $\mu$ of $(m,(B_1,\dots,B_{m-1}))$, where $\bbP(m=k)=\widetilde\theta_1^{\,k-1}
 \widetilde\theta_2$ and, given $m$, the decorations are independent, each empty with
@@ -150,15 +209,32 @@ conjugate law. Moreover $\cT(\omega)$ is isometric to the assembly of the shapes
 $\bbB$.
 \end{proposition}
 
+\begin{proof}
+\leanok
+\uses{thm:harris}
+The skeleton is a Galton--Watson tree in the two-value family, so its chain lengths are i.i.d.
+geometric. Attaching the conditionally independent bushes along the chain of each branch point
+gives the shape, i.i.d. with the stated law, and the assembly of the shapes is isometric to the
+original tree.
+\end{proof}
+
 \begin{lemma}[Shape mass bounds]
 \label{thm:shape-mass}
 \lean{ChainClasses.shape_mass_tail}
 \leanok
-\uses{thm:shape-iid}
 There are $c,C,n_0>0$ depending on $\theta$ such that $\mu(\abs S\geq n)\leq e^{-cn}$ for all
 $n\geq n_0$, and $\mu(\sigma)\geq e^{-C\abs\sigma}$ for every $\sigma\in\cS$ with
 $\mu(\sigma)>0$.
 \end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:shape-iid}
+A shape of size $n$ has probability a product of at most $2n$ factors, each one of finitely
+many positive constants, which gives the pointwise lower bound with $C=2\log p^{-1}$. The upper
+tail is a Chernoff bound, the exponential moment being finite because the neck length is geometric
+and the bushes are subcritical.
+\end{proof}
 
 \section{The net quantisation}
 
@@ -188,6 +264,14 @@ quasi-isometry, and members of equal or adjacent classes admit a $729D^7$-marked
 quasi-isometry.
 \end{lemma}
 
+\begin{proof}
+\leanok
+Track the three errors of \cref{def:qi} through a composition: the multiplicative error is
+$KK'$, the additive error $2KK'$, and the density and mark displacement $KK'+2K'$, all at
+most $3KK'$. A quasi-inverse costs $3K^2$. The properties of $\rep_D$ follow from minimality
+in the enumeration, and the class bounds by composing at most three marked maps.
+\end{proof}
+
 \begin{lemma}[Connectivity of the label graph]
 \label{thm:shape-connected}
 \lean{ChainClasses.netLink_connected_shapeFamily}
@@ -195,6 +279,14 @@ quasi-isometry.
 \uses{def:shape-net}
 The graph $G_D$ is connected.
 \end{lemma}
+
+\begin{proof}
+\leanok
+Delete one leaf of a representative's realisation, a bush leaf if there is one and the exit
+otherwise. What remains realises a shape of size one less, and the map fixing the remaining
+vertices is $2$-marked, so the representative is adjacent to that of the smaller shape.
+Induction on size reaches the one-vertex shape.
+\end{proof}
 
 \begin{lemma}[Entropy dilution]
 \label{thm:dilution}
@@ -207,15 +299,33 @@ at most $\exp\bigl(c_0(nD^{-1/3}+1)\bigr)$ members. In particular there are at m
 representatives of size at most $n$.
 \end{lemma}
 
+\begin{proof}
+\leanok
+Code a finite tree depth-first by a word over $\set{1,2}$, one letter on entering a vertex
+and one on leaving, so a tree with $k$ vertices has a code of length $2k$. Contracting a shape
+at scale $s$ leaves a tree with at most $n/s+1$ vertices, and equal contractions give
+comparable shapes, so the number of pairwise incomparable shapes is at most the number of such
+codes.
+\end{proof}
+
 \section{The glued transfer}
 
 \begin{lemma}[Glued transfer]
 \label{thm:glued-transfer}
 \lean{ChainClasses.Assembly.glued_transfer}
 \leanok
-\uses{thm:shape-iid, def:qi}
+\uses{def:qi}
 Let $(\sigma_w)_{w\in\bbB}$ and $(\sigma'_w)_{w\in\bbB}$ be families of shapes with assemblies
 $\cT$ and $\cT'$, let $K\geq1$, and suppose that for every $w\in\bbB$ the shapes $\sigma_w$
 and $\sigma'_w$ admit a $K$-marked quasi-isometry. Then there is an $8K^2$-quasi-isometry
 $\cT\to\cT'$.
 \end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:shape-iid}
+Each copy is an induced subtree, so its internal distances agree with those of the assembly.
+Map each copy by its marked quasi-isometry, sending entries to entries and exits to exits. Along a
+geodesic the error is a sum of neck comparisons over the copies met, and the ancestor and
+divergence cases give the constant $8K^2$.
+\end{proof}

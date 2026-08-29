@@ -22,29 +22,50 @@ infinite tree.
 \label{thm:main-matching}
 \lean{GraphMarkovMatching.varying_failure_le}
 \leanok
-\uses{thm:composite-matching}
 Specialising both sides to the same counter law gives the one-law matching theorem, with the
 failure probability bounded by $K_c\eta$ for an explicit constant.
 \end{corollary}
+
+\begin{proof}
+\leanok
+\uses{thm:composite-matching, thm:numeric}
+Specialise the two counter laws of \cref{thm:composite-matching} to a single law. The tagged
+grammar collapses to the ordinary one, the marker letters never occur, and the constants of
+\cref{thm:numeric} give the bound $K_c\eta$.
+\end{proof}
 
 \begin{corollary}[Exponential three-label example]
 \label{thm:exponential}
 \lean{GraphMarkovMatching.varying_exp3_failure_le}
 \leanok
-\uses{thm:main-matching}
 Fix $N\geq2$ and a law $\nu$ supported on a nonempty subset of $\set{2,\dots,N}$, let $G$ be the
 path $0-1-2$, and for real $D\geq5$ let $\mu_D$ have masses $p_1=e^{-D}$, $p_2=e^{-D^2}$ and
 $p_0=1-p_1-p_2$. Then the matching hypothesis holds for all large $D$.
 \end{corollary}
 
+\begin{proof}
+\leanok
+\uses{thm:main-matching}
+Every state is within distance one of $1$, with $b(0)=1-p_2$, $b(1)=1$ and $b(2)=p_1+p_2$. For
+$D\geq5$ both masses are below $e^{-5}<\tfrac1{20}$, so the tilts are bounded by a constant and the
+potential by a multiple of $e^{-D}$, which meets the hypothesis for large $D$.
+\end{proof}
+
 \begin{corollary}[Double-exponential law on the half-line]
 \label{thm:doubleexp}
 \lean{GraphMarkovMatching.varying_doubleExp_failure_le}
 \leanok
-\uses{thm:main-matching, thm:double-exp}
 The same holds for the path on the nonnegative integers with $p_k=e^{-D^k}$ for $k\geq1$ and
 $p_0=1-\sum_{k\geq1}p_k$.
 \end{corollary}
+
+\begin{proof}
+\leanok
+\uses{thm:main-matching, thm:double-exp}
+For $k\geq1$ the ratio $p_{k+1}/p_k=e^{-D^k(D-1)}\leq e^{-20}$ makes every tail geometric, so
+$\sum_{k\geq1}p_k<\tfrac1{10}$ and $p_0\geq\tfrac12$. Local dominance on the half-line then bounds
+the potential by a multiple of $e^{-D(D-5/2)}$.
+\end{proof}
 
 \section{Potential-theoretic estimates}
 
@@ -58,6 +79,14 @@ $\mu(V\setminus B_G(0,1))\leq2\eta$, and the far tilt and tilt moment sums are b
 explicit multiples of $\eta$.
 \end{lemma}
 
+\begin{proof}
+\leanok
+Assume $\eta<\infty$, so every state of positive mass has $b(v)>0$. Each state outside
+$B_G(0,1)$ has $b(v)\leq1-\mu(0)\leq\tfrac12$, so its summand in $\eta$ is at least
+$\tfrac12\mu(v)$, which gives the mass bound. The tilt and moment sums follow by the same pointwise
+comparison against the summands of $\eta$.
+\end{proof}
+
 \begin{theorem}[Four-law inequality]
 \label{thm:four-law}
 \lean{GraphMarkovMatching.PhiD_fourlaw_le}
@@ -69,15 +98,32 @@ directed potentials between the two source and two target laws, then the potenti
 symmetrised square of the pair laws is bounded by an explicit function of $M$.
 \end{theorem}
 
+\begin{proof}
+\leanok
+\uses{thm:pointwise-fourlaw}
+Sort the two rows in each column and apply the pointwise bound of \cref{thm:pointwise-fourlaw}
+at every doubly-positive pair. Integrating against the product of the two source laws and bounding
+each of the eight directed potentials by $M$ collects the linear and quadratic terms into the stated
+constants.
+\end{proof}
+
 \begin{proposition}[Pointwise four-law bound]
 \label{thm:pointwise-fourlaw}
 \lean{GraphMarkovMatching.phi_Q_split_four}
 \leanok
-\uses{thm:four-law}
 At a fixed pair $(x_0,x_1)$ with all four bad degrees below one, the square bad degree is below
 one and the weight of the square is bounded by a half-sum of the four one-sided weights plus a
 quadratic remainder.
 \end{proposition}
+
+\begin{proof}
+\leanok
+\uses{def:potential}
+In each column put $d_j=\max(q_0^j,q_1^j)$ and $e_j=\min(q_0^j,q_1^j)$. A lower bound for the
+square good degree in terms of the four column quantities, followed by the tangent-line and chord
+estimates for $\phi^E_\alpha$, separates the half-sum of the four one-sided weights from a quadratic
+remainder.
+\end{proof}
 
 \section{The one-law transfer system}
 
@@ -90,6 +136,14 @@ Let $\nu=\delta_3$ and let $v_f$ be any state with $\mu(v_f)>0$ and $v_f\not\sim
 directed potential from the frozen cross type into the fresh law is infinite at every height.
 \end{proposition}
 
+\begin{proof}
+\leanok
+Build, for each height $m$, an incompatible-root labelling together with an auxiliary labelling,
+by grafting the frozen state $v_f$ at the root and descending along the $\delta_3$ cascade. The
+source mass stays positive while the target good degree vanishes at every such point, so the
+directed potential has an infinite summand at every height.
+\end{proof}
+
 This is why the recursion is carried over screens rather than over the naive cross types.
 
 \begin{lemma}[One-step decomposition]
@@ -101,6 +155,13 @@ child pair $xp$. The good and bad degrees at $x$ decompose over the root state a
 children.
 \end{lemma}
 
+\begin{proof}
+\leanok
+The target law at height $h+1$ is the pushforward of the child-pair law under the branch map.
+Computing the good degree through that pushforward and applying the branch recursion splits it into
+the root-state factor and the two child factors.
+\end{proof}
+
 \begin{lemma}[Screening a fresh mixture]
 \label{thm:fresh-mixture}
 \lean{GraphMarkovMatching.rE_bind}
@@ -109,6 +170,13 @@ Let $\rho=\sum_a w_a\rho_a$ be a countable mixture of laws. Then $r_\rho(z)=\sum
 for every point $z$, so $r_\rho(z)=0$ if and only if $r_{\rho_a}(z)=0$ for every component with
 $w_a>0$.
 \end{lemma}
+
+\begin{proof}
+\leanok
+The good degree is a sum of target masses over compatible points, hence linear in the target
+law, and Fubini for nonnegative sums gives the mixture identity. A vanishing sum of nonnegative
+terms forces each term with positive weight to vanish.
+\end{proof}
 
 \begin{definition}[Restricted quantities]
 \label{def:restricted}
@@ -140,6 +208,13 @@ If the cell law is itself a member of the zero list and $R$ is reflexive, then t
 vanishes for every normalisation.
 \end{lemma}
 
+\begin{proof}
+\leanok
+Fix $x$ with $\rho_s(x)>0$. Reflexivity gives $r_{\rho_s}(x)\geq\rho_s(x)>0$, and since
+$\rho_s$ is in the zero list the dead-event indicator vanishes at $x$. Every summand of the screen
+is therefore zero.
+\end{proof}
+
 \begin{lemma}[Tilt pruning]
 \label{thm:tilt-pruning}
 \lean{GraphMarkovMatching.screenE_tilt_self}
@@ -148,24 +223,48 @@ vanishes for every normalisation.
 If the normalisation is the restricted tilt of a member of the zero list, the screen vanishes.
 \end{lemma}
 
+\begin{proof}
+\leanok
+Fix $x$. If $r_\rho(x)=0$ the restricted weight vanishes there by definition; if $r_\rho(x)>0$
+the dead-event indicator vanishes because $\rho$ lies in the zero list. Either way every summand is
+zero.
+\end{proof}
+
 \begin{lemma}[Screened $2\times2$ classification]
 \label{thm:hall}
 \lean{GraphMarkovMatching.rE_square_eq_zero_iff_hall}
 \leanok
-\uses{def:screen, thm:one-step}
+\uses{def:screen}
 The square good degree vanishes exactly when one source child is dead against both target laws,
 or the Hall condition fails on the $2\times2$ array; the surviving cases split into an explicit
 sum of resolved terms.
 \end{lemma}
 
+\begin{proof}
+\leanok
+\uses{thm:one-step}
+The square compatibility event is the union of the straight and the crossed pairing events, so
+its degree vanishes exactly when both pairings fail. Reading the four one-sided degrees as a
+$2\times2$ array, that is the failure of the Hall condition, and the surviving cases are the
+resolved terms.
+\end{proof}
+
 \begin{lemma}[Mixture bound for restricted weights]
 \label{thm:mixture-tilt}
 \lean{GraphMarkovMatching.WresD_XiBar_le_sum}
 \leanok
-\uses{def:restricted, thm:fresh-mixture}
+\uses{def:restricted}
 For a pair of height-$h$ full labellings, the restricted weight of the mixed pair law is bounded
 by the tilt-weighted sum of the restricted weights of its components.
 \end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:fresh-mixture}
+If the mixed good degree vanishes the left side is zero. Otherwise the mixture identity of
+\cref{thm:fresh-mixture} writes the mixed degree as the weighted sum of the component degrees, and
+dividing through gives the tilt-weighted bound.
+\end{proof}
 
 \section{The grammar and the accessible index}
 
@@ -187,6 +286,14 @@ Fix $N\geq2$ with $S_\nu\subseteq\set{0,\dots,N}$. Then successors stay inside $
 successors of members of $\cU_N$ stay in $\cU_N$, and
 $\abs{\cA_N}\leq2N+3$, $\abs{\cU_N}\leq(2N+3)2^{2N+3}(2N+4)$.
 \end{lemma}
+
+\begin{proof}
+\leanok
+Every member of the cascade pair of $j\leq N$ is $\Ff$ or a letter $\Zf_i$ with
+$i\leq\max\set{\floor{j/2},\,j-\floor{j/2}}\leq N$, so successors stay inside $\cA_N$. Counting the
+three families of letters gives the alphabet bound, and a screen is a cell, a subset of the alphabet
+and a normalisation, which gives the second count.
+\end{proof}
 
 \begin{definition}[Interpretation of the grammar]
 \label{def:interp}
@@ -216,6 +323,13 @@ component letter occurs in an accessible pair, and $\mathfrak O_\nu\subseteq\cA_
 $S_\nu\subseteq\set{0,\dots,N}$.
 \end{lemma}
 
+\begin{proof}
+\leanok
+Induct on the construction. The initial pair is fixed by swapping and by both diagonal maps, and
+each closure property is preserved by passing to pair successors. No successor of a letter in an
+accessible pair is a component letter, so component letters never appear.
+\end{proof}
+
 \begin{definition}[Accessible screens and the live index]
 \label{def:scracc}
 \lean{GraphMarkovMatching.ScrAcc}
@@ -236,6 +350,15 @@ zero list, or as its normalisation, and its cell pairs accessibly with itself an
 normalisation.
 \end{lemma}
 
+\begin{proof}
+\leanok
+\uses{thm:ordacc-inv}
+Induct on the construction of a screen. A seed has a nonempty zero list by definition and each
+of its letters is a successor of a coordinate of an accessible pair, so no component letter occurs;
+both properties are preserved by the closure operations. The pairing claims follow from
+\cref{thm:ordacc-inv}.
+\end{proof}
+
 \begin{definition}[The block matrix]
 \label{def:accN}
 \lean{GraphMarkovMatching.accN}
@@ -251,9 +374,16 @@ successor $j$ of $i$, and zero elsewhere.
 \label{thm:res-four-law}
 \lean{GraphMarkovMatching.PhiDres_fourlaw_le}
 \leanok
-\uses{thm:four-law, def:restricted}
+\uses{def:restricted}
 The four-law inequality holds for the restricted potentials, with an added zero-mass term.
 \end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:four-law}
+Run the proof of \cref{thm:four-law} on the restricted quantities. The pairs outside the
+doubly-positive set contribute the zero-mass term, and the rest is bounded exactly as before.
+\end{proof}
 
 \begin{definition}[The cell bound]
 \label{def:cellCB}
@@ -268,19 +398,35 @@ zero-mass and screen contributions of one cell.
 \label{thm:one-cell}
 \lean{GraphMarkovMatching.PhiDres_square_le}
 \leanok
-\uses{thm:res-four-law, def:cellCB, def:screen}
+\uses{def:cellCB, def:screen}
 If in addition the four resolved screens are bounded by $E'$, then the restricted potential of
 the square is at most the cell bound.
 \end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:res-four-law, def:screen}
+The restricted square potential is the average of the weight over the pairs alive against the
+target product. Splitting that average by \cref{thm:res-four-law} and bounding the four resolved
+screens by $E'$ collects the terms into the cell bound.
+\end{proof}
 
 \begin{lemma}[Square cell between cascades]
 \label{thm:psirow-square}
 \lean{GraphMarkovMatching.psiRow_square}
 \leanok
-\uses{thm:one-cell, def:interp}
+\uses{def:interp}
 Fix counters $k,j$ and a height $h$. If the ordinary coordinates, zero masses and screens
 between the two cascade families are bounded, then so is the square cell between them.
 \end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:one-cell}
+Both cells are products of interpreted letters, so \cref{thm:one-cell} applies with the two
+cascade laws as source and target. The hypotheses supply the bounds it needs on the ordinary
+coordinates, the zero masses and the screens.
+\end{proof}
 
 \begin{definition}[The one-sided bound]
 \label{def:oneSided}
@@ -294,55 +440,105 @@ $\mathrm{OS}(M,E'):=T_\nu\abs{S_\nu}\bigl(4E'(1+\alpha M)+4E'^2\bigr)$.
 \label{thm:one-sided}
 \lean{GraphMarkovMatching.oneSided_charge_le}
 \leanok
-\uses{def:oneSided, thm:mixture-tilt}
+\uses{def:oneSided}
 Under the row hypotheses the one-sided charge at a counter is at most $\mathrm{OS}(M,E')$.
 \end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:mixture-tilt}
+Treat the indicator and the tilt separately. Some supported component is dead at a pair point
+exactly when one of the finitely many component events occurs, and the tilt is bounded by
+\cref{thm:mixture-tilt}. Multiplying the two bounds and summing over the support gives
+$\mathrm{OS}(M,E')$.
+\end{proof}
 
 \begin{lemma}[The four ordinary rows]
 \label{thm:psi-rows}
 \lean{GraphMarkovMatching.psiRow_ZZ}
 \leanok
-\uses{thm:psirow-square, thm:one-sided, def:cellCB}
+\uses{def:cellCB}
 With $\Delta:=\mathrm{CB}(M,Z,E')+\mathrm{OS}(M,E')$, each of the four ordinary coordinates at
 height $h+1$ is bounded by $\Delta$ under the corresponding hypotheses at height $h$.
 \end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:psirow-square, thm:one-sided}
+Each of the four rows has a forced or fresh source whose height-$(h+1)$ law is the pushforward
+of a cascade law below a compatible root. \Cref{thm:psirow-square} bounds the square cell and
+\cref{thm:one-sided} the tilt mass carried by dead components, and the two together give
+$\Delta$.
+\end{proof}
 
 \begin{lemma}[Descent of a zero list]
 \label{thm:descent}
 \lean{GraphMarkovMatching.memInd_branch_iff}
 \leanok
-\uses{def:screen, thm:one-step}
+\uses{def:screen}
 For an $\Ff_k$-free zero list and a root state $v\sim0$ with $b(v)>0$, deadness of a branch
 point against the list is equivalent to deadness of the child pair against the descended list.
 \end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:one-step}
+A member of the zero list is dead after the root decomposition exactly when its member pairs are
+dead at the child pair, by the one-step decomposition and $b(v)>0$. Taking the conjunction over the
+list gives the equivalence.
+\end{proof}
 
 \begin{lemma}[Multi-member Hall factorisation]
 \label{thm:hall-factor}
 \lean{GraphMarkovMatching.hallFactorize}
 \leanok
-\uses{thm:hall}
 When every component of a member of the product list lies in the scalar list, deadness against
 the product list factorises through deadness against the scalar list.
 \end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:hall}
+Bound the indicator of joint deadness pointwise by the sum of the two one-sided indicators and a
+cross term over the scalar list. Integrating that bound against the two source laws factorises the
+product deadness through the scalar deadness.
+\end{proof}
 
 \begin{lemma}[The six screen rows]
 \label{thm:screen-rows}
 \lean{GraphMarkovMatching.interpScreen_forced_step}
 \leanok
-\uses{thm:descent, thm:hall-factor, def:scracc}
+\uses{def:scracc}
 For a formal screen whose cell is forced or fresh, with nonempty $\Ff_k$-free zero list and
 $\Ff_k$-free normalisation, the screen at height $h+1$ is bounded by the sum of its successor
 screens at height $h$ plus the ledger terms.
 \end{lemma}
 
+\begin{proof}
+\leanok
+\uses{thm:descent, thm:hall-factor}
+For a forced cell the height-$(h+1)$ law is the pushforward of a cascade law below a compatible
+root, so \cref{thm:descent} rewrites the zero event at the child pair and \cref{thm:hall-factor}
+splits it over the successor screens. The fresh cell is the same computation after expanding the
+root mixture, and the ledger terms collect the root tilt and the far mass.
+\end{proof}
+
 \begin{lemma}[Base bounds]
 \label{thm:base}
 \lean{GraphMarkovMatching.interpPhi_base}
 \leanok
-\uses{thm:zero-interface, def:interp}
+\uses{def:interp}
 Suppose $\mu(0)\geq1/2$. At height $0$ every $\Ff_k$-free ordinary coordinate is at most
 $\eta+\phi^E_\alpha(q_\mu(0))$, and every admissible formal screen is bounded likewise.
 \end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:zero-interface}
+A height-$0$ labelling is a single label and matching is state compatibility. For a forced
+target the degree at a compatible root is $1$, so the coordinate is $\eta$ plus the weight at the
+zero state; the screens are bounded by the same two quantities.
+\end{proof}
 
 \section{Nilpotence of the accessible screen block}
 
@@ -364,6 +560,12 @@ There is a threshold $R_0$ such that every multiple of $d_\nu$ at least $R_0$ be
 $\Sigma_\nu$.
 \end{lemma}
 
+\begin{proof}
+\leanok
+Divide the generators by $d_\nu$ so that they are coprime. Two consecutive elements then lie in
+the monoid, and every sufficiently large integer is a nonnegative combination of them.
+\end{proof}
+
 \begin{definition}[Admissible descents]
 \label{def:descend}
 \lean{GraphMarkovMatching.Descend}
@@ -381,6 +583,15 @@ The fresh-to-fresh descent lengths are exactly the monoid: $\set{m\colon\Ff\Down
 $\mathrm{toF}(k)$ with $k\in S_\nu$ is realised.
 \end{lemma}
 
+\begin{proof}
+\leanok
+\uses{def:renewal}
+For realisation, induct along the return-length recursion: whenever the successor set of a
+letter contains the cascade pair of $k$, each $d\in\mathrm{toF}(k)$ is realised by a descent of that
+length. For decomposition, every letter has some descent to $\Ff$, and concatenating fresh returns
+shows the descent lengths form the monoid.
+\end{proof}
+
 \begin{lemma}[List coverage]
 \label{thm:coverage}
 \lean{GraphMarkovMatching.mem_zsucc_iter_of_descend}
@@ -391,14 +602,29 @@ along any chain of full successor screens the zero list after $n$ steps is the $
 of the initial one.
 \end{lemma}
 
+\begin{proof}
+\leanok
+\uses{def:descend}
+The empty descent leaves $t'=t$ in the list. One step places $t'$ in the descended list, and
+induction advances the membership by one iterate per step; the same induction runs along a chain of
+full successor screens.
+\end{proof}
+
 \begin{lemma}[Returns along source chains]
 \label{thm:source-ray}
 \lean{GraphMarkovMatching.hits_F_of_gpair}
 \leanok
-\uses{thm:descend-realise}
 Along a chain of successor letters, a cascade entry at counter $k$ returns to $\Ff$ after some
 $m\in\mathrm{toF}(k)$, and a fresh letter returns after some renewal depth.
 \end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:descend-realise}
+Strong induction on the counter. If the next letter is $\Ff$ then $1\in\mathrm{toF}(k)$ works;
+otherwise the next letter is a forced letter at a strictly smaller counter, and the inductive
+hypothesis supplies a return whose length lies in the corresponding shifted set.
+\end{proof}
 
 \begin{definition}[Anchored letters and screens]
 \label{def:anchored}
@@ -419,15 +645,33 @@ screens. If $\Ff$ is anchored at $d$ then $d\in\Sigma_\nu$, and every accessible
 coordinates anchored.
 \end{lemma}
 
+\begin{proof}
+\leanok
+\uses{def:anchored}
+Prepending the step $t\to t'$ to a fresh completion of $t'$ of length $m$ gives one of $t$ of
+length $m+1$, which is the propagation. The empty completion forces $d\in\Sigma_\nu$ when $\Ff$ is
+anchored at $d$, and the accessible pairs are anchored because the seed is.
+\end{proof}
+
 \begin{theorem}[No anchored live path]
 \label{thm:nilpotence}
 \lean{GraphMarkovMatching.no_anchored_live_path}
 \leanok
-\uses{thm:anchor-step, thm:coverage, thm:source-ray, def:scracc}
+\uses{def:scracc}
 There is no infinite chain of formal screens, each a full successor of the last, starting from
 an anchored screen with nonempty zero list and never having its cell in its zero list.
 Consequently the block matrix on the live index is nilpotent.
 \end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:anchor-step, thm:coverage, thm:source-ray}
+Suppose such a chain exists. Anchoring propagates along it by \cref{thm:anchor-step}, and
+\cref{thm:source-ray} returns the cell to $\Ff$ at a bounded number of steps. \Cref{thm:coverage}
+puts that same letter in the zero list at the same step, so the cell lies in its zero list,
+contradicting liveness. A finite live index with no infinite path makes the block matrix
+nilpotent.
+\end{proof}
 
 \section{The closed recursion}
 
@@ -453,57 +697,101 @@ are the explicit increasing functions assembled from the cell and one-sided boun
 \label{thm:psi-step}
 \lean{GraphMarkovMatching.genPsi_step}
 \leanok
-\uses{thm:psi-rows, def:step-functions}
+\uses{def:step-functions}
 $\overline\Psi_{h+1}\leq f(\overline\Psi_h,\overline E_h)$ for every $h$.
 \end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:psi-rows, thm:ordacc-inv}
+An accessible pair contains no component letter, so its coordinate at height $h+1$ is one of the
+four rows of \cref{thm:psi-rows}, and every row bound is dominated by the ordinary step
+function.
+\end{proof}
 
 \begin{lemma}[The screen step]
 \label{thm:e-step}
 \lean{GraphMarkovMatching.genE_step}
 \leanok
-\uses{thm:screen-rows, def:accN, def:step-functions}
+\uses{def:accN, def:step-functions}
 For $\mu(0)>0$ and $C_W$ large enough,
 $E_{h+1}(i)\leq g(\overline\Psi_h,\overline E_h)+(\Nb E_h)(i)$ for every $h$ and every $i$.
 \end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:screen-rows, thm:scracc-inv}
+An index screen has one of the six shapes of \cref{thm:screen-rows}, by the component-letter
+freeness of \cref{thm:scracc-inv}. Each row bounds the screen at height $h+1$ by the step function
+plus the sum over full successors, which is the block matrix applied to $E_h$.
+\end{proof}
 
 \begin{lemma}[Nilpotent invariant]
 \label{thm:invariant}
 \lean{GraphMarkovMatching.nilpotent_invariant}
 \leanok
-\uses{thm:nilpotence}
 Let $\Nb$ be nonnegative on a finite index with $\Nb^{\,r}(u\mathbf1)=0$, and put
 $\widehat E:=\sum_{j<r}\Nb^{\,j}(u\mathbf1)$. Then $u\mathbf1+\Nb\widehat E=\widehat E$, and any
 vector sequence dominated by the step stays below $\widehat E$.
 \end{lemma}
 
+\begin{proof}
+\leanok
+\uses{thm:nilpotence}
+The identity is the index shift, whose top term $\Nb^{\,r}(u\mathbf1)$ vanishes. Invariance
+follows by induction on $h$: the base is the definition, and one step applies the monotone bound and
+the identity.
+\end{proof}
+
 \begin{theorem}[The screened recursion closes]
 \label{thm:engine}
 \lean{GraphMarkovMatching.screened_uniform_bound_mono}
 \leanok
-\uses{thm:invariant, thm:psi-step, thm:e-step}
 Under nilpotence of $\Nb$, monotone step functions, and the size and closure inequalities, the
 ordinary scalar stays below $K_c\eta$ and the screen vector below $\widehat E$ at every height.
 \end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:invariant, thm:psi-step, thm:e-step}
+Induct on the height on the joint invariant that the scalar stays below $K_c\eta$ and the vector
+below $\widehat E$. The base is the size inequality, and the step applies the two monotone step
+functions together with the invariant identity of \cref{thm:invariant}.
+\end{proof}
 
 \begin{lemma}[Geometric bound for the invariant]
 \label{thm:geom}
 \lean{GraphMarkovMatching.mulVec_le_of_row_sum}
 \leanok
-\uses{thm:invariant}
 If every row sum of $\Nb$ is at most $c$, then $\Nb^{\,j}(u\mathbf1)\leq c^ju\mathbf1$ and the
 invariant is at most $(\sum_{j<r}c^j)u\mathbf1$. For the block matrix one may take
 $c=C_W\abs{\mathfrak I_\nu}$.
 \end{lemma}
 
+\begin{proof}
+\leanok
+\uses{thm:invariant}
+If $x\leq b\mathbf1$ entrywise then $(\Nb x)(i)\leq b\sum_j\Nb(i,j)\leq cb$ for every $i$, so one
+application multiplies a constant bound by at most $c$. Induction on $j$ gives the power bound and
+summing gives the invariant bound.
+\end{proof}
+
 \begin{theorem}[Uniform failure bound, closure form]
 \label{thm:closure-form}
 \lean{GraphMarkovMatching.varying_failure_uniform}
 \leanok
-\uses{thm:engine, thm:geom, thm:base}
 With the step functions of \cref{def:step-functions} and $r_\nu=\abs{\mathfrak I_\nu}+1$ from
 \cref{thm:nilpotence}, and the ledger bounds in force, the failure probability is bounded
 uniformly in the height by the closed form.
 \end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:engine, thm:geom, thm:base, thm:nilpotence}
+Apply \cref{thm:engine} to the running coordinates, with the block matrix of \cref{def:accN},
+the step functions of \cref{def:step-functions}, nilpotence from \cref{thm:nilpotence}, the base
+bounds of \cref{thm:base}, and the invariant bounded geometrically by \cref{thm:geom}.
+\end{proof}
 
 \section{The numerical closure}
 
@@ -511,10 +799,17 @@ uniformly in the height by the closed form.
 \label{thm:ledger-constants}
 \lean{GraphMarkovMatching.rootTilt_le}
 \leanok
-\uses{thm:zero-interface}
 If $\sim$ is symmetric and $\mu(0)\geq1/2$, the ledger hypotheses hold with $R_T=8$,
 $F_M=2\eta$, $F_T=2\eta$.
 \end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:zero-interface}
+For $v\sim0$ the ball $B_G(v,1)$ contains $0$, so $b(v)\geq\mu(0)\geq\tfrac12$ and
+$b(v)^{-5/2}\leq2^{5/2}\leq8$. The far mass and the far tilt are the two zero-interface bounds of
+\cref{thm:zero-interface}.
+\end{proof}
 
 \begin{definition}[The explicit constants]
 \label{def:constants}
@@ -529,11 +824,19 @@ bounds $c_N\geq\abs{\mathfrak I_\nu}$ and $n_{\cA}\geq\abs{\cA_N}$, and the supp
 \label{thm:numeric}
 \lean{GraphMarkovMatching.varying_failure_le}
 \leanok
-\uses{def:constants, thm:closure-form}
+\uses{def:constants}
 If $\sim$ is reflexive and symmetric, $\mu(0)\geq1/2$ and $\eps^{-1}\eta\leq1$, then the size
 and closure inequalities hold with the explicit constants and the failure probability is at most
 $K_c\eta$.
 \end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:closure-form, thm:ledger-constants}
+Instantiate \cref{thm:closure-form} at the constants of \cref{def:constants} with the ledger
+values of \cref{thm:ledger-constants}, and verify the size and closure inequalities in turn using
+$\eps^{-1}\eta\leq1$.
+\end{proof}
 
 \begin{lemma}[Marginal consistency]
 \label{thm:marginal-consistency}
@@ -542,6 +845,12 @@ $K_c\eta$.
 Restriction of a height-$(h+1)$ labelling to $\bbB_h$ pushes $T_{h+1}$ forward to $T_h$, so the
 finite-height bounds pass to the infinite tree.
 \end{lemma}
+
+\begin{proof}
+\leanok
+The restriction of a branch is the branch of the restrictions, so the Markov property gives the
+identity by induction on the height, one fibre of the root mixture at a time.
+\end{proof}
 
 \section{Two counter laws with a common core}
 
@@ -565,6 +874,14 @@ cascade law at $a$ conditioned on the designated port carrying the label $(0,b)$
 probability $\mu(0)\nu_\sigma(b)>0$.
 \end{lemma}
 
+\begin{proof}
+\leanok
+\uses{def:composite-kernel}
+Below a counter-$a$ root the balanced rule forces every label of the $a$-cascade, and the
+designated port carries a fresh sample independent of all others. Conditioning on that sample being
+$(0,b)$ is an event of probability $\mu(0)\nu_\sigma(b)$ and leaves the marked law.
+\end{proof}
+
 \begin{lemma}[Support equality]
 \label{thm:support-equality}
 \lean{GraphMarkovMatching.Composite.exists_sim_of_muM_ne_zero}
@@ -574,14 +891,28 @@ After forgetting the counters, the supports of the corresponding components on t
 agree, componentwise and at every height.
 \end{lemma}
 
+\begin{proof}
+\leanok
+Induct on the height, proving all identities simultaneously. At height zero every listed law has
+root-state law $\mu$ or the point mass at $0$, and the branch recursion preserves the componentwise
+agreement because the two kernels differ only in the counters.
+\end{proof}
+
 \begin{corollary}[Exact pruning across the two laws]
 \label{thm:exact-pruning}
 \lean{GraphMarkovMatching.Composite.dead_screen_eq_zero}
 \leanok
-\uses{thm:support-equality, thm:pruning}
 A screen whose cell is a component on one side and whose zero list holds the matching components
 on the other side vanishes.
 \end{corollary}
+
+\begin{proof}
+\leanok
+\uses{thm:support-equality, thm:pruning}
+By \cref{thm:support-equality} every point of positive source mass has a target point carrying
+the same states at every vertex, and $\sim$ is reflexive, so the identity pairing witnesses life.
+The dead-event indicator therefore vanishes, as in \cref{thm:pruning}.
+\end{proof}
 
 \begin{definition}[The tagged alphabet and letter successors]
 \label{def:composite-grammar}
@@ -611,6 +942,14 @@ names with coordinates and stage in $\set{0,\dots,N}$,
 $\abs{\cL_N}=1+(N+1)+(N+1)^3=n_{\cA}$.
 \end{lemma}
 
+\begin{proof}
+\leanok
+\uses{thm:universes}
+The three families of names are disjoint with the displayed cardinalities. A screen is a cell, a
+subset of the alphabet and a normalisation, which gives $2^{n_{\cA}}$ zero lists and $n_{\cA}+1$
+normalisations.
+\end{proof}
+
 \begin{lemma}[Chart returns]
 \label{thm:chart-returns}
 \lean{GraphMarkovMatching.Composite.chartPorts_cases}
@@ -620,14 +959,29 @@ The designated port depth satisfies $d(k)\in\mathrm{toF}(k)$, and the port depth
 a declared pair lie in the corresponding union of return-length sets.
 \end{lemma}
 
+\begin{proof}
+\leanok
+\uses{def:renewal}
+Induct along the port-depth recursion: $d(k)=1$ for $k\leq3$, and for $k\geq4$ the depth enters
+the floor branch of the return-length recursion. The chart of a declared pair concatenates the
+designated path with the exposed fresh ports, so its depths lie in the corresponding union.
+\end{proof}
+
 \begin{lemma}[Realisation]
 \label{thm:composite-realise}
 \lean{GraphMarkovMatching.Composite.descend_F_iff_mem_sigmaS}
 \leanok
-\uses{thm:chart-returns, thm:descend-realise}
 On either side the fresh-to-fresh descent lengths are $\Sigma_S$, the descent lengths to $\Ff$
 do not depend on the side, and every chain of $2N+2$ successor steps passes through $\Ff$.
 \end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:chart-returns, thm:descend-realise}
+On either side the successor set of $\Ff$ contains the cascade pair of every core counter, so
+the realisation half of \cref{thm:descend-realise} applies verbatim. \Cref{thm:chart-returns} places
+the marker depths in the same monoid, so the descent lengths do not depend on the side.
+\end{proof}
 
 \begin{definition}[Anchored tagged letters and screens]
 \label{def:composite-anchored}
@@ -647,32 +1001,60 @@ $\Ff$ is anchored at $\delta$ if and only if $\delta\in\Sigma_S$, and a successo
 anchored at $\delta$ is anchored at $\delta+1$.
 \end{lemma}
 
+\begin{proof}
+\leanok
+\uses{thm:anchor-step, thm:composite-realise}
+The two clauses are \cref{thm:anchor-step} with $\Sigma_S$ in place of $\Sigma_\nu$ and the
+side-indexed successors in place of the ordinary ones; the empty chain forces $\delta\in\Sigma_S$
+for the fresh letter.
+\end{proof}
+
 \begin{theorem}[Acyclicity of the screen steps]
 \label{thm:composite-acyclic}
 \lean{GraphMarkovMatching.Composite.no_live_step_cycleS}
 \leanok
-\uses{thm:composite-anchor, thm:nilpotence}
 No cycle of full-successor edges passes through live anchored tagged screens, whether an edge
 advances the cell by a common counter or through an exceptional entrance. The directed graph on
 the live index is acyclic and the block matrix is nilpotent.
 \end{theorem}
 
+\begin{proof}
+\leanok
+\uses{thm:composite-anchor, thm:nilpotence}
+A cycle through live anchored screens, followed forever, gives an infinite path of live anchored
+screens, which \cref{thm:nilpotence} excludes once anchoring propagates by
+\cref{thm:composite-anchor}. A finite acyclic index makes the block matrix nilpotent.
+\end{proof}
+
 \begin{lemma}[The weighted mixture tilt]
 \label{thm:mixture-tilt-composite}
 \lean{GraphMarkovMatching.Composite.invTilt_simDeg_cXiBar_le}
 \leanok
-\uses{thm:mixture-tilt, def:composite-kernel}
+\uses{def:composite-kernel}
 At every pair point the restricted weight of the mixed pair law on one side is bounded by the
 weighted sum over the common core and the exceptional entrances.
 \end{lemma}
 
+\begin{proof}
+\leanok
+\uses{thm:mixture-tilt}
+Degrees are linear in the target law, so the mixed degree splits over the common core and the
+exceptional entrances with the exact coefficients of the counter law. Dividing through, as in
+\cref{thm:mixture-tilt}, gives the weighted bound.
+\end{proof}
+
 \begin{lemma}[Retention of the source coefficients]
 \label{thm:retention}
-\uses{thm:mixture-tilt-composite}
 Every transfer-row expression is a sum of integrals against its source law, so expanding the
 fresh source cell splits the row into component rows with the exact coefficients of the counter
 law, on both the common core and the exceptional entrances.
 \end{lemma}
+
+\begin{proof}
+\uses{thm:mixture-tilt-composite}
+Linearity of the source integral gives the split with the exact coefficients before any bound is
+applied, and \cref{thm:mixture-tilt-composite} supplies the weight for each component row.
+\end{proof}
 
 \begin{proposition}[The composite ledger]
 \label{thm:composite-ledger}
@@ -683,6 +1065,17 @@ For two counter laws with a common core, the running coordinates formed from the
 of the composite comparison satisfy the ordinary and screen step inequalities of
 \cref{thm:psi-step} and \cref{thm:e-step} with the tagged step functions.
 \end{proposition}
+
+\begin{proof}
+\leanok
+\uses{thm:retention, thm:psi-step, thm:e-step}
+Each transfer row splits over the common core and the exceptional entrances with the exact
+coefficients of the two counter laws, by \cref{thm:retention}. Applying the ordinary and screen
+rows of \cref{thm:psi-step} and \cref{thm:e-step} to each component and recombining gives the
+tagged step functions.
+\end{proof}
+
+\section{Proof of the two-law theorem}
 
 \begin{proof}
 \leanok
