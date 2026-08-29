@@ -1,0 +1,142 @@
+name: Build and audit
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build the four libraries
+    runs-on: ubuntu-latest
+    steps:
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.0
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: false
+          swap-storage: false
+
+      - name: Check out the project
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          path: project
+
+      # Mathlib arrives through `lake exe cache get`; this caches our own oleans,
+      # which are the expensive part of a rebuild.
+      - name: Cache the library build output
+        uses: actions/cache@v4
+        with:
+          path: project/.lake/build
+          key: lake-build-${{ hashFiles('project/lean-toolchain', 'project/lakefile.toml', 'project/lake-manifest.json') }}-${{ hashFiles('project/**/*.lean') }}
+          restore-keys: |
+            lake-build-${{ hashFiles('project/lean-toolchain', 'project/lakefile.toml', 'project/lake-manifest.json') }}-
+
+      # No lint driver and no `mk_all` umbrellas are configured, so both checks stay off.
+      - name: Build
+        uses: leanprover/lean-action@434f25c2f80ded67bba02502ad3a86f25db50709 # 2025-07-02
+        with:
+          lake-package-directory: project
+          build: true
+          lint: false
+          mk_all-check: false
+
+  comparator:
+    name: Comparator audit
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.0
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: false
+          swap-storage: false
+
+      - name: Check out the project
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          path: project
+
+      # Both tools are pinned. Bump them deliberately: `lean4export` reads the
+      # project's oleans and has to stay at the project's Lean version.
+      - name: Check out comparator
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: leanprover/comparator
+          ref: 777e7f56119efc0fac34003db4efe831e0b53723
+          path: comparator
+
+      - name: Check out lean4export
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: leanprover/lean4export
+          ref: 86e4a339507466921dc8c5417c8cb1de1ce7df60
+          path: lean4export
+
+      # Comparator requires landrun built from the main branch.
+      - name: Check out landrun
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: Zouuup/landrun
+          path: landrun
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Build landrun
+        working-directory: landrun
+        run: go build -o landrun cmd/landrun/main.go
+
+      - name: Restore the library build output
+        uses: actions/cache@v4
+        with:
+          path: project/.lake/build
+          key: lake-build-${{ hashFiles('project/lean-toolchain', 'project/lakefile.toml', 'project/lake-manifest.json') }}-${{ hashFiles('project/**/*.lean') }}
+          restore-keys: |
+            lake-build-${{ hashFiles('project/lean-toolchain', 'project/lakefile.toml', 'project/lake-manifest.json') }}-
+
+      - name: Build the project
+        uses: leanprover/lean-action@434f25c2f80ded67bba02502ad3a86f25db50709 # 2025-07-02
+        with:
+          lake-package-directory: project
+          build: true
+          lint: false
+          mk_all-check: false
+
+      # elan is on PATH from the step above, and each tool carries its own
+      # toolchain: comparator builds at its version, lean4export at v4.32.2.
+      - name: Build comparator
+        working-directory: comparator
+        run: lake build
+
+      - name: Build lean4export
+        working-directory: lean4export
+        run: lake build
+
+      # comparator-audit.sh resolves the two binaries under COMPARATOR_TOOLS and
+      # falls back to the macOS landrun shim, so the real binary is named here.
+      # The systemd-run hardening of comparator's README is not applied.
+      - name: Run the audit
+        working-directory: project
+        env:
+          COMPARATOR_TOOLS: ${{ github.workspace }}
+          COMPARATOR_LANDRUN: ${{ github.workspace }}/landrun/landrun
+        run: ./comparator-audit.sh

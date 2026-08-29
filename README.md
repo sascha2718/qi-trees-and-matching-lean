@@ -38,3 +38,7 @@ lake build Challenge Solution
 
 `ChainClasses/AxCheck.lean` contains the detailed axiom audit. `Challenge.lean`,
 `Solution.lean`, and `comparator-config.json` define the independent headline-theorem audit.
+
+## License
+
+Apache License 2.0, see [`LICENSE`](LICENSE).
