@@ -1,0 +1,60 @@
+% Macros and settings shared by the pdf and the web version.
+
+% ---------- theorem environments ----------
+% The dependency graph reads theorem, proposition, lemma, corollary and
+% definition. All environments share the theorem counter.
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{conjecture}[theorem]{Conjecture}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+% ---------- notation ----------
+% Follows preamble.tex of the paper. Paired delimiters and \DeclareMathOperator
+% are written as plain \newcommand so that MathJax receives them.
+\newcommand{\bbP}{\mathbb{P}}
+\newcommand{\bbE}{\mathbb{E}}
+\newcommand{\bbN}{\mathbb{N}}
+\newcommand{\bbZ}{\mathbb{Z}}
+\newcommand{\bbR}{\mathbb{R}}
+\newcommand{\bbB}{\mathbb{B}}
+\newcommand{\cA}{\mathcal{A}}
+\newcommand{\cB}{\mathcal{B}}
+\newcommand{\cC}{\mathcal{C}}
+\newcommand{\cD}{\mathcal{D}}
+\newcommand{\cE}{\mathcal{E}}
+\newcommand{\cF}{\mathcal{F}}
+\newcommand{\cK}{\mathcal{K}}
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\cM}{\mathcal{M}}
+\newcommand{\cN}{\mathcal{N}}
+\newcommand{\cR}{\mathcal{R}}
+\newcommand{\cS}{\mathcal{S}}
+\newcommand{\cT}{\mathcal{T}}
+\newcommand{\cU}{\mathcal{U}}
+\newcommand{\cX}{\mathcal{X}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\troot}{\emptyset}
+\newcommand{\rt}{\emptyset}
+\newcommand{\eqdist}{\overset{\mathrm{d}}{=}}
+\newcommand{\Geom}{\operatorname{Geom}}
+\newcommand{\diam}{\operatorname{diam}}
+\newcommand{\Aut}{\operatorname{Aut}}
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\rep}{\operatorname{rep}}
+\newcommand{\shrink}{\operatorname{sh}}
+\newcommand{\set}[1]{\{#1\}}
+\newcommand{\abs}[1]{\lvert #1 \rvert}
+\newcommand{\floor}[1]{\lfloor #1 \rfloor}
+\newcommand{\ceil}[1]{\lceil #1 \rceil}
+\newcommand{\Ff}{\mathsf{F}}
+\newcommand{\Zf}{\mathsf{Z}}
+\newcommand{\Mf}{\mathsf{M}}
+\newcommand{\Nb}{\mathsf{N}}

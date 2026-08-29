@@ -1,0 +1,20 @@
+% Macros used only by the printed version.
+%
+% The dummy definitions below let the pdf compiler ignore the macros that
+% plasTeX provides for the web version.
+
+\newcommand{\lean}[1]{}
+\newcommand{\discussion}[1]{}
+\newcommand{\leanok}{}
+\newcommand{\mathlibok}{}
+\newcommand{\notready}{}
+% \uses and \proves take real labels. The invisible refs make LaTeX warn about
+% an undefined label while printing nothing.
+\ExplSyntaxOn
+\NewDocumentCommand{\uses}{m}
+ {\clist_map_inline:nn{#1}{\vphantom{\ref{##1}}}%
+  \ignorespaces}
+\NewDocumentCommand{\proves}{m}
+ {\clist_map_inline:nn{#1}{\vphantom{\ref{##1}}}%
+  \ignorespaces}
+\ExplSyntaxOff
