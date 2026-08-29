@@ -1,0 +1,75 @@
+name: Blueprint
+
+on:
+  push:
+    branches: [main]
+    # Every input of the blueprint lives under blueprint/, so a push that only
+    # moves Lean sources leaves the published site correct.
+    paths:
+      - 'blueprint/**'
+      - '.github/workflows/blueprint.yml'
+  workflow_dispatch:
+
+# Pages runs one deployment at a time, and a queued one is worth finishing.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  blueprint:
+    name: Build the blueprint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the project
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      # blueprint.sty ships in blueprint/src, so TeX Live supplies nothing
+      # beyond its standard packages. plasTeX and its two plugins are pinned to
+      # the versions the site was written against; pygraphviz is compiled
+      # against the graphviz that draws the dependency graph.
+      - name: Build the pdf and the web version
+        uses: xu-cheng/texlive-action@22c04326a5d855880f9d39bb955138bf11c6df80 # v3
+        with:
+          texlive_version: 2025
+          run: |
+            apk add --no-cache python3 python3-dev py3-pip gcc musl-dev pkgconfig graphviz graphviz-dev
+            python3 -m venv /tmp/venv
+            . /tmp/venv/bin/activate
+            pip install --upgrade pip wheel
+            pip install pygraphviz==2.0.1
+            pip install plasTeX==3.1 plastexdepgraph==0.0.5 plastexshowmore==0.0.2 leanblueprint==0.0.20
+            cd blueprint/src
+            mkdir -p ../print
+            latexmk -output-directory=../print -interaction=nonstopmode -halt-on-error
+            plastex -c plastex.cfg web.tex
+
+      # \home in blueprint/src/web.tex names the site root, so the web version
+      # is the site itself and the printable version sits beside it.
+      - name: Assemble the site
+        run: |
+          mkdir site
+          cp -r blueprint/web/. site/
+          cp blueprint/print/print.pdf site/blueprint.pdf
+
+      - name: Upload the site
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+  deploy:
+    name: Deploy to Pages
+    needs: blueprint
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v5
