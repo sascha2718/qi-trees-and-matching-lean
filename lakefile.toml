@@ -1,0 +1,31 @@
+name = "graphmatching"
+defaultTargets = ["GraphMatching", "GraphMarkovMatching", "ChainClasses", "BranchingProcess"]
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4"
+rev = "v4.32.2"
+
+[[lean_lib]]
+name = "GraphMatching"
+
+[[lean_lib]]
+name = "GraphMarkovMatching"
+
+[[lean_lib]]
+name = "ChainClasses"
+
+# Public classification entry point: `import ChainClasses.Classification`.
+# `ChainClasses.AxCheck` remains separately buildable and is not imported by the umbrella module.
+
+[[lean_lib]]
+name = "BranchingProcess"
+
+# Comparator audit modules (not part of the four libraries, not default targets):
+# `Challenge` restates the headline theorems with `sorry`, `Solution` proves them
+# by the library declarations. See comparator-config.json.
+[[lean_lib]]
+name = "Challenge"
+
+[[lean_lib]]
+name = "Solution"
