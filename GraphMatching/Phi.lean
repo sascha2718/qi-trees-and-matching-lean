@@ -6,7 +6,7 @@ elementary facts the rest of the development needs:
 * `one_sub_rpow_leA`    the tangent line to `t ↦ t^α` at `t = 1`, used for `eq:W-bound`
 * `chordA`              `eq:iid-chord`:  `(1-z)^{-α} ≤ 1 + C_α z` on `[0,1/2]`
 * `phi_eq_sqrt`         the substitution `s = √(1-t)` that removes `rpow`
-                        from the analysis; see PLAN.md §2
+                        from the analysis
 
 All three hold at an arbitrary exponent, as in the paper; `alpha`, `phi` and the
 unsuffixed lemmas are the instances at `α = 5/2`, where the numeric chain runs.
@@ -109,9 +109,9 @@ lemma rpow_neg_alpha_le {t : ℝ} (h1 : t < 1) :
     (1 - t) ^ (-alpha) ≤ 1 + alpha * phi t :=
   rpow_neg_alpha_leA one_le_alpha h1
 
-/-- `x^α = (√x)^5` for `x ≥ 0`. This is the substitution of PLAN.md §2: it
-trades the `rpow` at `5/2` for a natural power of a square root, after which
-the estimates of `Maxima.lean` become polynomial. -/
+/-- `x^α = (√x)^5` for `x ≥ 0`. The substitution trades the `rpow` at `5/2`
+for a natural power of a square root, after which the estimates of
+`Maxima.lean` become polynomial. -/
 lemma rpow_alpha_eq_sqrt_pow {x : ℝ} (hx : 0 ≤ x) : x ^ alpha = (Real.sqrt x) ^ (5 : ℕ) := by
   rw [Real.sqrt_eq_rpow, ← Real.rpow_natCast (x ^ (1 / (2 : ℝ))) 5, ← Real.rpow_mul hx]
   norm_num [alpha]

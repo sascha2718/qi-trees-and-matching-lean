@@ -26,7 +26,7 @@ over the presented laws of `MatchedPresentation`:
 
 The identification of the presented labellings with the engine's process on
 one probability space is the almost sure framework and stays open, as
-`rem:quasi-compatible` and the plan record.
+`rem:quasi-compatible` records.
 -/
 import ChainClasses.MatchedPresentation
 import ChainClasses.SemigroupMerge

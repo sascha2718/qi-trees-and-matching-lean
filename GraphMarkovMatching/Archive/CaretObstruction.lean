@@ -1,7 +1,6 @@
 /-
 **The caret budget obstruction**: the kernel budgets of the caret encoding
-are infinite; the refutation is recorded in `PAPER_PLAN.md`, and the
-current tex records the parallel frozen-pattern obstruction as
+are infinite; the tex records the parallel frozen-pattern obstruction as
 `thm:obstruction` of `arbitrary_offspring_matching.tex`.
 
 Terminal caret states (arity-2 tops, last comb positions) emit two fresh

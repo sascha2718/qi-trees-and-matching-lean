@@ -21,7 +21,7 @@ composes across independent samples.
 
 The label-law half of `thm:cross-relabel` is the scalar layer of `Relabel`
 (`relabel_law`, `product_of_constant_conditional`); its comparability clause
-waits on the metric realisation of general shapes, as the plan records.
+waits on the metric realisation of general shapes.
 -/
 import ChainClasses.Trichotomy
 import ChainClasses.GeneralHarris

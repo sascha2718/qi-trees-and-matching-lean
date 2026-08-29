@@ -3,7 +3,7 @@
 space `(X, μ)` with a symmetric reflexive relation `R`, the bad and good
 degrees `q` and `r`, and the potential `Φ(R,μ)` of `eq:iid-potential`.
 
-Design, per PLAN.md §4:
+Design:
 
 * D1: `μ : PMF X`. Note this needs **no** `[Countable X]` hypothesis: a `PMF`
   sums to `1`, which forces its support to be countable automatically. So the
