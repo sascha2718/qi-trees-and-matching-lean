@@ -17,3 +17,4 @@ blueprint/src/*.toc
 blueprint/src/*.xdv
 blueprint/src/*.synctex.gz
 blueprint/src/*.paux
+blueprint/lean_decls
