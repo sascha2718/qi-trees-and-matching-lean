@@ -3,11 +3,6 @@ name: Blueprint
 on:
   push:
     branches: [main]
-    # Every input of the blueprint lives under blueprint/, so a push that only
-    # moves Lean sources leaves the published site correct.
-    paths:
-      - 'blueprint/**'
-      - '.github/workflows/blueprint.yml'
   workflow_dispatch:
 
 # Pages runs one deployment at a time, and a queued one is worth finishing.
@@ -54,11 +49,121 @@ jobs:
 
       # \home in blueprint/src/web.tex names the site root, so the web version
       # is the site itself and the printable version sits beside it.
-      - name: Assemble the site
+      - name: Assemble the blueprint
         run: |
           mkdir site
           cp -r blueprint/web/. site/
           cp blueprint/print/print.pdf site/blueprint.pdf
+
+      - name: Upload the blueprint
+        uses: actions/upload-artifact@v7
+        with:
+          name: blueprint
+          path: site
+          retention-days: 1
+
+  docs:
+    name: Build the api documentation
+    needs: blueprint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.0
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: false
+          swap-storage: false
+
+      - name: Check out the project
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          path: project
+
+      # The key is the one `Build and audit` writes; this job only reads it.
+      - name: Restore the library build output
+        uses: actions/cache/restore@v4
+        with:
+          path: project/.lake/build
+          key: lake-build-${{ hashFiles('project/lean-toolchain', 'project/lakefile.toml', 'project/lake-manifest.json') }}-${{ hashFiles('project/**/*.lean') }}
+          restore-keys: |
+            lake-build-${{ hashFiles('project/lean-toolchain', 'project/lakefile.toml', 'project/lake-manifest.json') }}-
+
+      - name: Build
+        uses: leanprover/lean-action@434f25c2f80ded67bba02502ad3a86f25db50709 # 2025-07-02
+        with:
+          lake-package-directory: project
+          build: true
+          lint: false
+          mk_all-check: false
+
+      # The documentation of the dependencies is the expensive part of the doc
+      # build and it changes only with the manifest, so it alone is cached.
+      - name: Cache the documentation of the dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            project/docbuild/.lake/build/doc/Mathlib
+            project/docbuild/.lake/build/doc/Archive
+            project/docbuild/.lake/build/doc/Counterexamples
+            project/docbuild/.lake/build/doc/Aesop
+            project/docbuild/.lake/build/doc/Batteries
+            project/docbuild/.lake/build/doc/Cli
+            project/docbuild/.lake/build/doc/ImportGraph
+            project/docbuild/.lake/build/doc/LeanSearchClient
+            project/docbuild/.lake/build/doc/Plausible
+            project/docbuild/.lake/build/doc/ProofWidgets
+            project/docbuild/.lake/build/doc/Qq
+            project/docbuild/.lake/build/doc/Init
+            project/docbuild/.lake/build/doc/Lake
+            project/docbuild/.lake/build/doc/Lean
+            project/docbuild/.lake/build/doc/Std
+          key: docs-${{ hashFiles('project/lake-manifest.json') }}
+
+      # doc-gen4 is required by a throwaway package created here on the runner,
+      # which reaches the libraries through a path dependency and shares their
+      # packages directory. The project's own lakefile and manifest are left
+      # untouched, so nothing about this build has to be carried in the tree.
+      # doc-gen4 tags a release per toolchain, hence the tag read from
+      # lean-toolchain, and the four libraries are those of defaultTargets.
+      - name: Build the documentation
+        working-directory: project
+        run: |
+          mkdir -p docbuild
+          cat > docbuild/lakefile.toml <<TOML
+          name = "docbuild"
+          reservoir = false
+          version = "0.1.0"
+          packagesDir = "../.lake/packages"
+
+          [[require]]
+          name = "graphmatching"
+          path = "../"
+
+          [[require]]
+          scope = "leanprover"
+          name = "doc-gen4"
+          rev = "$(cut -d: -f2 lean-toolchain)"
+          TOML
+          cd docbuild
+          MATHLIB_NO_CACHE_ON_UPDATE=1 lake update graphmatching
+          lake build GraphMatching:docs GraphMarkovMatching:docs ChainClasses:docs BranchingProcess:docs
+
+      - name: Download the blueprint
+        uses: actions/download-artifact@v8
+        with:
+          name: blueprint
+          path: site
+
+      # \dochome in blueprint/src/web.tex names this directory, so the links the
+      # blueprint carries to declarations resolve inside the published site.
+      - name: Assemble the site
+        run: |
+          mkdir -p site/docs
+          cp -r project/docbuild/.lake/build/doc/. site/docs/
 
       - name: Upload the site
         uses: actions/upload-pages-artifact@v5
@@ -67,7 +172,7 @@ jobs:
 
   deploy:
     name: Deploy to Pages
-    needs: blueprint
+    needs: docs
     runs-on: ubuntu-latest
     permissions:
       pages: write
