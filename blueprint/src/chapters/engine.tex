@@ -1,0 +1,695 @@
+\chapter{The matching engine at general arity}
+\label{ch:engine}
+
+The matching theorem for tree-indexed Markov label fields whose counter laws share a common
+core, with the one-law theorem as a corollary. Formalised in the library
+\texttt{GraphMarkovMatching}, self-contained over its vendored support layer.
+
+\section{The matching theorems}
+
+\begin{theorem}[Two-law matching]
+\label{thm:composite-matching}
+\lean{GraphMarkovMatching.Composite.composite_failure_bound_massfree}
+\leanok
+\uses{def:etaG}
+Let two counter laws share a common core. Under the potential hypothesis on the label graph,
+the probability that no automorphism matches the two tree-indexed label fields is bounded by an
+explicit multiple of the potential, uniformly in the height, and the same bound holds along the
+infinite tree.
+\end{theorem}
+
+\begin{corollary}[One-law matching]
+\label{thm:main-matching}
+\lean{GraphMarkovMatching.varying_failure_le}
+\leanok
+\uses{thm:composite-matching}
+Specialising both sides to the same counter law gives the one-law matching theorem, with the
+failure probability bounded by $K_c\eta$ for an explicit constant.
+\end{corollary}
+
+\begin{corollary}[Exponential three-label example]
+\label{thm:exponential}
+\lean{GraphMarkovMatching.varying_exp3_failure_le}
+\leanok
+\uses{thm:main-matching}
+Fix $N\geq2$ and a law $\nu$ supported on a nonempty subset of $\set{2,\dots,N}$, let $G$ be the
+path $0-1-2$, and for real $D\geq5$ let $\mu_D$ have masses $p_1=e^{-D}$, $p_2=e^{-D^2}$ and
+$p_0=1-p_1-p_2$. Then the matching hypothesis holds for all large $D$.
+\end{corollary}
+
+\begin{corollary}[Double-exponential law on the half-line]
+\label{thm:doubleexp}
+\lean{GraphMarkovMatching.varying_doubleExp_failure_le}
+\leanok
+\uses{thm:main-matching, thm:double-exp}
+The same holds for the path on the nonnegative integers with $p_k=e^{-D^k}$ for $k\geq1$ and
+$p_0=1-\sum_{k\geq1}p_k$.
+\end{corollary}
+
+\section{Potential-theoretic estimates}
+
+\begin{lemma}[Zero interface]
+\label{thm:zero-interface}
+\lean{GraphMarkovMatching.qE_zero_le}
+\leanok
+\uses{def:etaG}
+Suppose $\mu(0)\geq1/2$ and write $\eta:=\eta_{G,\alpha}(\mu)$. Then
+$\mu(V\setminus B_G(0,1))\leq2\eta$, and the far tilt and tilt moment sums are bounded by
+explicit multiples of $\eta$.
+\end{lemma}
+
+\begin{theorem}[Four-law inequality]
+\label{thm:four-law}
+\lean{GraphMarkovMatching.PhiD_fourlaw_le}
+\leanok
+\uses{def:potential, def:square}
+Let $\alpha\geq1$ and $\delta,L,K>0$ satisfy the standing hypothesis, let $R$ be a symmetric
+relation on a countable set, and let $\mu_0,\mu_1,\nu_0,\nu_1$ be laws. If $M$ bounds all eight
+directed potentials between the two source and two target laws, then the potential of the
+symmetrised square of the pair laws is bounded by an explicit function of $M$.
+\end{theorem}
+
+\begin{proposition}[Pointwise four-law bound]
+\label{thm:pointwise-fourlaw}
+\lean{GraphMarkovMatching.phi_Q_split_four}
+\leanok
+\uses{thm:four-law}
+At a fixed pair $(x_0,x_1)$ with all four bad degrees below one, the square bad degree is below
+one and the weight of the square is bounded by a half-sum of the four one-sided weights plus a
+quadratic remainder.
+\end{proposition}
+
+\section{The one-law transfer system}
+
+\begin{proposition}[The frozen cross-type potential is infinite]
+\label{thm:obstruction}
+\lean{GraphMarkovMatching.crossed_context_potential_top}
+\leanok
+\uses{def:potential}
+Let $\nu=\delta_3$ and let $v_f$ be any state with $\mu(v_f)>0$ and $v_f\not\sim0$. Then the
+directed potential from the frozen cross type into the fresh law is infinite at every height.
+\end{proposition}
+
+This is why the recursion is carried over screens rather than over the naive cross types.
+
+\begin{lemma}[One-step decomposition]
+\label{thm:one-step}
+\lean{GraphMarkovMatching.rE_succ_branch}
+\leanok
+Fix a height-$(h+1)$ source point $x=\mathrm{branch}((v,k);x^1,x^2)$ with root state $v$ and
+child pair $xp$. The good and bad degrees at $x$ decompose over the root state and the two
+children.
+\end{lemma}
+
+\begin{lemma}[Screening a fresh mixture]
+\label{thm:fresh-mixture}
+\lean{GraphMarkovMatching.rE_bind}
+\leanok
+Let $\rho=\sum_a w_a\rho_a$ be a countable mixture of laws. Then $r_\rho(z)=\sum_a w_ar_{\rho_a}(z)$
+for every point $z$, so $r_\rho(z)=0$ if and only if $r_{\rho_a}(z)=0$ for every component with
+$w_a>0$.
+\end{lemma}
+
+\begin{definition}[Restricted quantities]
+\label{def:restricted}
+\lean{GraphMarkovMatching.PhiDres}
+\leanok
+\uses{def:potential}
+For laws $\rho_s,\rho_t$ and a relation $R$, the restricted potential sums the weight only over
+points at which the target good degree is positive; the restricted weight and the zero mass are
+defined on the same restriction.
+\end{definition}
+
+\begin{definition}[Normalised screens]
+\label{def:screen}
+\lean{GraphMarkovMatching.screenE}
+\leanok
+\uses{def:restricted}
+Let $\rho_s$ be a cell law, $\boldsymbol z$ a finite list of target laws, and
+$g\colon\cX\to[0,\infty]$ a normalisation. The screen $\cE(\rho_s;\boldsymbol z\!\not\to g)$
+integrates $g$ against $\rho_s$ over the points that are dead against every member of
+$\boldsymbol z$.
+\end{definition}
+
+\begin{lemma}[Diagonal pruning]
+\label{thm:pruning}
+\lean{GraphMarkovMatching.screenE_self_mem}
+\leanok
+\uses{def:screen}
+If the cell law is itself a member of the zero list and $R$ is reflexive, then the screen
+vanishes for every normalisation.
+\end{lemma}
+
+\begin{lemma}[Tilt pruning]
+\label{thm:tilt-pruning}
+\lean{GraphMarkovMatching.screenE_tilt_self}
+\leanok
+\uses{def:screen}
+If the normalisation is the restricted tilt of a member of the zero list, the screen vanishes.
+\end{lemma}
+
+\begin{lemma}[Screened $2\times2$ classification]
+\label{thm:hall}
+\lean{GraphMarkovMatching.rE_square_eq_zero_iff_hall}
+\leanok
+\uses{def:screen, thm:one-step}
+The square good degree vanishes exactly when one source child is dead against both target laws,
+or the Hall condition fails on the $2\times2$ array; the surviving cases split into an explicit
+sum of resolved terms.
+\end{lemma}
+
+\begin{lemma}[Mixture bound for restricted weights]
+\label{thm:mixture-tilt}
+\lean{GraphMarkovMatching.WresD_XiBar_le_sum}
+\leanok
+\uses{def:restricted, thm:fresh-mixture}
+For a pair of height-$h$ full labellings, the restricted weight of the mixed pair law is bounded
+by the tilt-weighted sum of the restricted weights of its components.
+\end{lemma}
+
+\section{The grammar and the accessible index}
+
+\begin{definition}[Targets, cascade pairs, successors]
+\label{def:grammar}
+\lean{GraphMarkovMatching.Tgt}
+\leanok
+The target alphabet $\cA$ consists of the forced letters $\Zf_j$, the fresh letter $\Ff$, and
+the component letters $\Ff_k$. The cascade pair of a counter and the successor relation on
+letters are defined by the kernel recursion.
+\end{definition}
+
+\begin{lemma}[The bounded alphabet and screen family]
+\label{thm:universes}
+\lean{GraphMarkovMatching.screenUniv_card_le}
+\leanok
+\uses{def:grammar}
+Fix $N\geq2$ with $S_\nu\subseteq\set{0,\dots,N}$. Then successors stay inside $\cA_N$, full
+successors of members of $\cU_N$ stay in $\cU_N$, and
+$\abs{\cA_N}\leq2N+3$, $\abs{\cU_N}\leq(2N+3)2^{2N+3}(2N+4)$.
+\end{lemma}
+
+\begin{definition}[Interpretation of the grammar]
+\label{def:interp}
+\lean{GraphMarkovMatching.interpT, GraphMarkovMatching.interpScreen}
+\leanok
+\uses{def:grammar}
+At height $h$ the letters are interpreted as the process laws $Z_{j,h}$, $T_h$ and $F_{k,h}$,
+and a normalisation letter as the corresponding restricted tilt.
+\end{definition}
+
+\begin{definition}[Accessible ordered pairs]
+\label{def:ordacc}
+\lean{GraphMarkovMatching.OrdAcc}
+\leanok
+\uses{def:grammar}
+The set $\mathfrak O_\nu$ of accessible ordered pairs is the smallest subset of $\cA^2$
+containing $(\Ff,\Ff)$ and closed under pair successors.
+\end{definition}
+
+\begin{lemma}[Invariants of accessible pairs]
+\label{thm:ordacc-inv}
+\lean{GraphMarkovMatching.OrdAcc.swap}
+\leanok
+\uses{def:ordacc}
+$\mathfrak O_\nu$ is closed under swapping coordinates and under the two diagonal maps, no
+component letter occurs in an accessible pair, and $\mathfrak O_\nu\subseteq\cA_N^2$ when
+$S_\nu\subseteq\set{0,\dots,N}$.
+\end{lemma}
+
+\begin{definition}[Accessible screens and the live index]
+\label{def:scracc}
+\lean{GraphMarkovMatching.ScrAcc}
+\leanok
+\uses{def:screen, def:ordacc}
+A formal screen is a seed when its cell, zero list and normalisation all come from the
+successors of one accessible pair. The live index $\mathfrak I_\nu$ consists of the live members
+of the closure of the seeds under the successor operations.
+\end{definition}
+
+\begin{lemma}[Invariants of accessible screens]
+\label{thm:scracc-inv}
+\lean{GraphMarkovMatching.ScrAcc.nonempty}
+\leanok
+\uses{def:scracc}
+Every accessible screen has a nonempty zero list, no component letter occurs as its cell, in its
+zero list, or as its normalisation, and its cell pairs accessibly with itself and with its
+normalisation.
+\end{lemma}
+
+\begin{definition}[The block matrix]
+\label{def:accN}
+\lean{GraphMarkovMatching.accN}
+\leanok
+\uses{def:scracc}
+Fix $C_W\in[0,\infty]$. The block matrix on the live index carries $C_W$ from $i$ to each full
+successor $j$ of $i$, and zero elsewhere.
+\end{definition}
+
+\section{The transfer rows}
+
+\begin{lemma}[Restricted four-law]
+\label{thm:res-four-law}
+\lean{GraphMarkovMatching.PhiDres_fourlaw_le}
+\leanok
+\uses{thm:four-law, def:restricted}
+The four-law inequality holds for the restricted potentials, with an added zero-mass term.
+\end{lemma}
+
+\begin{definition}[The cell bound]
+\label{def:cellCB}
+\lean{GraphMarkovMatching.cellCB}
+\leanok
+\uses{thm:res-four-law}
+For bounds $M,Z,E'$ the cell bound $\mathrm{CB}(M,Z,E')$ collects the linear, quadratic,
+zero-mass and screen contributions of one cell.
+\end{definition}
+
+\begin{lemma}[One-cell row]
+\label{thm:one-cell}
+\lean{GraphMarkovMatching.PhiDres_square_le}
+\leanok
+\uses{thm:res-four-law, def:cellCB, def:screen}
+If in addition the four resolved screens are bounded by $E'$, then the restricted potential of
+the square is at most the cell bound.
+\end{lemma}
+
+\begin{lemma}[Square cell between cascades]
+\label{thm:psirow-square}
+\lean{GraphMarkovMatching.psiRow_square}
+\leanok
+\uses{thm:one-cell, def:interp}
+Fix counters $k,j$ and a height $h$. If the ordinary coordinates, zero masses and screens
+between the two cascade families are bounded, then so is the square cell between them.
+\end{lemma}
+
+\begin{definition}[The one-sided bound]
+\label{def:oneSided}
+\lean{GraphMarkovMatching.oneSidedBound}
+\leanok
+For bounds $M,E'$ and a tilt bound $T_\nu$, the one-sided bound is
+$\mathrm{OS}(M,E'):=T_\nu\abs{S_\nu}\bigl(4E'(1+\alpha M)+4E'^2\bigr)$.
+\end{definition}
+
+\begin{lemma}[One-sided tilt mass]
+\label{thm:one-sided}
+\lean{GraphMarkovMatching.oneSided_charge_le}
+\leanok
+\uses{def:oneSided, thm:mixture-tilt}
+Under the row hypotheses the one-sided charge at a counter is at most $\mathrm{OS}(M,E')$.
+\end{lemma}
+
+\begin{lemma}[The four ordinary rows]
+\label{thm:psi-rows}
+\lean{GraphMarkovMatching.psiRow_ZZ}
+\leanok
+\uses{thm:psirow-square, thm:one-sided, def:cellCB}
+With $\Delta:=\mathrm{CB}(M,Z,E')+\mathrm{OS}(M,E')$, each of the four ordinary coordinates at
+height $h+1$ is bounded by $\Delta$ under the corresponding hypotheses at height $h$.
+\end{lemma}
+
+\begin{lemma}[Descent of a zero list]
+\label{thm:descent}
+\lean{GraphMarkovMatching.memInd_branch_iff}
+\leanok
+\uses{def:screen, thm:one-step}
+For an $\Ff_k$-free zero list and a root state $v\sim0$ with $b(v)>0$, deadness of a branch
+point against the list is equivalent to deadness of the child pair against the descended list.
+\end{lemma}
+
+\begin{lemma}[Multi-member Hall factorisation]
+\label{thm:hall-factor}
+\lean{GraphMarkovMatching.hallFactorize}
+\leanok
+\uses{thm:hall}
+When every component of a member of the product list lies in the scalar list, deadness against
+the product list factorises through deadness against the scalar list.
+\end{lemma}
+
+\begin{lemma}[The six screen rows]
+\label{thm:screen-rows}
+\lean{GraphMarkovMatching.interpScreen_forced_step}
+\leanok
+\uses{thm:descent, thm:hall-factor, def:scracc}
+For a formal screen whose cell is forced or fresh, with nonempty $\Ff_k$-free zero list and
+$\Ff_k$-free normalisation, the screen at height $h+1$ is bounded by the sum of its successor
+screens at height $h$ plus the ledger terms.
+\end{lemma}
+
+\begin{lemma}[Base bounds]
+\label{thm:base}
+\lean{GraphMarkovMatching.interpPhi_base}
+\leanok
+\uses{thm:zero-interface, def:interp}
+Suppose $\mu(0)\geq1/2$. At height $0$ every $\Ff_k$-free ordinary coordinate is at most
+$\eta+\phi^E_\alpha(q_\mu(0))$, and every admissible formal screen is bounded likewise.
+\end{lemma}
+
+\section{Nilpotence of the accessible screen block}
+
+\begin{definition}[Return lengths]
+\label{def:renewal}
+\lean{GraphMarkovMatching.toFresh}
+\leanok
+The return lengths of a counter are defined by the recursion mirroring the kernel:
+$\mathrm{toF}(k)=\set1$ for $k\leq2$, $\mathrm{toF}(3)=\set{1,2}$, and
+$\mathrm{toF}(k)=(\mathrm{toF}(\floor{k/2})+1)\cup(\mathrm{toF}(\ceil{k/2})+1)$ for $k\geq4$.
+\end{definition}
+
+\begin{lemma}[Cofinality of the generated monoid]
+\label{thm:semigroup}
+\lean{GraphMarkovMatching.depths_semigroup}
+\leanok
+\uses{def:renewal}
+There is a threshold $R_0$ such that every multiple of $d_\nu$ at least $R_0$ belongs to
+$\Sigma_\nu$.
+\end{lemma}
+
+\begin{definition}[Admissible descents]
+\label{def:descend}
+\lean{GraphMarkovMatching.Descend}
+\leanok
+\uses{def:grammar}
+Write $t\Downarrow_m t'$ when there is a chain of $m$ successor steps from $t$ to $t'$.
+\end{definition}
+
+\begin{lemma}[Realisation and decomposition of fresh returns]
+\label{thm:descend-realise}
+\lean{GraphMarkovMatching.descend_of_mem_toFresh}
+\leanok
+\uses{def:descend, def:renewal}
+The fresh-to-fresh descent lengths are exactly the monoid: $\set{m\colon\Ff\Downarrow_m\Ff}=\Sigma_\nu$. Every letter admits some descent to $\Ff$, and every return length in
+$\mathrm{toF}(k)$ with $k\in S_\nu$ is realised.
+\end{lemma}
+
+\begin{lemma}[List coverage]
+\label{thm:coverage}
+\lean{GraphMarkovMatching.mem_zsucc_iter_of_descend}
+\leanok
+\uses{def:descend}
+If $t\in\boldsymbol z$ and $t\Downarrow_mt'$, then $t'$ lies in the $m$-fold descended list, and
+along any chain of full successor screens the zero list after $n$ steps is the $n$-fold descent
+of the initial one.
+\end{lemma}
+
+\begin{lemma}[Returns along source chains]
+\label{thm:source-ray}
+\lean{GraphMarkovMatching.hits_F_of_gpair}
+\leanok
+\uses{thm:descend-realise}
+Along a chain of successor letters, a cascade entry at counter $k$ returns to $\Ff$ after some
+$m\in\mathrm{toF}(k)$, and a fresh letter returns after some renewal depth.
+\end{lemma}
+
+\begin{definition}[Anchored letters and screens]
+\label{def:anchored}
+\lean{GraphMarkovMatching.Anchored}
+\leanok
+\uses{def:descend, thm:semigroup}
+A letter is anchored at absolute depth $d$ when $t\Downarrow_m\Ff$ implies $d+m\in\Sigma_\nu$. A
+screen is anchored at $d$ when its cell and every member of its zero list are.
+\end{definition}
+
+\begin{lemma}[Anchoring propagates]
+\label{thm:anchor-step}
+\lean{GraphMarkovMatching.Anchored.step}
+\leanok
+\uses{def:anchored}
+If $t$ is anchored at $d$ and $t'$ is a successor, then $t'$ is anchored at $d+1$; the same for
+screens. If $\Ff$ is anchored at $d$ then $d\in\Sigma_\nu$, and every accessible pair has both
+coordinates anchored.
+\end{lemma}
+
+\begin{theorem}[No anchored live path]
+\label{thm:nilpotence}
+\lean{GraphMarkovMatching.no_anchored_live_path}
+\leanok
+\uses{thm:anchor-step, thm:coverage, thm:source-ray, def:scracc}
+There is no infinite chain of formal screens, each a full successor of the last, starting from
+an anchored screen with nonempty zero list and never having its cell in its zero list.
+Consequently the block matrix on the live index is nilpotent.
+\end{theorem}
+
+\section{The closed recursion}
+
+\begin{definition}[Ordinary scalar and screen vector]
+\label{def:running}
+\lean{GraphMarkovMatching.genPsi}
+\leanok
+\uses{def:ordacc, def:scracc}
+Put $\overline\Psi_h:=\sup_{(s,t)\in\mathfrak O_\nu}\Psi_h(s,t)$, let $E_h$ be the vector of
+screens over the live index, and $\overline E_h$ its supremum.
+\end{definition}
+
+\begin{definition}[Ordinary and screen step functions]
+\label{def:step-functions}
+\lean{GraphMarkovMatching.genF, GraphMarkovMatching.genG}
+\leanok
+\uses{def:cellCB, def:oneSided}
+Fix a tilt bound and ledger bounds. The ordinary step function $f$ and screen step function $g$
+are the explicit increasing functions assembled from the cell and one-sided bounds.
+\end{definition}
+
+\begin{lemma}[The ordinary step]
+\label{thm:psi-step}
+\lean{GraphMarkovMatching.genPsi_step}
+\leanok
+\uses{thm:psi-rows, def:step-functions}
+$\overline\Psi_{h+1}\leq f(\overline\Psi_h,\overline E_h)$ for every $h$.
+\end{lemma}
+
+\begin{lemma}[The screen step]
+\label{thm:e-step}
+\lean{GraphMarkovMatching.genE_step}
+\leanok
+\uses{thm:screen-rows, def:accN, def:step-functions}
+For $\mu(0)>0$ and $C_W$ large enough,
+$E_{h+1}(i)\leq g(\overline\Psi_h,\overline E_h)+(\Nb E_h)(i)$ for every $h$ and every $i$.
+\end{lemma}
+
+\begin{lemma}[Nilpotent invariant]
+\label{thm:invariant}
+\lean{GraphMarkovMatching.nilpotent_invariant}
+\leanok
+\uses{thm:nilpotence}
+Let $\Nb$ be nonnegative on a finite index with $\Nb^{\,r}(u\mathbf1)=0$, and put
+$\widehat E:=\sum_{j<r}\Nb^{\,j}(u\mathbf1)$. Then $u\mathbf1+\Nb\widehat E=\widehat E$, and any
+vector sequence dominated by the step stays below $\widehat E$.
+\end{lemma}
+
+\begin{theorem}[The screened recursion closes]
+\label{thm:engine}
+\lean{GraphMarkovMatching.screened_uniform_bound_mono}
+\leanok
+\uses{thm:invariant, thm:psi-step, thm:e-step}
+Under nilpotence of $\Nb$, monotone step functions, and the size and closure inequalities, the
+ordinary scalar stays below $K_c\eta$ and the screen vector below $\widehat E$ at every height.
+\end{theorem}
+
+\begin{lemma}[Geometric bound for the invariant]
+\label{thm:geom}
+\lean{GraphMarkovMatching.mulVec_le_of_row_sum}
+\leanok
+\uses{thm:invariant}
+If every row sum of $\Nb$ is at most $c$, then $\Nb^{\,j}(u\mathbf1)\leq c^ju\mathbf1$ and the
+invariant is at most $(\sum_{j<r}c^j)u\mathbf1$. For the block matrix one may take
+$c=C_W\abs{\mathfrak I_\nu}$.
+\end{lemma}
+
+\begin{theorem}[Uniform failure bound, closure form]
+\label{thm:closure-form}
+\lean{GraphMarkovMatching.varying_failure_uniform}
+\leanok
+\uses{thm:engine, thm:geom, thm:base}
+With the step functions of \cref{def:step-functions} and $r_\nu=\abs{\mathfrak I_\nu}+1$ from
+\cref{thm:nilpotence}, and the ledger bounds in force, the failure probability is bounded
+uniformly in the height by the closed form.
+\end{theorem}
+
+\section{The numerical closure}
+
+\begin{lemma}[Ledger constants]
+\label{thm:ledger-constants}
+\lean{GraphMarkovMatching.rootTilt_le}
+\leanok
+\uses{thm:zero-interface}
+If $\sim$ is symmetric and $\mu(0)\geq1/2$, the ledger hypotheses hold with $R_T=8$,
+$F_M=2\eta$, $F_T=2\eta$.
+\end{lemma}
+
+\begin{definition}[The explicit constants]
+\label{def:constants}
+\lean{GraphMarkovMatching.genKcC}
+\leanok
+\uses{thm:ledger-constants, thm:universes}
+The constants $C_W$, $K_c$ and the level bounds are fixed from the tilt bound, the cardinality
+bounds $c_N\geq\abs{\mathfrak I_\nu}$ and $n_{\cA}\geq\abs{\cA_N}$, and the support size.
+\end{definition}
+
+\begin{theorem}[Numerical closure]
+\label{thm:numeric}
+\lean{GraphMarkovMatching.varying_failure_le}
+\leanok
+\uses{def:constants, thm:closure-form}
+If $\sim$ is reflexive and symmetric, $\mu(0)\geq1/2$ and $\eps^{-1}\eta\leq1$, then the size
+and closure inequalities hold with the explicit constants and the failure probability is at most
+$K_c\eta$.
+\end{theorem}
+
+\begin{lemma}[Marginal consistency]
+\label{thm:marginal-consistency}
+\lean{GraphMarkovMatching.Tlaw_map_restrictLab}
+\leanok
+Restriction of a height-$(h+1)$ labelling to $\bbB_h$ pushes $T_{h+1}$ forward to $T_h$, so the
+finite-height bounds pass to the infinite tree.
+\end{lemma}
+
+\section{Two counter laws with a common core}
+
+\begin{definition}[Composite kernels]
+\label{def:composite-kernel}
+\lean{GraphMarkovMatching.Composite.compK}
+\leanok
+\uses{def:grammar}
+The label alphabet consists of the plain labels $(v,k)$ together with the marked labels
+$(0,\langle p,i\rangle)$ for a declared pair $p$ and a stage $i$ along its designated path. The
+composite kernel walks the designated path and rejoins the common core.
+\end{definition}
+
+\begin{lemma}[Cluster identity]
+\label{thm:cluster}
+\lean{GraphMarkovMatching.Composite.mul_repZ_le_cZ}
+\leanok
+\uses{def:composite-kernel}
+For a side $\sigma$, a declared pair $p=(a,b)$ and a height $h$, the marked pair law is the
+cascade law at $a$ conditioned on the designated port carrying the label $(0,b)$, an event of
+probability $\mu(0)\nu_\sigma(b)>0$.
+\end{lemma}
+
+\begin{lemma}[Support equality]
+\label{thm:support-equality}
+\lean{GraphMarkovMatching.Composite.exists_sim_of_muM_ne_zero}
+\leanok
+\uses{def:composite-kernel}
+After forgetting the counters, the supports of the corresponding components on the two sides
+agree, componentwise and at every height.
+\end{lemma}
+
+\begin{corollary}[Exact pruning across the two laws]
+\label{thm:exact-pruning}
+\lean{GraphMarkovMatching.Composite.dead_screen_eq_zero}
+\leanok
+\uses{thm:support-equality, thm:pruning}
+A screen whose cell is a component on one side and whose zero list holds the matching components
+on the other side vanishes.
+\end{corollary}
+
+\begin{definition}[The tagged alphabet and letter successors]
+\label{def:composite-grammar}
+\lean{GraphMarkovMatching.Composite.Letter}
+\leanok
+\uses{def:grammar, def:composite-kernel}
+The tagged alphabet adds to the ordinary letters the marker letters carrying a declared pair and
+a stage, with successors following the designated path.
+\end{definition}
+
+\begin{definition}[The live index of the tagged grammar]
+\label{def:composite-index}
+\lean{GraphMarkovMatching.Composite.screenUniv}
+\leanok
+\uses{def:composite-grammar, def:scracc}
+The seeds are the fresh screens in either orientation, and the live index is the live part of
+their closure under full successors, restriction of the zero list, and the two side maps.
+\end{definition}
+
+\begin{lemma}[Universe bound]
+\label{thm:composite-universe}
+\lean{GraphMarkovMatching.Composite.cLetterBox_card}
+\leanok
+\uses{def:composite-index}
+With $\cL_N$ the formal envelope of one fresh name, the counter names $0,\dots,N$ and all marker
+names with coordinates and stage in $\set{0,\dots,N}$,
+$\abs{\cL_N}=1+(N+1)+(N+1)^3=n_{\cA}$.
+\end{lemma}
+
+\begin{lemma}[Chart returns]
+\label{thm:chart-returns}
+\lean{GraphMarkovMatching.Composite.chartPorts_cases}
+\leanok
+\uses{def:renewal, def:composite-kernel}
+The designated port depth satisfies $d(k)\in\mathrm{toF}(k)$, and the port depths of the chart of
+a declared pair lie in the corresponding union of return-length sets.
+\end{lemma}
+
+\begin{lemma}[Realisation]
+\label{thm:composite-realise}
+\lean{GraphMarkovMatching.Composite.descend_F_iff_mem_sigmaS}
+\leanok
+\uses{thm:chart-returns, thm:descend-realise}
+On either side the fresh-to-fresh descent lengths are $\Sigma_S$, the descent lengths to $\Ff$
+do not depend on the side, and every chain of $2N+2$ successor steps passes through $\Ff$.
+\end{lemma}
+
+\begin{definition}[Anchored tagged letters and screens]
+\label{def:composite-anchored}
+\lean{GraphMarkovMatching.Composite.Anchored, GraphMarkovMatching.Composite.ScreenAnchored}
+\leanok
+\uses{def:anchored, thm:composite-realise}
+A tagged letter is anchored at $\delta$ when $\delta+m\in\Sigma_S$ for every descent length $m$
+to $\Ff$ on either side, and a tagged screen when its cell, zero list and normalisation are.
+\end{definition}
+
+\begin{lemma}[Anchoring propagates]
+\label{thm:composite-anchor}
+\lean{GraphMarkovMatching.Composite.Anchored.step}
+\leanok
+\uses{def:composite-anchored}
+$\Ff$ is anchored at $\delta$ if and only if $\delta\in\Sigma_S$, and a successor of a letter
+anchored at $\delta$ is anchored at $\delta+1$.
+\end{lemma}
+
+\begin{theorem}[Acyclicity of the screen steps]
+\label{thm:composite-acyclic}
+\lean{GraphMarkovMatching.Composite.no_live_step_cycleS}
+\leanok
+\uses{thm:composite-anchor, thm:nilpotence}
+No cycle of full-successor edges passes through live anchored tagged screens, whether an edge
+advances the cell by a common counter or through an exceptional entrance. The directed graph on
+the live index is acyclic and the block matrix is nilpotent.
+\end{theorem}
+
+\begin{lemma}[The weighted mixture tilt]
+\label{thm:mixture-tilt-composite}
+\lean{GraphMarkovMatching.Composite.invTilt_simDeg_cXiBar_le}
+\leanok
+\uses{thm:mixture-tilt, def:composite-kernel}
+At every pair point the restricted weight of the mixed pair law on one side is bounded by the
+weighted sum over the common core and the exceptional entrances.
+\end{lemma}
+
+\begin{lemma}[Retention of the source coefficients]
+\label{thm:retention}
+\uses{thm:mixture-tilt-composite}
+Every transfer-row expression is a sum of integrals against its source law, so expanding the
+fresh source cell splits the row into component rows with the exact coefficients of the counter
+law, on both the common core and the exceptional entrances.
+\end{lemma}
+
+\begin{proposition}[The composite ledger]
+\label{thm:composite-ledger}
+\lean{GraphMarkovMatching.Composite.cPsi_step}
+\leanok
+\uses{thm:retention, thm:composite-acyclic, thm:psi-step, thm:e-step}
+For two counter laws with a common core, the running coordinates formed from the two orientations
+of the composite comparison satisfy the ordinary and screen step inequalities of
+\cref{thm:psi-step} and \cref{thm:e-step} with the tagged step functions.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\proves{thm:composite-matching}
+\uses{thm:composite-ledger, thm:composite-acyclic, thm:engine, thm:exact-pruning, thm:composite-universe}
+The tagged grammar's block matrix is nilpotent by \cref{thm:composite-acyclic}, and the composite
+ledger \cref{thm:composite-ledger} supplies the two step inequalities. \Cref{thm:engine} then
+closes the recursion, and the cardinality bound of \cref{thm:composite-universe} fixes the
+constants.
+\end{proof}

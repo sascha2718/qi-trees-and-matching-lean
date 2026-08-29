@@ -1,0 +1,221 @@
+\chapter{Label classes in the simple case}
+\label{ch:chain-simple}
+
+Offspring supported on $\set{0,1,2}$. The tree is encoded by a field of labels on the binary
+tree, the encoding is transported along relabellings, the labels are quantised into classes so
+that the matching machinery of \cref{ch:iid} applies, and the bushy regime is reduced to the
+chain regime by the Harris decomposition. Formalised in the library \texttt{ChainClasses},
+over the Galton--Watson foundation \texttt{BranchingProcess}.
+
+\section{The chain encoding}
+
+Assume first $\theta_0=0$, so that $\theta_1+\theta_2=1$. Every vertex of $\cT$ then lies on a
+unique maximal chain of degree-two vertices ending at a branch point, and the branch points
+form a copy of the binary tree $\bbB$. Write $\iota(w)$ for the vertex of $\cT$ carrying the
+branch point $w\in\bbB$, and $\lambda(w)$ for the length of the chain issuing from it.
+
+\begin{lemma}[The tree is the disjoint union of its chains]
+\label{thm:chains}
+\lean{ChainClasses.tree_eq_chains}
+\leanok
+\uses{def:gw}
+Every $v\in\cT$ has a unique representation $v=\iota(w)1^{l}$ with $w\in\bbB$ and
+$0\leq l\leq\lambda(w)-1$. If $w$ is not a prefix of $w'$, then the ray
+$\set{\iota(w)1^{j}\colon j\geq0}$ is disjoint from the chain of $w'$.
+\end{lemma}
+
+\begin{lemma}[The chain lengths are i.i.d.\ geometric]
+\label{thm:geometric}
+\lean{ChainClasses.label_iIndepFun}
+\leanok
+\uses{thm:chains}
+The random variables $\lambda(w)$, $w\in\bbB$, are independent and geometrically distributed,
+with $\bbP(\lambda(w)=n)=\theta_1^{n-1}\theta_2$ for $n\geq1$.
+\end{lemma}
+
+\begin{lemma}[Relabelling is an isometry]
+\label{thm:isometry}
+\lean{ChainClasses.isometry_of_relabel}
+\leanok
+\uses{thm:chains}
+Let $\pi\in\Aut(\bbB)$ and let $\lambda$ be a labelling with associated tree $\cT$. The tree
+$\cT'$ associated with $\lambda'(w)=\lambda(\pi^{-1}w)$ is isometric to $\cT$.
+\end{lemma}
+
+\begin{lemma}[Transfer]
+\label{thm:transfer}
+\lean{ChainClasses.transfer}
+\leanok
+\uses{thm:chains, def:qi}
+Let $\lambda,\lambda'$ be labellings of $\bbB$ with values in $\bbN$ and let $D\geq1$ satisfy
+$D^{-1}\lambda'(w)\leq\lambda(w)\leq D\,\lambda'(w)$ for all $w\in\bbB$. Then there is a
+$(D+3)$-quasi-isometry $\psi\colon\cT\to\cT'$ between the associated trees.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:chains}
+Map the chain of $w$ to the chain of $w$ in $\cT'$ by proportional division. The four distance
+cases, equal vertex, prefix, divergence, and density of the image, are each bounded by the
+comparability hypothesis.
+\end{proof}
+
+\section{Quantisation into level classes}
+
+Write $\ell_D(n):=\floor{\log_D n}$ for the level of $n\geq1$ at scale $D$.
+
+\begin{lemma}[Neighbouring levels are comparable]
+\label{thm:level}
+\lean{ChainClasses.level_close_comparable}
+\leanok
+Let $D\geq2$ and $m,m'\in\bbN$. If $\abs{\ell_D(m)-\ell_D(m')}\leq1$ then $D^{-2}m'<m<D^2m'$.
+\end{lemma}
+
+\begin{lemma}[The quantised law]
+\label{thm:quantised-law}
+\lean{ChainClasses.qF_le}
+\leanok
+\uses{thm:geometric}
+Let $p^{(D)}$ be the image under $\ell_D$ of the geometric law $\theta_1^{n-1}\theta_2$,
+$n\geq1$. Then $p^{(D)}_0=1-\theta_1^{D-1}$ and $p^{(D)}_j\leq\theta_1^{D^j-1}$ for $j\geq1$.
+\end{lemma}
+
+\begin{lemma}[Chain classes]
+\label{thm:chain-classes}
+\lean{ChainClasses.quantised_label_iIndepFun}
+\leanok
+\uses{thm:geometric, thm:quantised-law}
+Let $\theta_1+\theta_2=1$ with $0<\theta_1<1$, let $D\geq2$ be an integer, and put
+$\cC_k=\set{n\in\bbN\colon D^k\leq n<D^{k+1}}$. The classes $\cC_k$ partition $\bbN$, any two
+$n,m\in\cC_k$ satisfy $D^{-1}<n/m<D$, and the quantised labels $\ell_D(\lambda(w))$,
+$w\in\bbB$, are independent with common law
+\[
+ q_k=\bbP\bigl(\lambda(w)\in\cC_k\bigr)=\theta_1^{D^k-1}-\theta_1^{D^{k+1}-1}.
+\]
+\end{lemma}
+
+\begin{lemma}[Chain coupling across two laws]
+\label{thm:chain-coupling}
+\lean{ChainClasses.coupling_law}
+\leanok
+\uses{thm:chain-classes}
+Let $\theta_1,\theta_1'\in(0,1)$, put $\gamma=\log\theta_1/\log\theta_1'>0$, and let $D\geq2$
+be an integer with $\gamma(D-1)\geq1$. Let $q$ be the law of \cref{thm:chain-classes} for
+$\theta_1$ and $D$, let $\lambda'$ be geometric with parameter $\theta_1'$, and let $U$ be
+uniform on $[0,1)$ and independent of $\lambda'$. Then there are cut points
+$1=D_0'<D_1'<D_2'<\cdots$ at which consecutive classes of the second law meet, and a map
+$\ell'\colon\bbN\times[0,1)\to\bbN_0$, nondecreasing in its first argument, presenting the
+second law's classes against the first with a controlled ratio at every level.
+\end{lemma}
+
+\section{The bushy regime}
+
+Drop the assumption $\theta_0=0$.
+
+\begin{proposition}[Harris decomposition]
+\label{thm:harris}
+\lean{BranchingProcess.survivalMeasure_decorations_treeLaw}
+\leanok
+\uses{def:gw}
+Let $\theta$ be supported on $\set{0,1,2}$ and supercritical with $\theta_0>0$, and let
+$\cT(\omega)$ be a Galton--Watson tree with law $\theta$ conditioned on survival. Then
+$\cT(\omega)$ splits as a skeleton carrying the reduced law, decorated by bushes that are
+independent given the skeleton and distributed as Galton--Watson trees under the conjugate,
+subcritical law. Both halves hold as equalities of laws on trees, together with their joint
+form.
+\end{proposition}
+
+\begin{definition}[Shapes]
+\label{def:shape}
+\lean{ChainClasses.Shape}
+\leanok
+\uses{thm:harris}
+A \emph{shape} is a pair $\sigma=(m,(b_1,\dots,b_{m-1}))$ with $m\geq1$ and each $b_i$ either
+empty or a finite tree with offspring numbers in $\set{0,1,2}$. Its realisation is obtained
+from a path $v_1\cdots v_m$ by attaching the root of each nonempty $b_i$ by an edge at $v_i$.
+The entry is $v_1$, the exit is $v_m$, and $\abs\sigma$ is the number of vertices. Write $\cS$
+for the countable set of shapes.
+\end{definition}
+
+\begin{proposition}[Shape decomposition]
+\label{thm:shape-iid}
+\lean{ChainClasses.shape_decomposition}
+\leanok
+\uses{thm:harris, def:shape}
+Conditioned on infinite diameter, the shapes $S(w)$, $w\in\bbB$, are i.i.d.\ with the law
+$\mu$ of $(m,(B_1,\dots,B_{m-1}))$, where $\bbP(m=k)=\widetilde\theta_1^{\,k-1}
+\widetilde\theta_2$ and, given $m$, the decorations are independent, each empty with
+probability $\theta_1/\widetilde\theta_1$ and otherwise a Galton--Watson tree with the
+conjugate law. Moreover $\cT(\omega)$ is isometric to the assembly of the shapes along
+$\bbB$.
+\end{proposition}
+
+\begin{lemma}[Shape mass bounds]
+\label{thm:shape-mass}
+\lean{ChainClasses.shape_mass_tail}
+\leanok
+\uses{thm:shape-iid}
+There are $c,C,n_0>0$ depending on $\theta$ such that $\mu(\abs S\geq n)\leq e^{-cn}$ for all
+$n\geq n_0$, and $\mu(\sigma)\geq e^{-C\abs\sigma}$ for every $\sigma\in\cS$ with
+$\mu(\sigma)>0$.
+\end{lemma}
+
+\section{The net quantisation}
+
+\begin{definition}[The net and the label graph]
+\label{def:shape-net}
+\lean{ChainClasses.shapeFamily}
+\leanok
+\uses{def:shape}
+Fix an integer $D\geq2$ and enumerate $\cS$ by size, breaking ties arbitrarily. Let
+$\cR_D\subseteq\cS$ consist of those shapes admitting no $D$-marked quasi-isometry to any
+earlier member of $\cR_D$, and for $\sigma\in\cS$ let $\rep_D(\sigma)$ be the earliest member
+of $\cR_D$ to which $\sigma$ admits a $D$-marked quasi-isometry. The label graph $G_D$ has
+vertex set $\cR_D$, with an edge between distinct $\sigma^*,\tau^*$ whenever they admit a
+$27D^4$-marked quasi-isometry.
+\end{definition}
+
+\begin{lemma}[Basic net properties]
+\label{thm:shape-net}
+\lean{ChainClasses.markedQI_of_repIdx_adjacent}
+\leanok
+\uses{def:shape-net}
+The composition of a $K$-marked and a $K'$-marked quasi-isometry is $3KK'$-marked, and every
+$K$-marked quasi-isometry has a $3K^2$-marked quasi-inverse. Consequently $\rep_D(\sigma)$
+exists for every $\sigma$, fixes $\cR_D$ pointwise, satisfies
+$\abs{\rep_D(\sigma)}\leq\abs\sigma$, any two members of one class admit a $9D^3$-marked
+quasi-isometry, and members of equal or adjacent classes admit a $729D^7$-marked
+quasi-isometry.
+\end{lemma}
+
+\begin{lemma}[Connectivity of the label graph]
+\label{thm:shape-connected}
+\lean{ChainClasses.netLink_connected_shapeFamily}
+\leanok
+\uses{def:shape-net}
+The graph $G_D$ is connected.
+\end{lemma}
+
+\begin{lemma}[Entropy dilution]
+\label{thm:dilution}
+\lean{ChainClasses.dilution}
+\leanok
+\uses{def:shape-net}
+There is an absolute constant $c_0$ such that for all integers $D\geq2$ and $n\geq1$, every
+family of shapes of size at most $n$, no two of which admit a $D$-marked quasi-isometry, has
+at most $\exp\bigl(c_0(nD^{-1/3}+1)\bigr)$ members. In particular there are at most that many
+representatives of size at most $n$.
+\end{lemma}
+
+\section{The glued transfer}
+
+\begin{lemma}[Glued transfer]
+\label{thm:glued-transfer}
+\lean{ChainClasses.Assembly.glued_transfer}
+\leanok
+\uses{thm:shape-iid, def:qi}
+Let $(\sigma_w)_{w\in\bbB}$ and $(\sigma'_w)_{w\in\bbB}$ be families of shapes with assemblies
+$\cT$ and $\cT'$, let $K\geq1$, and suppose that for every $w\in\bbB$ the shapes $\sigma_w$
+and $\sigma'_w$ admit a $K$-marked quasi-isometry. Then there is an $8K^2$-quasi-isometry
+$\cT\to\cT'$.
+\end{lemma}

@@ -1,0 +1,163 @@
+\chapter{The classification}
+\label{ch:trichotomy}
+
+Assembly at general bounded support. The four regimes are separated by the obstructions, each
+regime is shown universal, and the branching semigroup indexes the chain classes.
+
+\section{The regimes and their obstructions}
+
+\begin{proposition}[Full trees]
+\label{thm:bushy}
+\lean{ChainClasses.fullTree_quasiIsometric_binary}
+\leanok
+\uses{def:qi}
+Let $N\in\bbN$ and let $\cT$ be a rooted subtree of the $N$-ary tree with $v1,v2\in\cT$ for
+every $v\in\cT$. Then $\cT\simeq\bbB$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{def:qi}
+Such a tree embeds into a binary tree in which every vertex has a vertex with two children
+within $\ceil{\log_2N}$ below it, and contracting the unary runs of such a tree is a
+quasi-isometry onto $\bbB$.
+\end{proof}
+
+\begin{lemma}[General-support regime obstructions]
+\label{thm:regime-obstructions-general}
+\uses{thm:regime-obstructions, thm:hair-separation, thm:three-rays}
+Let $\theta$ be finitely supported and supercritical, and let $\cT$ be a Galton--Watson tree
+with law $\theta$ conditioned on infinite diameter. Almost surely $\cT$ carries three rays
+meeting only at their common initial vertex; in the chain regime every vertex lies within
+bounded distance of a line; and in the bushy regime $\cT$ has hairs of unbounded depth.
+\end{lemma}
+
+\begin{proposition}[Separation within the chain regime]
+\label{thm:chain-separation}
+\lean{ChainClasses.chainSeparation}
+\leanok
+\uses{def:branching-semigroup, thm:reachable-arity}
+Let $\theta,\theta'$ be finitely supported supercritical laws in the chain regime with
+$\Lambda_{\theta}\neq\Lambda_{\theta'}$, and let $\cT,\cT'$ be independent Galton--Watson trees
+with these laws. Then almost surely $\cT\not\simeq\cT'$.
+\end{proposition}
+
+\begin{lemma}[Transitivity across independent realisations]
+\label{thm:qi-transitive}
+\lean{ChainClasses.pairQI_trans}
+\leanok
+\uses{def:qi}
+Let $P_0,\dots,P_m$ be laws of random trees such that for each $0\leq i<m$ independent
+realisations of $P_i$ and $P_{i+1}$ are almost surely quasi-isometric. Then independent
+realisations of $P_0$ and $P_m$ are almost surely quasi-isometric.
+\end{lemma}
+
+\section{Universality in the bushy regime}
+
+\begin{proposition}[Bushy cross-law product form]
+\label{thm:hairy-cross}
+\lean{ChainClasses.hairyCross_chart}
+\leanok
+\uses{thm:cross-relabel, thm:product-form}
+Fix $D\geq D_5$ and label the two reduced skeletons by the transported classes against
+independent uniform families. Then both labelled skeletons carry the product law
+$\mu_D\otimes\widetilde\nu$ and $\mu_D\otimes\widetilde\nu'$ with the same class law $\mu_D$,
+whose one-vertex class has mass at least $\tfrac12$.
+\end{proposition}
+
+\begin{proposition}[Universality in the bushy regime]
+\label{thm:hairy-general}
+\lean{ChainClasses.hairy_general_ae}
+\leanok
+\uses{thm:hairy-cross, thm:composite-matching, thm:glued-transfer}
+Let $\theta,\theta'$ be finitely supported supercritical laws in the bushy regime, and let
+$\cT,\cT'$ be independent Galton--Watson trees with these laws conditioned on infinite
+diameter. Then almost surely $\cT\simeq\cT'$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{thm:hairy-cross, thm:composite-matching, thm:glued-transfer, thm:merge}
+The labelled reduced skeleton is encoded into the binary tree along the cascades of
+\cref{thm:composite-matching}: a core arity by its balanced halving, an exceptional arity by its
+marker chain. The encoded law is the engine's process law at every height, markers included, so
+the engine aligns the two encoded label fields with probability at least $1-Ke^{-cD^2}$. Matched
+classes admit a marked quasi-isometry, and the glued transfer assembles them.
+\end{proof}
+
+\section{Universality within a chain class}
+
+\begin{lemma}[Geometric finite-phase resolvent]
+\label{thm:renewal-resolvent}
+\lean{ChainClasses.geometric_decay_of_block_contraction}
+\leanok
+\uses{thm:common-renewal}
+Let $\cD$ be the nonzero lag phases and $\cK$ the killed transition matrix of the lagging-side
+process, so that a transition reaching zero contributes no mass. With $H$ and $q$ the constants
+of \cref{thm:common-renewal}, $\cK^{nH}\mathbf1\leq(1-q)^n\mathbf1$ for $n\geq0$. Consequently
+the Green vector $F=\sum_{m\geq0}\cK^m\mathbf1$ is finite, satisfies $\mathbf1+\cK F=F$, and
+obeys $F\leq(H/q)\mathbf1$.
+\end{lemma}
+
+\begin{proposition}[The weighted-screen gap]
+\label{thm:renewal-weight-gap}
+\lean{GraphMarkovMatching.screened_uniform_bound_resolvent}
+\leanok
+\uses{thm:invariant, thm:renewal-resolvent}
+Suppose the screen row has the form $E_{h+1}\leq g(\Psi_h,\lVert E_h\rVert)+WE_h$. If there are
+scalar bounds $a_m$ with $W^m\mathbf1\leq a_m\mathbf1$ and $\sum_ma_m<\infty$, then the Green
+vector $F_W=\sum_{m\geq0}W^m(u\mathbf1)$ satisfies $u\mathbf1+WF_W=F_W$ and the invariant
+induction closes as in \cref{thm:invariant}. A geometric tail for a different killed kernel does
+not imply this hypothesis: already in one dimension $\cK=(3/4)$ has a geometric Green function
+while $W=2\cK=(3/2)$ admits no finite nonnegative $F$.
+\end{proposition}
+
+\begin{proposition}[Chain cross-law product form]
+\label{thm:chain-cross}
+\lean{ChainClasses.Matched.chainCross_qi_scale}
+\leanok
+\uses{thm:matched-presentation, thm:chain-coupling, thm:cluster-flat}
+Let $\theta,\theta'$ be chain-regime laws with $\Lambda_{\theta}=\Lambda_{\theta'}=\Lambda$.
+Then both presented skeletons carry the product law $\mu_*\otimes\hat\nu$ and
+$\mu_*\otimes\hat\nu'$ with the same presented class law $\mu_*$, the quantised law at ratio
+$\theta_1$ through the coupled classes of \cref{thm:chain-coupling}, whose zero class has mass
+at least $\tfrac12$; matched presented blobs are comparable at an explicit scale.
+\end{proposition}
+
+\begin{proposition}[Universality within a chain class]
+\label{thm:chain-general}
+\lean{ChainClasses.exists_engine_match_chain}
+\leanok
+\uses{thm:chain-cross, thm:composite-matching, thm:renewal-weight-gap}
+Let $\theta,\theta'$ be chain-regime laws with $\Lambda_{\theta}=\Lambda_{\theta'}$, and let
+$\cT,\cT'$ be independent Galton--Watson trees with these laws conditioned on infinite
+diameter. Then almost surely $\cT\simeq\cT'$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{thm:chain-cross, thm:composite-matching, thm:matched-presentation, thm:glued-transfer}
+The matched presentation of \cref{thm:matched-presentation} puts both laws on a common presented
+arity law, and \cref{thm:chain-cross} puts them on a common class law. The engine matches the two
+presented label fields at an explicit tilt budget, uniform in $D$ once
+$\theta_1^{D^2}\leq\tfrac12$. A presented blob is a multi-port piece, the tree is isometric to
+the assembly of its presented blobs, and the assembly of matched pieces is a quasi-isometry.
+\end{proof}
+
+\section{Proof of the classification}
+
+\begin{proof}[Proof of \cref{thm:trichotomy}]
+\leanok
+\proves{thm:trichotomy}
+\uses{thm:bushy, thm:regime-obstructions-general, thm:chain-separation, thm:qi-transitive,
+thm:hairy-general, thm:chain-general, thm:converse, thm:bushy-semigroup, thm:reachable-arity}
+The four classes are disjoint by definition, and every admissible law falls in one of them.
+Within a class, universality is \cref{thm:bushy} for (F), \cref{thm:hairy-general} for (B), and
+\cref{thm:chain-general} for $(\mathrm{C}_\Lambda)$, the ray class being trivial;
+\cref{thm:qi-transitive} composes these across independent realisations. Across classes, the
+obstructions of \cref{thm:regime-obstructions-general} separate (R), (F), (B) and the chain
+regime from one another, and \cref{thm:chain-separation} separates two chain classes with
+different branching semigroups. That the chain classes are indexed exactly by the branching
+semigroup is \cref{thm:reachable-arity}, with \cref{thm:bushy-semigroup} placing the bushy
+regime at $\Lambda=\bbN_0$.
+\end{proof}

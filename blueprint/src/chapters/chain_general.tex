@@ -1,0 +1,277 @@
+\chapter{Label classes at general arity}
+\label{ch:chain-general}
+
+The same correspondence at bounded support $\set{0,\dots,J}$. The skeleton is reduced, shapes
+carry a bouquet at every vertex, the transport and cross-law relabellings put both laws on one
+label graph, and merging turns the arities a law can present into its branching semigroup.
+
+\section{The reduced skeleton}
+
+\begin{proposition}[Harris decomposition, general support]
+\label{thm:harris-general}
+\lean{ChainClasses.transform_expansion}
+\leanok
+\uses{thm:harris, def:gw}
+Let $q\in[0,1)$ be the extinction probability, the root of $s=f(s)$ in $[0,1)$. For a
+Galton--Watson tree with offspring law $\theta$ conditioned on infinite diameter, the reduced
+skeleton is a Galton--Watson tree with the reduced law $\widetilde\nu$, and the decorations are
+independent given the skeleton, each a Galton--Watson tree under the conjugate law.
+\end{proposition}
+
+\begin{corollary}[The reduced law has full support]
+\label{thm:full-support}
+\lean{ChainClasses.reducedLaw_pos}
+\leanok
+\uses{thm:harris-general}
+In the bushy regime $\widetilde\nu_k>0$ for every $2\leq k\leq J$.
+\end{corollary}
+
+\begin{definition}[Shapes at general arity]
+\label{def:shape-general}
+\uses{def:shape}
+A \emph{shape} is a pair $\sigma=(m,(\beta_1,\dots,\beta_m))$ with $m\geq1$ and each $\beta_i$ a
+finite, possibly empty, list of finite trees with offspring numbers in $\set{0,\dots,J}$. Its
+realisation is obtained from a path $v_1\cdots v_m$ by attaching the roots of the trees in
+$\beta_i$ by an edge at $v_i$.
+\end{definition}
+
+\begin{lemma}[The joint law at a split]
+\label{thm:split-joint}
+\lean{ChainClasses.splitJoint_not_product}
+\leanok
+\uses{thm:harris-general}
+Conditioned on being a split, the arity $k$ of a skeleton vertex and the number $r$ of its
+bushes have joint law
+\[
+ \bbP(k,r)=\frac{\theta_{k+r}\binom{k+r}{k}(1-q)^{k-1}q^{\,r}}{1-\widetilde\theta_1}
+ \qquad(k\geq2,\ r\geq0).
+\]
+For $J\geq3$ this law is not a product of a law in $k$ and a law in $r$.
+\end{lemma}
+
+The failure of the product form is why the shape law has to be taken conditionally on the
+arity.
+
+\begin{definition}[Conditional shape laws]
+\label{def:conditional-laws}
+\uses{thm:split-joint, def:shape-general}
+For $k\in\supp\widetilde\nu$ let $\mu_k$ be the law of the shape at the root of the reduced
+skeleton, conditioned on its terminating split having arity $k$.
+\end{definition}
+
+\begin{lemma}[Explicit form of the conditional laws]
+\label{thm:conditional-explicit}
+\lean{ChainClasses.gMixMass_eq_measure}
+\leanok
+\uses{def:conditional-laws}
+Under $\mu_k$ the neck length is geometric, the neck decorations are the conjugate bushes, and,
+independently of both, the exit bouquet holds $r$ bushes with probability proportional to
+$\theta_{k+r}\binom{k+r}{k}q^{\,r}$, each an independent Galton--Watson tree under the conjugate
+law.
+\end{lemma}
+
+\begin{lemma}[Conditional independence]
+\label{thm:conditional-iid}
+\lean{ChainClasses.conditional_iid}
+\leanok
+\uses{def:conditional-laws}
+Conditioned on the arity field $(k(w))_w$ of the reduced skeleton, the shapes $S(w)$ are
+independent with $S(w)\sim\mu_{k(w)}$.
+\end{lemma}
+
+\begin{lemma}[Uniform mass bounds]
+\label{thm:mass-uniform}
+\uses{thm:shape-mass, def:conditional-laws}
+Every $\mu_k$, $k\in\supp\widetilde\nu$, and the mixture $\mu$ satisfy the two bounds of
+\cref{thm:shape-mass} with constants depending on $\theta$ alone.
+\end{lemma}
+
+\section{Transport and the product form}
+
+\begin{lemma}[Transport relabelling]
+\label{thm:relabel}
+\lean{ChainClasses.exists_gShapeCoupling_relabel}
+\leanok
+\uses{thm:conditional-iid, thm:mass-uniform, def:shape-net}
+There is $D_2=D_2(\theta)$ such that for every integer $D\geq D_2$ there are a law $\mu_D$ on
+$\cR_D$ and maps $\ell_k\colon\cS\times[0,1)\to\cR_D$ pushing every conditional shape law
+forward to the single class law $\mu_D$, with a marked quasi-isometry between a shape and its
+class representative and with the label graph potential below the matching threshold.
+\end{lemma}
+
+\begin{proposition}[Product form]
+\label{thm:product-form}
+\lean{ChainClasses.labelMeasure_label_pattern}
+\leanok
+\uses{thm:relabel, thm:conditional-iid}
+Fix $D\geq D_2$, let $(U(w))_w$ be independent uniform variables on $[0,1)$, independent of the
+realisation, and label the reduced skeleton by $x(w)=\ell_{k(w)}(S(w),U(w))$. Then the pairs
+$(x(w),k(w))$ are i.i.d.\ with the product law $Q=\mu_D\otimes\widetilde\nu$ on
+$\cR_D\times\set{2,\dots,J}$, and the class $v_0$ of the one-vertex shape carries
+$\mu_D(v_0)\geq\tfrac12$.
+\end{proposition}
+
+\begin{lemma}[Cross-law relabelling]
+\label{thm:cross-relabel}
+\lean{ChainClasses.exists_gShapeCoupling_cond_mix}
+\leanok
+\uses{thm:relabel}
+There is $D_5=D_5(\theta,\theta')$ such that for every integer $D\geq D_5$ a single class law
+$\mu_D$ on $\cR_D$ and maps $\ell_k$ serve both offspring laws at once, again with the marked
+quasi-isometry and the potential bound.
+\end{lemma}
+
+\section{Merging and the branching semigroup}
+
+\begin{definition}[Merged shapes]
+\label{def:merged-shape}
+\uses{def:shape-general}
+A \emph{merged shape} is a pair $(\tau,(x_1,\dots,x_k))$ with $\tau$ a finite rooted tree whose
+root is the entry and whose exits $x_1,\dots,x_k$ are vertices of $\tau$, repetitions allowed.
+The shape at a reduced skeleton vertex of arity $k$ is the merged shape whose tree is its
+realisation and whose exit list holds $k$ copies of the exit.
+\end{definition}
+
+\begin{lemma}[Merging splits]
+\label{thm:merge}
+\lean{ChainClasses.RTree.merge_size}
+\leanok
+\uses{def:merged-shape}
+Let $s$ be a split of arity $k_1$ in the reduced skeleton and $t$ one of its children, of arity
+$k_2$. Contracting the edge $st$ produces a reduced skeleton in which $s$ has arity
+$k_1+k_2-1$, and the contraction is a marked quasi-isometry at a constant depending only on
+$\ceil{\log_2 J}$.
+\end{lemma}
+
+\begin{lemma}[Semigroup threshold]
+\label{thm:semigroup-threshold}
+\lean{ChainClasses.semigroup_threshold}
+\leanok
+Let $\Lambda$ be the additive submonoid of $\bbN_0$ generated by a nonempty finite set of
+positive integers with greatest common divisor $d$. There is $v=v(\Lambda)\geq0$ such that $vd$
+and $(v+1)d$ lie in $\Lambda$, and every multiple of $d$ at least $v^2d$ lies in $\Lambda$.
+\end{lemma}
+
+\begin{corollary}[The bushy semigroup]
+\label{thm:bushy-semigroup}
+\lean{ChainClasses.branching_semigroup_eq_top}
+\leanok
+\uses{thm:full-support, def:branching-semigroup}
+In the bushy regime $\Lambda_{\widetilde\nu}=\bbN_0$.
+\end{corollary}
+
+\section{The chain regime}
+
+\begin{lemma}[Neck and arity are independent]
+\label{thm:chain-independence}
+\lean{ChainClasses.chain_joint_factor}
+\leanok
+\uses{thm:harris-general}
+Let $\theta_0=0$ and $\theta_1\in(0,1)$, and let $w$ be a vertex of the reduced skeleton, with
+$m(w)$ the length of the neck ending at $w$ and $k(w)$ the arity of its split. Then
+$\bbP(m(w)=r,\ k(w)=j)=\theta_1^{\,r-1}\theta_j$ for $r\geq1$ and $j\geq2$, a product of its
+two marginals.
+\end{lemma}
+
+\begin{proposition}[Product form in the chain regime]
+\label{thm:chain-product-form}
+\lean{ChainClasses.chain_product_form}
+\leanok
+\uses{thm:chain-independence, thm:chain-classes}
+Let $D\geq2$ and label the reduced skeleton by $x(w)=\ell_D(m(w))$. Then the pairs
+$(x(w),k(w))$ are i.i.d.\ with the product law $Q=\mu_D\otimes\widetilde\nu$ on
+$\bbN_0\times\supp\widetilde\nu$, where $\mu_D(i)=\theta_1^{\,D^i-1}-\theta_1^{\,D^{i+1}-1}$.
+\end{proposition}
+
+\section{Cluster and blob presentations}
+
+\begin{definition}[Cluster presentation]
+\label{def:cluster}
+\uses{thm:merge}
+Fix a revealing depth $R\geq1$ and $\beta\in[0,1]$, and attach an independent uniform variable
+$U(w)$ to every vertex of the reduced skeleton. Starting from the root, each cluster root either
+stands alone or absorbs its first child, according to $U(w)$ and $\beta$; the cluster's
+\emph{presented arity} is the arity of the merged shape, and the next cluster roots are the
+splits immediately below.
+\end{definition}
+
+\begin{lemma}[The presented pairs]
+\label{thm:cluster-law}
+\lean{ChainClasses.clusterLaw_tsum}
+\leanok
+\uses{def:cluster, thm:chain-product-form}
+Under the cluster presentation the presented neck lengths and presented arities are i.i.d.\
+over the presented skeleton, with an explicit arity law supported on the reachable interval.
+\end{lemma}
+
+\begin{lemma}[Flattening]
+\label{thm:cluster-flat}
+\lean{ChainClasses.markedQI_of_collapse}
+\leanok
+\uses{def:cluster, thm:merge}
+A cluster $\set{w,w_1}$ realises a neck of length $m(w)$ whose exits leave at two depths at most
+$R$ apart. It admits an $R$-marked quasi-isometry to the flat configuration: a neck of length
+$m(w)$ with all $k(w)+k(w_1)-1$ exits at its far end.
+\end{lemma}
+
+\begin{definition}[Blob presentation]
+\label{def:blob}
+\uses{def:cluster}
+Fix a revealing depth $R\geq1$, a cap $n\geq1$, and a rule that at each step either stops or
+names an unspent exit, as a function of what has been revealed and of an independent uniform
+variable. Each cluster root grows a \emph{blob} under this rule, with a presented arity and a
+set of next cluster roots.
+\end{definition}
+
+\begin{lemma}[The reachable arity laws]
+\label{thm:blob-law}
+\lean{ChainClasses.mixPow_tsum}
+\leanok
+\uses{def:blob, thm:cluster-law}
+Write $P=\widetilde\nu-1$ for the law of the shift $k-1$ under $\widetilde\nu$. Under the blob
+presentation the pairs of presented neck length and presented arity are i.i.d.\ over the
+presented skeleton, and the reachable arity laws are the mixtures of convolution powers of $P$
+that the rule can realise.
+\end{lemma}
+
+\begin{lemma}[The least shift is common]
+\label{thm:least-shift}
+\lean{ChainClasses.min_mem_of_generates}
+\leanok
+\uses{def:branching-semigroup}
+Let $\Lambda_{\theta}=\Lambda_{\theta'}=\Lambda$ and let $s_0$ be the least nonzero element of
+$\Lambda$. Then $s_0+1$ lies in the support of both reduced laws, and more generally every
+minimal generator of $\Lambda$ is a shift of both laws.
+\end{lemma}
+
+\begin{lemma}[Reachable arities]
+\label{thm:reachable-arity}
+\lean{ChainClasses.cluster_arity_mem}
+\leanok
+\uses{thm:blob-law, thm:least-shift}
+A cluster whose splits have shifts summing to $s$ has presented arity $s+1$, and $s$ ranges over
+$\Lambda_{\theta}$. The arities a chain-regime law can present are therefore
+$1+(\Lambda_{\theta}\setminus\set0)$, so two laws with $\Lambda_{\theta}=\Lambda_{\theta'}$ can
+present the same set of arities.
+\end{lemma}
+
+\begin{lemma}[Asynchronous common renewal]
+\label{thm:common-renewal}
+\lean{ChainClasses.finite_common_renewal_completions}
+\leanok
+\uses{thm:least-shift}
+Let $P,P'$ be laws with nonempty finite supports $A,B\subset\bbN$ of positive integers. If
+$\langle A\rangle=\langle B\rangle=\Lambda$, then two independent renewal walks with increments
+$P$ and $P'$ have an asynchronous common renewal time with an exponential tail.
+\end{lemma}
+
+\begin{lemma}[Matched presentation]
+\label{thm:matched-presentation}
+\lean{ChainClasses.Matched.matchedShift_window}
+\leanok
+\uses{thm:common-renewal, thm:reachable-arity, thm:blob-law}
+Let $\theta,\theta'$ be chain-regime laws with $\Lambda_{\theta}=\Lambda_{\theta'}=\Lambda$ and
+let $s_0$ be the least nonzero element of $\Lambda$. Then both laws admit blob presentations
+whose presented pairs are i.i.d.\ with a common arity law, the presented shifts staying in a
+bounded window around the common renewal.
+\end{lemma}
