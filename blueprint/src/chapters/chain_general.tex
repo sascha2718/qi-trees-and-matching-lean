@@ -1,9 +1,12 @@
 \chapter{Label classes at general arity}
 \label{ch:chain-general}
 
-The same correspondence at bounded support $\set{0,\dots,J}$. The skeleton is reduced, shapes
-carry a bouquet at every vertex, the transport and cross-law relabellings put both laws on one
-label graph, and merging turns the arities a law can present into its branching semigroup.
+We now extend the label-class construction to offspring laws supported on
+$\set{0,\dots,J}$. The reduced skeleton may have several arities, and a decorated shape carries
+a bouquet of finite bushes at each neck vertex. Conditional shape laws retain the dependence
+between the exit arity and its decorations. Transport relabellings remove this dependence from the
+label field, while merging adjacent splits identifies the possible presented arities with the
+branching semigroup.
 
 \section{The reduced skeleton}
 
@@ -21,9 +24,13 @@ independent given the skeleton, each a Galton--Watson tree under the conjugate l
 \begin{proof}
 \leanok
 \uses{thm:harris}
-Each child survives independently with probability $1-q$, so the number of surviving children
-of a vertex conditioned to survive has the transformed generating function. That transform is the
-reduced law, and the children that die found independent bushes under the conjugate law.
+Conditional on a vertex having $j$ children, their descendant trees survive independently with
+probability $1-q$. The number of surviving children is therefore binomial with parameters $j$
+and $1-q$. Conditioning on at least one surviving child and averaging over $j$ gives the reduced
+offspring law $\widetilde\nu$. Given the set of surviving children, the remaining child subtrees
+are independent and have the original Galton--Watson law conditioned on extinction, namely the
+conjugate law. Iterating this decomposition over the surviving vertices gives the claimed
+skeleton and decorations.
 \end{proof}
 
 \begin{corollary}[The reduced law has full support]
@@ -69,10 +76,16 @@ For $J\geq3$ this law is not a product of a law in $k$ and a law in $r$.
 \begin{proof}
 \leanok
 \uses{thm:harris-general}
-A vertex has total offspring $k+r$ with exactly $k$ surviving with probability
-$\theta_{k+r}\binom{k+r}{k}(1-q)^kq^{\,r}$, and conditioning on being a split divides by
-$1-\widetilde\theta_1$. For $J\geq3$ the binomial coefficient couples $k$ and $r$, so no
-factorisation exists.
+The event in question requires a total of $k+r$ children and a choice of exactly $k$ surviving
+ones. Before conditioning, its probability is
+\[
+ \theta_{k+r}\binom{k+r}{k}(1-q)^kq^r.
+\]
+Passing to the reduced tree contributes the survival normalisation, and conditioning the reduced
+vertex to be a split contributes the factor $1-\widetilde\theta_1$. Cancelling the common
+survival factor gives the displayed formula. For $J\geq3$, the factor
+$\theta_{k+r}\binom{k+r}{k}$ depends jointly on $k$ and $r$, so the conditional law need not
+factor into independent arity and bush-count laws.
 \end{proof}
 
 The failure of the product form is why the shape law has to be taken conditionally on the
@@ -100,10 +113,14 @@ law.
 
 \begin{proof}
 \leanok
-The neck length is geometric and independent of the arity of the terminating split, so the
-conditioning leaves it unchanged, and the neck decorations are the conjugate bushes for the same
-reason. Only the exit bouquet feels the conditioning, and its law is the $r$-marginal of
-\cref{thm:split-joint} at fixed $k$.
+\uses{thm:split-joint}
+Starting from one split, the successive reduced vertices are unary until the first vertex with at
+least two children. Independence of the offspring field makes this waiting time geometric, and
+the arity of the terminating split is independent of the waiting time. The decorations along the
+neck are conjugate bushes and are independent of both quantities. Conditioning the terminal arity
+to equal $k$ therefore changes only its exit bouquet. Summing the joint law of
+\cref{thm:split-joint} over the possible values of $r$ gives the stated normalisation and the
+conditional bouquet law.
 \end{proof}
 
 \begin{lemma}[Conditional independence]
@@ -117,9 +134,13 @@ independent with $S(w)\sim\mu_{k(w)}$.
 
 \begin{proof}
 \leanok
-The neck lengths are independent of the arity field and of each other, and the decorations are
-conditionally independent given the skeleton. Assembling the two gives shapes that are conditionally
-independent with the law attached to their own arity.
+\uses{thm:conditional-explicit, thm:harris-general}
+Fix a finite collection of reduced-skeleton vertices. The neck leading to each of them is explored
+inside a disjoint descendant subtree, so the neck lengths are mutually independent and independent
+of the terminal arities. By \cref{thm:harris-general}, the decorations are independent given the
+reduced skeleton. Hence, after conditioning on the complete arity field, each shape uses an
+independent neck and independent decorations. Its conditional distribution is precisely
+$\mu_{k(w)}$ by \cref{thm:conditional-explicit}.
 \end{proof}
 
 \begin{lemma}[Uniform mass bounds]
@@ -130,11 +151,15 @@ Every $\mu_k$, $k\in\supp\widetilde\nu$, and the mixture $\mu$ satisfy the two b
 \end{lemma}
 
 \begin{proof}
-\uses{thm:shape-mass}
-Give $\mu_k$ the explicit form of \cref{thm:conditional-explicit}. The size is dominated by
-the compound sum of \cref{thm:shape-mass} together with at most $J-2$ further independent total
-progenies under the conjugate law, which keeps the exponential tail; the pointwise lower bound is
-again a product of boundedly many fixed positive weights.
+\uses{thm:shape-mass, thm:conditional-explicit}
+Use the description in \cref{thm:conditional-explicit}. The neck length has a fixed geometric
+tail, and every decoration is a total progeny under the bounded, subcritical conjugate law. Relative
+to the binary case, the exit bouquet adds at most $J-2$ further such progenies. Their moment
+generating functions are finite in one common neighbourhood of the origin. Since only finitely
+many arities $k$ occur, the resulting exponential tail is uniform in $k$. A supported shape of
+size $n$ is specified by at most a fixed multiple of $n$ local choices from a finite set of
+positive probabilities. Taking the smallest of these probabilities gives the uniform pointwise
+lower bound.
 \end{proof}
 
 \section{Transport and the product form}
@@ -152,30 +177,42 @@ class representative and with the label graph potential below the matching thres
 
 \begin{proof}
 \leanok
-\uses{thm:conditional-iid, thm:mass-uniform}
-The uniform mass bounds supply what the cascade of \cref{thm:shape-coupling} needs. Build its
-two shrinking maps at scale $\floor{\sqrt{D/(216J^2)}}$, after fixing each shape into the
-support, and take $\mu_D$ to be the common pushforward. The potential bound is the entropy count
-of \cref{thm:dilution} against the mass bounds.
+\uses{thm:conditional-iid, thm:mass-uniform, thm:shape-coupling, thm:dilution}
+Choose a reference mixture of the finitely many conditional laws. The uniform estimates of
+\cref{thm:mass-uniform} allow the descending cascade used in
+\cref{thm:shape-coupling} to couple each $\mu_k$ to this mixture with constants independent of
+$k$. Before starting the cascade, fix a shape into the relevant support. On the two alternating
+sides, shrink at scale $\floor{\sqrt{D/(216J^2)}}$ so that a cascade pair remains comparable
+after projection to the net. Push every coupled law through its representative map and denote the
+common image law by $\mu_D$. The construction gives the maps $\ell_k$ and the required marked
+comparisons. Finally, \cref{thm:dilution} bounds the number of possible representatives at each
+size, and \cref{thm:mass-uniform} supplies their mass bounds. Summing over the sizes places the
+potential below the matching threshold for $D\geq D_2$.
 \end{proof}
 
 \begin{proposition}[Product form]
 \label{thm:product-form}
 \lean{ChainClasses.labelMeasure_label_pattern}
 \leanok
-Fix $D\geq D_2$, let $(U(w))_w$ be independent uniform variables on $[0,1)$, independent of the
-realisation, and label the reduced skeleton by $x(w)=\ell_{k(w)}(S(w),U(w))$. Then the pairs
-$(x(w),k(w))$ are i.i.d.\ with the product law $Q=\mu_D\otimes\widetilde\nu$ on
-$\cR_D\times\set{2,\dots,J}$, and the class $v_0$ of the one-vertex shape carries
-$\mu_D(v_0)\geq\tfrac12$.
+Fix $D\geq D_2$, and let $(U(w))_w$ be independent uniform variables on $[0,1)$, independent
+of the realisation. Label the reduced skeleton by
+\[
+ x(w)=\ell_{k(w)}(S(w),U(w)).
+\]
+Then the pairs $(x(w),k(w))$ are i.i.d.\ with the product law
+$Q=\mu_D\otimes\widetilde\nu$ on $\cR_D\times\set{2,\dots,J}$. The class $v_0$ of the
+one-vertex shape carries $\mu_D(v_0)\geq\tfrac12$.
 \end{proposition}
 
 \begin{proof}
 \leanok
 \uses{thm:relabel, thm:conditional-iid}
-Conditionally on the arity field the shapes are independent with $S(w)\sim\mu_{k(w)}$, so the
-labels are conditionally independent with the single law $\mu_D$, whatever the arity field. That
-law is free of the arity, so averaging gives independence of the pair and the product form.
+Condition on the entire arity field. By \cref{thm:conditional-iid}, the shapes are independent
+and $S(w)$ has law $\mu_{k(w)}$. The variables $U(w)$ are also independent, and the defining
+property of $\ell_k$ sends each $\mu_k$ to $\mu_D$. Thus, conditionally on the arities, the
+labels $x(w)$ are independent with common law $\mu_D$. This conditional law does not depend on
+the arity field. Averaging over that field therefore makes $x(w)$ independent of $k(w)$ at each
+vertex and makes the pairs i.i.d. with law $\mu_D\otimes\widetilde\nu$.
 \end{proof}
 
 \begin{lemma}[Cross-law relabelling]
@@ -190,9 +227,13 @@ quasi-isometry and the potential bound.
 \begin{proof}
 \leanok
 \uses{thm:relabel}
-Take $\mu_D=\mu\circ\rep_D^{-1}$ and the maps of \cref{thm:relabel} on the unprimed side. On
-the primed side, sample a partner from the coupling of $\mu_k$ with $\mu$ by the uniform
-variable and relabel by its representative. Both sides then push forward to $\mu_D$.
+Fix the unprimed reference mixture $\mu$ and set
+$\mu_D=\mu\circ\rep_D^{-1}$. On the unprimed side, use the maps constructed in
+\cref{thm:relabel}. For each conditional law on the primed side, the uniform mass estimates give
+a cascade coupling with $\mu$. Use the auxiliary uniform variable to sample the $\mu$-coordinate
+of this coupling and then apply $\rep_D$. The resulting primed map also has pushforward
+$\mu_D$. The two support-fixing and shrinking maps in the cascade give the marked comparison on
+their respective sides, and the same entropy estimate gives the common potential bound.
 \end{proof}
 
 \section{Merging and the branching semigroup}
@@ -221,10 +262,13 @@ $\ceil{\log_2 J}$.
 
 \begin{proof}
 \leanok
-The realisations at $s$ and at $t$ are subtrees joined by the edge from $s$ to the entry
-at $t$; their union along that edge is a merged shape with the combined exit list, of arity
-$k_1+k_2-1$. Addressing the exits by words of length $\ceil{\log_2J}$ realises the contraction
-as a quasi-isometry with that constant.
+The shape at $s$ contributes $k_1$ exits. Absorbing the child split $t$ uses one of those exits
+and replaces it by the $k_2$ exits of $t$, leaving $k_1+k_2-1$ exits in total. The two shape
+realisations and the edge between them form the tree component of the merged shape. To compare the
+old and contracted skeletons, encode the at most $J$ children of any split by distinct binary
+words of length $\ceil{\log_2J}$. The contraction changes distances only inside one such bounded
+addressing block and moves every exit by the same bounded amount. It is therefore a marked
+quasi-isometry with a constant depending only on $\ceil{\log_2J}$.
 \end{proof}
 
 \begin{lemma}[Semigroup threshold]
@@ -238,9 +282,12 @@ and $(v+1)d$ lie in $\Lambda$, and every multiple of $d$ at least $v^2d$ lies in
 
 \begin{proof}
 \leanok
-Assume $d=1$ by dividing the generators. B\'ezout gives a representation of $1$ as an
-integer combination of the generators, and clearing signs exhibits two consecutive integers in
-$\Lambda$; every integer beyond their product is then a nonnegative combination of them.
+Divide every generator by $d$, so that their greatest common divisor is one. B\'ezout's identity
+expresses $1$ as an integer combination of the generators. Move the negative terms to the other
+side. The two resulting nonnegative combinations are consecutive integers, say $v$ and $v+1$,
+and both belong to the rescaled monoid. Every integer $n\geq v^2$ may be written as
+$n=av+b(v+1)$ with $a,b\geq0$, by reducing $n$ modulo $v$. Multiplying back by $d$ gives the
+claim.
 \end{proof}
 
 \begin{corollary}[The bushy semigroup]
@@ -274,10 +321,12 @@ two marginals.
 \begin{proof}
 \leanok
 \uses{thm:harris-general}
-Descend from the vertex above $w$. The offspring numbers are i.i.d.\ with law $\theta$, and
-since $\theta_0=0$ every child survives, so a vertex is a neck vertex exactly when it has one
-child. The event therefore reads off $r-1$ unary steps followed by a split of arity $j$, giving
-the product $\theta_1^{\,r-1}\theta_j$.
+Explore the unique line of descent from the split above $w$. Since $\theta_0=0$, every child
+subtree is infinite and no reduction changes the offspring numbers. The event
+$\set{m(w)=r,k(w)=j}$ consists of exactly $r-1$ successive unary vertices followed by one
+vertex of arity $j$. Independence of the offspring counts gives probability
+$\theta_1^{r-1}\theta_j$. Summing over $j$ and over $r$ separately shows that this joint law is
+the product of the geometric neck law and the arity law conditioned on being at least two.
 \end{proof}
 
 \begin{proposition}[Product form in the chain regime]
@@ -292,9 +341,11 @@ $\bbN_0\times\supp\widetilde\nu$, where $\mu_D(i)=\theta_1^{\,D^i-1}-\theta_1^{\
 \begin{proof}
 \leanok
 \uses{thm:chain-independence, thm:chain-classes}
-The pairs are i.i.d.\ with independent coordinates by \cref{thm:chain-independence}, and
-$\ell_D$ acts on the first coordinate alone, so the labelled pairs are i.i.d.\ with the product of
-the quantised geometric law and the arity law.
+By \cref{thm:chain-independence}, the unquantised pairs $(m(w),k(w))$ are i.i.d. and their two
+coordinates are independent. Applying the deterministic map $\ell_D$ to the first coordinate
+preserves both properties. The image of the neck marginal is the law computed in
+\cref{thm:chain-classes}, while the second marginal remains $\widetilde\nu$. This gives the
+stated product law.
 \end{proof}
 
 \section{Cluster and blob presentations}
@@ -306,7 +357,7 @@ the quantised geometric law and the arity law.
 \uses{thm:merge}
 Fix a revealing depth $R\geq1$ and $\beta\in[0,1]$, and attach an independent uniform variable
 $U(w)$ to every vertex of the reduced skeleton. Starting from the root, each cluster root either
-stands alone or absorbs its first child, according to $U(w)$ and $\beta$; the cluster's
+stands alone or absorbs its first child, according to $U(w)$ and $\beta$. The cluster's
 \emph{presented arity} is the arity of the merged shape, and the next cluster roots are the
 splits immediately below.
 \end{definition}
@@ -322,11 +373,15 @@ over the presented skeleton, with an explicit arity law supported on the reachab
 
 \begin{proof}
 \leanok
-\uses{thm:chain-product-form}
-The rule inspects only $m(w)$, $k(w)$, the uniform variable, and a bounded prefix of the
-next neck, and it absorbs everything it inspects. The branching property therefore leaves the
-unexplored subtrees independent, so the presented pairs are i.i.d., and summing the absorption
-probabilities gives the presented arity law.
+\uses{thm:chain-product-form, thm:merge}
+Explore one cluster at a time. Its decision uses only the root data $(m(w),k(w))$, the auxiliary
+variable $U(w)$, and at most the revealed prefix of the first child. Every vertex whose data are
+inspected is absorbed into the cluster. The next cluster roots consequently lie at stopping
+positions beyond the explored region. By the branching property, their descendant fields are
+independent and have the original law. The presented pairs are therefore i.i.d. over the
+presented skeleton. If no child is absorbed, the presented arity is $k(w)$. If the first child
+is absorbed, it is $k(w)+k(w_1)-1$ by \cref{thm:merge}. Summing these alternatives with their
+rule probabilities gives the explicit presented arity law and its reachable support.
 \end{proof}
 
 \begin{lemma}[Flattening]
@@ -342,9 +397,12 @@ $m(w)$ with all $k(w)+k(w_1)-1$ exits at its far end.
 \begin{proof}
 \leanok
 \uses{thm:merge}
-Send the vertices of the inner neck to the far end of the outer neck and fix everything else.
-Distances never increase and decrease by at most $m(w_1)\leq R$, so the map is an $R$-marked
-quasi-isometry, and it is onto with each mark moved by at most $R$.
+Keep the outer neck fixed and collapse the inner neck towards the far endpoint of the outer one.
+Every exit formerly attached along the inner neck is then regarded as an exit at that endpoint.
+The map is onto the flat configuration. It does not increase any distance, while a path loses at
+most the length $m(w_1)\leq R$ of the collapsed inner neck. The entry is fixed and every exit
+moves by at most $R$, so all metric, density, and mark conditions for an $R$-marked
+quasi-isometry hold.
 \end{proof}
 
 \begin{definition}[Blob presentation]
@@ -371,11 +429,15 @@ that the rule can realise.
 
 \begin{proof}
 \leanok
-\uses{thm:cluster-law}
-Expose the blobs successively. At each new cluster root the rule has absorbed every vertex it
-inspected on the way there, so the unexplored subtrees are independent by the branching property.
-The presented arity is then one more than a sum of shifts drawn by the rule, whose law is the
-corresponding mixture of convolution powers of $P$.
+\uses{thm:cluster-law, thm:merge}
+Expose a blob together with all data inspected by its rule. Because every inspected vertex is
+absorbed, the next cluster roots are stopping positions whose descendant subtrees have not been
+examined. The branching property makes those subtrees independent with the original law, proving
+the i.i.d. assertion by iteration. If the blob absorbs splits of arities
+$k_1,\dots,k_m$, then repeated use of \cref{thm:merge} gives presented arity
+$1+\sum_{i=1}^m(k_i-1)$. Conditional on the rule choosing $m$ increments, this sum has law
+$P^{*m}$. Averaging over the random stopping rule gives precisely a mixture of convolution
+powers of $P$.
 \end{proof}
 
 \begin{lemma}[The least shift is common]
@@ -390,9 +452,12 @@ minimal generator of $\Lambda$ is a shift of both laws.
 
 \begin{proof}
 \leanok
-A least nonzero element of a submonoid of $\bbN_0$ is not a sum of two nonzero elements, both
-of which would be at least as large, so it lies in every generating set. Here the generating set is
-the set of shifts, that is the support of the reduced law minus one.
+Let $A$ be either set of supported shifts. Since $A$ generates $\Lambda$, the element $s_0$
+is a finite sum of elements of $A$. It cannot be a sum of two or more nonzero terms, since every
+such term lies in $\Lambda$ and is therefore at least $s_0$. Thus $s_0\in A$. The same argument
+applies to any generator of $\Lambda$ that is minimal under decomposition as a sum of nonzero
+elements. Adding one translates these common shifts back to arities in the supports of both
+reduced laws.
 \end{proof}
 
 \begin{lemma}[Reachable arities]
@@ -408,9 +473,12 @@ present the same set of arities.
 \begin{proof}
 \leanok
 \uses{thm:blob-law, thm:least-shift}
-A cluster of splits of arities $k_1,\dots,k_n$ has $\sum_i(k_i-1)+1$ outgoing edges, since
-each split contributes its arity and each absorbed split consumes one edge of its parent. That is
-$s+1$ for $s$ a sum of generators, and every element of $\Lambda_\theta$ arises this way.
+Begin with one outgoing slot. Absorbing a split of arity $k_i$ consumes that slot and creates
+$k_i$ new ones, increasing the number of available exits by $k_i-1$. A cluster containing splits
+of arities $k_1,\dots,k_n$ therefore has
+$1+\sum_i(k_i-1)$ exits. The sum belongs to $\Lambda_\theta$ by definition. Conversely, every
+$s\in\Lambda_\theta\setminus\set0$ is a finite sum of supported shifts. Absorbing a sequence of
+splits with those arities constructs a cluster of presented arity $s+1$.
 \end{proof}
 
 \begin{lemma}[Asynchronous common renewal]
@@ -425,10 +493,14 @@ $P$ and $P'$ have an asynchronous common renewal time with an exponential tail.
 \begin{proof}
 \leanok
 \uses{thm:least-shift}
-Track the lag between the two totals. After the first two draws the lag stays in a finite
-window determined by the two maximal increments, so the lag is a finite-state chain. Within each
-block of $H$ draws a correction word returns it to zero with probability at least $q$, which
-gives the exponential tail.
+Run the walks asynchronously: at each step advance a walk whose current total is smaller. The lag
+then lies in the finite interval determined by the two largest increments, so it is a finite-state
+Markov chain. Equality of the generated monoids implies that from every lag state there is a
+finite word of increments that returns the two totals to equality. Since the supports are finite,
+we may choose a common length bound $H$ for these correction words and a positive lower bound
+$q$ for their probabilities. Conditional on any history, the chance of avoiding equality for the
+next $H$ advances is at most $1-q$. Iteration gives
+$\bbP(\tau>nH)\leq(1-q)^n$, which is the required exponential tail.
 \end{proof}
 
 \begin{lemma}[Matched presentation]
@@ -444,8 +516,13 @@ bounded window around the common renewal.
 \begin{proof}
 \leanok
 \uses{thm:common-renewal, thm:reachable-arity, thm:blob-law}
-Build the rule on one side and mirror it. At the start of each blob the rule chooses, by an
-independent uniform variable, how many shifts to accumulate before stopping, capped so the presented
-shift stays within a bounded window of the common renewal of \cref{thm:common-renewal}. The
-resulting presented pairs are i.i.d.\ with the same arity law on both sides.
+Couple the two asynchronous renewal procedures through the rule, without coupling the underlying
+offspring fields. Starting at a blob root, the rule advances the lagging side and records the
+increments until the common renewal of \cref{thm:common-renewal} is reached. A fixed cap stops the
+exploration before it can inspect an unbounded region. An auxiliary uniform variable allocates
+the residual mass among the possible stopping values so that the two rules induce the same
+presented shift law. The exponential tail of the common renewal makes the missed mass uniformly
+small, while all uncapped outcomes lie in a bounded window about the common value. Since each blob
+absorbs all inspected vertices, \cref{thm:blob-law} applies independently at every new blob root.
+Thus the presented pairs are i.i.d. on both sides and have the same arity marginal.
 \end{proof}

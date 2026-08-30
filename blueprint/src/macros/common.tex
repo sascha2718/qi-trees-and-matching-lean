@@ -1,21 +1,5 @@
 % Macros and settings shared by the pdf and the web version.
 
-% ---------- theorem environments ----------
-% The dependency graph reads theorem, proposition, lemma, corollary and
-% definition. All environments share the theorem counter.
-\newtheorem{theorem}{Theorem}[chapter]
-\newtheorem{proposition}[theorem]{Proposition}
-\newtheorem{lemma}[theorem]{Lemma}
-\newtheorem{corollary}[theorem]{Corollary}
-\newtheorem{conjecture}[theorem]{Conjecture}
-
-\theoremstyle{definition}
-\newtheorem{definition}[theorem]{Definition}
-\newtheorem{example}[theorem]{Example}
-
-\theoremstyle{remark}
-\newtheorem{remark}[theorem]{Remark}
-
 % ---------- notation ----------
 % Follows preamble.tex of the paper. Paired delimiters and \DeclareMathOperator
 % are written as plain \newcommand so that MathJax receives them.

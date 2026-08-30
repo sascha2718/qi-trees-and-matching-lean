@@ -1,8 +1,11 @@
 \chapter{The classification}
 \label{ch:trichotomy}
 
-Assembly at general bounded support. The four regimes are separated by the obstructions, each
-regime is shown universal, and the branching semigroup indexes the chain classes.
+We now assemble the classification for arbitrary bounded offspring support. First we separate the
+four geometric regimes by coarse invariants. We then apply the two-law matching theorem to prove
+universality in the bushy regime and within every chain class. In the chain regime, the branching
+semigroup is both the source of the common presentation and the invariant that distinguishes the
+classes.
 
 \section{The regimes and their obstructions}
 
@@ -18,9 +21,17 @@ every $v\in\cT$. Then $\cT\simeq\bbB$.
 \begin{proof}
 \leanok
 \uses{def:qi}
-Such a tree embeds into a binary tree in which every vertex has a vertex with two children
-within $\ceil{\log_2N}$ below it, and contracting the unary runs of such a tree is a
-quasi-isometry onto $\bbB$.
+Put $L=\ceil{\log_2N}$. Encode each of the $N$ child indices by a binary word of length $L$,
+choosing the codes of $1$ and $2$ to differ in their first bit. Replacing every edge of $\cT$
+by its code path embeds $\cT$ in a binary tree $\cT'$, multiplies distances by $L$, and leaves
+every point of $\cT'$ within distance $L$ of a coded vertex. Hence $\cT\simeq\cT'$.
+
+Every coded vertex of $\cT'$ has two descendant branches because $v1,v2\in\cT$, and a vertex
+inside a code path reaches such a split within $L$ steps. Map $\bbB$ recursively to the first
+split below the root and then to the first splits below the two children of each image. This map
+replaces every binary edge by a path of length between $1$ and $L+1$, and every vertex of
+$\cT'$ lies within distance $L$ of its image. It is therefore an $(L+1)$-quasi-isometry, so
+$\cT\simeq\cT'\simeq\bbB$.
 \end{proof}
 
 \begin{lemma}[General-support regime obstructions]
@@ -30,18 +41,30 @@ ChainClasses.unbounded_hairs_gSample_ae}
 \leanok
 Let $\theta$ be finitely supported and supercritical, and let $\cT$ be a Galton--Watson tree
 with law $\theta$ conditioned on infinite diameter. Almost surely $\cT$ carries three rays
-meeting only at their common initial vertex; in the chain regime every vertex lies within
-bounded distance of a line; and in the bushy regime $\cT$ has hairs of unbounded depth.
+meeting only at their common initial vertex. In the chain regime every vertex lies within
+bounded distance of a line, while in the bushy regime $\cT$ has hairs of unbounded depth.
 \end{lemma}
 
 \begin{proof}
 \leanok
-\uses{thm:regime-obstructions, thm:hair-separation, thm:three-rays}
-Write $\cT^*$ for $\cT$ when $\theta_0=0$ and for its skeleton otherwise. Under the
-conditioning $\cT^*$ is a Galton--Watson tree with the reduced law, never dies out, and sits
-inside $\cT$. The three rays come from a split below a split, the line in the chain regime from
-the neck through each vertex, and the unbounded hairs from the dying bushes recurring along the
-skeleton.
+\uses{thm:regime-obstructions, thm:hair-separation, thm:three-rays,
+thm:harris-general}
+Write $\cT^*$ for $\cT$ when $\theta_0=0$ and for its reduced skeleton otherwise. Under the
+conditioning, $\cT^*$ never dies out and is an isometric subtree of $\cT$. If its reduced law is
+not concentrated at one, independence along every infinite descent implies that a split occurs
+below every vertex almost surely. Choose a split below a split. Two rays descend from distinct
+children of the lower split, while a third returns towards the upper split and descends through a
+different child. This proves the three-ray assertion.
+
+In the chain regime the tree has no leaves. Below the first split, every vertex lies on a line:
+one half follows an infinite descendant ray, while the other climbs to an ancestral split and
+leaves through a different infinite child. The finite initial stem is within the depth of the
+first split of such a line, giving the uniform bound. In the bushy regime, the Harris decomposition
+of \cref{thm:harris-general} attaches independent conjugate-law bushes along the infinite
+skeleton. For every depth $r$, such a bush has positive probability of containing a path of
+length $r$ and becoming extinct. Independent trials at infinitely many skeleton vertices
+therefore produce hairs of depth at least $r$ almost surely. Intersecting over $r$ gives
+unbounded hairs.
 \end{proof}
 
 \begin{proposition}[Separation within the chain regime]
@@ -57,11 +80,29 @@ with these laws. Then almost surely $\cT\not\simeq\cT'$.
 \begin{proof}
 \leanok
 \uses{thm:reachable-arity}
-Fix $m\in\Lambda_{\theta}\setminus\Lambda_{\theta'}$ and put $n=m+2$. Every
-quasi-isometry is a $D$-quasi-isometry for some $D$, and a countable union of null events is
-null, so it suffices to rule out each $D$ separately. The arities that the second law can present
-are $1+(\Lambda_{\theta'}\setminus\set0)$ by \cref{thm:reachable-arity}, which omits $n-1$,
-while the first law presents it at every scale.
+After exchanging the laws if necessary, fix
+$m\in\Lambda_\theta\setminus\Lambda_{\theta'}$ and set $n=m+2$. Every quasi-isometry is a
+$D$-quasi-isometry for some integer $D\geq1$, so it is enough to rule out each $D$ on an event of
+probability one.
+
+First consider a chain-regime tree with law $\theta'$. If a finite connected set has total
+branching excess $s=\sum_v(\deg^+(v)-1)$, then a sphere just outside it has cardinality $s+2$.
+Every summand is a supported shift, so $s\in\Lambda_{\theta'}$. Thus no region in the second tree
+can have the sphere count $n=m+2$.
+
+In the first tree, write $m$ as a sum of supported shifts. With positive probability, the
+corresponding finite stack of split vertices occurs with long unary chains along all its incoming
+and outgoing directions. Independence along a fixed ray and the second Borel--Cantelli lemma show
+that, for every length $L$, two such $L$-isolated stacks occur arbitrarily far apart almost surely.
+Each stack has exactly $n$ boundary chains.
+
+Suppose a $D$-quasi-isometry existed. Choose $L$ much larger than its distortion constants and
+apply tree stability to the $n$ long boundary chains of one stack. Their images determine a sphere
+in the second tree with exactly $n$ outward components. Repeating the argument with a second,
+distant stack ensures that at least one image lies far enough from the root for the sphere count
+to apply. This forces $n=s+2$ with $s\in\Lambda_{\theta'}$, contradicting the choice of $m$.
+Hence the event of a $D$-quasi-isometry has probability zero. Taking the countable union over $D$
+proves the proposition.
 \end{proof}
 
 \begin{lemma}[Transitivity across independent realisations]
@@ -76,10 +117,11 @@ realisations of $P_0$ and $P_m$ are almost surely quasi-isometric.
 
 \begin{proof}
 \leanok
-Realise $\cT_0,\dots,\cT_m$ independently on one space. Each consecutive pair carries the
-product law of the hypothesis, so each event $\cT_i\simeq\cT_{i+1}$ has probability one, and on
-the intersection of these finitely many events composition gives a quasi-isometry
-$\cT_0\to\cT_m$.
+Realise $\cT_0,\dots,\cT_m$ independently on one product space. Each consecutive pair has the
+product law in the corresponding hypothesis, so
+$\bbP(\cT_i\simeq\cT_{i+1})=1$. The intersection of these finitely many events also has
+probability one. On that intersection, compose the consecutive quasi-isometries. A finite
+composition is again a quasi-isometry, and it maps $\cT_0$ to $\cT_m$.
 \end{proof}
 
 \section{Universality in the bushy regime}
@@ -96,11 +138,14 @@ whose one-vertex class has mass at least $\tfrac12$.
 
 \begin{proof}
 \leanok
-\uses{thm:cross-relabel, thm:product-form}
-Conditionally on the arity field the shapes on either side are independent with
-$S(w)\sim\mu_{k(w)}$ by \cref{thm:conditional-iid}. The cross-law relabelling pushes every
-conditional law forward to the same class law, so the labels are conditionally independent with a
-law free of the arity, and averaging over the arity field gives the product form on both sides.
+\uses{thm:cross-relabel, thm:product-form, thm:conditional-iid}
+Condition on the arity field of either reduced skeleton. By \cref{thm:conditional-iid}, its
+shapes are independent and the shape at $w$ has law $\mu_{k(w)}$. The cross-law maps of
+\cref{thm:cross-relabel}, together with the independent uniform variables, push every conditional
+law on both sides to the same law $\mu_D$. Hence the transported labels are conditionally
+independent with a distribution that does not depend on the arities. Averaging over the arity
+field gives independence between label and arity at each vertex and yields the two stated product
+laws. The lower bound at the one-vertex class is part of the relabelling construction.
 \end{proof}
 
 \begin{proposition}[Universality in the bushy regime]
@@ -115,12 +160,21 @@ diameter. Then almost surely $\cT\simeq\cT'$.
 
 \begin{proof}
 \leanok
-\uses{thm:hairy-cross, thm:composite-matching, thm:glued-transfer, thm:merge}
-The labelled reduced skeleton is encoded into the binary tree along the cascades of
-\cref{thm:composite-matching}: a core arity by its balanced halving, an exceptional arity by its
-marker chain. The encoded law is the engine's process law at every height, markers included, so
-the engine aligns the two encoded label fields with probability at least $1-Ke^{-cD^2}$. Matched
-classes admit a marked quasi-isometry, and the glued transfer assembles them.
+\uses{thm:hairy-cross, thm:composite-matching, thm:glued-transfer, thm:merge,
+thm:cross-relabel, thm:qi-transitive}
+Use \cref{thm:hairy-cross} to label both reduced skeletons on one class graph. Encode an arity in
+the common core by the balanced binary cascade of \cref{thm:composite-matching}. Encode an arity
+outside the core by its finite marker chain. The branching property and the product forms identify
+the resulting finite-height laws with the two process laws used by the matching engine, including
+all marker coordinates.
+
+When the supports are close enough for a single common-core comparison, the potential estimate in
+\cref{thm:cross-relabel} and \cref{thm:composite-matching} give a matching automorphism with
+failure probability at most $Ke^{-cD^2}$. For arbitrary bounded supports, insert a finite chain
+of intermediate arity laws and use \cref{thm:qi-transitive}. A matched pair of class labels gives
+a marked quasi-isometry between the corresponding shapes. The binary encoding changes only the
+bounded cascade blocks, and \cref{thm:merge} and \cref{thm:glued-transfer} assemble the local maps
+into a quasi-isometry of the original trees. Letting $D\to\infty$ gives the almost sure conclusion.
 \end{proof}
 
 \section{Universality within a chain class}
@@ -139,10 +193,18 @@ obeys $F\leq(H/q)\mathbf1$.
 \begin{proof}
 \leanok
 \uses{thm:common-renewal}
-The $z$-coordinate of $\cK^m\mathbf1$ is the probability, from phase $z$, of avoiding
-zero over the next $m$ increments. The correction-word argument of \cref{thm:common-renewal}
-kills the chain with probability at least $q$ within each block of $H$ increments, which gives
-the block bound; summing the geometric series bounds the Green vector by $(H/q)\mathbf1$.
+For $z\in\cD$, the $z$-coordinate of $\cK^m\mathbf1$ is the probability that the lag process,
+started at $z$, avoids zero during its next $m$ advances. By the correction-word construction in
+\cref{thm:common-renewal}, conditional on any current nonzero phase, the process reaches zero
+within the next $H$ advances with probability at least $q$. Iterating over blocks gives
+$\cK^{nH}\mathbf1\leq(1-q)^n\mathbf1$.
+
+Every $m$ belongs to a block of length $H$, so summing the block estimate gives
+$F\leq(H/q)\mathbf1$. Fubini's theorem for nonnegative sums allows the index shift
+\[
+ \cK F=\sum_{m\geq1}\cK^m\mathbf1=F-\mathbf1,
+\]
+which is the resolvent identity.
 \end{proof}
 
 \begin{proposition}[The weighted-screen gap]
@@ -160,10 +222,16 @@ while $W=2\cK=(3/2)$ admits no finite nonnegative $F$.
 \begin{proof}
 \leanok
 \uses{thm:invariant, thm:renewal-resolvent}
-Summability of the $a_m$ makes $F_W$ finite, with $F_W\leq(\sum_ma_m)u\mathbf1$. Fubini
-for nonnegative sums gives $WF_W=\sum_{m\geq1}W^m(u\mathbf1)$, which is the resolvent identity,
-and the invariant induction closes on $F_W$ as in \cref{thm:invariant}. The one-dimensional
-example shows a geometric tail for a killed kernel does not transfer to the weighted one.
+The power bound gives
+$F_W\leq(\sum_m a_m)u\mathbf1<\infty$. By Fubini's theorem for nonnegative sums,
+\[
+ WF_W=\sum_{m\geq1}W^m(u\mathbf1)=F_W-u\mathbf1.
+\]
+Thus $u\mathbf1+WF_W=F_W$, and the same monotone induction as in \cref{thm:invariant} keeps every
+screen vector below $F_W$. This argument depends on powers of the weighted operator $W$, not on
+the transition kernel $\cK$. Indeed, for $\cK=3/4$ the killed process has a geometric Green
+function, whereas $W=2\cK=3/2$ has divergent powers and admits no finite nonnegative invariant
+vector. The renewal tail alone therefore does not close the screen recursion.
 \end{proof}
 
 \begin{proposition}[Chain cross-law product form]
@@ -174,16 +242,20 @@ Let $\theta,\theta'$ be chain-regime laws with $\Lambda_{\theta}=\Lambda_{\theta
 Then both presented skeletons carry the product law $\mu_*\otimes\hat\nu$ and
 $\mu_*\otimes\hat\nu'$ with the same presented class law $\mu_*$, the quantised law at ratio
 $\theta_1$ through the coupled classes of \cref{thm:chain-coupling}, whose zero class has mass
-at least $\tfrac12$; matched presented blobs are comparable at an explicit scale.
+at least $\tfrac12$. Matched presented blobs are comparable at an explicit scale.
 \end{proposition}
 
 \begin{proof}
 \leanok
 \uses{thm:matched-presentation, thm:chain-coupling, thm:cluster-flat}
-The presented necks are geometric with ratios $\theta_1$ and $\theta_1'$ and independent
-of the presented arities, by \cref{thm:matched-presentation}. \Cref{thm:chain-coupling} quantises
-the two neck laws into the same class law $\mu_*$, and the matched presentation gives the two
-sides a common presented arity law, so both carry the stated product form.
+By \cref{thm:matched-presentation}, the blob rule uses only absorbed data. The branching property
+therefore makes the presented pairs i.i.d. The neck coordinate remains geometric, with ratios
+$\theta_1$ and $\theta_1'$ on the two sides, and is independent of the presented arity. Apply the
+randomised cuts of \cref{thm:chain-coupling} to the two neck coordinates. Their class labels now
+have one common law $\mu_*$, whose zero class has mass at least $1/2$. The matched presentation
+gives the arity coordinates their common law. Independence of the two coordinates yields the two
+product forms. Finally, \cref{thm:cluster-flat} and the bounded renewal window compare blobs with
+matched labels at the stated scale.
 \end{proof}
 
 \begin{proposition}[Universality within a chain class]
@@ -200,10 +272,17 @@ diameter. Then almost surely $\cT\simeq\cT'$.
 \leanok
 \uses{thm:chain-cross, thm:composite-matching, thm:matched-presentation, thm:glued-transfer}
 The matched presentation of \cref{thm:matched-presentation} puts both laws on a common presented
-arity law, and \cref{thm:chain-cross} puts them on a common class law. The engine matches the two
-presented label fields at an explicit tilt budget, uniform in $D$ once
-$\theta_1^{D^2}\leq\tfrac12$. A presented blob is a multi-port piece, the tree is isometric to
-the assembly of its presented blobs, and the assembly of matched pieces is a quasi-isometry.
+arity law, while \cref{thm:chain-cross} gives their neck labels the common class law $\mu_*$. We
+encode the presented arities by the composite cascades. At every height, the encoded fields have
+the process laws required by \cref{thm:composite-matching}. The exceptional top window contributes
+to a finite tilt budget, and this budget is uniform in $D$ once
+$\theta_1^{D^2}\leq1/2$. The engine therefore matches the two presented label fields with failure
+probability tending to zero.
+
+Each blob is a finite multi-port tree piece, and the original tree is isometric to the assembly of
+these pieces over the presented skeleton. By \cref{thm:chain-cross}, matched blobs admit uniform
+marked quasi-isometries. The multi-port form of \cref{thm:glued-transfer} assembles them into a
+quasi-isometry of the two original trees. Taking the union over $D$ gives probability one.
 \end{proof}
 
 \section{Proof of the classification}
@@ -213,13 +292,21 @@ the assembly of its presented blobs, and the assembly of matched pieces is a qua
 \proves{thm:trichotomy}
 \uses{thm:bushy, thm:regime-obstructions-general, thm:chain-separation, thm:qi-transitive,
 thm:hairy-general, thm:chain-general, thm:converse, thm:bushy-semigroup, thm:reachable-arity}
-The four classes are disjoint by definition, and every admissible law falls in one of them.
-Within a class, universality is \cref{thm:bushy} for (F), \cref{thm:hairy-general} for (B), and
-\cref{thm:chain-general} for $(\mathrm{C}_\Lambda)$, the ray class being trivial;
-\cref{thm:qi-transitive} composes these across independent realisations. Across classes, the
-obstructions of \cref{thm:regime-obstructions-general} separate (R), (F), (B) and the chain
-regime from one another, and \cref{thm:chain-separation} separates two chain classes with
-different branching semigroups. That the chain classes are indexed exactly by the branching
-semigroup is \cref{thm:reachable-arity}, with \cref{thm:bushy-semigroup} placing the bushy
-regime at $\Lambda=\bbN_0$.
+We first classify the laws. If $\theta_1=1$, the realisation is the ray. Otherwise, an infinite
+law with $\theta_0=\theta_1=0$ belongs to (F), a law with $\theta_0=0<\theta_1<1$ belongs to
+the chain regime, and a law with $\theta_0>0$ belongs to (B). These cases are mutually exclusive
+and exhaustive. In the chain case, \cref{thm:reachable-arity} associates the class
+$(\mathrm C_{\Lambda_\theta})$. The bushy reduced law instead has full branching semigroup by
+\cref{thm:bushy-semigroup}.
+
+We next prove the same-class assertion. The ray case is deterministic. The full-tree case is
+\cref{thm:bushy}, the bushy case is \cref{thm:hairy-general}, and the chain case at a fixed
+semigroup is \cref{thm:chain-general}. Whenever an argument passes through intermediate laws,
+\cref{thm:qi-transitive} composes the almost sure pairwise conclusions.
+
+Finally, \cref{thm:regime-obstructions-general} separates the ray, full-tree, chain, and bushy
+regimes by the three-ray, bottleneck, line, and hair properties. Within the chain regime,
+\cref{thm:chain-separation} separates distinct branching semigroups. The elementary finite class
+is disjoint from all four infinite classes because a quasi-isometry preserves boundedness. This
+proves both directions of \cref{thm:trichotomy}.
 \end{proof}

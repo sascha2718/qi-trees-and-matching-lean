@@ -1,9 +1,11 @@
 \chapter{Matching independent labels on the binary tree}
 \label{ch:iid}
 
-This chapter is the matching theorem for independent labels drawn from a countable
-graph, together with the contraction machinery that proves it. It is formalised end to
-end in the library \texttt{GraphMatching}, which depends on Mathlib alone.
+This chapter proves the matching theorem for independent labels drawn from a countable graph.
+The proof reduces matching on a binary tree to the iteration of a one-site potential, proves
+that this potential contracts under the binary-tree recursion, and then passes from finite
+heights to the infinite tree. The entire argument is formalised in \texttt{GraphMatching},
+which depends on Mathlib alone.
 
 \section{Set-up and the compatibility rule}
 
@@ -12,16 +14,16 @@ end in the library \texttt{GraphMatching}, which depends on Mathlib alone.
 \lean{GraphMatching.Aut}
 \leanok
 For $h\geq0$ the complete binary tree $\bbB_h$ consists of the words over $\set{1,2}$ of
-length at most $h$, arranged in levels $0$ through $h$; its $2^h$ leaves are the words of
+length at most $h$, arranged in levels $0$ through $h$. Its $2^h$ leaves are the words of
 $\set{1,2}^h$. An automorphism $\pi\in\Aut(\bbB_h)$ fixes the root and, at every internal
 vertex, either fixes or interchanges the two child subtrees, acting recursively inside
 them. In particular $\pi$ preserves levels.
 \end{definition}
 
-The recursive description is the one the induction on the height runs along, and it is
-also how the group is defined in Lean. That the recursion captures the intended object is
-itself proved: \texttt{fullSim\_iff\_graphAut} identifies the matching relation below with
-matching over the root-fixing graph automorphisms of the adjacency structure of $\bbB_h$.
+The induction on the height uses this recursive description, which is also the definition of the
+group in Lean. The declaration \texttt{fullSim\_iff\_graphAut} verifies that these recursively
+defined maps are precisely the root-fixing graph automorphisms of the adjacency graph of
+$\bbB_h$.
 
 \begin{definition}[Compatibility]
 \label{def:compat}
@@ -131,10 +133,12 @@ $\Phi(R^\square,\mu^2)\leq\rho\,\Phi(R,\mu)$.
 \begin{proof}
 \leanok
 \uses{thm:transversal}
-The transversal lemma turns the failure of $R^\square$ at a pair into a bad row or a bad
-column of the $2\times2$ array of $R$-tests, which bounds the bad degree of $R^\square$ by
-the two one-site bad degrees. The weight $\phi_\alpha$ is then estimated on that bound, the
-two maxima $A_\alpha$ and $B_\alpha$ absorbing the linear and the quadratic part.
+Fix a source pair and arrange its four compatibility tests against a target pair in a
+$2\times2$ array. By \cref{thm:transversal}, failure of $R^\square$ forces one row or one
+column to be entirely bad. A union bound therefore controls the square bad degree by the two
+one-site bad degrees. Applying the pointwise estimates for $\phi_\alpha$ separates this bound
+into a linear term and a quadratic remainder. Averaging over the source pair gives the stated
+constants $A_\alpha$ and $B_\alpha$.
 \end{proof}
 
 \begin{lemma}[Product of relations]
@@ -151,10 +155,13 @@ potential of the product is controlled by $\Phi_1$ and $\Phi_2$ at exponent $2\a
 \begin{proof}
 \leanok
 \uses{def:potential}
-Fix a point of the product support. Under the product relation the good degree is the
-product of the two good degrees, so the bad degree is $q_1+(1-q_1)q_2$. The splitting bound for
-$\phi_\alpha$ separates the two coordinates, and summing against the product measure gives the
-bound at exponent $2\alpha$.
+Fix $(x_1,x_2)$ in the product support and write $q_i$ for the bad degree of $x_i$. Since the
+two target coordinates are independent, the good degree of the product point is
+$(1-q_1)(1-q_2)$. Its bad degree is therefore
+$q_1+(1-q_1)q_2$. The splitting inequality for $\phi_\alpha$ bounds the resulting weight by
+one term depending on $q_1$, one depending on $q_2$, and a product term. Summing against
+$\mu_1\otimes\mu_2$ yields the claimed control in terms of the two potentials at exponent
+$2\alpha$.
 \end{proof}
 
 \section{Reduction to the one-site potential}
@@ -181,11 +188,17 @@ height $h$.
 \begin{proof}
 \leanok
 \uses{thm:contraction, thm:product}
-Induction on the height. One level of the tree replaces the labelling by its symmetrised
-square, so the contraction estimate supplies the factor $\rho$ at each step and the product
-lemma handles the two independent subtrees. The passage from every finite height to the
-infinite tree is a compactness argument over the levels, carried in Lean by
-\texttt{Konig.infinite\_matching\_of\_forall\_level} with the measure layer of
+We proceed by induction on the height. For leaf labellings, adjoining one level replaces the
+matching relation by its symmetrised square. Thus \cref{thm:contraction} multiplies the
+potential by at most $\rho$ at each step, which gives the first bound.
+
+For full labellings, the new root contributes one relation factor and the two independent child
+subtrees contribute a symmetrised-square factor. The product estimate and the displayed
+hypothesis on $\mathfrak K$ preserve the required uniform bound under this recursion. Finally,
+the finite matching sets form a finitely branching, restriction-compatible tree. K\"onig's
+lemma produces a compatible automorphism on all levels, while the measure argument preserves
+the probability bound. In Lean these steps are
+\texttt{Konig.infinite\_matching\_of\_forall\_level} and the accompanying results in
 \texttt{Measure}.
 \end{proof}
 
@@ -215,10 +228,12 @@ which tends to zero as $h\to\infty$.
 \begin{proof}
 \leanok
 \uses{thm:reduction, def:etaG}
-The graph potential is the one-site potential of the compatibility relation, so the
-reduction applies with $\Phi_0=\eta_{G,\alpha}(\mu)$. At $\alpha=5/2$ the numeric
-hypotheses of the reduction hold at the two thresholds stated, with $\rho=253/256$ and
-$\mathfrak K=16$.
+By \cref{def:etaG}, the graph potential is the one-site potential of the compatibility
+relation. We may therefore apply \cref{thm:reduction} with
+$\Phi_0=\eta_{G,\alpha}(\mu)$. At $\alpha=5/2$, the explicit contraction constants give
+$\rho=253/256$ whenever $\Phi_0\leq1/256$. For the full matching recursion,
+$\mathfrak K=16$ satisfies the required inequality whenever $\Phi_0\leq10^{-4}$. Substitution
+in the two clauses of \cref{thm:reduction} gives the stated bounds.
 \end{proof}
 
 \begin{theorem}[The infinite tree]
@@ -233,9 +248,12 @@ infinite labelled rooted binary trees.
 \begin{proof}
 \leanok
 \uses{thm:matching, thm:reduction}
-The finite-height bounds are uniform in $h$ and the matching relations are consistent under
-restriction, so a compactness argument over the levels produces a single automorphism matching
-every vertex. The measure layer carries the bound through the projective limit.
+For each height, consider the finite set of matching automorphisms. Restriction from height
+$h+1$ to height $h$ preserves the matching property, and \cref{thm:matching} gives the same
+lower probability bound at every height. K\"onig's lemma applied to these restriction maps
+produces a compatible family of finite automorphisms, hence one automorphism of the infinite
+binary tree. Continuity from above transfers the finite-height probability bound to this
+intersection event.
 \end{proof}
 
 \begin{corollary}[Local-dominance condition]
@@ -258,9 +276,11 @@ Then $\eta_{G,\alpha}(\mu)\leq\cD_{G,\alpha}(\mu,0)$.
 
 \begin{proof}
 \leanok
-Split the sum defining $\eta_{G,\alpha}$ at the distinguished vertex. The term at $0$ is
-bounded by the mass outside $B_G(0,1)$ divided by $(1-\varepsilon_0)^\alpha$, and every other
-term by $\mu(v)/\mu(B_G(v,1))^\alpha$, since $1-b(v)\leq1$.
+Split the defining sum for $\eta_{G,\alpha}$ into the term at $0$ and the terms with
+$v\neq0$. At the distinguished vertex, the incompatible mass is $\tau$ and the compatible
+mass is at least $\mu(0)=1-\varepsilon_0$. Its contribution is therefore at most the first
+term in $\cD_{G,\alpha}(\mu,0)$. For $v\neq0$, discard the numerator $1-b(v)\leq1$. Summing
+these bounds gives the result.
 \end{proof}
 
 \section{The integer alphabet}
@@ -284,8 +304,12 @@ for the infinite tree.
 
 \begin{proof}
 \leanok
-\uses{thm:matching, thm:dominance}
-The ratios $a_{j+1}/a_j\leq e^{-20}<\tfrac12$ make the tail sums geometric, so $p_0>\tfrac12$
-and the two neighbouring masses exceed $\tfrac12$. Local dominance then bounds the potential by
-$4e^{-D(D-5/2)}$, which is below $10^{-4}$ for $D\geq5$.
+\uses{thm:matching, thm:dominance, thm:infinite}
+For $j\geq1$, the ratio of consecutive tail masses satisfies
+$p_{j+1}/p_j\leq e^{-20}<1/2$. Hence the sum of the positive-index masses is dominated by a
+geometric series, which gives $p_0>1/2$. The same estimate controls the mass outside the unit
+ball about $0$, while the neighbouring masses give the denominators required in
+\cref{thm:dominance}. Substitution yields
+$\eta_{\mathsf P,5/2}(p)\leq4e^{-D(D-5/2)}$. This is below $10^{-4}$ for $D\geq5$, so the
+full and infinite-tree conclusions follow from \cref{thm:matching} and \cref{thm:infinite}.
 \end{proof}

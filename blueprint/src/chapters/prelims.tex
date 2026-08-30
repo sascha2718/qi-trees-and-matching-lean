@@ -1,9 +1,11 @@
 \chapter{The setting and the main results}
 \label{ch:prelims}
 
-This chapter fixes the objects and states the three headline results. Their proofs are
-assembled in \cref{ch:gw-simple} and \cref{ch:trichotomy}, on top of the matching
-machinery of \cref{ch:iid} and \cref{ch:engine}.
+We first fix the geometric and probabilistic objects used throughout the blueprint. We then
+state the complete classification, its quantitative two-value special case, and the resulting
+quasisymmetry statement for visual boundaries. The proofs are assembled in
+\cref{ch:gw-simple} and \cref{ch:trichotomy} from the matching theorems of
+\cref{ch:iid} and \cref{ch:engine}.
 
 \section{Galton--Watson trees and quasi-isometry}
 
@@ -112,7 +114,8 @@ disconnected metric spaces, and there is a quasisymmetric homeomorphism
 
 \begin{proof}
 \uses{thm:trichotomy}
-The quasi-isometry supplied by \cref{thm:trichotomy} is the input; the passage to a
-quasisymmetric homeomorphism of visual boundaries is the theorem of Buyalo and Schroeder.
-That last step is not formalised.
+By \cref{thm:trichotomy}, the two tree realisations are almost surely quasi-isometric. Since the
+trees are locally finite, they are proper hyperbolic spaces. The theorem of Buyalo and Schroeder
+therefore extends the quasi-isometry to a quasisymmetric homeomorphism of their visual
+boundaries. This final boundary-extension step is not formalised in Lean.
 \end{proof}
