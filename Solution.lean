@@ -10,6 +10,7 @@ import GraphMarkovMatching.Closure.Numeric
 import GraphMatching.Graph
 import GraphMatching.Kolmogorov
 import GraphMatching.AutBridge
+import ChainClasses.Classification
 import ChainClasses.TwoValue
 
 universe u
@@ -215,6 +216,174 @@ instance instMeasurableFullLab {V : Type*} [MeasurableSpace V] :
 
 end Iid
 
+/-! ## Conditioned Galton--Watson trees and their coarse classes -/
+
+section Classification
+
+/-- A finitely supported offspring distribution. -/
+structure Offspring (J : ℕ) where
+  pmf : PMF ℕ
+  vanishing : ∀ j, J < j → pmf j = 0
+
+instance {J : ℕ} : CoeFun (Offspring J) (fun _ => ℕ → ℝ) :=
+  ⟨fun theta j => (theta.pmf j).toReal⟩
+
+namespace Offspring
+
+noncomputable def mean {J : ℕ} (theta : Offspring J) : ℝ :=
+  ∑ j ∈ Finset.range (J + 1), (j : ℝ) * theta j
+
+def IsSupercritical {J : ℕ} (theta : Offspring J) : Prop := 1 < theta.mean
+
+end Offspring
+
+abbrev GWWord (N : ℕ) : Type := List (Fin N)
+
+/-- Membership in the tree cut out by an offspring-count field. -/
+def inGWSample {N : ℕ} (c : GWWord N → ℕ) (v : GWWord N) : Prop :=
+  ∀ i, (h : i < v.length) → ((v.get ⟨i, h⟩ : Fin N) : ℕ) < c (v.take i)
+
+def gwSurvives {N : ℕ} (c : GWWord N → ℕ) : Prop :=
+  {v | inGWSample c v}.Infinite
+
+/-- The i.i.d. offspring field and its law conditioned on an infinite sample. -/
+noncomputable def gwField {J N : ℕ} (theta : Offspring J) : Measure (GWWord N → ℕ) :=
+  Measure.infinitePi (fun _ : GWWord N => theta.pmf.toMeasure)
+
+noncomputable def conditionedGW {J N : ℕ} (theta : Offspring J) :
+    Measure (GWWord N → ℕ) :=
+  ProbabilityTheory.cond (gwField (N := N) theta) {c | gwSurvives c}
+
+def wedgeN {N : ℕ} : GWWord N → GWWord N → GWWord N
+  | [], _ => []
+  | _, [] => []
+  | a :: v, b :: w => if a = b then a :: wedgeN v w else []
+
+def treeDistN {N : ℕ} (v w : GWWord N) : ℕ :=
+  v.length + w.length - 2 * (wedgeN v w).length
+
+/-- The parent--child graph of a Galton--Watson sample. -/
+def gwTreeGraph {N : ℕ} (c : GWWord N → ℕ) :
+    SimpleGraph {w : GWWord N // inGWSample c w} :=
+  SimpleGraph.fromRel fun u v => treeDistN u.1 v.1 = 1
+
+structure GraphQIWith {V V' : Type*} (D : ℕ) (G : SimpleGraph V)
+    (G' : SimpleGraph V') (f : V → V') : Prop where
+  upper : ∀ x y, G'.dist (f x) (f y) ≤ D * G.dist x y + D
+  lower : ∀ x y, G.dist x y ≤ D * G'.dist (f x) (f y) + D * D
+  dense : ∀ y', ∃ x, G'.dist (f x) y' ≤ D
+
+def GraphQuasiIsometric {V V' : Type*} (G : SimpleGraph V) (G' : SimpleGraph V') : Prop :=
+  ∃ (D : ℕ) (f : V → V'), GraphQIWith D G G' f
+
+/-- The shifted positive support generating the chain-regime invariant. -/
+noncomputable def shiftSupp {J : ℕ} (theta : Offspring J) : Finset ℕ :=
+  ((Finset.range (J + 1)).filter fun k => 2 ≤ k ∧ theta k ≠ 0).image fun k => k - 1
+
+end Classification
+
+/-! ## Bridge for the conditioned classification block -/
+
+def offspringToLib {J : ℕ} (theta : Offspring J) : BranchingProcess.Offspring J where
+  mass := fun j => (theta.pmf j).toReal
+  nonneg := fun j => ENNReal.toReal_nonneg
+  vanishing := by
+    intro j hj
+    simp [theta.vanishing j hj]
+  total := by
+    have hzero : ∀ j ∉ Finset.range (J + 1), theta.pmf j = 0 := by
+      intro j hj
+      exact theta.vanishing j (by simpa using hj)
+    have hsum : ∑ j ∈ Finset.range (J + 1), theta.pmf j = 1 := by
+      calc
+        ∑ j ∈ Finset.range (J + 1), theta.pmf j = ∑' j, theta.pmf j :=
+          (tsum_eq_sum hzero).symm
+        _ = 1 := theta.pmf.tsum_coe
+    calc
+      ∑ j ∈ Finset.range (J + 1), (theta.pmf j).toReal =
+          ENNReal.toReal (∑ j ∈ Finset.range (J + 1), theta.pmf j) :=
+        (ENNReal.toReal_sum (fun j _ => theta.pmf.apply_ne_top j)).symm
+      _ = 1 := by rw [hsum]; simp
+
+@[simp] lemma offspringToLib_apply {J : ℕ} (theta : Offspring J) (j : ℕ) :
+    offspringToLib theta j = theta j := rfl
+
+lemma offspringSupercritical_iff {J : ℕ} (theta : Offspring J) :
+    theta.IsSupercritical ↔ (offspringToLib theta).IsSupercritical := Iff.rfl
+
+lemma offspringPMF_eq {J : ℕ} (theta : Offspring J) :
+    (offspringToLib theta).toPMF = theta.pmf := by
+  ext j
+  exact ENNReal.ofReal_toReal (theta.pmf.apply_ne_top j)
+
+lemma offspringLaw_eq {J : ℕ} (theta : Offspring J) :
+    theta.pmf.toMeasure = (offspringToLib theta).law := by
+  rw [BranchingProcess.Offspring.law, offspringPMF_eq]
+
+lemma gwField_eq {J N : ℕ} (theta : Offspring J) :
+    gwField (N := N) theta = BranchingProcess.sampleMeasure (N := N) (offspringToLib theta) := by
+  simp only [gwField, BranchingProcess.sampleMeasure, BranchingProcess.fieldMeasure,
+    offspringLaw_eq]
+
+lemma inGWSample_iff {N : ℕ} (c : GWWord N → ℕ) (w : GWWord N) :
+    inGWSample c w ↔ w ∈ BranchingProcess.sample c := Iff.rfl
+
+lemma gwSurvives_iff {N : ℕ} (c : GWWord N → ℕ) :
+    gwSurvives c ↔ BranchingProcess.Survives c := Iff.rfl
+
+lemma conditionedGW_eq {J N : ℕ} (theta : Offspring J) :
+    conditionedGW (N := N) theta =
+      BranchingProcess.survivalMeasure (N := N) (offspringToLib theta) := by
+  have hevent : {c : GWWord N → ℕ | gwSurvives c} =
+      {c : GWWord N → ℕ | BranchingProcess.Survives c} := by
+    ext c
+    exact gwSurvives_iff c
+  rw [conditionedGW, BranchingProcess.survivalMeasure, gwField_eq, hevent]
+
+lemma wedgeN_eq {N : ℕ} : ∀ v w : GWWord N,
+    wedgeN v w = BranchingProcess.wedge v w
+  | [], _ => rfl
+  | _ :: _, [] => rfl
+  | a :: v, b :: w => by
+      simp only [wedgeN, BranchingProcess.wedge, wedgeN_eq v w]
+
+lemma treeDistN_eq {N : ℕ} (v w : GWWord N) :
+    treeDistN v w = BranchingProcess.treeDist v w := by
+  simp [treeDistN, BranchingProcess.treeDist, wedgeN_eq]
+
+lemma gwTreeGraph_eq {N : ℕ} (c : GWWord N → ℕ) :
+    gwTreeGraph c = ChainClasses.wordGraphN (fun w => w ∈ BranchingProcess.sample c) := by
+  ext u v
+  change u ≠ v ∧ (treeDistN u.1 v.1 = 1 ∨ treeDistN v.1 u.1 = 1) ↔
+    BranchingProcess.treeDist u.1 v.1 = 1
+  rw [treeDistN_eq, treeDistN_eq]
+  constructor
+  · rintro ⟨_, h | h⟩
+    · exact h
+    · rwa [BranchingProcess.treeDist_comm] at h
+  · intro h
+    refine ⟨?_, Or.inl h⟩
+    intro huv
+    subst v
+    rw [BranchingProcess.treeDist_self] at h
+    omega
+
+lemma graphQIWith_iff {V V' : Type*} (D : ℕ) (G : SimpleGraph V)
+    (G' : SimpleGraph V') (f : V → V') :
+    GraphQIWith D G G' f ↔ BranchingProcess.IsQIWith D G G' f := by
+  constructor <;> rintro ⟨hup, hlo, hden⟩ <;> exact ⟨hup, hlo, hden⟩
+
+lemma graphQuasiIsometric_iff {V V' : Type*} (G : SimpleGraph V) (G' : SimpleGraph V') :
+    GraphQuasiIsometric G G' ↔ BranchingProcess.QuasiIsometric G G' := by
+  constructor
+  · rintro ⟨D, f, hf⟩
+    exact ⟨D, f, (graphQIWith_iff D G G' f).1 hf⟩
+  · rintro ⟨D, f, hf⟩
+    exact ⟨D, f, (graphQIWith_iff D G G' f).2 hf⟩
+
+lemma shiftSupp_eq {J : ℕ} (theta : Offspring J) :
+    shiftSupp theta = ChainClasses.shiftSupp (offspringToLib theta) := rfl
+
 /-! ## The two-value family -/
 
 section TwoValue
@@ -249,14 +418,13 @@ structure IsQIWith (K : ℕ) (T T' : Word → Prop) (f : Word → Word) : Prop w
 noncomputable def bernoulliLaw {t : ℝ} (ht : 0 ≤ t) (ht1 : t ≤ 1) : Measure Bool :=
   ProbabilityTheory.bernoulliMeasure true false ⟨t, ht, ht1⟩
 
-instance instIsProbabilityBernoulliLaw {t : ℝ} (ht : 0 ≤ t) (ht1 : t ≤ 1) :
-    IsProbabilityMeasure (bernoulliLaw ht ht1) :=
-  inferInstanceAs
-    (IsProbabilityMeasure (ProbabilityTheory.bernoulliMeasure true false ⟨t, ht, ht1⟩))
-
 /-- The i.i.d. Bernoulli field indexed by the vertices of the tree. -/
 noncomputable def bernoulliField {t : ℝ} (ht : 0 ≤ t) (ht1 : t ≤ 1) : Measure (Word → Bool) :=
   Measure.infinitePi (fun _ : Word => bernoulliLaw ht ht1)
+
+/-- The square-root form of the quantitative two-value error rate. -/
+noncomputable def qBound (a : ℝ) (D : ℕ) : ℝ :=
+  Real.sqrt (a ^ (D * (2 * D - 5)))
 
 end TwoValue
 
@@ -316,6 +484,11 @@ def autToLib (k : ℕ) : (m n : ℕ) → AutK k m n ≃ GraphMarkovMatching.Supp
 
 @[simp] lemma toLib_succ_apply (S : Type u) (n : ℕ) (a : S) (l r : FullLab S n) :
     toLib S (n + 1) (a, l, r) = (a, toLib S n l, toLib S n r) := rfl
+
+@[simp] lemma toLib_succ_symm_apply (S : Type u) (n : ℕ) (a : S)
+    (l r : GraphMarkovMatching.Support.FullLab S n) :
+    (toLib S (n + 1)).symm (a, l, r) =
+      (a, (toLib S n).symm l, (toLib S n).symm r) := rfl
 
 @[simp] lemma autToLib_zero_succ_apply (k n : ℕ) (b : Bool) (l r : AutK k (k - 1) n) :
     autToLib k 0 (n + 1) (b, l, r) = (b, autToLib k (k - 1) n l, autToLib k (k - 1) n r) := rfl
@@ -401,6 +574,126 @@ lemma Tlaw_apply {V : Type} (μ : PMF V) (ν : PMF ℕ) (v0 : V) (h : ℕ)
   · intro b hb
     exact if_neg fun hh => hb ((toLib (V × ℕ) h).injective hh.symm)
 
+/-- Restriction of labellings commutes with the Markov-library transport. -/
+lemma restrictLab_toLib_process {S : Type u} :
+    ∀ (n : ℕ) (x : FullLab S (n + 1)),
+      toLib S n (restrictLab n x) =
+        GraphMarkovMatching.Support.restrictLab n (toLib S (n + 1) x)
+  | 0, _ => rfl
+  | n + 1, x => by
+      obtain ⟨a, l, r⟩ := x
+      simp [restrictLab, GraphMarkovMatching.Support.restrictLab,
+        restrictLab_toLib_process n]
+
+/-- The transport of Markov full labellings and its inverse are measurable. -/
+lemma measurable_toLib_process {S : Type u} [MeasurableSpace S] :
+    ∀ n, Measurable (toLib S n)
+  | 0 => measurable_id
+  | n + 1 => by
+      have h := measurable_toLib_process (S := S) n
+      exact (measurable_fst.prodMk
+        (((h.comp measurable_fst).comp measurable_snd).prodMk
+          ((h.comp measurable_snd).comp measurable_snd)))
+
+lemma measurable_toLib_process_symm {S : Type u} [MeasurableSpace S] :
+    ∀ n, Measurable (toLib S n).symm
+  | 0 => measurable_id
+  | n + 1 => by
+      have h := measurable_toLib_process_symm (S := S) n
+      exact (measurable_fst.prodMk
+        (((h.comp measurable_fst).comp measurable_snd).prodMk
+          ((h.comp measurable_snd).comp measurable_snd)))
+
+/-! ### The full-group Markov tower as a graph automorphism -/
+
+def supportFullToGraph (S : Type u) :
+    (n : ℕ) → GraphMarkovMatching.Support.FullLab S n ≃ GraphMatching.FullLab S n
+  | 0 => Equiv.refl S
+  | n + 1 => Equiv.prodCongr (Equiv.refl S)
+      (Equiv.prodCongr (supportFullToGraph S n) (supportFullToGraph S n))
+
+def supportAutToGraph :
+    (n : ℕ) → GraphMarkovMatching.Support.AutK 1 0 n ≃ GraphMatching.Aut n
+  | 0 => Equiv.refl Unit
+  | n + 1 => Equiv.prodCongr (Equiv.refl Bool)
+      (Equiv.prodCongr (supportAutToGraph n) (supportAutToGraph n))
+
+@[simp] lemma supportFullToGraph_succ_apply (S : Type u) (n : ℕ) (a : S)
+    (l r : GraphMarkovMatching.Support.FullLab S n) :
+    supportFullToGraph S (n + 1) (a, l, r) =
+      (a, supportFullToGraph S n l, supportFullToGraph S n r) := rfl
+
+@[simp] lemma supportAutToGraph_succ_apply (n : ℕ) (b : Bool)
+    (l r : GraphMarkovMatching.Support.AutK 1 0 n) :
+    supportAutToGraph (n + 1) (b, l, r) =
+      (b, supportAutToGraph n l, supportAutToGraph n r) := rfl
+
+lemma supportRestrictLab_toGraph {S : Type u} :
+    ∀ (n : ℕ) (x : GraphMarkovMatching.Support.FullLab S (n + 1)),
+      supportFullToGraph S n (GraphMarkovMatching.Support.restrictLab n x) =
+        GraphMatching.restrictLab n (supportFullToGraph S (n + 1) x)
+  | 0, _ => rfl
+  | n + 1, x => by
+      obtain ⟨a, l, r⟩ := x
+      simp only [GraphMarkovMatching.Support.restrictLab,
+        supportFullToGraph_succ_apply, GraphMatching.restrictLab]
+      rw [supportRestrictLab_toGraph n, supportRestrictLab_toGraph n]
+
+lemma supportRestrictAut_toGraph :
+    ∀ (n : ℕ) (π : GraphMarkovMatching.Support.AutK 1 0 (n + 1)),
+      supportAutToGraph n (GraphMarkovMatching.Support.restrictAutK 1 0 n π) =
+        GraphMatching.restrictAut n (supportAutToGraph (n + 1) π)
+  | 0, _ => rfl
+  | n + 1, π => by
+      obtain ⟨b, l, r⟩ := π
+      simp only [GraphMarkovMatching.Support.restrictAutK,
+        supportAutToGraph_succ_apply, GraphMatching.restrictAut]
+      rw [supportRestrictAut_toGraph n, supportRestrictAut_toGraph n]
+
+lemma supportMatches_toGraph {S : Type u} (R : S → S → Prop) :
+    ∀ (n : ℕ) (π : GraphMarkovMatching.Support.AutK 1 0 n)
+      (x y : GraphMarkovMatching.Support.FullLab S n),
+      GraphMarkovMatching.Support.fullMatchesK R 1 0 n π x y ↔
+        GraphMatching.fullMatchesA R n (supportAutToGraph n π)
+          (supportFullToGraph S n x) (supportFullToGraph S n y)
+  | 0, _, _, _ => Iff.rfl
+  | n + 1, π, x, y => by
+      obtain ⟨b, πl, πr⟩ := π
+      change GraphMarkovMatching.Support.AutK 1 0 n at πl πr
+      obtain ⟨xa, xl, xr⟩ := x
+      obtain ⟨ya, yl, yr⟩ := y
+      cases b <;>
+        simp only [GraphMarkovMatching.Support.fullMatchesK,
+          supportAutToGraph_succ_apply, supportFullToGraph_succ_apply,
+          GraphMatching.fullMatchesA, supportMatches_toGraph R n] <;> simp
+
+lemma supportInfMatch_toGraph {S : Type u} (R : S → S → Prop)
+    (X Y : (n : ℕ) → GraphMarkovMatching.Support.FullLab S n)
+    (h : GraphMarkovMatching.InfMatch R X Y) :
+    GraphMatching.InfMatch R (fun n => supportFullToGraph S n (X n))
+      (fun n => supportFullToGraph S n (Y n)) := by
+  obtain ⟨σ, hcompat, hmatch⟩ := h
+  refine ⟨fun n => supportAutToGraph n (σ n), fun n => ?_, fun n => ?_⟩
+  · rw [← supportRestrictAut_toGraph, hcompat]
+  · exact (supportMatches_toGraph R n (σ n) (X n) (Y n)).1 (hmatch n)
+
+lemma coord_supportToGraph {S : Type u} :
+    ∀ (n : ℕ) (x : GraphMarkovMatching.Support.FullLab S n) (w : List Bool),
+      coord n ((toLib S n).symm x) w =
+        GraphMatching.coord n (supportFullToGraph S n x) w
+  | 0, _, _ => rfl
+  | n + 1, x, [] => rfl
+  | n + 1, x, false :: w => by
+      obtain ⟨a, l, r⟩ := x
+      simpa only [toLib_succ_symm_apply, coord, supportFullToGraph_succ_apply,
+        GraphMatching.coord] using
+        coord_supportToGraph n l w
+  | n + 1, x, true :: w => by
+      obtain ⟨a, l, r⟩ := x
+      simpa only [toLib_succ_symm_apply, coord, supportFullToGraph_succ_apply,
+        GraphMatching.coord] using
+        coord_supportToGraph n r w
+
 /-- The potential and the constants are literally the library's. -/
 lemma etaG_eq : @etaG = @GraphMarkovMatching.etaG := rfl
 lemma genKcC_eq : @genKcC = @GraphMarkovMatching.genKcC := rfl
@@ -440,6 +733,114 @@ theorem audit_main_matching_failure_le {V : Type} (Rv : V → V → Prop) (μ : 
   refine tsum_congr fun y => ?_
   rw [Tlaw_apply μ ν v0 h y, fullSim_iff]
   rfl
+
+/-- `thm:main-matching`, the infinite conclusion: two independent consistent
+processes admit one root-fixing infinite-tree automorphism with the stated probability. -/
+theorem audit_main_matching_infinite {V : Type} (Rv : V → V → Prop) (μ : PMF V) (v0 : V)
+    [Countable V] [MeasurableSpace V] [MeasurableSingletonClass V]
+    (ν : PMF ℕ) (N : ℕ) (S : Finset ℕ)
+    (hrefl : ∀ v, Rv v v) (hsymm : ∀ a b, Rv a b → Rv b a)
+    (hhalf : 2⁻¹ ≤ μ v0)
+    (hN : 2 ≤ N) (hS : ∀ k ∈ S, k ≤ N) (hSne : S.Nonempty)
+    (hSsupp : ∀ i : ℕ, (ν i : ℝ≥0∞) ≠ 0 ↔ i ∈ S)
+    (T : ℝ≥0∞)
+    (hT : (∑' i, if (ν i : ℝ≥0∞) = 0 then 0
+        else (ν i : ℝ≥0∞) ^ (-(5 / 2 : ℝ))) ≤ T)
+    (heta : etaG (5 / 2) Rv μ
+      ≤ (genSmallC ((2 * N + 3) * 2 ^ (2 * N + 3) * (2 * N + 4)) S.card
+          (2 * N + 3) T)⁻¹) :
+    ∃ (Omega : Type) (_ : MeasurableSpace Omega) (P : Measure Omega)
+      (_ : IsProbabilityMeasure P)
+      (X Y : (n : ℕ) → Omega → FullLab (V × ℕ) n),
+      (∀ n omega, restrictLab n (X (n + 1) omega) = X n omega) ∧
+      (∀ n omega, restrictLab n (Y (n + 1) omega) = Y n omega) ∧
+      (∀ n, Measurable (fun omega => (X n omega, Y n omega))) ∧
+      (∀ n, P.map (fun omega => (X n omega, Y n omega))
+        = (prodPMF (Tlaw μ ν v0 n) (Tlaw μ ν v0 n)).toMeasure) ∧
+      1 - genKcC ((2 * N + 3) * 2 ^ (2 * N + 3) * (2 * N + 4)) S.card T
+          * etaG (5 / 2) Rv μ
+        ≤ P {omega | ∃ g : List Bool ≃ List Bool, IsTreeAut g ∧
+          ∀ s : List Bool, labRel Rv
+            (coord (g s).length (X (g s).length omega) (g s))
+            (coord s.length (Y s.length omega) s)} := by
+  rw [etaG_eq, genSmallC_eq] at heta
+  rw [etaG_eq, genKcC_eq]
+  let Omega :=
+    ((Π n, GraphMarkovMatching.Support.FullLab (V × ℕ) n) ×
+      (Π n, GraphMarkovMatching.Support.FullLab (V × ℕ) n))
+  let P : Measure Omega := GraphMarkovMatching.TlawPair μ ν v0
+  let X : (n : ℕ) → Omega → FullLab (V × ℕ) n := fun n omega =>
+    (toLib (V × ℕ) n).symm (GraphMarkovMatching.Support.consLab n omega.1)
+  let Y : (n : ℕ) → Omega → FullLab (V × ℕ) n := fun n omega =>
+    (toLib (V × ℕ) n).symm (GraphMarkovMatching.Support.consLab n omega.2)
+  refine ⟨Omega, inferInstance, P, inferInstance, X, Y, ?_, ?_, ?_, ?_, ?_⟩
+  · intro n omega
+    apply (toLib (V × ℕ) n).injective
+    rw [restrictLab_toLib_process, Equiv.apply_symm_apply, Equiv.apply_symm_apply]
+    exact GraphMarkovMatching.Support.restrictLab_consLab n omega.1
+  · intro n omega
+    apply (toLib (V × ℕ) n).injective
+    rw [restrictLab_toLib_process, Equiv.apply_symm_apply, Equiv.apply_symm_apply]
+    exact GraphMarkovMatching.Support.restrictLab_consLab n omega.2
+  · intro n
+    exact ((measurable_toLib_process_symm n).comp measurable_fst).prodMk
+      ((measurable_toLib_process_symm n).comp measurable_snd) |>.comp
+        (GraphMarkovMatching.Support.measurable_consLab_pair n)
+  · intro n
+    have hmm : Measurable
+        (Prod.map (toLib (V × ℕ) n).symm (toLib (V × ℕ) n).symm) :=
+      ((measurable_toLib_process_symm n).comp measurable_fst).prodMk
+        ((measurable_toLib_process_symm n).comp measurable_snd)
+    have hfun : (fun omega : Omega => (X n omega, Y n omega)) =
+        (Prod.map (toLib (V × ℕ) n).symm (toLib (V × ℕ) n).symm) ∘
+          (fun omega => (GraphMarkovMatching.Support.consLab n omega.1,
+            GraphMarkovMatching.Support.consLab n omega.2)) := rfl
+    have hlawlib : P.map
+        (fun omega => (GraphMarkovMatching.Support.consLab n omega.1,
+          GraphMarkovMatching.Support.consLab n omega.2)) =
+        (GraphMarkovMatching.Support.prodPMF (GraphMarkovMatching.Tlaw μ ν v0 n)
+          (GraphMarkovMatching.Tlaw μ ν v0 n)).toMeasure := by
+      exact GraphMarkovMatching.Support.trajPairLab_map_consLab _ _ _ _ n
+    rw [hfun, ← Measure.map_map hmm
+      (GraphMarkovMatching.Support.measurable_consLab_pair n), hlawlib,
+      PMF.toMeasure_map _ _ hmm, ← prodPMF_eq, map_prodPMF,
+      ← Tlaw_eq, PMF.map_comp, Equiv.symm_comp_self, PMF.map_id]
+  · have hmain := GraphMarkovMatching.main_matching_le_traj
+      (Rv := Rv) (μ := μ) (v0 := v0) ν N S hrefl hsymm hhalf hN hS hSne hSsupp T hT heta
+    refine le_trans hmain (measure_mono ?_)
+    intro omega homega
+    change GraphMarkovMatching.InfMatch (GraphMarkovMatching.labRel Rv)
+      (fun n => GraphMarkovMatching.Support.consLab n omega.1)
+      (fun n => GraphMarkovMatching.Support.consLab n omega.2) at homega
+    have hmatch := supportInfMatch_toGraph (GraphMarkovMatching.labRel Rv)
+      (fun n => GraphMarkovMatching.Support.consLab n omega.1)
+      (fun n => GraphMarkovMatching.Support.consLab n omega.2) homega
+    have hXgraph : ∀ n, GraphMatching.restrictLab n
+        (supportFullToGraph (V × ℕ) (n + 1)
+          (GraphMarkovMatching.Support.consLab (n + 1) omega.1)) =
+        supportFullToGraph (V × ℕ) n (GraphMarkovMatching.Support.consLab n omega.1) := by
+      intro n
+      rw [← supportRestrictLab_toGraph,
+        GraphMarkovMatching.Support.restrictLab_consLab]
+    have hYgraph : ∀ n, GraphMatching.restrictLab n
+        (supportFullToGraph (V × ℕ) (n + 1)
+          (GraphMarkovMatching.Support.consLab (n + 1) omega.2)) =
+        supportFullToGraph (V × ℕ) n (GraphMarkovMatching.Support.consLab n omega.2) := by
+      intro n
+      rw [← supportRestrictLab_toGraph,
+        GraphMarkovMatching.Support.restrictLab_consLab]
+    obtain ⟨g, hroot, hg⟩ := (GraphMatching.infMatch_iff_graphAut
+      (GraphMarkovMatching.labRel Rv)
+      (fun n => supportFullToGraph (V × ℕ) n
+        (GraphMarkovMatching.Support.consLab n omega.1))
+      (fun n => supportFullToGraph (V × ℕ) n
+        (GraphMarkovMatching.Support.consLab n omega.2)) hXgraph hYgraph).1 hmatch
+    change ∃ g : List Bool ≃ List Bool, IsTreeAut g ∧ ∀ s : List Bool, labRel Rv
+      (coord (g s).length (X (g s).length omega) (g s))
+      (coord s.length (Y s.length omega) s)
+    refine ⟨g.toEquiv, ⟨hroot, fun s t => ?_⟩, fun s => ?_⟩
+    · exact ⟨fun h => (g.map_adj_iff).2 h, fun h => (g.map_adj_iff).1 h⟩
+    · simpa [X, Y, labRel, GraphMarkovMatching.labRel, coord_supportToGraph] using hg s
 
 
 
@@ -679,6 +1080,66 @@ theorem audit_exists_infinite_tree_matching_graphAut {V : Type u} (μ : PMF V)
     · exact ⟨fun h => (g.map_adj_iff).2 h, fun h => (g.map_adj_iff).1 h⟩
     · simpa [coord_toLib, Equiv.apply_symm_apply] using hg s
 
+/-! ## Complete conditioned-infinite classification -/
+
+/-- `thm:trichotomy`, on the part claimed as machine-checked: two conditioned
+infinite finite-support Galton--Watson trees are quasi-isometric almost surely
+exactly in classes (R), (F), the same `(C_Lambda)`, or (B). -/
+theorem audit_offspring_classification_ae_iff {J J' N N' : ℕ}
+    (theta : Offspring J) (hJN : J ≤ N)
+    (hvalid : theta.IsSupercritical ∨ theta 1 = 1)
+    (htop : theta 1 = 1 ∨ (2 ≤ J ∧ 0 < theta J))
+    (theta' : Offspring J') (hJN' : J' ≤ N')
+    (hvalid' : theta'.IsSupercritical ∨ theta' 1 = 1)
+    (htop' : theta' 1 = 1 ∨ (2 ≤ J' ∧ 0 < theta' J')) :
+    ∀ᵐ omega ∂((conditionedGW (N := N) theta).prod (conditionedGW (N := N') theta')),
+      GraphQuasiIsometric (gwTreeGraph omega.1) (gwTreeGraph omega.2) ↔
+        (theta 1 = 1 ∧ theta' 1 = 1) ∨
+        (theta 0 = 0 ∧ theta 1 = 0 ∧ theta' 0 = 0 ∧ theta' 1 = 0) ∨
+        ((theta 0 = 0 ∧ 0 < theta 1 ∧ theta 1 < 1) ∧
+          (theta' 0 = 0 ∧ 0 < theta' 1 ∧ theta' 1 < 1) ∧
+          AddSubmonoid.closure (shiftSupp theta : Set ℕ) =
+            AddSubmonoid.closure (shiftSupp theta' : Set ℕ)) ∨
+        (0 < theta 0 ∧ 0 < theta' 0) := by
+  let thetaL := offspringToLib theta
+  let thetaL' := offspringToLib theta'
+  have hvalidL : thetaL.IsSupercritical ∨ thetaL 1 = 1 := by
+    rcases hvalid with h | h
+    · exact Or.inl ((offspringSupercritical_iff theta).1 h)
+    · exact Or.inr h
+  have hvalidL' : thetaL'.IsSupercritical ∨ thetaL' 1 = 1 := by
+    rcases hvalid' with h | h
+    · exact Or.inl ((offspringSupercritical_iff theta').1 h)
+    · exact Or.inr h
+  have htopL : thetaL 1 = 1 ∨ (2 ≤ J ∧ 0 < thetaL J) := htop
+  have htopL' : thetaL' 1 = 1 ∨ (2 ≤ J' ∧ 0 < thetaL' J') := htop'
+  have hsource := ChainClasses.offspring_classification_ae_iff
+    thetaL hJN hvalidL htopL thetaL' hJN' hvalidL' htopL'
+  have hraw :
+      ∀ᵐ omega ∂((BranchingProcess.survivalMeasure (N := N) thetaL).prod
+        (BranchingProcess.survivalMeasure (N := N') thetaL')),
+        BranchingProcess.QuasiIsometric
+            (ChainClasses.wordGraphN (fun w => w ∈ BranchingProcess.sample omega.1))
+            (ChainClasses.wordGraphN (fun w => w ∈ BranchingProcess.sample omega.2)) ↔
+          (thetaL 1 = 1 ∧ thetaL' 1 = 1) ∨
+          (thetaL 0 = 0 ∧ thetaL 1 = 0 ∧ thetaL' 0 = 0 ∧ thetaL' 1 = 0) ∨
+          ((thetaL 0 = 0 ∧ 0 < thetaL 1 ∧ thetaL 1 < 1) ∧
+            (thetaL' 0 = 0 ∧ 0 < thetaL' 1 ∧ thetaL' 1 < 1) ∧
+            AddSubmonoid.closure (ChainClasses.shiftSupp thetaL : Set ℕ) =
+              AddSubmonoid.closure (ChainClasses.shiftSupp thetaL' : Set ℕ)) ∨
+          (0 < thetaL 0 ∧ 0 < thetaL' 0) := by
+    classical
+    unfold ChainClasses.GRegime.ofExact at hsource
+    split_ifs at hsource <;>
+      simp only [ChainClasses.GRegime.sampleLaw, ChainClasses.gRayLaw,
+        ChainClasses.gFullLaw, ChainClasses.gChainLaw, ChainClasses.gBushyLaw,
+        ChainClasses.gwLaw, ChainClasses.GSampleLaw.graph, ChainClasses.GPairQI] at hsource <;>
+      convert hsource using 1 <;> rfl
+  rw [conditionedGW_eq, conditionedGW_eq]
+  filter_upwards [hraw] with omega homega
+  simp only [gwTreeGraph_eq, graphQuasiIsometric_iff, shiftSupp_eq]
+  convert homega using 1 <;> rfl
+
 /-! ## Bridge for the two-value block -/
 
 lemma wedge_eq : ∀ x y : Word, wedge x y = ChainClasses.wedge x y
@@ -720,6 +1181,8 @@ lemma isQIWith_eq : @IsQIWith = @ChainClasses.IsQIWith := by
 lemma bernoulliField_eq {t : ℝ} (ht : 0 ≤ t) (ht1 : t ≤ 1) :
     bernoulliField ht ht1 = BranchingProcess.bernoulliField (ι := Word) ht ht1 := rfl
 
+lemma qBound_eq : @qBound = @ChainClasses.qBound := rfl
+
 /-! ## Universality in the two-value family -/
 
 /-- `thm:twovalue`: two independent Galton--Watson trees whose offspring law is
@@ -732,5 +1195,17 @@ theorem audit_twovalue_ae_tree_family {t : ℝ} (ht0 : 0 ≤ t) (ht1 : t ≤ 1) 
   congr 1
   ext ω
   simp only [Set.mem_setOf_eq, inTree_eq, isQIWith_eq]
+
+/-- The quantitative half of `thm:twovalue`: above a threshold, failure of a
+`(D²+3)`-quasi-isometry has probability at most the explicit rate. -/
+theorem audit_twovalue_rate_tree {t : ℝ} (ht0 : 0 < t) (ht1 : t < 1) :
+    ∃ D₀ : ℕ, ∀ D : ℕ, D₀ ≤ D →
+      ((bernoulliField ht0.le ht1.le).prod (bernoulliField ht0.le ht1.le))
+          {ω | ¬ ∃ f : Word → Word,
+            IsQIWith (D ^ 2 + 3) (InTree ω.1) (InTree ω.2) f}
+        ≤ ENNReal.ofReal (256 * qBound (1 - t) D) := by
+  rw [bernoulliField_eq, qBound_eq]
+  simpa only [ChainClasses.twoSampleMeasure, ChainClasses.chainMeasure, inTree_eq,
+    isQIWith_eq] using ChainClasses.exists_twovalue_rate_tree ht0 ht1
 
 end Challenge

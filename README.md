@@ -90,9 +90,10 @@ and run the independent kernel audit with
 ./comparator-audit.sh
 ```
 
-The audited endpoints are listed in `comparator-config.json`. They cover the general matching
-theorem, the leaf, full, and infinite i.i.d. matching theorems, and universality in the two-value
-family.
+The audited endpoints are listed in `comparator-config.json`. They cover the finite and infinite
+general Markov matching theorem (the latter over an actual root-fixing graph automorphism), the
+leaf, full, and infinite i.i.d. matching theorems, the complete conditioned-infinite
+Galton--Watson classification, and both the qualitative and quantitative two-value results.
 
 ## Build the blueprint locally
 

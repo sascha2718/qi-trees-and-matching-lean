@@ -5,7 +5,9 @@ of their proofs.
 Everything these statements mention is defined below, over Mathlib alone. No
 module of the four libraries is imported: the trust boundary of the audit is this
 file together with its import closure, and the libraries are what the audit is
-about. `Solution.lean` is the untrusted side and may import them freely.
+about. The material preceding the headline theorems is definitional scaffolding
+only; no auxiliary result is proved here. `Solution.lean` is the untrusted side
+and may import the libraries freely.
 
 Run from `lean/` with
 `lake env <comparator binary> comparator-config.json`
@@ -214,6 +216,72 @@ instance instMeasurableFullLab {V : Type*} [MeasurableSpace V] :
 
 end Iid
 
+/-! ## Conditioned Galton--Watson trees and their coarse classes -/
+
+section Classification
+
+/-- A finitely supported offspring distribution. -/
+structure Offspring (J : ℕ) where
+  pmf : PMF ℕ
+  vanishing : ∀ j, J < j → pmf j = 0
+
+instance {J : ℕ} : CoeFun (Offspring J) (fun _ => ℕ → ℝ) :=
+  ⟨fun theta j => (theta.pmf j).toReal⟩
+
+namespace Offspring
+
+noncomputable def mean {J : ℕ} (theta : Offspring J) : ℝ :=
+  ∑ j ∈ Finset.range (J + 1), (j : ℝ) * theta j
+
+def IsSupercritical {J : ℕ} (theta : Offspring J) : Prop := 1 < theta.mean
+
+end Offspring
+
+abbrev GWWord (N : ℕ) : Type := List (Fin N)
+
+/-- Membership in the tree cut out by an offspring-count field. -/
+def inGWSample {N : ℕ} (c : GWWord N → ℕ) (v : GWWord N) : Prop :=
+  ∀ i, (h : i < v.length) → ((v.get ⟨i, h⟩ : Fin N) : ℕ) < c (v.take i)
+
+def gwSurvives {N : ℕ} (c : GWWord N → ℕ) : Prop :=
+  {v | inGWSample c v}.Infinite
+
+/-- The i.i.d. offspring field and its law conditioned on an infinite sample. -/
+noncomputable def gwField {J N : ℕ} (theta : Offspring J) : Measure (GWWord N → ℕ) :=
+  Measure.infinitePi (fun _ : GWWord N => theta.pmf.toMeasure)
+
+noncomputable def conditionedGW {J N : ℕ} (theta : Offspring J) :
+    Measure (GWWord N → ℕ) :=
+  ProbabilityTheory.cond (gwField (N := N) theta) {c | gwSurvives c}
+
+def wedgeN {N : ℕ} : GWWord N → GWWord N → GWWord N
+  | [], _ => []
+  | _, [] => []
+  | a :: v, b :: w => if a = b then a :: wedgeN v w else []
+
+def treeDistN {N : ℕ} (v w : GWWord N) : ℕ :=
+  v.length + w.length - 2 * (wedgeN v w).length
+
+/-- The parent--child graph of a Galton--Watson sample. -/
+def gwTreeGraph {N : ℕ} (c : GWWord N → ℕ) :
+    SimpleGraph {w : GWWord N // inGWSample c w} :=
+  SimpleGraph.fromRel fun u v => treeDistN u.1 v.1 = 1
+
+structure GraphQIWith {V V' : Type*} (D : ℕ) (G : SimpleGraph V)
+    (G' : SimpleGraph V') (f : V → V') : Prop where
+  upper : ∀ x y, G'.dist (f x) (f y) ≤ D * G.dist x y + D
+  lower : ∀ x y, G.dist x y ≤ D * G'.dist (f x) (f y) + D * D
+  dense : ∀ y', ∃ x, G'.dist (f x) y' ≤ D
+
+def GraphQuasiIsometric {V V' : Type*} (G : SimpleGraph V) (G' : SimpleGraph V') : Prop :=
+  ∃ (D : ℕ) (f : V → V'), GraphQIWith D G G' f
+
+/-- The shifted positive support generating the chain-regime invariant. -/
+noncomputable def shiftSupp {J : ℕ} (theta : Offspring J) : Finset ℕ :=
+  ((Finset.range (J + 1)).filter fun k => 2 ≤ k ∧ theta k ≠ 0).image fun k => k - 1
+
+end Classification
+
 /-! ## The two-value family -/
 
 section TwoValue
@@ -248,14 +316,13 @@ structure IsQIWith (K : ℕ) (T T' : Word → Prop) (f : Word → Word) : Prop w
 noncomputable def bernoulliLaw {t : ℝ} (ht : 0 ≤ t) (ht1 : t ≤ 1) : Measure Bool :=
   ProbabilityTheory.bernoulliMeasure true false ⟨t, ht, ht1⟩
 
-instance instIsProbabilityBernoulliLaw {t : ℝ} (ht : 0 ≤ t) (ht1 : t ≤ 1) :
-    IsProbabilityMeasure (bernoulliLaw ht ht1) :=
-  inferInstanceAs
-    (IsProbabilityMeasure (ProbabilityTheory.bernoulliMeasure true false ⟨t, ht, ht1⟩))
-
 /-- The i.i.d. Bernoulli field indexed by the vertices of the tree. -/
 noncomputable def bernoulliField {t : ℝ} (ht : 0 ≤ t) (ht1 : t ≤ 1) : Measure (Word → Bool) :=
   Measure.infinitePi (fun _ : Word => bernoulliLaw ht ht1)
+
+/-- The square-root form of the quantitative two-value error rate. -/
+noncomputable def qBound (a : ℝ) (D : ℕ) : ℝ :=
+  Real.sqrt (a ^ (D * (2 * D - 5)))
 
 end TwoValue
 
@@ -306,6 +373,36 @@ theorem audit_main_matching_failure_le {V : Type} (Rv : V → V → Prop) (μ : 
         ≤ genKcC ((2 * N + 3) * 2 ^ (2 * N + 3) * (2 * N + 4)) S.card T
             * etaG (5 / 2) Rv μ := sorry
 
+/-- `thm:main-matching`, the infinite conclusion: two independent consistent
+processes admit one root-fixing infinite-tree automorphism with the stated probability. -/
+theorem audit_main_matching_infinite {V : Type} (Rv : V → V → Prop) (μ : PMF V) (v0 : V)
+    [Countable V] [MeasurableSpace V] [MeasurableSingletonClass V]
+    (ν : PMF ℕ) (N : ℕ) (S : Finset ℕ)
+    (hrefl : ∀ v, Rv v v) (hsymm : ∀ a b, Rv a b → Rv b a)
+    (hhalf : 2⁻¹ ≤ μ v0)
+    (hN : 2 ≤ N) (hS : ∀ k ∈ S, k ≤ N) (hSne : S.Nonempty)
+    (hSsupp : ∀ i : ℕ, (ν i : ℝ≥0∞) ≠ 0 ↔ i ∈ S)
+    (T : ℝ≥0∞)
+    (hT : (∑' i, if (ν i : ℝ≥0∞) = 0 then 0
+        else (ν i : ℝ≥0∞) ^ (-(5 / 2 : ℝ))) ≤ T)
+    (heta : etaG (5 / 2) Rv μ
+      ≤ (genSmallC ((2 * N + 3) * 2 ^ (2 * N + 3) * (2 * N + 4)) S.card
+          (2 * N + 3) T)⁻¹) :
+    ∃ (Omega : Type) (_ : MeasurableSpace Omega) (P : Measure Omega)
+      (_ : IsProbabilityMeasure P)
+      (X Y : (n : ℕ) → Omega → FullLab (V × ℕ) n),
+      (∀ n omega, restrictLab n (X (n + 1) omega) = X n omega) ∧
+      (∀ n omega, restrictLab n (Y (n + 1) omega) = Y n omega) ∧
+      (∀ n, Measurable (fun omega => (X n omega, Y n omega))) ∧
+      (∀ n, P.map (fun omega => (X n omega, Y n omega))
+        = (prodPMF (Tlaw μ ν v0 n) (Tlaw μ ν v0 n)).toMeasure) ∧
+      1 - genKcC ((2 * N + 3) * 2 ^ (2 * N + 3) * (2 * N + 4)) S.card T
+          * etaG (5 / 2) Rv μ
+        ≤ P {omega | ∃ g : List Bool ≃ List Bool, IsTreeAut g ∧
+          ∀ s : List Bool, labRel Rv
+            (coord (g s).length (X (g s).length omega) (g s))
+            (coord s.length (Y s.length omega) s)} := sorry
+
 /-! ## The i.i.d. matching theorem -/
 
 /-- `thm:matching`(1): the leaf bound. -/
@@ -337,6 +434,28 @@ theorem audit_exists_infinite_tree_matching_graphAut {V : Type u} (μ : PMF V)
         ∀ s : List Bool, R₀ (coord (g s).length (X (g s).length ω) (g s))
           (coord s.length (Y s.length ω) s)} := sorry
 
+/-! ## Complete conditioned-infinite classification -/
+
+/-- `thm:trichotomy`, on the part claimed as machine-checked: two conditioned
+infinite finite-support Galton--Watson trees are quasi-isometric almost surely
+exactly in classes (R), (F), the same `(C_Lambda)`, or (B). -/
+theorem audit_offspring_classification_ae_iff {J J' N N' : ℕ}
+    (theta : Offspring J) (hJN : J ≤ N)
+    (hvalid : theta.IsSupercritical ∨ theta 1 = 1)
+    (htop : theta 1 = 1 ∨ (2 ≤ J ∧ 0 < theta J))
+    (theta' : Offspring J') (hJN' : J' ≤ N')
+    (hvalid' : theta'.IsSupercritical ∨ theta' 1 = 1)
+    (htop' : theta' 1 = 1 ∨ (2 ≤ J' ∧ 0 < theta' J')) :
+    ∀ᵐ omega ∂((conditionedGW (N := N) theta).prod (conditionedGW (N := N') theta')),
+      GraphQuasiIsometric (gwTreeGraph omega.1) (gwTreeGraph omega.2) ↔
+        (theta 1 = 1 ∧ theta' 1 = 1) ∨
+        (theta 0 = 0 ∧ theta 1 = 0 ∧ theta' 0 = 0 ∧ theta' 1 = 0) ∨
+        ((theta 0 = 0 ∧ 0 < theta 1 ∧ theta 1 < 1) ∧
+          (theta' 0 = 0 ∧ 0 < theta' 1 ∧ theta' 1 < 1) ∧
+          AddSubmonoid.closure (shiftSupp theta : Set ℕ) =
+            AddSubmonoid.closure (shiftSupp theta' : Set ℕ)) ∨
+        (0 < theta 0 ∧ 0 < theta' 0) := sorry
+
 /-! ## Universality in the two-value family -/
 
 /-- `thm:twovalue`: two independent Galton--Watson trees whose offspring law is
@@ -344,5 +463,14 @@ supported on `{1,2}` are almost surely quasi-isometric. -/
 theorem audit_twovalue_ae_tree_family {t : ℝ} (ht0 : 0 ≤ t) (ht1 : t ≤ 1) :
     ((bernoulliField ht0 ht1).prod (bernoulliField ht0 ht1))
       {ω | ¬ ∃ (K : ℕ) (f : Word → Word), IsQIWith K (InTree ω.1) (InTree ω.2) f} = 0 := sorry
+
+/-- The quantitative half of `thm:twovalue`: above a threshold, failure of a
+`(D²+3)`-quasi-isometry has probability at most the explicit rate. -/
+theorem audit_twovalue_rate_tree {t : ℝ} (ht0 : 0 < t) (ht1 : t < 1) :
+    ∃ D₀ : ℕ, ∀ D : ℕ, D₀ ≤ D →
+      ((bernoulliField ht0.le ht1.le).prod (bernoulliField ht0.le ht1.le))
+          {ω | ¬ ∃ f : Word → Word,
+            IsQIWith (D ^ 2 + 3) (InTree ω.1) (InTree ω.2) f}
+        ≤ ENNReal.ofReal (256 * qBound (1 - t) D) := sorry
 
 end Challenge
