@@ -1,7 +1,7 @@
 /-
 Comparator challenge file: the headline theorems, restated with `sorry` in place
 of their proofs.
-
+Checked by ST on 1 Sep 19:40 CEST
 Everything these statements mention is defined below, over Mathlib alone. No
 module of the four libraries is imported: the trust boundary of the audit is this
 file together with its import closure, and the libraries are what the audit is
