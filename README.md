@@ -14,7 +14,7 @@ its Lean declaration, and the web version displays the theorem-dependency graph.
 
 ## Libraries
 
-The project has four default library targets.
+The project has four default library targets. 
 
 | Library | Role |
 |---|---|
