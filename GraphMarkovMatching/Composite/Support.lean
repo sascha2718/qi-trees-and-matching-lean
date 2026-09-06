@@ -24,9 +24,8 @@ of the acyclicity theorem `no_live_common_cycle`.
 * `simDeg`, `dead_screen_eq_zero`, `fresh_dead_screen_eq_zero`
   (`thm:exact-pruning`): a screen whose dead indicator includes the
   namesake of its cell is exactly zero;
-* `mul_simDeg_le_simDeg`, `mul_simDeg_repXi_le_simDeg_cXiBar`: degrees
-  are monotone under component minorization; with the cluster floor this
-  is the degree half of `thm:mixture-tilt-composite`.
+* `mul_simDeg_le_simDeg`: degrees are monotone under component
+  minorization, the degree half of `thm:mixture-tilt-composite`.
 -/
 import GraphMarkovMatching.Composite.Kernel
 import GraphMarkovMatching.Process.Sim
@@ -181,16 +180,6 @@ def Safe (exc1 : ℕ → Option (ℕ × ℕ)) (ν2 : PMF ℕ) (N : ℕ) :
     CState V → Prop
   | (_, CtrC.ord k) => k ≤ N ∨ ∃ p, exc1 k = some p
   | (_, CtrC.mark a b _) => a ≤ N ∧ b ≤ N ∧ ν2 b ≠ 0
-
-lemma safe_ord {exc1 : ℕ → Option (ℕ × ℕ)} {ν2 : PMF ℕ} {N : ℕ}
-    {v : V} {k : ℕ} :
-    Safe exc1 ν2 N (v, CtrC.ord k) ↔ (k ≤ N ∨ ∃ p, exc1 k = some p) :=
-  Iff.rfl
-
-lemma safe_mark {exc1 : ℕ → Option (ℕ × ℕ)} {ν2 : PMF ℕ} {N : ℕ}
-    {v : V} {a b i : ℕ} :
-    Safe exc1 ν2 N (v, CtrC.mark a b i) ↔ (a ≤ N ∧ b ≤ N ∧ ν2 b ≠ 0) :=
-  Iff.rfl
 
 variable (Rv : V → V → Prop) (μ : PMF V) (v0 : V)
 variable (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ) (N : ℕ)
@@ -524,22 +513,6 @@ lemma mul_simDeg_le_simDeg {X : Type} (c : ℝ≥0∞) {ρ ρ' : PMF X}
   · rw [if_pos hxy, if_pos hxy]
     exact hle y
   · rw [if_neg hxy, if_neg hxy, mul_zero]
-
-/-- The degree half of the weighted mixture tilt
-(`thm:mixture-tilt-composite`): the degree against the fresh cell mixture
-dominates the degree against a replacement cell at its composite floor.
-The inverse `5/2`-power layer on top of this inequality is the remaining
-half. -/
-theorem mul_simDeg_repXi_le_simDeg_cXiBar
-    {exc : ℕ → Option (ℕ × ℕ)} {ν : PMF ℕ} {a : ℕ} (b : ℕ)
-    (ha : ∀ j, j ≤ a → exc j = none) (h : ℕ)
-    (Rel : (FullLab (CState V) h × FullLab (CState V) h) →
-      (FullLab (CState V) h × FullLab (CState V) h) → Prop)
-    (x : FullLab (CState V) h × FullLab (CState V) h) :
-    (ν a * (μ v0 * ν b)) * simDeg (repXi exc μ ν v0 a b h) Rel x ≤
-      simDeg (cXiBar exc μ ν v0 h) Rel x :=
-  mul_simDeg_le_simDeg _ Rel
-    (fun y => repXi_le_cXiBar exc μ ν v0 b ha h y) x
 
 end Composite
 end GraphMarkovMatching

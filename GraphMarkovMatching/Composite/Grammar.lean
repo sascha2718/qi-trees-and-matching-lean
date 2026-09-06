@@ -3,10 +3,9 @@ The composite tagged grammar (`arbitrary_offspring_matching.tex`,
 `sec:composite`, `def:composite-grammar`): letters, successor sets,
 descents, chart ports, and the realization theorem.
 
-This subfolder is the fresh formalisation of the composite two-law
-development.  It deliberately imports only `VaryingDepths` (the certified
-counter-depth combinatorics `toFresh`, `depthSet`, `depths_semigroup`) and
-nothing from the earlier two-law attempts.
+This subfolder is the composite two-law development.  Its grammar imports
+only `Grammar/Depths` (the certified counter-depth combinatorics `toFresh`,
+`depthSet`, `depths_semigroup`) from the one-law grammar.
 
 * `Letter`: fresh `F`, forced `Z j`, exposed `Fk k`, and the pair-indexed
   markers `M a b i` carrying the pending port of the composite chart of

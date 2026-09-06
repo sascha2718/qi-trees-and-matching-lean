@@ -97,12 +97,6 @@ def fullMatchesK (R₀ : V → V → Prop) (k : ℕ) :
 def fullSimK (R₀ : V → V → Prop) (k m n : ℕ) (x y : FullLab V n) : Prop :=
   ∃ π : AutK k m n, fullMatchesK R₀ k m n π x y
 
-/-- Height `0`: the relation is `R₀` at every phase. -/
-lemma fullSimK_zero (R₀ : V → V → Prop) (k m : ℕ) : fullSimK R₀ k m 0 = R₀ := by
-  funext x y
-  simp only [fullSimK, fullMatchesK]
-  exact propext ⟨fun ⟨_, hh⟩ => hh, fun hh => ⟨(), hh⟩⟩
-
 /-- **The swap-phase recursion**: `≈(0,n+1) = R₀ ⊗ (≈(k-1,n))^(2)`. -/
 lemma fullSimK_succ_swap (R₀ : V → V → Prop) (k n : ℕ) :
     fullSimK R₀ k 0 (n + 1)
@@ -162,31 +156,5 @@ lemma fullSimK_symm (R₀ : V → V → Prop) (h : ∀ a b, R₀ a b → R₀ b 
       | m + 1 =>
           rw [fullSimK_succ_prod]
           exact ProdRel_symm h (ProdRel_symm (ih m) (ih m)) x y
-
-/-! ### The phase product measure -/
-
-/-- The phase product measure: the root of a height-`n` tree at swap distance
-`m` carries law `ν m`, and the two subtrees are independent copies at the
-successor phase. -/
-noncomputable def fullMuK (ν : ℕ → PMF V) (k : ℕ) :
-    (m : ℕ) → (n : ℕ) → PMF (FullLab V n)
-  | m, 0 => ν m
-  | 0, n + 1 =>
-      prodPMF (ν 0) (prodPMF (fullMuK ν k (k - 1) n) (fullMuK ν k (k - 1) n))
-  | m + 1, n + 1 =>
-      prodPMF (ν (m + 1)) (prodPMF (fullMuK ν k m n) (fullMuK ν k m n))
-
-@[simp] lemma fullMuK_zero (ν : ℕ → PMF V) (k m : ℕ) :
-    fullMuK ν k m 0 = ν m := by unfold fullMuK; rfl
-
-@[simp] lemma fullMuK_succ_swap (ν : ℕ → PMF V) (k n : ℕ) :
-    fullMuK ν k 0 (n + 1)
-      = prodPMF (ν 0) (prodPMF (fullMuK ν k (k - 1) n) (fullMuK ν k (k - 1) n)) := by
-  simp [fullMuK]
-
-@[simp] lemma fullMuK_succ_prod (ν : ℕ → PMF V) (k m n : ℕ) :
-    fullMuK ν k (m + 1) (n + 1)
-      = prodPMF (ν (m + 1)) (prodPMF (fullMuK ν k m n) (fullMuK ν k m n)) := by
-  simp [fullMuK]
 
 end GraphMarkovMatching.Support

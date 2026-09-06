@@ -9,7 +9,7 @@ by the zero-interface estimates:
 * the forced-source screens and the forced-source mass vanish, because
   the root `v0` is charged (`μ(v0) ≥ 1/2` and reflexivity).
 -/
-import GraphMarkovMatching.Process.Descent
+import GraphMarkovMatching.Process.Failure
 import GraphMarkovMatching.Process.ScreenBridges
 
 namespace GraphMarkovMatching
@@ -19,35 +19,7 @@ open scoped ENNReal Classical
 
 universe u
 
-/-- The good degree against a point mass. -/
-lemma rE_pure {X : Type u} (b : X) (R : X → X → Prop) (z : X) :
-    rE (PMF.pure b) R z = if R z b then 1 else 0 := by
-  rw [rE_eq_tsum_mul, tsum_pure_mul b (goodInd R z), goodInd]
-
 variable {V : Type} (α : ℝ) (Rv : V → V → Prop) (μ : PMF V) (v0 : V)
-
-/-- The height-zero fresh tilt is the label tilt. -/
-lemma WresD_Tlaw_zero_le (ν : PMF ℕ) (v : V) (k : ℕ) :
-    WresD α (Tlaw μ ν v0 0) (fullSim (labRel Rv) 0) (leaf (v, k))
-      ≤ (rE μ Rv v) ^ (-α) := by
-  by_cases hres : rE (Tlaw μ ν v0 0) (fullSim (labRel Rv) 0)
-      (leaf (v, k)) = 0
-  · rw [WresD, if_pos hres]
-    exact zero_le
-  · rw [← rE_rpow_neg_eq_WresD (Tlaw μ ν v0 0) (fullSim (labRel Rv) 0)
-      (leaf (v, k)) hres, rE_Tlaw_zero Rv μ ν v0 v k]
-
-/-- The height-zero forced target is dead exactly at far roots. -/
-lemma rE_Zlaw_zero_eq (ν : PMF ℕ) (v : V) (k j : ℕ) :
-    rE (Zlaw μ ν v0 j 0) (fullSim (labRel Rv) 0) (leaf (v, k))
-      = if Rv v v0 then 1 else 0 := by
-  rw [show Zlaw μ ν v0 j 0 = PMF.pure (leaf (v0, j)) from rfl,
-    rE_pure]
-  by_cases hv : Rv v v0
-  · rw [if_pos ((fullSim_leaf (labRel Rv) (v, k) (v0, j)).mpr hv),
-      if_pos hv]
-  · rw [if_neg (fun hc =>
-      hv ((fullSim_leaf (labRel Rv) (v, k) (v0, j)).mp hc)), if_neg hv]
 
 /-- **Base of the fresh-source screen** (`e₂` at height zero): at most the
 far tilt, hence at most `2η`. -/

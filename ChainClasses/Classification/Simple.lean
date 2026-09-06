@@ -1,10 +1,10 @@
-import ChainClasses.Trichotomy
+import ChainClasses.Bushy.Trichotomy
 
 /-!
 # Classification for offspring supported on `{0,1,2}`
 
 This is the public entry point for the simple-support classification.  The proof is developed in
-`ChainClasses.Trichotomy`. The declarations below give the result names that should be used by
+`ChainClasses.Bushy.Trichotomy`. The declarations below give the result names that should be used by
 downstream files.
 
 The declaration `simple_classification` is the direct endpoint for the paper theorem, including

@@ -45,12 +45,6 @@ private lemma rE_ne_zero_of_near (hpos : (μ v0 : ℝ≥0∞) ≠ 0) {v : V}
   rw [h0] at hle
   exact hpos (le_antisymm hle zero_le)
 
-/-- The zero-event indicator is at most one. -/
-private lemma screenInd_le_one {X : Type} (R : X → X → Prop)
-    (zs : List (PMF X)) (x : X) : screenInd R zs x ≤ 1 := by
-  rw [screenInd]
-  split_ifs <;> simp
-
 /-- A unit-tilted screen is a subprobability. -/
 private lemma screenE_one_le_one {X : Type} (ρs : PMF X)
     (R : X → X → Prop) (zs : List (PMF X)) :
@@ -275,19 +269,6 @@ private lemma cell_W_order (S : Finset ℕ) (hα : 1 ≤ α) (k h : ℕ)
       (hE _ hm1)
   refine le_trans (add_le_add (add_le_add hT1 hT2)
     (mul_le_mul' hquad0 hquad1)) (le_of_eq (by ring))
-
-/-- Distributing a two-term pointwise bound over a weighted, indicated
-sum. -/
-private lemma tsum_ind_split {Y : Type} (ρs : PMF Y)
-    (c W P Q : Y → ℝ≥0∞) (hW : ∀ y, W y ≤ P y + Q y) :
-    ∑' y, ρs y * (c y * W y)
-      ≤ (∑' y, ρs y * (c y * P y)) + ∑' y, ρs y * (c y * Q y) := by
-  rw [← ENNReal.tsum_add]
-  refine ENNReal.tsum_le_tsum fun y => ?_
-  calc ρs y * (c y * W y)
-      ≤ ρs y * (c y * (P y + Q y)) :=
-        mul_le_mul_right (mul_le_mul_right (hW y) _) _
-    _ = ρs y * (c y * P y) + ρs y * (c y * Q y) := by ring
 
 /-- The full square cell of the fresh screen rows: the survivor split
 of the `Ξ_j`-tilt into the two orders, each resolved by

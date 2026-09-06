@@ -447,59 +447,6 @@ lemma PhiDres_Xi_XiBar_le (hα : 1 ≤ α) (k h : ℕ) :
             from by ring,
           ENNReal.tsum_mul_left, PhiDres]
 
-/-- **Mixture to diagonal reserve** (`def:screen`, `u = ∅`): for a charged
-source counter, the pair-level one-sided screen normalized by the mixture
-degree is at most `ν_k^{-α}` times the same screen normalized by the
-diagonal reserve of the source pair law.  Off the support the diagonal
-tilt may be `⊤`, but there the source weight vanishes; on the support the
-diagonal reserve is positive by reflexivity. -/
-lemma pairScreen_mix_le_diag (hα0 : 0 ≤ α) {k : ℕ}
-    (hk : (ν k : ℝ≥0∞) ≠ 0) (h : ℕ)
-    (hrefl : ∀ xp : FullLab (V × ℕ) h × FullLab (V × ℕ) h,
-      SquareRel (fullSim (labRel Rv) h) xp xp)
-    (ind : FullLab (V × ℕ) h × FullLab (V × ℕ) h → ℝ≥0∞) :
-    ∑' xp, Xi μ ν v0 k h xp
-        * (ind xp * WresD α (XiBar μ ν v0 h)
-            (SquareRel (fullSim (labRel Rv) h)) xp)
-      ≤ (ν k : ℝ≥0∞) ^ (-α)
-        * ∑' xp, Xi μ ν v0 k h xp
-            * (ind xp * (rE (Xi μ ν v0 k h)
-                (SquareRel (fullSim (labRel Rv) h)) xp) ^ (-α)) := by
-  rw [← ENNReal.tsum_mul_left]
-  refine ENNReal.tsum_le_tsum fun xp => ?_
-  by_cases hxp : Xi μ ν v0 k h xp = 0
-  · rw [hxp, zero_mul]
-    exact zero_le
-  · have hdiag : rE (Xi μ ν v0 k h)
-        (SquareRel (fullSim (labRel Rv) h)) xp ≠ 0 := by
-      intro h0
-      exact hxp (le_antisymm (h0 ▸ le_rE_of_refl (hrefl xp)) zero_le)
-    have htilt : WresD α (XiBar μ ν v0 h)
-          (SquareRel (fullSim (labRel Rv) h)) xp
-        ≤ (ν k : ℝ≥0∞) ^ (-α)
-          * (rE (Xi μ ν v0 k h)
-              (SquareRel (fullSim (labRel Rv) h)) xp) ^ (-α) := by
-      by_cases hres : rE (XiBar μ ν v0 h)
-          (SquareRel (fullSim (labRel Rv) h)) xp = 0
-      · rw [WresD, if_pos hres]
-        exact zero_le
-      · rw [← rE_rpow_neg_eq_WresD (XiBar μ ν v0 h)
-            (SquareRel (fullSim (labRel Rv) h)) xp hres,
-          ← ENNReal.mul_rpow_of_ne_zero hk hdiag]
-        exact rpow_neg_antitone hα0
-          (mul_rE_le_rE_bind ν (fun j => Xi μ ν v0 j h)
-            (SquareRel (fullSim (labRel Rv) h)) xp k)
-    calc Xi μ ν v0 k h xp * (ind xp * WresD α (XiBar μ ν v0 h)
-          (SquareRel (fullSim (labRel Rv) h)) xp)
-        ≤ Xi μ ν v0 k h xp * (ind xp * ((ν k : ℝ≥0∞) ^ (-α)
-            * (rE (Xi μ ν v0 k h)
-                (SquareRel (fullSim (labRel Rv) h)) xp) ^ (-α))) := by
-          exact mul_le_mul_right (mul_le_mul_right htilt _) _
-      _ = (ν k : ℝ≥0∞) ^ (-α) * (Xi μ ν v0 k h xp
-            * (ind xp * (rE (Xi μ ν v0 k h)
-                (SquareRel (fullSim (labRel Rv) h)) xp) ^ (-α))) := by
-          ring
-
 /-- **Union bound over the dead components**: the existential one-sided
 indicator of the mixture is dominated by the sum of per-component dead
 indicators, for any nonnegative tilt. -/
@@ -531,34 +478,6 @@ lemma pairScreen_exists_le (k h : ℕ)
       exact zero_le
   exact le_trans (ENNReal.tsum_le_tsum hpt) (le_of_eq ENNReal.tsum_comm)
 
-/-- **The one-sided tilt mass in diagonal form**: for a charged source
-counter, the one-sided pair screen of the fresh-target mixture is at most
-`ν_k^{-α}` times the sum over components of the diagonal-reserve pair
-screens.  Each summand with a concrete product component then factorizes
-through `diagPairScreen_le`. -/
-lemma oneSidedScreen_le_diag (hα0 : 0 ≤ α) {k : ℕ}
-    (hk : (ν k : ℝ≥0∞) ≠ 0) (h : ℕ)
-    (hrefl : ∀ xp : FullLab (V × ℕ) h × FullLab (V × ℕ) h,
-      SquareRel (fullSim (labRel Rv) h) xp xp) :
-    ∑' xp, Xi μ ν v0 k h xp
-        * ((if ∃ j, ν j ≠ 0 ∧ rE (Xi μ ν v0 j h)
-              (SquareRel (fullSim (labRel Rv) h)) xp = 0 then 1 else 0)
-          * WresD α (XiBar μ ν v0 h)
-              (SquareRel (fullSim (labRel Rv) h)) xp)
-      ≤ (ν k : ℝ≥0∞) ^ (-α)
-        * ∑' j, ∑' xp, Xi μ ν v0 k h xp
-            * ((if ν j ≠ 0 ∧ rE (Xi μ ν v0 j h)
-                  (SquareRel (fullSim (labRel Rv) h)) xp = 0 then 1 else 0)
-              * (rE (Xi μ ν v0 k h)
-                  (SquareRel (fullSim (labRel Rv) h)) xp) ^ (-α)) := by
-  refine le_trans (pairScreen_exists_le Rv μ ν v0 k h
-    (WresD α (XiBar μ ν v0 h) (SquareRel (fullSim (labRel Rv) h)))) ?_
-  rw [← ENNReal.tsum_mul_left]
-  refine ENNReal.tsum_le_tsum fun j => ?_
-  exact pairScreen_mix_le_diag α Rv μ ν v0 hα0 hk h hrefl
-    (fun xp => if ν j ≠ 0 ∧ rE (Xi μ ν v0 j h)
-      (SquareRel (fullSim (labRel Rv) h)) xp = 0 then 1 else 0)
-
 /-! ### The base case -/
 
 /-- At height zero the fresh bad degree is the label bad degree: the
@@ -587,15 +506,6 @@ lemma qE_Tlaw_zero (v : V) (k : ℕ) :
         tsum_prod_split (fun w => if Rv v w then 0 else μ w)
           (fun l => (ν l : ℝ≥0∞))
     _ = qE μ Rv v := by rw [ν.tsum_coe, mul_one]; rfl
-
-/-- Dropping a conjunct from an indicator. -/
-lemma indicator_and_le {p q : Prop} :
-    (if p ∧ q then (1 : ℝ≥0∞) else 0) ≤ if q then 1 else 0 := by
-  split_ifs with h1 h2
-  · exact le_rfl
-  · exact absurd h1.2 h2
-  · exact zero_le
-  · exact le_rfl
 
 /-- The good-degree form of the height-zero fresh identity. -/
 lemma rE_Tlaw_zero (v : V) (k : ℕ) :

@@ -179,16 +179,6 @@ lemma case_two_le_MA (α : ℝ) : (5 : ℝ) / 2 ≤ MA α := le_max_right _ _
 
 lemma MA_nonneg (α : ℝ) : 0 ≤ MA α := le_trans (by norm_num) (case_two_le_MA α)
 
-lemma AA_nonneg {α : ℝ} (hα : 0 ≤ α) : 0 ≤ AA α := by
-  have h1 := LA_nonneg hα
-  have h2 := KA_nonneg hα
-  rw [AA]; linarith
-
-lemma BA_nonneg (α : ℝ) : 0 ≤ BA α := by
-  have h1 := MA_nonneg α
-  have h2 : (0 : ℝ) ≤ 4 * α ^ 2 := by positivity
-  rw [BA]; linarith
-
 /-- The chord slope is nonnegative at every `α ≥ 0`. -/
 lemma chordConstA_nonneg {α : ℝ} (hα : 0 ≤ α) : 0 ≤ chordConstA α := by
   rw [chordConstA]

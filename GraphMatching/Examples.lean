@@ -132,8 +132,6 @@ noncomputable def etaPA (α : ℝ) (p : PMF ℕ) : ℝ≥0∞ := etaGA α p path
 /-- `η_{𝖯,α}(p)` at the pinned exponent, the form `thm:double-exp` is stated at. -/
 noncomputable def etaP (p : PMF ℕ) : ℝ≥0∞ := etaG p pathGraph
 
-lemma etaP_eq_etaPA (p : PMF ℕ) : etaP p = etaPA alpha p := rfl
-
 /-- **`thm:matching`(1) for the path** (`|j-k| ≤ 1` rule): geometric leaf decay. -/
 theorem path_leaf_matching_bound (p : PMF ℕ) (h0 : etaP p ≤ 1 / 256) (h : ℕ) :
     ∑' x, leafMu p h x * qE (leafMu p h) (leafSim (compat pathGraph) h) x

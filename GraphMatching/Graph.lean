@@ -58,11 +58,6 @@ lemma phiA_q_eq (α : ℝ) (μ : PMF V) (R : V → V → Prop) (v : V) :
   have hden : (1 : ℝ) - (1 - (rE μ R v).toReal) = (rE μ R v).toReal := by ring
   rw [hden]
 
-/-- The same identity at the pinned exponent. -/
-lemma phi_q_eq (μ : PMF V) (R : V → V → Prop) (v : V) :
-    phi (q μ R v) = (1 - (rE μ R v).toReal) / (rE μ R v).toReal ^ alpha :=
-  phiA_q_eq alpha μ R v
-
 /-- **`eq:etaG`**: the graph potential
 `η_{G,α}(μ) = ∑_v μ(v) (1 - b(v))/b(v)^α`, at a general exponent. The paper defines it
 this way and fixes `α = 5/2` only in the statement of `thm:matching`. -/

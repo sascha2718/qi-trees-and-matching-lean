@@ -255,11 +255,6 @@ theorem mem_of_prefix {v w : Word N} (h : v <+: w) (hw : w ∈ T) : v ∈ T :=
 theorem nil_mem {v : Word N} (hv : v ∈ T) : ([] : Word N) ∈ T :=
   mem_of_prefix List.nil_prefix hv
 
-/-- The parent of a vertex of `T` lies in `T`. -/
-theorem mem_of_mem_children {v w : Word N} (hw : w ∈ Word.children v) (h : w ∈ T) :
-    v ∈ T :=
-  mem_of_prefix (Word.prefix_of_mem_children hw) h
-
 /-- The wedge of a vertex of a subtree with any word is again a vertex of it: subtrees
 are closed under the meet of `𝒩(N)`. -/
 theorem wedge_mem {v : Word N} (hv : v ∈ T) (w : Word N) : wedge v w ∈ T :=
@@ -269,17 +264,6 @@ theorem wedge_mem {v : Word N} (hv : v ∈ T) (w : Word N) : wedge v w ∈ T :=
 notation of `𝒩(N)`: it consists of the words `w` with `v ++ w` in `T`. -/
 theorem mem_subAt {v w : Word N} : w ∈ Descriptive.Tree.subAt T v ↔ v ++ w ∈ T :=
   Descriptive.Tree.mem_subAt T v w
-
-/-- The residual subtree at a vertex of `T` contains the root. -/
-theorem nil_mem_subAt {v : Word N} (hv : v ∈ T) :
-    ([] : Word N) ∈ Descriptive.Tree.subAt T v :=
-  mem_subAt.mpr (by simpa using hv)
-
-/-- Prefix closure of the residual subtree, in the unfolded form a Galton-Watson
-recursion consumes: shortening the tail of a vertex of `T` below `v` stays in `T`. -/
-theorem append_mem_of_prefix {v x y : Word N} (h : x <+: y) (hy : v ++ y ∈ T) :
-    v ++ x ∈ T :=
-  mem_of_prefix ((List.prefix_append_right_inj v).mpr h) hy
 
 end Subtree
 

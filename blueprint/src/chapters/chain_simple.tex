@@ -144,7 +144,7 @@ $\cC_k=\set{n\in\bbN\colon D^k\leq n<D^{k+1}}$. The classes $\cC_k$ partition $\
 $n,m\in\cC_k$ satisfy $D^{-1}<n/m<D$, and the quantised labels $\ell_D(\lambda(w))$,
 $w\in\bbB$, are independent with common law
 \[
- q_k=\bbP\bigl(\lambda(w)\in\cC_k\bigr)=\theta_1^{D^k-1}-\theta_1^{D^{k+1}-1}.
+ p^{(D)}_k=\bbP\bigl(\lambda(w)\in\cC_k\bigr)=\theta_1^{D^k-1}-\theta_1^{D^{k+1}-1}.
 \]
 \end{lemma}
 
@@ -161,7 +161,7 @@ labels, and the class masses are the tail differences of the geometric law.
 \lean{ChainClasses.coupling_law}
 \leanok
 Let $\theta_1,\theta_1'\in(0,1)$, put $\gamma=\log\theta_1/\log\theta_1'>0$, and let $D\geq2$
-be an integer with $\gamma(D-1)\geq1$. Let $q$ be the law of \cref{thm:chain-classes} for
+be an integer with $\gamma(D-1)\geq1$. Let $p^{(D)}$ be the law of \cref{thm:chain-classes} for
 $\theta_1$ and $D$, let $\lambda'$ be geometric with parameter $\theta_1'$, and let $U$ be
 uniform on $[0,1)$ and independent of $\lambda'$. Then there are cut points
 $1=D_0'<D_1'<D_2'<\cdots$ at which consecutive classes of the second law meet, and a map
@@ -179,7 +179,7 @@ The identity $\theta_1=(\theta_1')^\gamma$ shows that the tail of the second geo
 equals the tail of the first law at $D^k$. The numbers $t_k$ are not generally integral. We
 therefore round each $t_k$ to neighbouring integers and use $U$ to divide the single atom crossed
 by the cut in the required proportion. This produces consecutive integer intervals with exactly
-the class masses $q_k$. Their endpoints remain within a fixed multiplicative factor of the
+the class masses $p^{(D)}_k$. Their endpoints remain within a fixed multiplicative factor of the
 corresponding powers $D^k$, because the rounding error is at most one and
 $\gamma(D-1)\geq1$. Hence the resulting map $\ell'$ has the stated monotonicity and ratio
 control.

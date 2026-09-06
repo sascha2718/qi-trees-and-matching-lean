@@ -11,27 +11,22 @@ Konig/measure packaging (`infinite_tree_matchingK_prob`) at the
 composite tagged kernel `compK`, and assumes only the uniform
 finite-height mismatch estimate.
 
-* `cT_map_restrictLab`, `cPairLaw_map_restrictLab`: the composite
-  fresh-mixture law and the two-law product law are projectively
+* `cT_map_restrictLab`: the composite fresh-mixture law is projectively
   consistent;
-* `cFailure_le_PhiD`: the finite-height mismatch is bounded by the full
-  directed potential;
 * `cT_hasMatchingSupport`, `cFailure_le_PhiDres_of_support`: under the
   support witness of `thm:support-equality` the zero interface vanishes, so
-  the restricted potential alone bounds the mismatch;
-* `cMatching_infinite`, `cMatching_infinite_of_PhiD`,
-  `cMatching_infinite_of_PhiDres`: a uniform finite-height mismatch
-  bound `b` yields one binary-tree automorphism matching the two
-  infinite composite samples with probability at least `1 - b`;
-* `cTPair`, `cMatching_infinite_traj`: the law of the two independent
-  infinite composite samples, constructed as the product of two
-  trajectory measures, and the endpoint on it, with no probability
-  space assumed.
+  the restricted potential alone bounds the finite-height mismatch;
+* `cMatching_infinite`, `cMatching_infinite_of_PhiDres`: a uniform
+  finite-height mismatch bound `b` yields one binary-tree automorphism
+  matching the two infinite composite samples with probability at least
+  `1 - b`;
+* `cTPair`: the law of the two independent infinite composite samples,
+  constructed as the product of two trajectory measures, a probability
+  measure.
 -/
 import GraphMarkovMatching.Composite.Support
-import GraphMarkovMatching.Closure.ProductMeasure
+import GraphMarkovMatching.Composite.ProductMeasure
 import GraphMarkovMatching.Process.MatchingSupport
-import GraphMarkovMatching.Tail.QuenchedRows
 import GraphMarkovMatching.Support.Trajectory
 
 namespace GraphMarkovMatching
@@ -66,26 +61,7 @@ theorem cT_map_restrictLab {V : Type} (exc : ℕ → Option (ℕ × ℕ))
     (cT exc μ ν v0 (n + 1)).map (restrictLab n) = cT exc μ ν v0 n := by
   exact mix_map_restrictLab (compK exc μ ν v0) (freshC μ ν) n
 
-/-- The two composite laws are jointly projectively consistent. -/
-theorem cPairLaw_map_restrictLab {V : Type} (μ : PMF V) (v0 : V)
-    (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ) (n : ℕ) :
-    (prodPMF (cT exc1 μ ν1 v0 (n + 1)) (cT exc2 μ ν2 v0 (n + 1))).map
-        (Prod.map (restrictLab n) (restrictLab n)) =
-      prodPMF (cT exc1 μ ν1 v0 n) (cT exc2 μ ν2 v0 n) := by
-  rw [prodPMF_map_prodMap, cT_map_restrictLab, cT_map_restrictLab]
-
 /-! ### Finite-height mismatch against the potentials -/
-
-/-- The finite-height composite mismatch is bounded by the corresponding
-full directed potential. -/
-theorem cFailure_le_PhiD {V : Type} {alpha : ℝ} (halpha : 0 ≤ alpha)
-    (Rv : V → V → Prop) (μ : PMF V) (v0 : V)
-    (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ) (n : ℕ) :
-    failureD (cT exc1 μ ν1 v0 n) (cT exc2 μ ν2 v0 n)
-        (fullSim (cRel Rv) n) ≤
-      PhiD alpha (cT exc1 μ ν1 v0 n) (cT exc2 μ ν2 v0 n)
-        (fullSim (cRel Rv) n) := by
-  exact tsum_qE_le_PhiD halpha _ _ _
 
 /-- The support witness of `thm:support-equality`, packaged as a matching
 support statement for the two composite fresh laws. -/
@@ -168,30 +144,6 @@ theorem cMatching_infinite {V : Type} {Omega : Type*}
       hlaw n, prodPMF_toMeasure_not_rel_cross]
     exact hfail n
 
-/-- Potential form of the composite endpoint. -/
-theorem cMatching_infinite_of_PhiD {V : Type} {Omega : Type*}
-    [Countable V] [MeasurableSpace V] [MeasurableSingletonClass V]
-    [MeasurableSpace Omega] (Pm : Measure Omega) [IsProbabilityMeasure Pm]
-    {alpha : ℝ} (halpha : 0 ≤ alpha)
-    (Rv : V → V → Prop) (μ : PMF V) (v0 : V)
-    (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ)
-    (b : ℝ≥0∞)
-    (hPhi : ∀ n, PhiD alpha
-      (cT exc1 μ ν1 v0 n) (cT exc2 μ ν2 v0 n)
-      (fullSim (cRel Rv) n) ≤ b)
-    (X Y : (n : ℕ) → Omega → FullLab (CState V) n)
-    (hX : ∀ n omega, restrictLab n (X (n + 1) omega) = X n omega)
-    (hY : ∀ n omega, restrictLab n (Y (n + 1) omega) = Y n omega)
-    (hpair : ∀ n, Measurable (fun omega => (X n omega, Y n omega)))
-    (hlaw : ∀ n, Pm.map (fun omega => (X n omega, Y n omega)) =
-      (prodPMF (cT exc1 μ ν1 v0 n)
-        (cT exc2 μ ν2 v0 n)).toMeasure) :
-    1 - b ≤ Pm {omega | InfMatch (cRel Rv)
-      (fun n => X n omega) (fun n => Y n omega)} := by
-  exact cMatching_infinite Pm Rv μ v0 exc1 exc2 ν1 ν2 b
-    (fun n => (cFailure_le_PhiD halpha Rv μ v0 exc1 exc2 ν1 ν2 n).trans
-      (hPhi n)) X Y hX hY hpair hlaw
-
 /-- Restricted-potential form of the composite endpoint.  The support
 witness removes the zero-interface contribution uniformly in the height,
 so a bound on `PhiDres` itself is enough. -/
@@ -240,28 +192,6 @@ instance {V : Type} [Countable V] [MeasurableSpace V] [MeasurableSingletonClass 
     IsProbabilityMeasure (cTPair μ v0 exc1 exc2 ν1 ν2) := by
   rw [cTPair]
   infer_instance
-
-/-- **The composite two-law infinite endpoint, with the trajectory space constructed**: on
-the product of the two trajectory measures, the consistent level processes realise the two
-independent infinite composite samples, and a uniform mismatch bound at every finite
-height yields one binary-tree automorphism matching them with probability at least
-`1 - b`.  No probability space is assumed. -/
-theorem cMatching_infinite_traj {V : Type}
-    [Countable V] [MeasurableSpace V] [MeasurableSingletonClass V]
-    (Rv : V → V → Prop) (μ : PMF V) (v0 : V)
-    (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ)
-    (b : ℝ≥0∞)
-    (hfail : ∀ n, failureD
-      (cT exc1 μ ν1 v0 n) (cT exc2 μ ν2 v0 n)
-      (fullSim (cRel Rv) n) ≤ b) :
-    1 - b ≤ cTPair μ v0 exc1 exc2 ν1 ν2 {omega | InfMatch (cRel Rv)
-      (fun n => consLab n omega.1) (fun n => consLab n omega.2)} :=
-  cMatching_infinite (cTPair μ v0 exc1 exc2 ν1 ν2) Rv μ v0 exc1 exc2 ν1 ν2 b hfail
-    (fun n omega => consLab n omega.1) (fun n omega => consLab n omega.2)
-    (fun n omega => restrictLab_consLab n omega.1)
-    (fun n omega => restrictLab_consLab n omega.2)
-    (fun n => measurable_consLab_pair n)
-    (fun n => trajPairLab_map_consLab _ _ _ _ n)
 
 end Composite
 end GraphMarkovMatching

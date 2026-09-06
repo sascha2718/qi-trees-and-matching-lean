@@ -5,7 +5,7 @@ The nilpotence certificate for the accessible screen block
 
 * `nilpotent_of_rank`: a rank function that strictly decreases along the
   support of `N` and stays below `r` makes `N^r` annihilate every vector.
-  This discharges the hypothesis `hnil` of `screened_uniform_bound`; the
+  This discharges the hypothesis `hnil` of `screened_uniform_bound_mono`; the
   rank is supplied by the renewal-depth argument.
 * `nilpotent_of_acyclic`: acyclicity of the support graph alone produces
   such a rank (the cardinality of the strictly reachable set), so

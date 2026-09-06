@@ -412,11 +412,6 @@ lemma ELamsq_le (α : ℝ) (μ : PMF X) (R : X → X → Prop) :
         ENNReal.tsum_le_tsum fun y => by gcongr; exact Lam_le_Phi α μ R y
     _ = PhiA α μ R ^ 2 := by rw [ENNReal.tsum_mul_right, μ.tsum_coe, one_mul]
 
-/-- `ENNReal.ofReal (1/8) = 1/8`, as an `ℝ≥0∞` numeral. -/
-lemma ofReal_one_eighth : ENNReal.ofReal (1 / 8) = 1 / 8 := by
-  rw [ENNReal.ofReal_div_of_pos (by norm_num), ENNReal.ofReal_one]
-  norm_num [ENNReal.ofReal_ofNat]
-
 /-- `𝔼[q(Y)²] ≤ (1/8)Φ` (uses reflexivity, via `q_lt_one` on the support). -/
 lemma Eqsq_le (hα : 1 ≤ α) (μ : PMF X) (R : X → X → Prop) (hrefl : ∀ x, R x x) :
     ∑' y, μ y * qE μ R y ^ 2 ≤ ENNReal.ofReal (KA α) * PhiA α μ R := by

@@ -1,11 +1,11 @@
-import ChainClasses.ChainSeparationProof
+import ChainClasses.Universality.ChainSeparationProof
 
 /-!
 # Complete classification for conditioned infinite Galton--Watson trees
 
 This is the public entry point for the complete conditioned-infinite classification at finite
-support.  The proof is developed in `ChainClasses.GeneralTrichotomy` and
-`ChainClasses.ChainSeparationProof`.
+support.  The proof is developed in `ChainClasses.Universality.GeneralTrichotomy` and
+`ChainClasses.Universality.ChainSeparationProof`.
 
 The main declarations are:
 

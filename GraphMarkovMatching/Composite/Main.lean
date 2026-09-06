@@ -44,9 +44,8 @@ Delivered unconditionally:
   `cPsi (h+1) ≤ cStepF … (cPsi h) (cDebt h)`;
 * the closure constants `cRootA`, `cLamS`, `cQuadC`, `cLinB`, `cKc`,
   `cB2`, `cC2`, `cC3` and the threshold `cEtaStar` (the constants `K`
-  and `eps` of `eq:composite-K-eps`), with the positivity
-  `cEtaStar_pos` and the scalar absorption `cStepF_absorb`
-  (the absorption computation of `thm:numeric`).
+  and `eps` of `eq:composite-K-eps`), with the scalar absorption
+  `cStepF_absorb` (the absorption computation of `thm:numeric`).
 
 The screen half of the ledger (the screen rows `thm:screen-rows` with
 their explicit common and priced matrices, and the nilpotence of the
@@ -364,19 +363,6 @@ lemma row_le_cStepF (α δ L K : ℝ) {θ0 θ' T κ M D osb : ℝ≥0∞}
 
 /-! ### Restricted-hypothesis helpers -/
 
-/-- Distributing a two-term pointwise bound over a weighted, indicated
-sum (local copy of the private helper of `Assembly`). -/
-private lemma tsum_ind_splitR {Y : Type} (ρs : PMF Y)
-    (c W P Q : Y → ℝ≥0∞) (hW : ∀ y, W y ≤ P y + Q y) :
-    ∑' y, ρs y * (c y * W y)
-      ≤ (∑' y, ρs y * (c y * P y)) + ∑' y, ρs y * (c y * Q y) := by
-  rw [← ENNReal.tsum_add]
-  refine ENNReal.tsum_le_tsum fun y => ?_
-  calc ρs y * (c y * W y)
-      ≤ ρs y * (c y * (P y + Q y)) :=
-        mul_le_mul_right (mul_le_mul_right (hW y) _) _
-    _ = ρs y * (c y * P y) + ρs y * (c y * Q y) := by ring
-
 /-- A PMF average of a family bounded on the charged support is
 bounded. -/
 private lemma tsum_pmf_mul_le_charged {w : PMF ℕ} {g : ℕ → ℝ≥0∞}
@@ -502,7 +488,7 @@ theorem cPairScreenR_tilt_le (hα : 1 ≤ α) (c₁ c₂ c₃ : CtrC) (h : ℕ)
   set ρd := cLet exc2 μ ν2 v0 (cComp1 exc2 c₂) h with hρd
   set ρe := cLet exc2 μ ν2 v0 (cComp0 exc2 c₃) h with hρe
   set ρf := cLet exc2 μ ν2 v0 (cComp1 exc2 c₃) h with hρf
-  have hsplit := tsum_ind_splitR (prodPMF ρa ρb)
+  have hsplit := tsum_ind_split (prodPMF ρa ρb)
     (fun xp => if rE (prodPMF ρc ρd)
         (SquareRel (fullSim (cRel Rv) h)) xp = 0 then 1 else 0)
     (WresD α (prodPMF ρe ρf) (SquareRel (fullSim (cRel Rv) h)))
@@ -1223,73 +1209,12 @@ noncomputable def cEtaStar (α δ L K : ℝ) (μ : PMF V) (v0 : V)
 
 /-! ### Finiteness and positivity of the constants -/
 
-lemma cRootA_ne_top (μ : PMF V) (v0 : V) (hμ0 : μ v0 ≠ 0) :
-    cRootA μ v0 ≠ ⊤ := by
-  rw [cRootA]
-  exact ENNReal.add_ne_top.mpr
-    ⟨ENNReal.one_ne_top, ENNReal.inv_ne_top.mpr hμ0⟩
-
 lemma cLinB_ne_top (δ : ℝ) {T κ X : ℝ≥0∞} (hT : T ≠ ⊤) (hκ : κ ≠ ⊤)
     (hX : X ≠ ⊤) : cLinB δ T κ X ≠ ⊤ := by
   rw [cLinB]
   refine ENNReal.mul_ne_top (ENNReal.add_ne_top.mpr
     ⟨ENNReal.add_ne_top.mpr ⟨ENNReal.ofReal_ne_top, ENNReal.ofNat_ne_top⟩,
       ENNReal.mul_ne_top (ENNReal.mul_ne_top ENNReal.ofNat_ne_top hT) hκ⟩) hX
-
-lemma cKc_ne_top (δ L K : ℝ) (μ : PMF V) (v0 : V) {T κ X : ℝ≥0∞}
-    (hμ0 : μ v0 ≠ 0) (hlam : cLamS δ L K < 1)
-    (hT : T ≠ ⊤) (hκ : κ ≠ ⊤) (hX : X ≠ ⊤) :
-    cKc δ L K μ v0 T κ X ≠ ⊤ := by
-  rw [cKc]
-  refine ENNReal.mul_ne_top (ENNReal.add_ne_top.mpr
-    ⟨ENNReal.add_ne_top.mpr
-      ⟨cRootA_ne_top μ v0 hμ0, cLinB_ne_top δ hT hκ hX⟩,
-      ENNReal.one_ne_top⟩) ?_
-  exact ENNReal.inv_ne_top.mpr (tsub_pos_of_lt hlam).ne'
-
-lemma cB2_ne_top (α δ L K : ℝ) (μ : PMF V) (v0 : V) {T κ X : ℝ≥0∞}
-    (hμ0 : μ v0 ≠ 0) (hlam : cLamS δ L K < 1)
-    (hT : T ≠ ⊤) (hκ : κ ≠ ⊤) (hX : X ≠ ⊤) :
-    cB2 α δ L K μ v0 T κ X ≠ ⊤ := by
-  have hKc := cKc_ne_top δ L K μ v0 hμ0 hlam hT hκ hX
-  rw [cB2]
-  refine ENNReal.add_ne_top.mpr ⟨ENNReal.add_ne_top.mpr ⟨?_, ?_⟩, ?_⟩
-  · exact ENNReal.mul_ne_top ENNReal.ofReal_ne_top
-      (ENNReal.mul_ne_top hKc hKc)
-  · refine ENNReal.mul_ne_top (ENNReal.mul_ne_top (ENNReal.mul_ne_top
-      (ENNReal.mul_ne_top ENNReal.ofNat_ne_top ENNReal.ofReal_ne_top)
-        hX) hKc) ?_
-    exact ENNReal.add_ne_top.mpr
-      ⟨ENNReal.one_ne_top, ENNReal.mul_ne_top hT hκ⟩
-  · exact ENNReal.mul_ne_top (ENNReal.mul_ne_top
-      (ENNReal.mul_ne_top ENNReal.ofNat_ne_top hT) hκ)
-      (ENNReal.mul_ne_top hX hX)
-
-/-- **Positivity of the threshold** (`thm:composite-matching`, the
-claim `eps > 0`): under finite budgets and linear subcriticality the
-threshold `cEtaStar` is strictly positive. -/
-theorem cEtaStar_pos (α δ L K : ℝ) (μ : PMF V) (v0 : V) {T κ X : ℝ≥0∞}
-    (hμ0 : μ v0 ≠ 0) (hlam : cLamS δ L K < 1)
-    (hT : T ≠ ⊤) (hκ : κ ≠ ⊤) (hX : X ≠ ⊤) :
-    0 < cEtaStar α δ L K μ v0 T κ X := by
-  have hA := cRootA_ne_top μ v0 hμ0
-  have hKc := cKc_ne_top δ L K μ v0 hμ0 hlam hT hκ hX
-  have hB2 := cB2_ne_top α δ L K μ v0 hμ0 hlam hT hκ hX
-  have hC2 : cC2 α δ L K μ v0 T κ X ≠ ⊤ := by
-    rw [cC2]
-    refine ENNReal.add_ne_top.mpr ⟨hB2, ?_⟩
-    refine ENNReal.mul_ne_top
-      (ENNReal.mul_ne_top ENNReal.ofReal_ne_top hA) ?_
-    exact ENNReal.add_ne_top.mpr
-      ⟨ENNReal.mul_ne_top ENNReal.ofReal_ne_top hKc,
-        cLinB_ne_top δ hT hκ hX⟩
-  have hC3 : cC3 α δ L K μ v0 T κ X ≠ ⊤ := by
-    rw [cC3]
-    exact ENNReal.mul_ne_top
-      (ENNReal.mul_ne_top ENNReal.ofReal_ne_top hA) hB2
-  rw [cEtaStar, ENNReal.inv_pos]
-  exact ENNReal.add_ne_top.mpr
-    ⟨ENNReal.add_ne_top.mpr ⟨hC2, hC3⟩, ENNReal.one_ne_top⟩
 
 /-! ### The fixed-point identity and the scalar absorption -/
 

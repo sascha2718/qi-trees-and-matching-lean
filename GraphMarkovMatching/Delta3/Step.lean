@@ -6,14 +6,14 @@ exercise of the certified ledger.
 For `ν = δ₃` the mixture trivialises (`Ξ̄ = Ξ₃`), the fresh cells carry
 counter `3` only, and `ν_* = 1`, so no reciprocal weight appears.  The
 crossed-context obstruction (`crossed_context_potential_top` in
-`Process/CrossedContext.lean`) shows this case CANNOT be handled by
+`Obstructions/CrossedContext.lean`) shows this case CANNOT be handled by
 unrestricted potentials; here the restricted ledger goes through:
 
 * `XiBar_delta3`: `Ξ̄ = Ξ₃`;
 * `delta3_Tlaw_Tlaw_step`: the principal ordinary coordinate at height
   `h+1` is bounded by `η`, the four-law output of the single square cell
   `(Z₂⊗T → Z₂⊗T)`, its four resolved screens, and the quadratic cross
-  term — the complete `Ψ`-step of `screened_uniform_bound` for the
+  term, the complete `Ψ`-step of `screened_uniform_bound_mono` for the
   principal row, as one machine-checked inequality.
 -/
 import GraphMarkovMatching.Process.Descent

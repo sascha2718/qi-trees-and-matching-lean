@@ -23,19 +23,10 @@ namespace GraphMarkovMatching
 open GraphMarkovMatching.Support Real
 open scoped ENNReal Classical
 
-set_option maxHeartbeats 1600000
-
 universe u
 variable {X : Type u}
 
 /-! ### Helpers -/
-
-/-- `ofReal ∘ φ` is dominated by the safe weight. -/
-lemma ofReal_phi_le_phiE {α t : ℝ} :
-    ENNReal.ofReal (phi α t) ≤ phiE α t := by
-  by_cases h : t < 1
-  · rw [phiE_of_lt h]
-  · rw [phiE, if_neg h]; exact le_top
 
 /-- On charged points of a row with finite directed potential, the bad degree
 is below one. -/
@@ -565,27 +556,5 @@ theorem PhiD_fourlaw_le {α δ L K : ℝ} (hα : 1 ≤ α) (hδ : 0 < δ)
           rw [← ENNReal.ofReal_add (by positivity) (by positivity)]
         rw [hsplitA, hsplitC]
         exact le_of_eq (by ring)
-
-/-- **Discharge of the four-law input for the tree potentials**: for a
-two-sided pattern pair (all eight directed tree potentials bounded by `Ψ`),
-the frozen-pattern square potential of the step hypothesis `hΓ`/`hFour`
-contracts. -/
-theorem fourLaw_tree {S : Type u} {α δ L K : ℝ} (hα : 1 ≤ α) (hδ : 0 < δ)
-    (hL0 : 0 ≤ L) (hL : ∀ t : ℝ, 0 ≤ t → t / (1 + t) ^ α ≤ L)
-    (hK0 : 0 < K) (hK : ∀ t : ℝ, 0 ≤ t → t ≤ 1 → t * (1 - t) ^ α ≤ K)
-    (P : S → PMF (S × S)) (R₀ : S → S → Prop)
-    (hsymm : ∀ a b, R₀ a b → R₀ b a) (n : ℕ) (σ τ : S × S) (Ψ : ℝ≥0∞)
-    (h00 : PhiM α P R₀ σ.1 τ.1 n ≤ Ψ) (h01 : PhiM α P R₀ σ.1 τ.2 n ≤ Ψ)
-    (h10 : PhiM α P R₀ σ.2 τ.1 n ≤ Ψ) (h11 : PhiM α P R₀ σ.2 τ.2 n ≤ Ψ)
-    (hr00 : PhiM α P R₀ τ.1 σ.1 n ≤ Ψ) (hr10 : PhiM α P R₀ τ.1 σ.2 n ≤ Ψ)
-    (hr01 : PhiM α P R₀ τ.2 σ.1 n ≤ Ψ) (hr11 : PhiM α P R₀ τ.2 σ.2 n ≤ Ψ) :
-    PhiD α (prodPMF (muM P σ.1 n) (muM P σ.2 n)) (prodPMF (muM P τ.1 n) (muM P τ.2 n))
-        (SquareRel (fullSim R₀ n))
-      ≤ ENNReal.ofReal (2 * L + 2 * (1 + δ) * K) * Ψ
-        + ENNReal.ofReal (2 * L * chordConst α + 20 + 2 * (1 + δ⁻¹) * α ^ 2) * Ψ ^ 2 :=
-  PhiD_fourlaw_le hα hδ hL0 hL hK0 hK
-    (muM P σ.1 n) (muM P σ.2 n) (muM P τ.1 n) (muM P τ.2 n)
-    (fullSim R₀ n) (fullSim_symm R₀ hsymm n) Ψ
-    h00 h01 h10 h11 hr00 hr10 hr01 hr11
 
 end GraphMarkovMatching

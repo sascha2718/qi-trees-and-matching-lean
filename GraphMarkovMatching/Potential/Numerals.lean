@@ -13,11 +13,17 @@ monotonicity of `Real.rpow` and polynomial arithmetic; no genuine
   `(1-t)^(5/2) ≤ (1-t)^2` on `[0,1]` (base in `[0,1]`, larger exponent)
   and `t(1-t)^2 ≤ 4/27`;
 * `delta3_A_lt_one`, `delta3_A_le`: at `δ = 1/8` the linear four-law
-  constant is `2L + 2(1+δ)K = 1/2 + 1/3 = 5/6 < 1`.
+  constant is `2L + 2(1+δ)K = 1/2 + 1/3 = 5/6 < 1`;
+* `two_rpow_five_half_le_eight`, `ennreal_two_rpow_five_half_le_eight`,
+  `chordConst_five_half_le`: the rpow numerals `2^{5/2} ≤ 8`, in `ℝ` and
+  in `ℝ≥0∞`, and `chordConst(5/2) ≤ 14`.
 -/
 import GraphMarkovMatching.Process.Ledger
 
 namespace GraphMarkovMatching
+
+open GraphMarkovMatching.Support
+open scoped ENNReal
 
 /-- The `L`-hypothesis of the restricted four-law at `α = 5/2` with the
 coarse constant `L = 1/4`: for `t ≥ 0`,
@@ -69,5 +75,33 @@ downstream rewriting. -/
 lemma delta3_A_le :
     (2 * (1 / 4 : ℝ) + 2 * (1 + (1 / 8 : ℝ)) * (4 / 27)) = 5 / 6 := by
   norm_num
+
+/-! ### rpow numerals -/
+
+/-- `2^{5/2} ≤ 8` in `ℝ`. -/
+lemma two_rpow_five_half_le_eight : (2 : ℝ) ^ ((5 : ℝ) / 2) ≤ 8 := by
+  calc (2 : ℝ) ^ ((5 : ℝ) / 2)
+      ≤ (2 : ℝ) ^ (3 : ℝ) :=
+        Real.rpow_le_rpow_of_exponent_le one_le_two (by norm_num)
+    _ = 8 := by
+        rw [show (3 : ℝ) = ((3 : ℕ) : ℝ) from by norm_num,
+          Real.rpow_natCast]
+        norm_num
+
+/-- `2^{5/2} ≤ 8` in `ℝ≥0∞`. -/
+lemma ennreal_two_rpow_five_half_le_eight :
+    (2 : ℝ≥0∞) ^ ((5 : ℝ) / 2) ≤ 8 := by
+  calc (2 : ℝ≥0∞) ^ ((5 : ℝ) / 2)
+      ≤ (2 : ℝ≥0∞) ^ (3 : ℝ) :=
+        ENNReal.rpow_le_rpow_of_exponent_le (by norm_num) (by norm_num)
+    _ = 8 := by
+        rw [show (3 : ℝ) = ((3 : ℕ) : ℝ) from by norm_num,
+          ENNReal.rpow_natCast]
+        norm_num
+
+/-- The chord constant at `α = 5/2` is at most `14`. -/
+lemma chordConst_five_half_le : chordConst ((5 : ℝ) / 2) ≤ 14 := by
+  rw [chordConst]
+  linarith [two_rpow_five_half_le_eight]
 
 end GraphMarkovMatching

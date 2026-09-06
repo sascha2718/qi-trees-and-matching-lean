@@ -61,16 +61,6 @@ lemma fullSim_root (R₀ : S → S → Prop) :
       rintro x y ⟨π, h⟩
       exact h.1
 
-/-- The squared form: a matched pair of subtree pairs has `R₀`-square-related
-root patterns. -/
-lemma squareRel_root (R₀ : S → S → Prop) (n : ℕ)
-    (p r : FullLab S n × FullLab S n) :
-    SquareRel (fullSim R₀ n) p r
-      → SquareRel R₀ (rootLab n p.1, rootLab n p.2) (rootLab n r.1, rootLab n r.2) := by
-  rintro (⟨h₁, h₂⟩ | ⟨h₁, h₂⟩)
-  · exact Or.inl ⟨fullSim_root R₀ n _ _ h₁, fullSim_root R₀ n _ _ h₂⟩
-  · exact Or.inr ⟨fullSim_root R₀ n _ _ h₁, fullSim_root R₀ n _ _ h₂⟩
-
 /-- Reflexivity propagates (identity automorphism). -/
 lemma fullSim_refl (R₀ : S → S → Prop) (h : ∀ v, R₀ v v) (n : ℕ)
     (x : FullLab S n) : fullSim R₀ n x x :=

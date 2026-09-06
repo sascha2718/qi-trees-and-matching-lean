@@ -14,8 +14,7 @@ about arbitrary infinite trees, and both are proved here over Mathlib's
   source walk, so the stability constant of quasi-geodesics is `D` itself and
   no hyperbolicity enters.
 * `IsRay`, `IsLine`: rays and lines as maps `ℕ → V` and `ℤ → V` that are
-  isometric onto their images.  `IsLine.isRay_right` and `IsLine.isRay_left`
-  split a line at a vertex, and `IsLine.exists_far` is the form the separation
+  isometric onto their images.  `IsLine.exists_far` is the form the separation
   consumes: one of the two half-rays runs away from any given vertex through
   the splitting point.
 * `IsHair`: a component of the complement of a single vertex, of depth `h`,
@@ -64,10 +63,6 @@ def Between (G : SimpleGraph V) (u m v : V) : Prop :=
 /-- The left endpoint lies between itself and any vertex. -/
 lemma between_left (G : SimpleGraph V) (u v : V) : Between G u u v :=
   fun p => p.start_mem_support
-
-/-- The right endpoint lies between any vertex and itself. -/
-lemma between_right (G : SimpleGraph V) (u v : V) : Between G u v v :=
-  fun p => p.end_mem_support
 
 /-- Betweenness is symmetric in its outer arguments. -/
 lemma Between.symm {u m v : V} (h : Between G u m v) : Between G v m u := by
@@ -171,31 +166,6 @@ def IsRay (G : SimpleGraph V) (r : ℕ → V) : Prop :=
 /-- A line: a map `ℤ → V` isometric onto its image. -/
 def IsLine (G : SimpleGraph V) (l : ℤ → V) : Prop :=
   ∀ m n, G.dist (l m) (l n) = (m - n).natAbs
-
-/-- The natural distance as the absolute value of the integer difference. -/
-lemma natDist_eq_natAbs (m n : ℕ) : Nat.dist m n = ((m : ℤ) - n).natAbs := by
-  unfold Nat.dist
-  omega
-
-/-- The half-line of a line to the right of a parameter is a ray. -/
-lemma IsLine.isRay_right {l : ℤ → V} (hl : IsLine G l) (k : ℤ) :
-    IsRay G (fun n => l (k + n)) := by
-  intro m n
-  rw [hl, natDist_eq_natAbs]
-  congr 1
-  ring
-
-/-- The half-line of a line to the left of a parameter is a ray. -/
-lemma IsLine.isRay_left {l : ℤ → V} (hl : IsLine G l) (k : ℤ) :
-    IsRay G (fun n => l (k - n)) := by
-  intro m n
-  rw [hl, natDist_eq_natAbs]
-  omega
-
-/-- Consecutive vertices of a line are adjacent. -/
-lemma IsLine.adj {l : ℤ → V} (hl : IsLine G l) (k : ℤ) : G.Adj (l k) (l (k + 1)) := by
-  rw [← dist_eq_one_iff_adj, hl]
-  omega
 
 /-- A line leaves a vertex through two distinct neighbours. -/
 lemma IsLine.ne {l : ℤ → V} (hl : IsLine G l) (k : ℤ) : l (k + 1) ≠ l (k - 1) := by

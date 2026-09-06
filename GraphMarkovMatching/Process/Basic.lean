@@ -83,15 +83,6 @@ def rootLab : (n : ℕ) → FullLab S n → S
 @[simp] lemma rootLab_branch {n : ℕ} (s : S) (p : FullLab S n × FullLab S n) :
     rootLab (n + 1) (branch s p) = s := rfl
 
-lemma leaf_rootLab (x : FullLab S 0) : leaf (rootLab 0 x) = x := rfl
-
-/-- `branch` is injective in the pair for fixed root, and determines the root. -/
-lemma branch_inj {n : ℕ} {s s' : S} {p p' : FullLab S n × FullLab S n}
-    (h : branch s p = branch s' p') : s = s' ∧ p = p' := by
-  have h1 : (branch s p).1 = (branch s' p').1 := by rw [h]
-  have h2 : (branch s p).2 = (branch s' p').2 := by rw [h]
-  exact ⟨h1, Prod.ext (congrArg Prod.fst h2) (congrArg Prod.snd h2)⟩
-
 /-! ### The tree law of a Markov label system -/
 
 variable (P : S → PMF (S × S))

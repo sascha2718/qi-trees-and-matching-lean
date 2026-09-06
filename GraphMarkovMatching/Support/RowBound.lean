@@ -7,7 +7,7 @@ With `d = max(q₀,q₁)`, `e = min(q₀,q₁)`, `u = 1-d`, `s = 1+d-2e`, and
 
     (d²+e²)/(u^α s^α) ≤ L(φ_α(d)+φ_α(e)) + (2L·c_α + 5/2)·φ_α(d)φ_α(e),
 
-for ANY constant `L` bounding `t ↦ t/(1+t)^α` at `t = d` (the caller supplies
+for any constant `L` bounding `t ↦ t/(1+t)^α` at `t = d` (the caller supplies
 `L = 1/(2α)` from `Maxima.lean`, or a sharper instance), with
 `c_α = 2(2^α - 1)` the chord constant of `Phi.lean`.
 
@@ -22,7 +22,7 @@ Two-case split:
 The coefficients stay symbolic throughout; no rational surrogates or
 numeric checks are needed.
 -/
-import GraphMarkovMatching.Support.Maxima
+import GraphMarkovMatching.Support.Phi
 
 namespace GraphMarkovMatching.Support
 

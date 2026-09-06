@@ -8,7 +8,6 @@ exactly two component successors.  In particular, no successor is the
 aggregate law `Tlaw` and no child-pair target is `XiBar`.
 -/
 import GraphMarkovMatching.Tail.Quenched
-import GraphMarkovMatching.Process.Ledger
 
 namespace GraphMarkovMatching
 
@@ -78,23 +77,6 @@ noncomputable def qChildren (μ : PMF V) (v0 : V) {h : ℕ}
 
 /-! ### Exact component child identities -/
 
-/-- A forced quenched target is its component child product with its fixed
-root attached. -/
-lemma qInterp_Z_succ (μ : PMF V) (v0 : V) {h : ℕ} (k : ℕ)
-    (e : FullLab ℕ (h + 1)) :
-    qInterp μ v0 (⟨QMode.Z k, e⟩ : QTgt (h + 1))
-      = (qChildren μ v0 (⟨QMode.Z k, e⟩ : QTgt (h + 1))).map
-          (branch (v0, k)) := by
-  rw [qInterp_Z, quenchedMuM_succ]
-  simp only [qChildren, qchild0, qchild1, QTgt.counter_Z]
-  by_cases h4 : 4 ≤ k
-  · simp only [h4, if_pos, qInterp_Z]
-  · by_cases h3 : k = 3
-    · subst k
-      simp only [show ¬ 4 ≤ 3 by omega, if_false, if_true, qInterp_Z, qInterp_F,
-        quenchedFresh]
-    · simp only [h4, h3, if_false, qInterp_F, quenchedFresh]
-
 /-- A fresh quenched target samples only its root state; below the root its
 law is the same component child product. -/
 lemma qInterp_F_succ (μ : PMF V) (v0 : V) {h : ℕ}
@@ -115,12 +97,5 @@ lemma qInterp_F_succ (μ : PMF V) (v0 : V) {h : ℕ}
       simp only [show ¬ 4 ≤ 3 by omega, if_false, if_true, qInterp_Z, qInterp_F,
         quenchedFresh]
     · simp only [h4, h3, if_false, qInterp_F, quenchedFresh]
-
-/-- The quenched child target is always a product of two component laws;
-there is no aggregate `XiBar` target. -/
-lemma qChildren_eq_prod (μ : PMF V) (v0 : V) {h : ℕ}
-    (t : QTgt (h + 1)) :
-    qChildren μ v0 t
-      = prodPMF (qInterp μ v0 (qchild0 t)) (qInterp μ v0 (qchild1 t)) := rfl
 
 end GraphMarkovMatching

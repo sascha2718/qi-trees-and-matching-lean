@@ -103,11 +103,7 @@ lemma measurableSet_jointBox (j : ℕ) (S : Finset (Fin N)) {A B : ℕ → Set (
     MeasurableSet (jointBox (N := N) j S A B i) := by
   cases i with
   | none =>
-      have h : jointBox (N := N) j S A B none
-          = (fun u : Branch N none → ℕ ↦ u rootIdx) ⁻¹' {j} := rfl
-      rw [h]
-      exact measurable_pi_apply (X := fun _ : Branch N none ↦ ℕ) rootIdx
-        MeasurableSet.of_discrete
+      exact measurableSet_rootIdx_preimage {j}
   | some i =>
       rw [jointBox_some]
       split

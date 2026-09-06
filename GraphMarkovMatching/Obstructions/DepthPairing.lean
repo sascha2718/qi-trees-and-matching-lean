@@ -120,18 +120,6 @@ theorem counterFiveFreshFrontier_depthSet :
   ext d
   simp [counterFiveFreshFrontier, or_comm]
 
-/-- The FIFO allocation of the two concrete cascade frontiers is already in
-lag phase `-2`, the phase predicted by the shifted increments
-`(3-1)-(5-1)=-2`. -/
-theorem counterThreeFive_fifo_phase :
-    HeavyQueueInvariant .n2
-      (fifoAllocate counterThreeFreshFrontier
-        counterFiveFreshFrontier).left
-      (fifoAllocate counterThreeFreshFrontier
-        counterFiveFreshFrontier).right := by
-  simp [HeavyQueueInvariant, counterThreeFreshFrontier,
-    counterFiveFreshFrontier, fifoAllocate, heavyLagValue]
-
 /-- The flat FIFO allocation pairs the depth-one fresh exit of counter `3`
 with a depth-three fresh exit of counter `5`. -/
 theorem counterThreeFive_fifo_not_depthCompatible :
@@ -170,11 +158,6 @@ comparison. -/
 def counterThreeFiveLedger : ExitLedger BinaryAddress BinaryAddress :=
   let A := fifoAllocate counterThreeFreshFrontier counterFiveFreshFrontier
   ⟨A.pairs, A.left, A.right⟩
-
-theorem counterThreeFiveLedger_phase :
-    HeavyQueueInvariant .n2 counterThreeFiveLedger.left
-      counterThreeFiveLedger.right := by
-  exact counterThreeFive_fifo_phase
 
 /-- No correction word can make the accumulated FIFO pair list
 depth-compatible, because the initial bad pair remains in the ledger. -/

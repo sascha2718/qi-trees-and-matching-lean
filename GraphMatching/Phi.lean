@@ -5,15 +5,15 @@ elementary facts the rest of the development needs:
 * `le_phiA`             `eq:phi-dominates`:  `t ≤ φ_α t` on `[0,1)`
 * `one_sub_rpow_leA`    the tangent line to `t ↦ t^α` at `t = 1`, used for `eq:W-bound`
 * `chordA`              `eq:iid-chord`:  `(1-z)^{-α} ≤ 1 + C_α z` on `[0,1/2]`
-* `phi_eq_sqrt`         the substitution `s = √(1-t)` that removes `rpow`
-                        from the analysis
+* `rpow_alpha_eq_sqrt_pow`  the substitution `s = √(1-t)` that removes `rpow`
+                        from the analysis at `α = 5/2`
 
-All three hold at an arbitrary exponent, as in the paper; `alpha`, `phi` and the
+The first two hold at an arbitrary exponent, as in the paper; `alpha`, `phi` and the
 unsuffixed lemmas are the instances at `α = 5/2`, where the numeric chain runs.
 
 The `rpow` at exponent `5/2` is the main obstacle to automation in this file.
-`phi_eq_sqrt` is the bridge that turns `φ` into a rational function of `s`,
-which is what makes `Maxima.lean` (M3) tractable.
+`rpow_alpha_eq_sqrt_pow` is the bridge that turns `φ` into a rational function of
+`s`, which is what makes `Maxima.lean` tractable.
 -/
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Analysis.Convex.SpecificFunctions.Basic
@@ -115,11 +115,6 @@ for a natural power of a square root, after which the estimates of
 lemma rpow_alpha_eq_sqrt_pow {x : ℝ} (hx : 0 ≤ x) : x ^ alpha = (Real.sqrt x) ^ (5 : ℕ) := by
   rw [Real.sqrt_eq_rpow, ← Real.rpow_natCast (x ^ (1 / (2 : ℝ))) 5, ← Real.rpow_mul hx]
   norm_num [alpha]
-
-/-- `φ t = t / (√(1-t))^5` on `(-∞,1)`: `φ` is a rational function of
-`s = √(1-t)`. -/
-lemma phi_eq_sqrt {t : ℝ} (ht : t < 1) : phi t = t / (Real.sqrt (1 - t)) ^ (5 : ℕ) := by
-  rw [phi, rpow_alpha_eq_sqrt_pow (by linarith : (0 : ℝ) ≤ 1 - t)]
 
 /-! ### The chord bound, `eq:iid-chord`
 

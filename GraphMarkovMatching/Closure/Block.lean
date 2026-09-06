@@ -14,8 +14,7 @@ certified in invariant form:
 * `screened_uniform_bound_mono` (`thm:engine`): the abstract closure with
   arbitrary monotone step functions `f, g`; under the closure inequalities
   `f(Kc·η, Ξ) ≤ Kc·η` and `g(Kc·η, Ξ) ≤ u`, the scalar satisfies
-  `Ψ_h ≤ Kc·η` uniformly in the height.  The earlier quadratic form
-  `screened_uniform_bound` is a special case, kept for reference.
+  `Ψ_h ≤ Kc·η` uniformly in the height.
 
 The matrix `N` need not be substochastic in any norm; only nilpotence and
 the invariant vector enter (tex: no operator norm and no substochasticity
@@ -152,61 +151,6 @@ theorem screened_uniform_bound_mono
           rw [← nilSum_fixed hnil i]
           exact add_le_add (le_trans (hg _ _ _ _ ihΨ hsup) hu)
             (mulVec_mono ihE i)
-  exact fun h => (main h).1
-
-/-- **The screened block recursion**: the joint invariant induction for the
-ordinary scalar `Ψ` and the screen vector `E`.  Under the nilpotence of the
-screen block, the two closure inequalities `hu` (the screen bound `u`
-absorbs its inhomogeneity) and `hclose` (the ordinary bound `Kc·η` absorbs
-the four-law contraction, the screen input `Ξ`, and the quadratic
-remainder), the matching-failure scalar satisfies `Ψ_h ≤ Kc·η` uniformly in
-the height.  The legacy quadratic form of the screened recursion,
-subsumed by `screened_uniform_bound_mono` (`thm:engine`). -/
-theorem screened_uniform_bound
-    {N : ι → ι → ℝ≥0∞} {r : ℕ} (hr : 0 < r)
-    (Ψ : ℕ → ℝ≥0∞) (E : ℕ → ι → ℝ≥0∞)
-    (A C c b c' b' η Kc u Ξ : ℝ≥0∞)
-    (hnil : (mulVec N)^[r] (fun _ => u) = fun _ => 0)
-    (hΞ : ∀ i, nilSum N r u i ≤ Ξ)
-    (hΨ0 : Ψ 0 ≤ c * η)
-    (hE0 : ∀ i, E 0 i ≤ u)
-    (hcK : c ≤ Kc)
-    (hΨstep : ∀ h, Ψ (h + 1) ≤
-      c * η + A * Ψ h + C * (⨆ i, E h i)
-        + b * (η + Ψ h + (⨆ i, E h i)) ^ 2)
-    (hEstep : ∀ h i, E (h + 1) i ≤
-      (c' * η + b' * (η + Ψ h + (⨆ i, E h i)) ^ 2) + mulVec N (E h) i)
-    (hu : c' * η + b' * (η + Kc * η + Ξ) ^ 2 ≤ u)
-    (hclose : c * η + A * (Kc * η) + C * Ξ + b * (η + Kc * η + Ξ) ^ 2 ≤ Kc * η) :
-    ∀ h, Ψ h ≤ Kc * η := by
-  have main : ∀ h, Ψ h ≤ Kc * η ∧ ∀ i, E h i ≤ nilSum N r u i := by
-    intro h
-    induction h with
-    | zero =>
-        refine ⟨le_trans hΨ0 (mul_le_mul_left hcK η), fun i => ?_⟩
-        exact le_trans (hE0 i)
-          (Finset.single_le_sum
-            (f := fun j => (mulVec N)^[j] (fun _ => u) i)
-            (fun j _ => zero_le) (Finset.mem_range.mpr hr))
-    | succ h ih =>
-        obtain ⟨ihΨ, ihE⟩ := ih
-        have hsup : (⨆ i, E h i) ≤ Ξ :=
-          iSup_le fun i => le_trans (ihE i) (hΞ i)
-        have hlin : η + Ψ h + (⨆ i, E h i) ≤ η + Kc * η + Ξ :=
-          add_le_add (add_le_add le_rfl ihΨ) hsup
-        have hquad : (η + Ψ h + (⨆ i, E h i)) ^ 2 ≤ (η + Kc * η + Ξ) ^ 2 := by
-          rw [pow_two, pow_two]
-          exact mul_le_mul' hlin hlin
-        constructor
-        · refine le_trans (hΨstep h) (le_trans ?_ hclose)
-          exact add_le_add (add_le_add (add_le_add le_rfl
-            (mul_le_mul_right ihΨ A)) (mul_le_mul_right hsup C))
-            (mul_le_mul_right hquad b)
-        · intro i
-          refine le_trans (hEstep h i) ?_
-          rw [← nilSum_fixed hnil i]
-          refine add_le_add ?_ (mulVec_mono ihE i)
-          exact le_trans (add_le_add le_rfl (mul_le_mul_right hquad b')) hu
   exact fun h => (main h).1
 
 end GraphMarkovMatching

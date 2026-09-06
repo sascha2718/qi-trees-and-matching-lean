@@ -4,7 +4,7 @@ field of offspring counts `c : Word N → ℕ` cuts out of the ambient `N`-ary t
 subtree in which each vertex `v` keeps its first `c v` children; the randomness enters
 later, through a random field `c`, and no measure theory appears here.
 
-* `sample`: the tree cut out by `c`, a `Subtree N`, with `mem_sample_iff`,
+* `sample`: the tree cut out by `c`, a `Subtree N`, with `mem_sample_iff'`,
   `nil_mem_sample` and the workhorse `mem_sample_append_singleton`.
 * `append_mem_sample_iff` and `subAt_sample`: the branching property, the residual
   subtree at a vertex of the sample is the sample of the shifted field.
@@ -41,11 +41,6 @@ def sample (c : Word N → ℕ) : Subtree N :=
     have h : (((v ++ [a])[i]'hi' : Fin N) : ℕ) < c ((v ++ [a]).take i) := hv i hi'
     rw [List.getElem_append_left hi, List.take_append_of_le_length hi.le] at h
     exact h⟩
-
-/-- Membership in the sample, unfolded. -/
-theorem mem_sample_iff {c : Word N → ℕ} {v : Word N} :
-    v ∈ sample c ↔ ∀ i, (h : i < v.length) → ((v.get ⟨i, h⟩ : Fin N) : ℕ) < c (v.take i) :=
-  Iff.rfl
 
 /-- The same condition indexed by `getElem`, the shape the proofs below consume. -/
 theorem mem_sample_iff' {c : Word N → ℕ} {v : Word N} :

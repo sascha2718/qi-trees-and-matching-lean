@@ -75,6 +75,24 @@ noncomputable def screenInd (R : X → X → Prop) (zs : List (PMF X)) (x : X) :
     ℝ≥0∞ :=
   if ∀ ρ ∈ zs, rE ρ R x = 0 then 1 else 0
 
+/-- The zero-event indicator is at most one. -/
+lemma screenInd_le_one (R : X → X → Prop) (zs : List (PMF X)) (x : X) :
+    screenInd R zs x ≤ 1 := by
+  rw [screenInd]
+  split_ifs <;> simp
+
+/-- Distributing a two-term pointwise bound over a weighted, indicated
+sum. -/
+lemma tsum_ind_split (ρs : PMF X) (c W P Q : X → ℝ≥0∞) (hW : ∀ y, W y ≤ P y + Q y) :
+    ∑' y, ρs y * (c y * W y)
+      ≤ (∑' y, ρs y * (c y * P y)) + ∑' y, ρs y * (c y * Q y) := by
+  rw [← ENNReal.tsum_add]
+  refine ENNReal.tsum_le_tsum fun y => ?_
+  calc ρs y * (c y * W y)
+      ≤ ρs y * (c y * (P y + Q y)) :=
+        mul_le_mul_right (mul_le_mul_right (hW y) _) _
+    _ = ρs y * (c y * P y) + ρs y * (c y * Q y) := by ring
+
 /-- The normalized screen `𝓔(ρ_s; z ↛ g)`: the `g`-tilted mass of the zero
 event of the list `zs` under the cell law `ρs`.  The normalization `g` is
 a single inverse degree (a diagonal reserve or a positive alternative); its

@@ -7,8 +7,8 @@ height-`h` coordinates of the same laws `cZ`/`cXi`/`cT`/`cXiBar`, for a
 source side `(exc1, μ, ν1, v0)` and a target side `(exc2, μ, ν2, v0)`
 sharing the graph law, the distinguished state, and the state relation
 `cRel Rv`.  This is the composite analogue of the one-law
-`VaryingCells`/`VaryingStep` layer, covering all tagged letters, markers
-included.
+`Process/Cells` and `Process/Descent` layer, covering all tagged letters,
+markers included.
 
 * `compK_state_blind`, `pairMix_compK`, `muM_compK_succ`,
   `cT_eq_freshQ_bind`: the composite kernel ignores the graph state, so
@@ -16,19 +16,12 @@ included.
 * `rE_cZ_succ_branch`, `qE_cZ_succ_branch`: the forced decomposition at a
   branch point, one lemma for all letters: the degree toward a frozen
   height-`(h+1)` law is the root indicator times the cell degree;
-* `rE_cZ_ord_none_of_ge_succ_branch` .. `rE_cZ_mark_le_two_succ_branch`:
-  the same identity with the cell resolved into its kernel shape:
-  deterministic children (ordinary `k ≥ 4`, markers at running value
-  `≥ 4` or `= 3`), one frozen child and one fresh child (ordinary `3`,
-  markers at running value `≤ 2`; the marker freezes the port
-  `(v0, ord b)` on the left), two fresh children (ordinary `k ≤ 2`), and
-  the exceptional entrance into the stage-zero marker cell;
 * `rE_cT_succ_branch`, `qE_cT_succ_branch`: the fresh decomposition: the
   degree toward the fresh law factorizes as the root ball mass times the
   mixture cell degree, and the bad degree as
   `q(v) + r(v)·q̄`;
-* `rE_cXiBar_eq_tsum`, `rE_cXiBar_eq_zero_iff`,
-  `mul_rE_cXi_le_rE_cXiBar`: the fresh cell mixture identity;
+* `rE_cXiBar_eq_zero_iff`: the fresh cell mixture dies exactly when every
+  charged component dies;
 * `cPhiDres_muM_cZ_succ`, `cPhiDres_cZ_cZ_succ`: forced source against
   forced target, an exact reduction to the square coordinate under the
   root indicator;
@@ -38,7 +31,6 @@ included.
   integrates to the graph potential `etaG` and the counter mixture splits
   the coordinate into the `ν1`-weighted sum over side-1 cells, the
   exceptional arities contributing their own `cXi (ord z)` cells;
-* `cPhiDres_cXiBar_eq`: source linearity of the mixture coordinate;
 * `qE_cT_zero`, `rE_cT_zero`, `cPhiDres_cZ_cZ_zero`, `cPhiDres_cT_cZ_zero`,
   `cPhiDres_cZ_cT_zero_le`, `cPhiDres_cT_cT_zero_le`: the height-zero base
   for all letter pairs.
@@ -110,107 +102,6 @@ lemma qE_cZ_succ_branch {v : V} (hv : Rv v v0) (cs c : CtrC) (h : ℕ)
   qE_succ_branch (compK exc μ ν v0) (cRel Rv)
     (show cRel Rv (v, cs) (v0, c) from hv) h xp
 
-/-! ### The forced decomposition in the three kernel shapes -/
-
-/-- Ordinary counter `k ≥ 4`, not exceptional: deterministic children. -/
-lemma rE_cZ_ord_none_of_ge_succ_branch {k : ℕ} (hk : exc k = none)
-    (h4 : 4 ≤ k) (v : V) (cs : CtrC) (h : ℕ)
-    (xp : FullLab (CState V) h × FullLab (CState V) h) :
-    rE (cZ exc μ ν v0 (CtrC.ord k) (h + 1)) (fullSim (cRel Rv) (h + 1))
-        (branch (v, cs) xp)
-      = if Rv v v0 then
-          rE (prodPMF (cZ exc μ ν v0 (CtrC.ord (k / 2)) h)
-              (cZ exc μ ν v0 (CtrC.ord (k - k / 2)) h))
-            (SquareRel (fullSim (cRel Rv) h)) xp
-        else 0 := by
-  rw [rE_cZ_succ_branch Rv exc μ ν v0 v cs (CtrC.ord k) h xp,
-    cXi_ord_none_of_ge exc μ ν v0 hk h4 h]
-
-/-- Ordinary counter `3`, not exceptional: frozen `(v0, ord 2)` on the
-left, fresh right child. -/
-lemma rE_cZ_ord_none_three_succ_branch {k : ℕ} (hk : exc k = none)
-    (h3 : k = 3) (v : V) (cs : CtrC) (h : ℕ)
-    (xp : FullLab (CState V) h × FullLab (CState V) h) :
-    rE (cZ exc μ ν v0 (CtrC.ord k) (h + 1)) (fullSim (cRel Rv) (h + 1))
-        (branch (v, cs) xp)
-      = if Rv v v0 then
-          rE (prodPMF (cZ exc μ ν v0 (CtrC.ord 2) h) (cT exc μ ν v0 h))
-            (SquareRel (fullSim (cRel Rv) h)) xp
-        else 0 := by
-  rw [rE_cZ_succ_branch Rv exc μ ν v0 v cs (CtrC.ord k) h xp,
-    cXi_ord_none_three exc μ ν v0 hk h3 h]
-
-/-- Ordinary counter `≤ 2`, not exceptional: two fresh children. -/
-lemma rE_cZ_ord_none_le_two_succ_branch {k : ℕ} (hk : exc k = none)
-    (h2 : k ≤ 2) (v : V) (cs : CtrC) (h : ℕ)
-    (xp : FullLab (CState V) h × FullLab (CState V) h) :
-    rE (cZ exc μ ν v0 (CtrC.ord k) (h + 1)) (fullSim (cRel Rv) (h + 1))
-        (branch (v, cs) xp)
-      = if Rv v v0 then
-          rE (prodPMF (cT exc μ ν v0 h) (cT exc μ ν v0 h))
-            (SquareRel (fullSim (cRel Rv) h)) xp
-        else 0 := by
-  rw [rE_cZ_succ_branch Rv exc μ ν v0 v cs (CtrC.ord k) h xp,
-    cXi_ord_none_le_two exc μ ν v0 hk h2 h]
-
-/-- Exceptional counter: the chart entrance, the cell of the stage-zero
-marker of its declared pair. -/
-lemma rE_cZ_ord_exc_succ_branch {z : ℕ} {p : ℕ × ℕ} (hz : exc z = some p)
-    (v : V) (cs : CtrC) (h : ℕ)
-    (xp : FullLab (CState V) h × FullLab (CState V) h) :
-    rE (cZ exc μ ν v0 (CtrC.ord z) (h + 1)) (fullSim (cRel Rv) (h + 1))
-        (branch (v, cs) xp)
-      = if Rv v v0 then
-          rE (cXi exc μ ν v0 (CtrC.mark p.1 p.2 0) h)
-            (SquareRel (fullSim (cRel Rv) h)) xp
-        else 0 := by
-  rw [rE_cZ_succ_branch Rv exc μ ν v0 v cs (CtrC.ord z) h xp,
-    cXi_ord_exc exc μ ν v0 hz h]
-
-/-- Marker at running value `≥ 4`: deterministic children, the advanced
-marker on the left. -/
-lemma rE_cZ_mark_of_ge_succ_branch {a b i : ℕ} (hval : 4 ≤ val a i)
-    (v : V) (cs : CtrC) (h : ℕ)
-    (xp : FullLab (CState V) h × FullLab (CState V) h) :
-    rE (cZ exc μ ν v0 (CtrC.mark a b i) (h + 1)) (fullSim (cRel Rv) (h + 1))
-        (branch (v, cs) xp)
-      = if Rv v v0 then
-          rE (prodPMF (cZ exc μ ν v0 (CtrC.mark a b (i + 1)) h)
-              (cZ exc μ ν v0 (CtrC.ord (val a i - val a i / 2)) h))
-            (SquareRel (fullSim (cRel Rv) h)) xp
-        else 0 := by
-  rw [rE_cZ_succ_branch Rv exc μ ν v0 v cs (CtrC.mark a b i) h xp,
-    cXi_mark_of_ge exc μ ν v0 hval h]
-
-/-- Marker at running value `3`: deterministic children, the port
-`(v0, ord b)` delivered on the right. -/
-lemma rE_cZ_mark_three_succ_branch {a b i : ℕ} (hval : val a i = 3)
-    (v : V) (cs : CtrC) (h : ℕ)
-    (xp : FullLab (CState V) h × FullLab (CState V) h) :
-    rE (cZ exc μ ν v0 (CtrC.mark a b i) (h + 1)) (fullSim (cRel Rv) (h + 1))
-        (branch (v, cs) xp)
-      = if Rv v v0 then
-          rE (prodPMF (cZ exc μ ν v0 (CtrC.ord 2) h)
-              (cZ exc μ ν v0 (CtrC.ord b) h))
-            (SquareRel (fullSim (cRel Rv) h)) xp
-        else 0 := by
-  rw [rE_cZ_succ_branch Rv exc μ ν v0 v cs (CtrC.mark a b i) h xp,
-    cXi_mark_three exc μ ν v0 hval h]
-
-/-- Marker at running value `≤ 2`: the frozen port `(v0, ord b)` on the
-left, fresh right child. -/
-lemma rE_cZ_mark_le_two_succ_branch {a b i : ℕ} (hval : val a i ≤ 2)
-    (v : V) (cs : CtrC) (h : ℕ)
-    (xp : FullLab (CState V) h × FullLab (CState V) h) :
-    rE (cZ exc μ ν v0 (CtrC.mark a b i) (h + 1)) (fullSim (cRel Rv) (h + 1))
-        (branch (v, cs) xp)
-      = if Rv v v0 then
-          rE (prodPMF (cZ exc μ ν v0 (CtrC.ord b) h) (cT exc μ ν v0 h))
-            (SquareRel (fullSim (cRel Rv) h)) xp
-        else 0 := by
-  rw [rE_cZ_succ_branch Rv exc μ ν v0 v cs (CtrC.mark a b i) h xp,
-    cXi_mark_le_two exc μ ν v0 hval h]
-
 /-! ### The fresh decomposition and the mixture identity -/
 
 /-- **The fresh decomposition**: the good degree toward the composite
@@ -254,16 +145,6 @@ lemma rE_cT_succ_branch (v : V) (cs : CtrC) (h : ℕ)
       rw [h2]
       rfl
 
-/-- The fresh cell mixture identity:
-`r_{·|Ξ̄} = ∑_k ν_k r_{·|Ξ_k}` at the composite cells. -/
-lemma rE_cXiBar_eq_tsum (h : ℕ)
-    (R : FullLab (CState V) h × FullLab (CState V) h
-      → FullLab (CState V) h × FullLab (CState V) h → Prop)
-    (xp : FullLab (CState V) h × FullLab (CState V) h) :
-    rE (cXiBar exc μ ν v0 h) R xp
-      = ∑' k, ν k * rE (cXi exc μ ν v0 (CtrC.ord k) h) R xp := by
-  rw [cXiBar, rE_bind]
-
 /-- A zero degree toward the fresh cell mixture forces a zero degree
 toward every charged component. -/
 lemma rE_cXiBar_eq_zero_iff (h : ℕ)
@@ -273,16 +154,6 @@ lemma rE_cXiBar_eq_zero_iff (h : ℕ)
     rE (cXiBar exc μ ν v0 h) R xp = 0 ↔
       ∀ k, ν k = 0 ∨ rE (cXi exc μ ν v0 (CtrC.ord k) h) R xp = 0 := by
   rw [cXiBar, rE_bind_eq_zero_iff]
-
-/-- One charged cell already bounds the mixture degree from below. -/
-lemma mul_rE_cXi_le_rE_cXiBar (h : ℕ)
-    (R : FullLab (CState V) h × FullLab (CState V) h
-      → FullLab (CState V) h × FullLab (CState V) h → Prop)
-    (xp : FullLab (CState V) h × FullLab (CState V) h) (k : ℕ) :
-    ν k * rE (cXi exc μ ν v0 (CtrC.ord k) h) R xp
-      ≤ rE (cXiBar exc μ ν v0 h) R xp := by
-  rw [cXiBar]
-  exact mul_rE_le_rE_bind ν _ R xp k
 
 /-- **The root factorisation of the bad degree**: against the composite
 fresh law, the bad degree of an attached sample is exactly
@@ -415,16 +286,6 @@ lemma rE_cT_zero (v : V) (c : CtrC) :
   calc rE (cT exc μ ν v0 0) (fullSim (cRel Rv) 0) (leaf (v, c))
       = 1 - qE μ Rv v := ENNReal.eq_sub_of_add_eq qE_ne_top h1
     _ = rE μ Rv v := (ENNReal.eq_sub_of_add_eq qE_ne_top h2).symm
-
-/-- Source linearity of the mixture coordinate: a `Ξ̄`-source restricted
-potential is the `ν`-average of its cell coordinates. -/
-lemma cPhiDres_cXiBar_eq (h : ℕ)
-    (ρt : PMF (FullLab (CState V) h × FullLab (CState V) h))
-    (R : FullLab (CState V) h × FullLab (CState V) h
-      → FullLab (CState V) h × FullLab (CState V) h → Prop) :
-    PhiDres α (cXiBar exc μ ν v0 h) ρt R
-      = ∑' k, ν k * PhiDres α (cXi exc μ ν v0 (CtrC.ord k) h) ρt R := by
-  rw [cXiBar, PhiDres_bind_left]
 
 end OneSide
 

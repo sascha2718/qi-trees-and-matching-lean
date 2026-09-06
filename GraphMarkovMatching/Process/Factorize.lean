@@ -13,14 +13,7 @@ the two children (quadratic products of singleton screens).
   product of the two dead-component counting sums;
 * `hallFactorize`: the integrated form: the tilted dead-event mass is
   below two full-list screens times tilted moments plus a product of
-  summed singleton screens;
-* `weighted_diag_tilt_le`: on a reflexive relation the diagonal square
-  tilt is pointwise below the product of the two child diagonal tilts
-  wherever the weight charges the point;
-* `screenE_diag_eq_WresD`: the raw diagonal tilt and the restricted
-  inverse degree normalize a screen identically;
-* `tsum_mul_WresD_diag_le`: the diagonal inverse moment is at most
-  `1 + α·Φres(ρ → ρ)`.
+  summed singleton screens.
 -/
 import GraphMarkovMatching.Process.Coordinates
 
@@ -264,75 +257,5 @@ lemma hallFactorize {X : Type} (ρa ρb : PMF X) (R : X → X → Prop)
                   if rE ρ R x = 0 then (1 : ℝ≥0∞) else 0).sum * G₁ x),
             tsum_deadSum_eq ρa R zs G₀, tsum_deadSum_eq ρb R zs G₁]
         rw [e0, e1, e2]
-
-/-! ### The diagonal tilt row -/
-
-/-- On a reflexive relation the diagonal square tilt is pointwise below
-the product of the two child diagonal tilts wherever the weight charges
-the point: the straight pairing minorizes the square degree, and the
-negative power flips the bound. -/
-lemma weighted_diag_tilt_le {X : Type} {α : ℝ} (hα0 : 0 ≤ α)
-    (ρa ρb : PMF X) (R : X → X → Prop) (hrefl : ∀ x, R x x)
-    (xp : X × X) (c : ℝ≥0∞) :
-    prodPMF ρa ρb xp * (c * (rE (prodPMF ρa ρb) (SquareRel R) xp) ^ (-α))
-      ≤ prodPMF ρa ρb xp
-        * (c * ((rE ρa R xp.1) ^ (-α) * (rE ρb R xp.2) ^ (-α))) := by
-  obtain ⟨x₀, x₁⟩ := xp
-  by_cases ha : ρa x₀ = 0
-  · simp [ha]
-  by_cases hb : ρb x₁ = 0
-  · simp [hb]
-  have hlea : ρa x₀ ≤ rE ρa R x₀ := le_rE_of_refl (hrefl x₀)
-  have hleb : ρb x₁ ≤ rE ρb R x₁ := le_rE_of_refl (hrefl x₁)
-  have ha' : rE ρa R x₀ ≠ 0 := fun h0 =>
-    ha (le_antisymm (h0 ▸ hlea) zero_le)
-  have hb' : rE ρb R x₁ ≠ 0 := fun h0 =>
-    hb (le_antisymm (h0 ▸ hleb) zero_le)
-  refine mul_le_mul_right (mul_le_mul_right ?_ c) _
-  calc (rE (prodPMF ρa ρb) (SquareRel R) (x₀, x₁)) ^ (-α)
-      ≤ (rE ρa R x₀ * rE ρb R x₁) ^ (-α) :=
-        rpow_neg_antitone hα0 (straight_le_rE_square ρa ρb R x₀ x₁)
-    _ = (rE ρa R x₀) ^ (-α) * (rE ρb R x₁) ^ (-α) :=
-        ENNReal.mul_rpow_of_ne_zero ha' hb' (-α)
-
-/-- The raw diagonal tilt and the restricted inverse degree normalize a
-screen identically: on the dead set of the cell law both integrands
-carry zero mass, and on the live set reflexivity makes the good degree
-positive, where the two normalizations agree. -/
-lemma screenE_diag_eq_WresD {X : Type} {α : ℝ} (ρs : PMF X)
-    (R : X → X → Prop) (hrefl : ∀ x, R x x) (zs : List (PMF X)) :
-    screenE ρs R zs (fun x => (rE ρs R x) ^ (-α))
-      = screenE ρs R zs (WresD α ρs R) := by
-  unfold screenE
-  refine tsum_congr fun x => ?_
-  by_cases hx : ρs x = 0
-  · simp [hx]
-  · have hle : ρs x ≤ rE ρs R x := le_rE_of_refl (hrefl x)
-    have hne : rE ρs R x ≠ 0 := fun h0 =>
-      hx (le_antisymm (h0 ▸ hle) zero_le)
-    show ρs x * screenInd R zs x * (rE ρs R x) ^ (-α)
-        = ρs x * screenInd R zs x * WresD α ρs R x
-    rw [rE_rpow_neg_eq_WresD ρs R x hne]
-
-/-- **The diagonal inverse moment**: the raw diagonal tilt integrates to
-at most `1 + α·Φres(ρ → ρ)`, by replacing the tilt with the restricted
-inverse degree on the live set. -/
-lemma tsum_mul_WresD_diag_le {X : Type} {α : ℝ} (hα : 1 ≤ α) (ρs : PMF X)
-    (R : X → X → Prop) (hrefl : ∀ x, R x x) :
-    ∑' x, ρs x * (rE ρs R x) ^ (-α)
-      ≤ 1 + ENNReal.ofReal α * PhiDres α ρs ρs R := by
-  have heq : ∀ x, ρs x * (rE ρs R x) ^ (-α)
-      = ρs x * WresD α ρs R x := by
-    intro x
-    by_cases hx : ρs x = 0
-    · rw [hx, zero_mul, zero_mul]
-    · have hle : ρs x ≤ rE ρs R x := le_rE_of_refl (hrefl x)
-      have hne : rE ρs R x ≠ 0 := fun h0 =>
-        hx (le_antisymm (h0 ▸ hle) zero_le)
-      rw [rE_rpow_neg_eq_WresD ρs R x hne]
-  calc ∑' x, ρs x * (rE ρs R x) ^ (-α)
-      = ∑' x, ρs x * WresD α ρs R x := tsum_congr heq
-    _ ≤ 1 + ENNReal.ofReal α * PhiDres α ρs ρs R :=
-        tsum_WresD_le hα ρs ρs R
 
 end GraphMarkovMatching

@@ -7,7 +7,6 @@ Bridging lemmas for the screen-row compositions
 * `screenE_one_eq_zMass`: unit-tilt singleton screens are zero masses;
 * `zMass_self`: the diagonal zero mass vanishes (reflexivity keeps every
   support atom's own mass in the good degree);
-* `zMass_le_one`: masses are subprobabilities;
 * `screenE_tilt_self`: a screen whose zero list is its own tilt law
   vanishes (the restricted tilt is zero exactly on the dead event the
   screen charges).
@@ -115,15 +114,5 @@ lemma screenE_tilt_self (α : ℝ) (ρs : PMF X) (R : X → X → Prop)
       rw [screenInd,
         if_neg (fun hall => hx (hall ρ (List.mem_singleton_self ρ)))],
       mul_zero, zero_mul]
-
-/-- Zero masses are subprobabilities. -/
-lemma zMass_le_one (ρs ρt : PMF X) (R : X → X → Prop) :
-    zMass ρs ρt R ≤ 1 := by
-  rw [zMass]
-  calc ∑' y, ρs y * (if rE ρt R y = 0 then 1 else 0)
-      ≤ ∑' y, ρs y * 1 :=
-        ENNReal.tsum_le_tsum fun y =>
-          mul_le_mul_right (by split_ifs <;> simp) _
-    _ = 1 := by rw [tsum_congr fun y => mul_one (ρs y), ρs.tsum_coe]
 
 end GraphMarkovMatching

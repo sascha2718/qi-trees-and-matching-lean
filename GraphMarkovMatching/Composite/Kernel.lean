@@ -309,9 +309,6 @@ lemma mul_prodPMF_le_prodPMF_right {A B : Type} (p : ℝ≥0∞)
     p * (ρ z.1 * τ z.2) = ρ z.1 * (p * τ z.2) := by ring
     _ ≤ ρ z.1 * τ' z.2 := mul_le_mul_right (hτ z.2) _
 
-lemma pmf_apply_le_one {A : Type} (p : PMF A) (a : A) : p a ≤ 1 :=
-  (ENNReal.le_tsum a).trans_eq p.tsum_coe
-
 /-! ### The replacement component -/
 
 /-- The replacement subtree of a pair with port continuation `b`, below a
@@ -344,7 +341,7 @@ theorem mul_repZ_le_cZ (b : ℕ) :
   | zero =>
       intro v hv x
       have hle : μ v0 * ν b ≤ 1 :=
-        mul_le_one' (pmf_apply_le_one μ v0) (pmf_apply_le_one ν b)
+        mul_le_one' (PMF.coe_le_one μ v0) (PMF.coe_le_one ν b)
       calc (μ v0 * ν b) * repZ exc μ ν v0 b v 0 x
           ≤ 1 * repZ exc μ ν v0 b v 0 x := mul_le_mul_left hle _
         _ = repZ exc μ ν v0 b v 0 x := one_mul _

@@ -13,7 +13,7 @@ The proofs are the two-measure transcriptions of the one-law identities of
 `GraphMarkovMatching.Support.Square`. `toReal` forms and the `ℝ≥0∞` two-product
 arithmetic-mean bound close the file.
 -/
-import GraphMarkovMatching.Potential.DirectedProduct
+import GraphMarkovMatching.FourLaw.Base
 import GraphMarkovMatching.Support.Contraction
 
 namespace GraphMarkovMatching

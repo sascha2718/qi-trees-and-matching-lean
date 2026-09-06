@@ -3,10 +3,8 @@ The source ray of an infinite screen path
 (`arbitrary_offspring_matching.tex`, `thm:source-ray` and the source
 side of `thm:nilpotence`):
 along a `screenSucc`-path the zero list iterates `zsucc` and the source
-cell follows an admissible descent; from a fresh cell the path returns
-to a fresh cell after exactly a return length of the support; combined
-with coverage and the target-ray realization this self-prunes any path
-seeded at a fresh comparison.
+cell follows an admissible descent, and from a fresh cell the path
+returns to a fresh cell after exactly a return length of the support.
 
 * `screenSucc_zlist` / `screenSucc_cell`: the components of a successor
   screen;
@@ -14,13 +12,7 @@ seeded at a fresh comparison.
   entered the forced cascade of a counter `k` reaches the fresh cell
   after a length in `toFresh k`;
 * `cellPath_F_return` (`thm:source-ray` (b)): from a fresh cell the
-  path returns to a fresh cell after a length in `𝒟_ν`;
-* `screenPath_self_prune`: an infinite screen path whose seed has a
-  fresh cell and the fresh state in its zero list reaches a screen
-  whose zero list contains its own cell, so its value vanishes by
-  diagonal pruning (`thm:pruning`).  Recorded for its own sake; the
-  acyclicity proof of `thm:nilpotence` goes through
-  `no_anchored_live_path` instead.
+  path returns to a fresh cell after a length in `𝒟_ν`.
 -/
 import GraphMarkovMatching.Grammar.Descend
 
@@ -129,33 +121,5 @@ lemma one_le_of_mem_depthSet {S : Finset ℕ} {d : ℕ}
     (hd : d ∈ depthSet S) : 1 ≤ d := by
   obtain ⟨k, _, hdk⟩ := Finset.mem_biUnion.mp hd
   exact one_le_of_mem_toFresh k d hdk
-
-/-- **Self-pruning of fresh-seeded screen paths**: an infinite screen
-path whose seed has a fresh cell and the fresh state in its zero list
-reaches, after one return length, a screen whose zero list contains
-its own cell, whose value vanishes by diagonal pruning.  Recorded for
-its own sake; `thm:nilpotence` is proved through
-`no_anchored_live_path`. -/
-theorem screenPath_self_prune {S : Finset ℕ} (sc : ℕ → GScreen)
-    (hpath : ∀ n, sc (n + 1) ∈ screenSucc S (sc n))
-    (hcell : (sc 0).cell = Tgt.F) (hz : Tgt.F ∈ (sc 0).zlist) :
-    ∃ n, 1 ≤ n ∧ (sc n).cell ∈ (sc n).zlist := by
-  have hcpath : ∀ n, (sc (n + 1)).cell ∈ tgtSucc S ((sc n).cell) :=
-    fun n => screenSucc_cell (hpath n)
-  have hzl : ∀ n, (sc n).zlist = (zsucc S)^[n] ((sc 0).zlist) := by
-    intro n
-    induction n with
-    | zero => rfl
-    | succ n ihn =>
-        rw [Function.iterate_succ_apply', ← ihn]
-        exact screenSucc_zlist (hpath n)
-  obtain ⟨m, hmD, hmF⟩ :=
-    cellPath_F_return (c := fun n => (sc n).cell) hcpath (n := 0) hcell
-  rw [Nat.zero_add] at hmF
-  refine ⟨m, one_le_of_mem_depthSet hmD, ?_⟩
-  rw [hmF, hzl m]
-  exact mem_zsucc_iter_of_descend hz
-    (descend_closure (AddSubmonoid.subset_closure
-      (Finset.mem_coe.mpr hmD)))
 
 end GraphMarkovMatching

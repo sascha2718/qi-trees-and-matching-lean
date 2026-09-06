@@ -7,8 +7,6 @@ The numeric closure of the `ν = δ₃` matching theorem
 `u = 16·η`, `Ξ = 320·η` whenever `2³⁰·η ≤ 1`, where `η` is the label
 budget `etaG`.
 
-* `two_rpow_five_half_le_eight` / `chordConst_five_half_le`: the rpow
-  numerals `2^{5/2} ≤ 8` and `chordConst(5/2) ≤ 14`;
 * `delta3Far_le` / `delta3FarMass_le`: the far masses are at most
   `2η` (the zero-interface far tail, with the root condition swapped
   by symmetry);
@@ -19,6 +17,7 @@ budget `etaG`.
   at every height is at most `16384·η`.
 -/
 import GraphMarkovMatching.Delta3.Assembled
+import GraphMarkovMatching.Potential.Numerals
 
 namespace GraphMarkovMatching
 
@@ -26,34 +25,6 @@ open GraphMarkovMatching.Support
 open scoped ENNReal Classical
 
 variable {V : Type} (Rv : V → V → Prop) (μ : PMF V) (v0 : V)
-
-/-! ### rpow numerals -/
-
-/-- `2^{5/2} ≤ 8` in `ℝ`. -/
-lemma two_rpow_five_half_le_eight : (2 : ℝ) ^ ((5 : ℝ) / 2) ≤ 8 := by
-  calc (2 : ℝ) ^ ((5 : ℝ) / 2)
-      ≤ (2 : ℝ) ^ (3 : ℝ) :=
-        Real.rpow_le_rpow_of_exponent_le one_le_two (by norm_num)
-    _ = 8 := by
-        rw [show (3 : ℝ) = ((3 : ℕ) : ℝ) from by norm_num,
-          Real.rpow_natCast]
-        norm_num
-
-/-- `2^{5/2} ≤ 8` in `ℝ≥0∞`. -/
-lemma ennreal_two_rpow_five_half_le_eight :
-    (2 : ℝ≥0∞) ^ ((5 : ℝ) / 2) ≤ 8 := by
-  calc (2 : ℝ≥0∞) ^ ((5 : ℝ) / 2)
-      ≤ (2 : ℝ≥0∞) ^ (3 : ℝ) :=
-        ENNReal.rpow_le_rpow_of_exponent_le (by norm_num) (by norm_num)
-    _ = 8 := by
-        rw [show (3 : ℝ) = ((3 : ℕ) : ℝ) from by norm_num,
-          ENNReal.rpow_natCast]
-        norm_num
-
-/-- The chord constant at `α = 5/2` is at most `14`. -/
-lemma chordConst_five_half_le : chordConst ((5 : ℝ) / 2) ≤ 14 := by
-  rw [chordConst]
-  linarith [two_rpow_five_half_le_eight]
 
 /-! ### The far masses -/
 

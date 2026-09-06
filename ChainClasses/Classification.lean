@@ -14,6 +14,6 @@ modules.
   for offspring laws.
 * `same_class_ae` and `different_class_ae` expose its two conclusions separately.
 
-The implementation remains in `ChainClasses.Trichotomy`, `ChainClasses.GeneralTrichotomy`, and
-`ChainClasses.ChainSeparationProof`.
+The implementation remains in `ChainClasses.Bushy.Trichotomy`, `ChainClasses.Universality.GeneralTrichotomy`, and
+`ChainClasses.Universality.ChainSeparationProof`.
 -/

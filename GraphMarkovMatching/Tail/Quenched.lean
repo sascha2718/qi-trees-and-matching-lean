@@ -15,6 +15,7 @@ structural theorem below says that averaging the quenched law recovers the
 original Markov law exactly.
 -/
 import GraphMarkovMatching.Process.Cells
+import GraphMarkovMatching.Process.Ledger
 
 namespace GraphMarkovMatching
 
@@ -115,16 +116,6 @@ lemma quenchedMuM_succ (s : V × ℕ) (h : ℕ) (e : FullLab ℕ (h + 1)) :
            else
              prodPMF Lfresh Rfresh
          children.map (branch s)) := rfl
-
-/-- The counter at the root of the environment is irrelevant once the
-started label (and hence its counter) is fixed. -/
-lemma quenchedMuM_succ_envRoot_irrel (s : V × ℕ) (h : ℕ)
-    (e : FullLab ℕ (h + 1)) (k : ℕ) :
-    quenchedMuM μ v0 s (h + 1) e
-      = quenchedMuM μ v0 s (h + 1)
-          (branch k (envLeft e, envRight e)) := by
-  rw [quenchedMuM_succ, quenchedMuM_succ]
-  rfl
 
 /-! ### Environment averaging -/
 
@@ -315,11 +306,6 @@ theorem counterEnv_bind_quenched (h : ℕ) :
         exact hpair
 
 /-! ### Annealed failure as a quenched average -/
-
-/-- The directed mismatch mass between two laws. -/
-noncomputable def failureD {X : Type} (ρs ρt : PMF X)
-    (R : X → X → Prop) : ℝ≥0∞ :=
-  ∑' x, ρs x * qE ρt R x
 
 /-- Mismatch mass is bilinear under mixtures of the source and target
 laws.  Unlike `PhiD`, this identity has no convexity or inverse-degree

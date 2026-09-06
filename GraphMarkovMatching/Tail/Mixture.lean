@@ -11,7 +11,6 @@ This identity alone is not a closure theorem.  Its aggregate inverse tilt
 must still be controlled by a weighted ordinary/screen ledger.
 -/
 import GraphMarkovMatching.Process.Ledger
-import GraphMarkovMatching.Process.Screens
 
 namespace GraphMarkovMatching
 

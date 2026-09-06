@@ -7,16 +7,12 @@ whose height-`n` pair law is the product of two process laws, admit a
 single automorphism of the infinite binary tree matching every vertex
 with probability at least `1 - 16384·η`.
 
-* `Tlaw_map_restrictLab`: the marginal consistency of the process law
-  (the fact any trajectory construction must verify), from the generic
-  root-mixture consistency of the Markov tree law;
-* `delta3Matching_infinite`: the infinite-tree theorem, an instance of
-  the generic interface `infinite_tree_matchingK_prob` with the level
-  failure bounds supplied by `delta3_failure_le`.
+* `delta3Matching_infinite`: the infinite-tree theorem, the instance of
+  `varyingMatching_infinite` with the level failure bounds supplied by
+  `delta3_failure_le`.
 -/
 import GraphMarkovMatching.Delta3.NumericClose
-import GraphMarkovMatching.Closure.Measure
-import GraphMarkovMatching.Support.Trajectory
+import GraphMarkovMatching.Closure.Infinite
 
 namespace GraphMarkovMatching
 
@@ -25,13 +21,6 @@ open scoped ENNReal Classical
 open MeasureTheory
 
 variable {V : Type} (Rv : V → V → Prop) (μ : PMF V) (v0 : V)
-
-/-- **Marginal consistency of the process law**: restricting a
-height-`(n + 1)` sample of the varying-offspring process to height `n`
-recovers the height-`n` law. -/
-lemma Tlaw_map_restrictLab (ν : PMF ℕ) (n : ℕ) :
-    (Tlaw μ ν v0 (n + 1)).map (restrictLab n) = Tlaw μ ν v0 n :=
-  mix_map_restrictLab (varyK μ ν v0) (freshQ μ ν) n
 
 /-- **The `δ₃` matching theorem on the infinite tree.**  Two
 independent infinite pure-ternary varying-offspring labellings, given
@@ -56,19 +45,9 @@ theorem delta3Matching_infinite {Ω : Type*} [MeasurableSpace Ω]
             (Tlaw μ (PMF.pure 3) v0 n)).toMeasure) :
     1 - 16384 * etaG (5 / 2) Rv μ
       ≤ Pm {ω | InfMatch (labRel Rv)
-          (fun n => X n ω) (fun n => Y n ω)} := by
-  refine infinite_tree_matchingK_prob Pm (labRel Rv) 1 0 X Y hX hY
-    (fun n => ?_) _ (fun n => ?_)
-  · exact (hpair n)
-      ((Set.to_countable
-        {p : FullLab (V × ℕ) n × FullLab (V × ℕ) n
-          | fullSimK (labRel Rv) 1 0 n p.1 p.2}).measurableSet)
-  · rw [show {ω | ¬ fullSimK (labRel Rv) 1 0 n (X n ω) (Y n ω)}
-          = (fun ω => (X n ω, Y n ω)) ⁻¹'
-              {p | ¬ fullSimK (labRel Rv) 1 0 n p.1 p.2} from rfl,
-      ← Measure.map_apply (hpair n) ((Set.to_countable _).measurableSet),
-      hlaw n, prodPMF_toMeasure_not_rel]
-    exact delta3_failure_le Rv μ v0 hRv hsymm hhalf hsmall n
+          (fun n => X n ω) (fun n => Y n ω)} :=
+  varyingMatching_infinite Rv μ (PMF.pure 3) v0 Pm _
+    (fun n => delta3_failure_le Rv μ v0 hRv hsymm hhalf hsmall n) X Y hX hY hpair hlaw
 
 /-- **The `δ₃` matching theorem on the infinite tree, with the trajectory space
 constructed**: on the product of the two trajectory measures over the pure-ternary level
@@ -87,15 +66,7 @@ theorem delta3Matching_infinite_traj [Countable V]
           (fun n => Tlaw_map_restrictLab (μ := μ) (v0 := v0) (PMF.pure 3) n)
           {ω | InfMatch (labRel Rv)
             (fun n => consLab n ω.1) (fun n => consLab n ω.2)} :=
-  delta3Matching_infinite Rv μ v0
-    (trajPairLab (Tlaw μ (PMF.pure 3) v0)
-      (fun n => Tlaw_map_restrictLab (μ := μ) (v0 := v0) (PMF.pure 3) n)
-      (Tlaw μ (PMF.pure 3) v0)
-      (fun n => Tlaw_map_restrictLab (μ := μ) (v0 := v0) (PMF.pure 3) n))
-    hRv hsymm hhalf hsmall
-    (fun n ω => consLab n ω.1) (fun n ω => consLab n ω.2)
-    (fun n ω => restrictLab_consLab n ω.1) (fun n ω => restrictLab_consLab n ω.2)
-    (fun n => measurable_consLab_pair n)
-    (fun n => trajPairLab_map_consLab _ _ _ _ n)
+  varyingMatching_infinite_traj Rv μ (PMF.pure 3) v0 _
+    (fun n => delta3_failure_le Rv μ v0 hRv hsymm hhalf hsmall n)
 
 end GraphMarkovMatching

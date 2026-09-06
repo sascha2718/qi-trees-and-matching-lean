@@ -10,10 +10,12 @@ The restricted failure bound and the two remaining mixed base coordinates
   a compatible root sees the forced target with zero bad degree, an
   incompatible root is removed by the restriction;
 * `PhiDres_Zlaw_Tlaw_zero`: the forced-fresh base coordinate is at most
-  the root potential `φ_α(q(v0))`.
+  the root potential `φ_α(q(v0))`;
+* `rE_pure`, `WresD_Tlaw_zero_le`, `rE_Zlaw_zero_eq`: the height-zero
+  degrees: the good degree against a point mass, the fresh tilt as the
+  label tilt, and the forced target dead exactly at far roots.
 -/
 import GraphMarkovMatching.Process.Descent
-import GraphMarkovMatching.Delta3.Base
 
 namespace GraphMarkovMatching
 
@@ -44,6 +46,39 @@ lemma tsum_qE_le_PhiDres {α : ℝ} (hα : 0 ≤ α) (ρ : PMF X) (R : X → X �
       (ENNReal.ofReal_toReal qE_ne_top).symm
     rw [hqE]
     exact ofReal_le_phiE hα q_nonneg q_le_one
+
+end
+
+section
+variable {V : Type} (α : ℝ) (Rv : V → V → Prop) (μ : PMF V) (v0 : V)
+
+/-- The good degree against a point mass. -/
+lemma rE_pure {X : Type u} (b : X) (R : X → X → Prop) (z : X) :
+    rE (PMF.pure b) R z = if R z b then 1 else 0 := by
+  rw [rE_eq_tsum_mul, tsum_pure_mul b (goodInd R z), goodInd]
+
+/-- The height-zero fresh tilt is the label tilt. -/
+lemma WresD_Tlaw_zero_le (ν : PMF ℕ) (v : V) (k : ℕ) :
+    WresD α (Tlaw μ ν v0 0) (fullSim (labRel Rv) 0) (leaf (v, k))
+      ≤ (rE μ Rv v) ^ (-α) := by
+  by_cases hres : rE (Tlaw μ ν v0 0) (fullSim (labRel Rv) 0)
+      (leaf (v, k)) = 0
+  · rw [WresD, if_pos hres]
+    exact zero_le
+  · rw [← rE_rpow_neg_eq_WresD (Tlaw μ ν v0 0) (fullSim (labRel Rv) 0)
+      (leaf (v, k)) hres, rE_Tlaw_zero Rv μ ν v0 v k]
+
+/-- The height-zero forced target is dead exactly at far roots. -/
+lemma rE_Zlaw_zero_eq (ν : PMF ℕ) (v : V) (k j : ℕ) :
+    rE (Zlaw μ ν v0 j 0) (fullSim (labRel Rv) 0) (leaf (v, k))
+      = if Rv v v0 then 1 else 0 := by
+  rw [show Zlaw μ ν v0 j 0 = PMF.pure (leaf (v0, j)) from rfl,
+    rE_pure]
+  by_cases hv : Rv v v0
+  · rw [if_pos ((fullSim_leaf (labRel Rv) (v, k) (v0, j)).mpr hv),
+      if_pos hv]
+  · rw [if_neg (fun hc =>
+      hv ((fullSim_leaf (labRel Rv) (v, k) (v0, j)).mp hc)), if_neg hv]
 
 end
 

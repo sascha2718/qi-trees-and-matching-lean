@@ -7,13 +7,18 @@ is self-contained: the support layer lives in `Support/`.
 
 # The support layer
 
-* `Support/*`     the support layer: full labellings and automorphisms of
-               `𝔹_h`, `φ_α` and its calculus, potentials, the
-               product/square relations, the contraction toolkit, the
-               König/measure interface, and the trajectory measure
-               (`Support/Trajectory`): the Ionescu-Tulcea construction of
-               the infinite sample pair behind the infinite-tree
-               endpoints, with its consistent level processes
+* `Support/Phi`          the weight `φ_α` at a free exponent and its calculus
+* `Support/Potential`    the countable label space, its degrees `q`/`r`, and the potential `Φ`
+* `Support/Product`      the product of relations
+* `Support/Square`       the symmetrised square `R^□` and the contraction setup
+* `Support/RowBound`     the row bound of the contraction lemma
+* `Support/Contraction`  the weighted mean inequality, the `K`-step and the finite overlap degrees
+* `Support/Tree`         full labellings of `𝔹_n`, the restricted automorphism group, the phase recursions
+* `Support/Reduction`    the mean bad degree is below the potential
+* `Support/Konig`        the König step: matchings at every finite height give an infinite one
+* `Support/Measure`      the measure half of the König step
+* `Support/Trajectory`   the Ionescu-Tulcea construction of the infinite sample pair
+                     behind the infinite-tree endpoints, with its consistent level processes
 
 # Markov label systems and the four-law core
 
@@ -24,17 +29,15 @@ is self-contained: the support layer lives in `Support/`.
 * `Potential/Directed`   directed potentials `Φ_α(μ → ν)` in the safe `phiE` convention
 * `Potential/Jensen`     the supporting line of `φ_α` and countable mixture Jensen
 * `Potential/Split`      the mixture split (product algebra via conditioning)
-* `Process/TreePotential` the tree potential `PhiM`, the kernel budget `etaD`, and
-               the pure-measure and root-attachment transports they rest on
+* `Process/TreePotential` the pure-measure and root-attachment transports of the tree laws
 * `FourLaw/Base`    the pointwise core of the four-law directed contraction
-* `Potential/DirectedProduct`  the directed product lemma (one-sided step)
 * `FourLaw/Square`    degree identities for two distinct column laws
 * `FourLaw/Pointwise` the pointwise main bound
 * `FourLaw/Assembly`  the measure-level four-law theorem and its tree form
 * `Closure/Measure`    marginal consistency of the tree law and its
                      root-mixture form, the projective input of every
                      endpoint theorem
-* `Closure/ProductMeasure`  the two-law product mismatch identity consumed by the
+* `Composite/ProductMeasure`  the two-law product mismatch identity consumed by the
                      endpoint theorems
 
 # The one-law varying-offspring development
@@ -45,15 +48,10 @@ is self-contained: the support layer lives in `Support/`.
                      varying-offspring process (corrected Step 2, one-block
                      form: exact root factorisation, split, change of
                      measure, four-law)
-* `Process/CrossedContext`   renewal-grammar building blocks: same-counter context
-                     recursion, the fresh-cherry contraction, and the
-                     crossed-context obstruction (`Φ(Z₂ → T) = ⊤` for the
-                     pure-ternary law: cross-type context potentials cannot
-                     enter the block recursion unconditioned)
 * `Potential/ZeroInterface`    the zero-interface estimates: the tilted-summand
-                     identity `φ_α(q) = q·r^{-α}`, the far tail `≤ 2η`,
-                     the inverse moments, and the exceptional pair bound
-                     (the per-level `O(η)` charges of the block recursion)
+                     identity `φ_α(q) = q·r^{-α}`, the far tail `≤ 2η`, and
+                     the inverse moments (the per-level `O(η)` charges of
+                     the block recursion)
 * `Process/Screens`   normalized screens for the arbitrary-support proof:
                      the fresh-mixture identity for good degrees, the
                      zero-event mass bound, and the diagonal-pruning lemma
@@ -61,7 +59,7 @@ is self-contained: the support layer lives in `Support/`.
 * `Closure/Block`     the abstract screened block recursion: the nilpotent
                      invariant `Ê = ∑_{j<r} N^j(u·𝟙)` for the screen block
                      and the joint closure induction
-                     `screened_uniform_bound` giving `Ψ_h ≤ K·η` uniformly
+                     `screened_uniform_bound_mono` giving `Ψ_h ≤ K·η` uniformly
                      (the engine of `arbitrary_offspring_matching.tex`
                      `thm:main-matching`)
 * `Grammar/Nilpotence` the nilpotence certificate: a rank decreasing along
@@ -85,7 +83,7 @@ is self-contained: the support layer lives in `Support/`.
                      positive-set restricted potentials `PhiDres` with
                      the SAME constants as the full four-law, plus the
                      reversed zero-interface masses `zMass` (coefficient
-                     `2(1+δ)`) — plus the one-cell row `PhiDres_square_le`
+                     `2(1+δ)`), plus the one-cell row `PhiDres_square_le`
                      (four-law output + four singleton screens times
                      restricted inverse moments)
 * `Process/MatchingSupport`  the generic support witness `HasMatchingSupport`
@@ -98,18 +96,13 @@ is self-contained: the support layer lives in `Support/`.
                      composite routes
 * `Process/Descent`      the per-state-pair step: height-(h+1) restricted
                      ordinary coordinates reduce to height-h square
-                     coordinates — forced targets exactly
+                     coordinates: forced targets exactly
                      (`PhiDres_muM_Zlaw_succ`), fresh targets by the
                      split bound (`PhiDres_muM_Tlaw_succ`), fresh sources
                      by the root mixture (`PhiDres_Tlaw_*_succ`: the root
                      integrates to `η`, the cascade to `∑ ν_k Φres(Ξ_k→·)`);
                      plus the fresh-target mixture split, the one-sided
                      screen conversions, and the height-0 base case
-* `Process/ScreenStep` the screen-step rows: the height-(h+1) screens on
-                     cell laws with diagonal tilt EQUAL the height-h
-                     diagonal pair screens (forced and fresh zero lists),
-                     and the mixture-dead indicator is below every
-                     charged component's dead indicator
 * `Process/ScreenTilt` the screen-step rows for arbitrary tilts, and the
                      tilt conversions for forced and fresh alternatives
 * `Process/ZMass`     the zero-mass rows: forced and fresh dead-mass
@@ -120,115 +113,110 @@ is self-contained: the support layer lives in `Support/`.
 * `Delta3/Rows` the eight sibling ordinary rows for `ν = δ₃`
                      (forced-forced at all four cells, forced-fresh and
                      fresh-forced at both counters)
+* `Process/ScreenBridges` bridging lemmas for the screen-row compositions
+* `Delta3/Base`       the height-zero base of the `ν = δ₃` screen system
+* `Delta3/ScreensA`   the fresh-source screen rows at `ν = δ₃`
+* `Delta3/ScreensB`   the forced-source screen rows at `ν = δ₃`
+* `Potential/Numerals` numeric constants at `α = 5/2`: the four-law hypotheses and the rpow numerals
+* `Process/Failure`   the restricted failure bound, the height-zero degrees and the mixed base coordinates
+* `Delta3/Closure`    the closure keystone at `ν = δ₃`: the five-dimensional screen
+                     matrix and the uniform failure theorem
+* `Delta3/StepFun`    the concrete monotone step functions `delta3F`/`delta3G`
+* `Delta3/PsiStep`    the assembled ordinary step at `ν = δ₃`
+* `Delta3/EStep`      the assembled screen step at `ν = δ₃`
+* `Delta3/Assembled`  the assembled uniform failure bound at `ν = δ₃`
+* `Delta3/NumericClose` the numeric closure at `ν = δ₃`: failure at most `16384·η`
+* `Delta3/Infinite`   the infinite-tree matching theorem at `ν = δ₃`
+* `Grammar/Depths`    the renewal-depth combinatorics and the numerical semigroup of
+                     return lengths
+* `Grammar/Alphabet`  the formal screen grammar: targets, cascade pairs, the successor step
+* `Grammar/Descend`   admissible descents in the screen grammar
+* `Grammar/SourceRay` the source ray of an infinite screen path
+* `Grammar/Accessible` anchoring and the acyclicity of the screen graph
+* `Grammar/Interp`    the interpretation of the formal grammar as context laws and screens
+* `Process/Coordinates` the ordinary coordinates over the grammar and the mixture-tilt
+                     conversion
+* `Process/Factorize` the multi-member Hall factorization `hallFactorize`
+* `Grammar/Index`     the accessible coordinate system and the concrete block matrix `accN`
+* `Rows/Base`         the general-ν base case of the block recursion (`thm:base`)
+* `Rows/Psi`          the general-ν ordinary rows (`thm:psi-rows`)
+* `Rows/ECore`        the descent core of the screen rows (`thm:descent`)
+* `Rows/EForced`      the forced-source screen rows (`thm:screen-rows`)
+* `Rows/EFresh`       the fresh-source screen rows (`thm:screen-rows`)
+* `Closure/Geometric` bridging identities for the closure and the geometric half of `thm:geom`
+* `Closure/Gen`       the general-ν closure: coordinates, dichotomies, and levels
+* `Closure/EStep`     the assembled screen step (`thm:e-step`)
+* `Closure/Infinite`  the infinite-tree matching theorem at an arbitrary offspring law
+                     (`thm:konig`)
+* `Closure/Main`      the general-ν uniform failure theorem (`thm:closure-form`)
+* `Closure/Numeric`   the numeric closure of the general matching theorem (`thm:numeric`)
+* `Closure/Examples`  the two label-law examples (`thm:exponential`, `thm:doubleexp`)
 
 # The tail and heavy-core layer
 
-The modules feeding the two-law development: the screened tail estimates and
-their rare perturbations, the denominator-free Green estimate for an abstract
-weighted screen ledger (`Closure/Green`), the quenched tail rows and the hybrid
-screen conversions, and the heavy common core with its ledger and
-realization.
+The countable-kernel closure and its rare perturbations feed the two-law
+development.  The `Tail/` modules are the partial route toward an
+exponential-tail theorem at unbounded support: the finite renewal
+generators, the quenched counter environments with their grammar and
+ordinary rows, and the hybrid screen conversions; `Tail/QuenchedObstruction`
+below records where that route stops.  The heavy common core follows with
+its ledger and realization.
+
+* `Composite/Resolvent`      countable kernels and the screened closure through a finite invariant
+* `Composite/RareMatrix`     rare two-law perturbations of a finite screen grammar
+* `Composite/Green`          the denominator-free Green estimate for a weighted screen ledger
+* `Obstructions/FiniteZipper` finite macro-step zippers for two-law matching
+* `Tail/Combinatorics`     finite renewal generators and cascade estimates at unbounded support
+* `Tail/Mixture`           weighted mixture identities
+* `Tail/Quenched`          quenched counter environments
+* `Tail/QuenchedGrammar`   the mixture-free target grammar over a quenched environment
+* `Tail/QuenchedRows`      the ordinary restricted-potential rows of the quenched grammar
+* `Tail/Hybrid`            hybrid annealed/quenched screen lemmas
+* `Obstructions/HeavyCore` the structural and weight reduction for the common core `{3,5,7,9}`
+* `Obstructions/ExitLedger` the full-retention lag ledger of the common core
+* `Obstructions/DepthPairing` the physical-depth obstruction to promoting the flat ledger
 
 # The two-law development `Composite/`
 
-The composite two-law route at arbitrary proper offspring support: the formal
-grammar and its anchoring (`Grammar`, `Anchor`, `Rank`), the tagged kernel and
-its support and tilt layers (`Kernel`, `Support`, `Tilt`), the projective
-endpoint (`Endpoint`), the ledger and its cell and screen descents (`Ledger`,
-`CellStep`, `Bridge`, `ScreenDescent`, `Assembly`), the ordinary closure and
-the headline interface (`Main`), the ledger certificates (`Debt`), the
-concrete ledger instance (`Step`), and the unconditional numeric closure at
-`α = 5/2` (`Numeric`).  `Composite/AxCheck.lean` audits them.
+The composite two-law route at arbitrary proper offspring support.
+
+* `Composite/Grammar`  the composite tagged grammar (`def:composite-grammar`)
+* `Composite/Anchor`   anchoring and the acyclicity of the common block (`thm:composite-acyclic`)
+* `Composite/Rank`     nilpotence from a rank, and a rank from acyclicity
+* `Composite/Kernel`   the composite tagged kernel and the cluster minorization (`thm:cluster`)
+* `Composite/Support`  support witnesses and exact pruning (`thm:support-equality`,
+                     `thm:exact-pruning`)
+* `Composite/Tilt`     the weighted mixture tilt (`thm:mixture-tilt-composite`)
+* `Composite/Endpoint` the finite-to-infinite endpoint
+* `Composite/Ledger`   from acyclicity to nilpotence of the transfer matrix
+                     (`eq:composite-nilpotent`)
+* `Composite/CellStep` the one-step reductions of the ordinary coordinates
+* `Composite/Bridge`   the dictionary between the composite lemmas and the ledger functionals
+* `Composite/ScreenDescent` the descent of zero events and tilts across the branch point
+* `Composite/Assembly` the letter alphabet, the row constants, and the base rows
+* `Composite/Main`     the ordinary height recursion and the closure constants
+* `Composite/Debt`     the screen-debt discharge (`thm:geom`, `thm:engine`)
+* `Composite/StepLetters`  the letter box, the debt index and the target sets of the ledger input
+* `Composite/StepMatrices` the common and priced matrices and the nilpotence of the common block
+* `Composite/StepRows`     the descended pair screens and the one-step descent
+* `Composite/StepRouting`  the inhomogeneity and the routing of the ledger entries into the rows
+* `Composite/StepMain`     the assembled one-step row and the priced final theorems
+* `Composite/Step`         the merged block and the closed theorems
+* `Composite/Numeric`  the numeric closure at `α = 5/2` (`thm:composite-matching`)
 
 # The recorded obstructions
 
-`Process/CrossedContext.crossed_context_potential_top` (cross-type context potentials
+`Obstructions/CrossedContext.crossed_context_potential_top` (cross-type context potentials
 are infinite for the pure-ternary law), `Tail/QuenchedObstruction`
 (a quenched fresh mode keeps a screen charged),
 `Obstructions/Semigroup.unweighted_twoLaw_closure_forces_zero` (an
 unweighted two-law closure forces the trivial level), and
 `Obstructions/DepthPairing` (the fixed-depth realization obstruction).
 
-# The archive
-
-`Archive/` holds the modules the paper no longer refers to: the per-state
-frozen-pattern ceiling and the infinite-tree theorem it closes, the caret
-layer and its budget obstruction, the extension kernel, the retired
-renewal-block invariant, the two-law cross ledger, and the finished grafted
-11/13 pipeline.  They are complete, sorry-free and axiom-clean, they are
-still built through `Archive.lean`, and `Archive/AxCheck.lean` audits them.
-See `Archive.lean` for what each one contains.
-
----
-
-The four-law directed contraction is fully certified
-(`PhiD_fourlaw_le`, constant `A = 2L + 2(1+δ)K`, quadratic constant
-`2Lc_α + 20 + 2(1+δ⁻¹)α²`), with `fourLaw_tree` discharging the step
-hypothesis `hΓ`/`hFour` for two-sided pattern pairs. The two-ceiling `β`-refinement is done (`PhiM_succ_le_two`,
-`PhiM_le_of_invariant_closed`, `markovMatching_failure_le_closed`): the
-matching bound at every height holds from the budgets `ε` (kernel mismatch),
-`β` (one-sided mass), `η_ι` (root) and one closure inequality, with no
-undischarged mathematical hypotheses. The König packaging is done in interface form
-(`markovMatching_infinite`: compatible measurable level projections with the
-root-mixture laws give the infinite-tree matching bound).
-
-The varying-offspring layer (`arbitrary_offspring_matching.tex`)
-avoids the per-state budgets entirely: `varyingMatching_failure_le_closed`
-certifies the nondegenerating bound (Theorem `thm:main-matching`)
-through the exact root factorisation `q = δ_v + (1-δ_v)q̃`, the mixture
-comparison `ν₂·T⊗T ≤ Ξ̄ ≤ C̄·T⊗T`, the certified change of measure, and the
-four-law.
-
-For `ν = δ₃` the screened block recursion is fully assembled:
-`delta3_failure_uniform_assembled` bounds the matching failure at every
-height by `Kc·η` from the ledger constants, the two closure inequalities
-at the invariant levels, and the root budgets alone. The recursion runs
-through the concrete monotone step functions `delta3F`/`delta3G`
-(`Delta3/StepFun`), the assembled ordinary and screen step bounds
-(`Delta3/PsiStep`, `Delta3/EStep`), and the closure keystone
-with its five-dimensional screen matrix `delta3N`, nilpotent by the rank
-certificate (`Delta3/Closure`).  The numeric closure is certified
-with explicit constants (`Delta3/NumericClose.delta3_failure_le`):
-at `α = 5/2` with `μ(v0) ≥ 1/2` and `2³⁰·η ≤ 1`, the matching failure
-at every height is at most `16384·η`.  The König packaging is certified
-in interface form (`Delta3/Infinite.delta3Matching_infinite`):
-compatible measurable level projections with the process pair law give
-a full-tree matching automorphism with probability at least
-`1 - 16384·η`, with the marginal consistency of the process law
-supplied by `Tlaw_map_restrictLab`.
-
-For an ARBITRARY finitely supported offspring law the assembly is
-complete in closure form (`Closure/Main.varying_failure_uniform`,
-`varying_matching_infinite_closed`).  The coordinates are indexed by
-the formal grammar: ordinary coordinates over the aligned pair
-grammar `OrdAcc` generated from `(F, F)`, screen coordinates over the
-accessible live index `scrIndex` generated from the state-pair seeds
-and closed under sub-successors (`Grammar/Index`); anchoring propagates
-through the closure, so the block matrix `accN` is nilpotent by the
-anchored acyclicity (`accN_acyclic`, `accN_nilpotent`), with NO
-nilpotence hypothesis in the final theorem.  The transfer rows are
-certified generically: the ordinary rows through the componentized
-square cells and the mixture one-sided charge with the pointwise
-tilt conversion `WresD_XiBar_le_sum` (`Rows/Psi`,
-`Process/Coordinates`), the screen rows through the multi-member Hall
-factorization `hallFactorize` (`Process/Factorize`), the descent core
-`memInd_branch_iff` (`Rows/ECore`), and the six cell-by-norm
-rows (`Rows/EForced`, `Rows/EFresh`); the base case is
-`Rows/Base`, the assembled steps and levels are `Closure/Gen`
-and `Closure/EStep`, and the remaining hypotheses of the main
-theorem are exactly the ledger constants, the finite tilt constants,
-and the two closure inequalities at the invariant levels.  The
-numeric closure is certified with explicit constants
-(`Closure/Numeric.varying_failure_le`, `varying_matching_le`): at
-`α = 5/2` the levels are built from the charged tilt sum `T`, the
-support size, the accessible-index cardinality bound, and the
-alphabet bound, and the failure at every height is at most
-`genKcC·η` once `genSmallC·η ≤ 1`; the pure ternary law re-derives as
-an instance (`delta3_failure_le_of_general`).  Two label-law examples
-instantiate the theorem on the half-line path (`Closure/Examples`,
-self-contained): the exponential three-label law with potential
-budget `9 e^{-(D-5/2)D}` and the double-exponential law with budget
-`4 e^{-(D-5/2)D}`.
+* `Obstructions/CrossedContext` the crossed-context obstruction: cross-type context
+                     potentials are infinite for the pure-ternary law
+* `Tail/QuenchedObstruction` a quenched fresh mode keeps a screen charged
+* `Obstructions/Semigroup`   the finite-support obstruction to an asymmetric two-law theorem
 -/
 
 -- ## The support layer
@@ -237,12 +225,10 @@ import GraphMarkovMatching.Support.Phi
 import GraphMarkovMatching.Support.Potential
 import GraphMarkovMatching.Support.Product
 import GraphMarkovMatching.Support.Square
-import GraphMarkovMatching.Support.Maxima
 import GraphMarkovMatching.Support.RowBound
 import GraphMarkovMatching.Support.Contraction
 import GraphMarkovMatching.Support.Tree
 import GraphMarkovMatching.Support.Reduction
-import GraphMarkovMatching.Support.ConcreteBlock
 import GraphMarkovMatching.Support.Konig
 import GraphMarkovMatching.Support.Measure
 import GraphMarkovMatching.Support.Trajectory
@@ -256,18 +242,16 @@ import GraphMarkovMatching.Potential.Jensen
 import GraphMarkovMatching.Potential.Split
 import GraphMarkovMatching.Process.TreePotential
 import GraphMarkovMatching.FourLaw.Base
-import GraphMarkovMatching.Potential.DirectedProduct
 import GraphMarkovMatching.FourLaw.Square
 import GraphMarkovMatching.FourLaw.Pointwise
 import GraphMarkovMatching.FourLaw.Assembly
 import GraphMarkovMatching.Closure.Measure
-import GraphMarkovMatching.Closure.ProductMeasure
+import GraphMarkovMatching.Composite.ProductMeasure
 
 -- ## The one-law varying-offspring development
 
 import GraphMarkovMatching.Process.Kernel
 import GraphMarkovMatching.Process.Contraction
-import GraphMarkovMatching.Process.CrossedContext
 import GraphMarkovMatching.Potential.ZeroInterface
 import GraphMarkovMatching.Process.Screens
 import GraphMarkovMatching.Closure.Block
@@ -277,7 +261,6 @@ import GraphMarkovMatching.Process.Hall
 import GraphMarkovMatching.Process.Ledger
 import GraphMarkovMatching.Process.MatchingSupport
 import GraphMarkovMatching.Process.Descent
-import GraphMarkovMatching.Process.ScreenStep
 import GraphMarkovMatching.Process.ScreenTilt
 import GraphMarkovMatching.Process.ZMass
 import GraphMarkovMatching.Delta3.Step
@@ -319,9 +302,9 @@ import GraphMarkovMatching.Closure.Examples
 
 -- ## The tail and heavy-core layer
 
-import GraphMarkovMatching.Tail.Block
-import GraphMarkovMatching.Closure.RareMatrix
-import GraphMarkovMatching.Closure.Green
+import GraphMarkovMatching.Composite.Resolvent
+import GraphMarkovMatching.Composite.RareMatrix
+import GraphMarkovMatching.Composite.Green
 import GraphMarkovMatching.Obstructions.FiniteZipper
 import GraphMarkovMatching.Tail.Combinatorics
 import GraphMarkovMatching.Tail.Mixture
@@ -349,14 +332,16 @@ import GraphMarkovMatching.Composite.ScreenDescent
 import GraphMarkovMatching.Composite.Assembly
 import GraphMarkovMatching.Composite.Main
 import GraphMarkovMatching.Composite.Debt
+import GraphMarkovMatching.Composite.StepLetters
+import GraphMarkovMatching.Composite.StepMatrices
+import GraphMarkovMatching.Composite.StepRows
+import GraphMarkovMatching.Composite.StepRouting
+import GraphMarkovMatching.Composite.StepMain
 import GraphMarkovMatching.Composite.Step
 import GraphMarkovMatching.Composite.Numeric
 
 -- ## The recorded obstructions
 
+import GraphMarkovMatching.Obstructions.CrossedContext
 import GraphMarkovMatching.Tail.QuenchedObstruction
 import GraphMarkovMatching.Obstructions.Semigroup
-
--- ## The archive
-
-import GraphMarkovMatching.Archive

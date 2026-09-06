@@ -16,9 +16,8 @@ admissible fresh-to-fresh descent length.
   realisation): every return length
   `d ∈ toFresh k` is realized as a `d`-step descent from `Z k`, `Fk k`
   or (for `k ∈ S`) from `F`, to the fresh state;
-* `descend_closure`, `descend_large_multiples`: every element of the
-  semigroup `Σ_ν`, in particular every sufficiently large multiple of
-  `gcd 𝒟_ν`, is an admissible fresh-to-fresh descent length.
+* `descend_closure`: every element of the semigroup `Σ_ν` is an
+  admissible fresh-to-fresh descent length.
 -/
 import GraphMarkovMatching.Grammar.Alphabet
 import GraphMarkovMatching.Grammar.Depths
@@ -127,15 +126,5 @@ lemma descend_closure {S : Finset ℕ} {m : ℕ}
       exact descend_F hk hdk
   | zero => exact Descend.refl _
   | add a b _ _ iha ihb => exact Descend.trans iha ihb
-
-/-- **Large multiples are descent lengths** (`thm:semigroup` combined
-with the realisation of `thm:descend-realise`; consumed by
-`thm:nilpotence`): every sufficiently large multiple of `gcd 𝒟_ν` is
-an admissible fresh-to-fresh descent length. -/
-theorem descend_large_multiples (S : Finset ℕ) :
-    ∃ R, ∀ m, R ≤ m → (depthSet S).gcd id ∣ m →
-      Descend S m Tgt.F Tgt.F := by
-  obtain ⟨R, hR⟩ := depths_semigroup S
-  exact ⟨R, fun m hm hdvd => descend_closure (hR m hm hdvd)⟩
 
 end GraphMarkovMatching

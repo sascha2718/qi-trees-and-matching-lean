@@ -27,15 +27,14 @@ one zero-list completion depth in `Σ_S`; the Frobenius threshold of
 
 The entrance-inclusive strengthening lives at the end of the file:
 `CommonStepE` lets the cell advance through an exceptional entrance of
-the target side, `CommonStep.toE` embeds the common steps,
-`Anchored.stepE` and `ScreenAnchored.stepE` propagate anchoring along
-such steps through the chart returns `chartPorts_cases`, and
-`no_live_step_cycle` is the cycle refutation for `CommonStepE`, under
-the standing membership of the declared pairs of both sides in the
-common support.  `CommonStepES` is the two-set variant matching the
+the target side, and `Anchored.stepE` and `ScreenAnchored.stepE`
+propagate anchoring along such steps through the chart returns
+`chartPorts_cases`.  `CommonStepES` is the two-set variant matching the
 composite ledger exactly: the cell enters through the source side's
 declared pairs while the zero list advances with the target side's;
-`no_live_step_cycleS` is its cycle refutation, by the same alignment.
+`no_live_step_cycleS` is its cycle refutation, by the same alignment,
+under the standing membership of the declared pairs of the source side
+in the common support.
 -/
 import GraphMarkovMatching.Composite.Grammar
 
@@ -289,12 +288,6 @@ structure CommonStepE (S : Finset ℕ) (Etgt : Finset (ℕ × ℕ))
   cell_mem : s'.cell ∈ succ S Etgt s.cell
   zlist_eq : s'.zlist = s.zlist.biUnion (succ S Etgt)
 
-/-- A common step is in particular an entrance-inclusive step. -/
-lemma CommonStep.toE {S : Finset ℕ} {Etgt : Finset (ℕ × ℕ)}
-    {s s' : Screen} (h : CommonStep S Etgt s s') :
-    CommonStepE S Etgt s s' :=
-  ⟨succ_empty_subset S Etgt _ h.cell_mem, h.zlist_eq⟩
-
 /-- Screen anchoring propagates along entrance-inclusive steps, under
 the membership of the declared pairs of both sides in the common
 support. -/
@@ -311,144 +304,14 @@ lemma ScreenAnchored.stepE {S : Finset ℕ} {Esrc Etgt : Finset (ℕ × ℕ)}
     obtain ⟨t, ht, hmem⟩ := Finset.mem_biUnion.mp ht'
     exact (h.zlist t ht).step hmem
 
-/-- A target-side descent moves zero-list membership along a path of
-entrance-inclusive steps. -/
-lemma mem_zlist_of_descendE {S : Finset ℕ} {Etgt : Finset (ℕ × ℕ)}
-    {path : ℕ → Screen}
-    (hstep : ∀ j, CommonStepE S Etgt (path j) (path (j + 1)))
-    {t u : Letter} {m : ℕ} (hd : Descend S Etgt t m u) :
-    ∀ j, t ∈ (path j).zlist → u ∈ (path (j + m)).zlist := by
-  induction hd with
-  | refl t =>
-      intro j hj
-      simpa using hj
-  | @step t₁ t₂ t₃ m₁ hmem hd ih =>
-      intro j hj
-      have h1 : t₂ ∈ (path (j + 1)).zlist := by
-        rw [(hstep j).zlist_eq]
-        exact Finset.mem_biUnion.mpr ⟨t₁, hj, hmem⟩
-      have h2 := ih (j + 1) h1
-      rw [show j + (m₁ + 1) = j + 1 + m₁ by omega]
-      exact h2
-
-/-- Along a path of entrance-inclusive steps the cell reaches the fresh
-letter: the forced-depth measure decreases under an arbitrary entrance
-set. -/
-lemma exists_cell_FE {S : Finset ℕ} {Etgt : Finset (ℕ × ℕ)}
-    {path : ℕ → Screen}
-    (hstep : ∀ j, CommonStepE S Etgt (path j) (path (j + 1))) (j : ℕ) :
-    ∃ i, (path (j + i)).cell = .F := by
-  suffices h : ∀ M j, meas (path j).cell ≤ M →
-      ∃ i, (path (j + i)).cell = .F from h (meas (path j).cell) j le_rfl
-  intro M
-  induction M with
-  | zero =>
-      intro j hM
-      by_cases hF : (path j).cell = .F
-      · exact ⟨0, by simpa using hF⟩
-      · by_cases hF' : (path (j + 1)).cell = .F
-        · exact ⟨1, hF'⟩
-        · exact absurd
-            (lt_of_lt_of_le (meas_lt_of_mem_succ hF hF' (hstep j).cell_mem) hM)
-            (Nat.not_lt_zero _)
-  | succ M ih =>
-      intro j hM
-      by_cases hF : (path j).cell = .F
-      · exact ⟨0, by simpa using hF⟩
-      · by_cases hF' : (path (j + 1)).cell = .F
-        · exact ⟨1, hF'⟩
-        · have hlt := meas_lt_of_mem_succ hF hF' (hstep j).cell_mem
-          obtain ⟨i, hi⟩ := ih (j + 1) (by omega)
-          exact ⟨i + 1, by rw [show j + (i + 1) = j + 1 + i by omega]; exact hi⟩
-
-/-- **Acyclicity, entrance-inclusive form** (`thm:composite-acyclic`,
-combinatorial core).  A periodic path of entrance-inclusive
-full-successor steps, anchored at its origin and with a nonempty zero
-list, must contain a screen whose cell is the fresh letter and whose
-zero list contains the fresh letter, provided every declared pair of
-either side lies in the common support. -/
-theorem no_live_step_cycle
-    (S : Finset ℕ) (hSne : S.Nonempty) (Esrc Etgt : Finset (ℕ × ℕ))
-    (hEsrc : ∀ p ∈ Esrc, p.1 ∈ S ∧ p.2 ∈ S)
-    (hEtgt : ∀ p ∈ Etgt, p.1 ∈ S ∧ p.2 ∈ S)
-    (path : ℕ → Screen) (n : ℕ) (hn : 1 ≤ n)
-    (hstep : ∀ j, CommonStepE S Etgt (path j) (path (j + 1)))
-    (hper : ∀ j, path (j + n) = path j)
-    (δ0 : ℕ) (hanch0 : ScreenAnchored S Esrc Etgt δ0 (path 0))
-    (hne : ((path 0).zlist).Nonempty)
-    (hdiag : ∀ j, ¬((path j).cell = .F ∧ .F ∈ (path j).zlist)) :
-    False := by
-  -- anchoring propagates along the whole path
-  have hanch : ∀ j, ScreenAnchored S Esrc Etgt (δ0 + j) (path j) := by
-    intro j
-    induction j with
-    | zero => simpa using hanch0
-    | succ j ih => exact ih.stepE hEsrc hEtgt (hstep j)
-  -- zero lists stay nonempty
-  have hzne : ∀ j, ((path j).zlist).Nonempty := by
-    intro j
-    induction j with
-    | zero => exact hne
-    | succ j ih =>
-        obtain ⟨t, ht⟩ := ih
-        obtain ⟨t', ht'⟩ := succ_nonempty hSne Etgt t
-        rw [(hstep j).zlist_eq]
-        exact ⟨t', Finset.mem_biUnion.mpr ⟨t, ht, ht'⟩⟩
-  -- a position with fresh cell
-  obtain ⟨i0, hi0⟩ := exists_cell_FE hstep 0
-  have hcell : (path i0).cell = .F := by simpa using hi0
-  -- periodicity along multiples of the cycle length
-  have hperiodic : ∀ q, path (i0 + q * n) = path i0 := by
-    intro q
-    induction q with
-    | zero => simp
-    | succ q ih =>
-        have harith : i0 + (q + 1) * n = i0 + q * n + n := by ring
-        rw [harith, hper, ih]
-  -- the depths of the fresh-cell occurrences lie in the monoid
-  have hdepth : ∀ q, δ0 + (i0 + q * n) ∈ SigmaS S := by
-    intro q
-    have h1 := (hanch (i0 + q * n)).cell
-    rw [hperiodic q, hcell] at h1
-    exact h1.depth_mem
-  -- a zero-list member and one completion
-  obtain ⟨t, ht⟩ := hzne i0
-  obtain ⟨m, hm⟩ := exists_descend_F (S := S) (E := Etgt) t
-  have hdm : δ0 + i0 + m ∈ SigmaS S := (hanch i0).zlist t ht m hm
-  -- the fresh letter enters the zero list and persists at monoid times
-  have hFz : Letter.F ∈ (path (i0 + m)).zlist :=
-    mem_zlist_of_descendE hstep hm i0 ht
-  have hFz' : ∀ m', m' ∈ SigmaS S →
-      Letter.F ∈ (path (i0 + m + m')).zlist := fun m' hm' =>
-    mem_zlist_of_descendE hstep (descend_F_of_mem_sigmaS hm') (i0 + m) hFz
-  -- Frobenius alignment
-  obtain ⟨R, hR⟩ := depths_semigroup S
-  have hqn : m + R ≤ (m + R) * n := by
-    calc m + R = (m + R) * 1 := (mul_one _).symm
-    _ ≤ (m + R) * n := Nat.mul_le_mul_left _ hn
-  have hd1 : (depthSet S).gcd id ∣ δ0 + (i0 + (m + R) * n) :=
-    gcd_dvd_of_mem_sigmaS (hdepth (m + R))
-  have hd2 : (depthSet S).gcd id ∣ δ0 + i0 + m := gcd_dvd_of_mem_sigmaS hdm
-  have hdvd : (depthSet S).gcd id ∣ (m + R) * n - m := by
-    have hsub := Nat.dvd_sub hd1 hd2
-    rwa [show δ0 + (i0 + (m + R) * n) - (δ0 + i0 + m) = (m + R) * n - m
-      by omega] at hsub
-  have hmem : (m + R) * n - m ∈ SigmaS S := hR _ (by omega) hdvd
-  have hfinal : Letter.F ∈ (path (i0 + (m + R) * n)).zlist := by
-    have hstepF := hFz' ((m + R) * n - m) hmem
-    rwa [show i0 + m + ((m + R) * n - m) = i0 + (m + R) * n by omega] at hstepF
-  rw [hperiodic (m + R)] at hfinal
-  exact hdiag i0 ⟨hcell, hfinal⟩
-
 /-! ### Entrance-inclusive steps with source-side cell entrances
 
 The rare edges of the composite screen ledger advance the cell through
 an exceptional entrance declared on the source side, while the zero
 list advances by the full successor set of the target side.  The step
 relation of this section records exactly that shape; the cycle
-refutation is the one of `no_live_step_cycle`, with the cell
-propagation `Anchored.stepE` instantiated at the source-side entrance
-set. -/
+refutation runs the semigroup alignment with the cell propagation
+`Anchored.stepE` instantiated at the source-side entrance set. -/
 
 /-- An entrance-inclusive full-successor step with source-side cell
 entrances: the cell advances by any successor of the source side,

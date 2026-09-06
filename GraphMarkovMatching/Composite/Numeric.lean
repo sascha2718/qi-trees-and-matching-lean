@@ -4,8 +4,8 @@ The numeric closure of the composite two-law programme at `α = 5/2`
 explicit constants `eq:composite-cardinals`, `eq:composite-tilt`, and
 `eq:composite-K-eps`).
 
-Every scalar witness fed to `composite_failure_le_final` /
-`composite_matching_le_final` is replaced by a μ-free quantity built
+Every scalar witness fed to `composite_failure_le_final` is replaced by
+a μ-free quantity built
 from the instance data `(exc1, exc2, ν1, ν2, K1, K2, N)` alone, using
 only the root-mass floor `2⁻¹ ≤ μ v0`:
 
@@ -38,11 +38,10 @@ only the root-mass floor `2⁻¹ ≤ μ v0`:
 
       cMpBudget · (2 · (2 · compC)^(cRank N)) ≤ compC.
 
-The headline theorems `composite_failure_bound` and
-`composite_matching_bound` instantiate the conditional theorems of
-`Step` at these witnesses: their hypotheses are the structural
-instance pack, `hdom`, and the threshold `heta`; all constants in the
-conclusions are μ-free and existence-level.
+The headline theorem `composite_failure_bound` instantiates the
+conditional theorem of `Step` at these witnesses: its hypotheses are the
+structural instance pack, `hdom`, and the threshold `heta`; all constants
+in the conclusion are μ-free and existence-level.
 
 Non-vacuity: since the rare budget is proportional to the exceptional
 mass (`cMpBudget = compEM · compC` at the instance data), `hdom` holds
@@ -106,10 +105,10 @@ lemma compTiltFloor_some {k : ℕ} {p : ℕ × ℕ} (hk : exc k = some p) :
 lemma compTiltFloor_le_one (k : ℕ) : compTiltFloor exc ν k ≤ 1 := by
   rcases hexc : exc k with _ | p
   · rw [compTiltFloor_none exc ν hexc]
-    exact pmf_apply_le_one ν k
+    exact PMF.coe_le_one ν k
   · rw [compTiltFloor_some exc ν hexc]
     exact mul_le_one' (by norm_num)
-      (mul_le_one' (pmf_apply_le_one ν _) (pmf_apply_le_one ν _))
+      (mul_le_one' (PMF.coe_le_one ν _) (PMF.coe_le_one ν _))
 
 lemma compTiltFloor_ne_zero
     (hdecl : ∀ k p, exc k = some p → ν p.1 ≠ 0 ∧ ν p.2 ≠ 0)
@@ -169,16 +168,6 @@ lemma compTiltBound_ne_top {Kf : Finset ℕ}
   rintro (⟨h0, _⟩ | ⟨ht, _⟩)
   · exact hfl0 h0
   · exact hflt ht
-
-/-- On a nonempty support the μ-free tilt bound is at least one. -/
-lemma one_le_compTiltBound {Kf : Finset ℕ} (hne : Kf.Nonempty) :
-    1 ≤ compTiltBound exc ν Kf := by
-  obtain ⟨k, hk⟩ := hne
-  rw [compTiltBound]
-  refine le_trans ?_ (Finset.single_le_sum (fun i _ => zero_le) hk)
-  calc (1 : ℝ≥0∞) = 1 ^ (-(5 / 2 : ℝ)) := (ENNReal.one_rpow _).symm
-    _ ≤ compTiltFloor exc ν k ^ (-(5 / 2 : ℝ)) :=
-        rpow_neg_antitone (by norm_num) (compTiltFloor_le_one exc ν k)
 
 end TiltBound
 
@@ -551,11 +540,6 @@ lemma compT_ne_top
       lt_top_iff_ne_top.mpr
         (compTiltBound_ne_top exc2 ν2 hsup2 hdecl2)⟩).ne
 
-lemma one_le_compT (hne : K1.Nonempty) :
-    1 ≤ compT exc1 exc2 ν1 ν2 K1 K2 := by
-  rw [compT]
-  exact le_trans (one_le_compTiltBound exc1 ν1 hne) (le_max_left _ _)
-
 lemma compEM_le_one : compEM exc1 exc2 ν1 ν2 ≤ 1 := by
   rw [compEM]
   exact max_le (cExcMass_le_one exc1 ν1) (cExcMass_le_one exc2 ν2)
@@ -602,76 +586,6 @@ lemma compCu_ne_top
     ⟨ENNReal.mul_ne_top ENNReal.ofNat_ne_top
       (compT_ne_top exc1 exc2 ν1 ν2 K1 K2 hsup1 hdecl1 hsup2 hdecl2),
       ENNReal.ofNat_ne_top⟩
-
-lemma compX_ne_top
-    (hsup1 : ∀ k, (ν1 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K1)
-    (hdecl1 : ∀ k p, exc1 k = some p → ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
-    (hsup2 : ∀ k, (ν2 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K2)
-    (hdecl2 : ∀ k p, exc2 k = some p → ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0) :
-    compX exc1 exc2 ν1 ν2 K1 K2 N ≠ ⊤ := by
-  rw [compX, cX, graftGreenMultiplier, graftGreenRemainder]
-  refine ENNReal.mul_ne_top (ENNReal.mul_ne_top ENNReal.ofNat_ne_top ?_)
-    (compCu_ne_top exc1 exc2 ν1 ν2 K1 K2 hsup1 hdecl1 hsup2 hdecl2)
-  refine ENNReal.sum_ne_top.mpr fun j _ => ENNReal.pow_ne_top ?_
-  exact ENNReal.mul_ne_top ENNReal.ofNat_ne_top
-    (compC_ne_top exc1 exc2 ν1 ν2 K1 K2 hsup1 hdecl1 hsup2 hdecl2)
-
-/-- **Finiteness of the failure constant.** -/
-theorem compKcFinal_ne_top
-    (hsup1 : ∀ k, (ν1 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K1)
-    (hdecl1 : ∀ k p, exc1 k = some p → ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
-    (hsup2 : ∀ k, (ν2 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K2)
-    (hdecl2 : ∀ k p, exc2 k = some p → ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0) :
-    compKcFinal exc1 exc2 ν1 ν2 K1 K2 N ≠ ⊤ := by
-  rw [compKcFinal]
-  exact compKcOf_ne_top
-    (compT_ne_top exc1 exc2 ν1 ν2 K1 K2 hsup1 hdecl1 hsup2 hdecl2)
-    (ENNReal.natCast_ne_top _)
-    (compX_ne_top exc1 exc2 ν1 ν2 K1 K2 N hsup1 hdecl1 hsup2 hdecl2)
-
-/-- **Positivity of the threshold**: under chargedness of the declared
-pairs all three entries of the minimum are positive. -/
-theorem compEtaStar_pos
-    (hsup1 : ∀ k, (ν1 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K1)
-    (hdecl1 : ∀ k p, exc1 k = some p → ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
-    (hsup2 : ∀ k, (ν2 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K2)
-    (hdecl2 : ∀ k p, exc2 k = some p → ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0) :
-    0 < compEtaStar exc1 exc2 ν1 ν2 K1 K2 N := by
-  have hT := compT_ne_top exc1 exc2 ν1 ν2 K1 K2 hsup1 hdecl1 hsup2 hdecl2
-  have hκ : (cMx K1 K2 : ℝ≥0∞) ≠ ⊤ := ENNReal.natCast_ne_top _
-  have hX := compX_ne_top exc1 exc2 ν1 ν2 K1 K2 N hsup1 hdecl1 hsup2
-    hdecl2
-  rw [compEtaStar]
-  refine lt_min_iff.mpr ⟨?_, lt_min_iff.mpr ⟨?_, ?_⟩⟩
-  · rw [ENNReal.inv_pos]
-    exact ENNReal.add_ne_top.mpr
-      ⟨ENNReal.add_ne_top.mpr
-        ⟨compC2Of_ne_top hT hκ hX, compC3Of_ne_top hT hκ hX⟩,
-        ENNReal.one_ne_top⟩
-  · rw [ENNReal.inv_pos]
-    exact compHuCOf_ne_top hT hκ hX _
-  · rw [ENNReal.inv_pos]
-    refine ENNReal.mul_ne_top ENNReal.ofNat_ne_top ?_
-    exact compKcFinal_ne_top exc1 exc2 ν1 ν2 K1 K2 N hsup1 hdecl1
-      hsup2 hdecl2
-
-/-- The threshold is nonzero (the form used by the headline
-hypotheses). -/
-theorem compEtaStar_ne_zero
-    (hsup1 : ∀ k, (ν1 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K1)
-    (hdecl1 : ∀ k p, exc1 k = some p → ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
-    (hsup2 : ∀ k, (ν2 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K2)
-    (hdecl2 : ∀ k p, exc2 k = some p → ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0) :
-    compEtaStar exc1 exc2 ν1 ν2 K1 K2 N ≠ 0 :=
-  (compEtaStar_pos exc1 exc2 ν1 ν2 K1 K2 N hsup1 hdecl1 hsup2
-    hdecl2).ne'
-
-/-- The threshold is finite: the absorption entry is at most one. -/
-theorem compEtaStar_ne_top :
-    compEtaStar exc1 exc2 ν1 ν2 K1 K2 N ≠ ⊤ := by
-  refine ne_top_of_le_ne_top ENNReal.one_ne_top ?_
-  rw [compEtaStar]
-  exact le_trans (min_le_left _ _) (ENNReal.inv_le_one.mpr le_add_self)
 
 end Instance
 
@@ -927,143 +841,6 @@ theorem composite_failure_bound
   rw [compKcFinal]
   exact cKc_le_compKcOf μ v0 hhalf _ _ _
 
-/-- **The composite two-law matching theorem with μ-free constants**, an
-intermediate form of `thm:composite-matching` still carrying the
-domination hypothesis: under the same instance pack and the projective
-sample pack, the defect `compKcFinal · η` is at most `2⁻¹`, and one
-binary-tree automorphism matches the two infinite composite samples
-with probability at least `1 - compKcFinal · η`. -/
-theorem composite_matching_bound {Omega : Type*}
-    [Countable V] [MeasurableSpace V] [MeasurableSingletonClass V]
-    [MeasurableSpace Omega] (Pm : Measure Omega)
-    [IsProbabilityMeasure Pm]
-    (hRv : ∀ v, Rv v v) (hsymm : ∀ a b, Rv a b → Rv b a)
-    (hμ0 : μ v0 ≠ 0) (hhalf : 2⁻¹ ≤ μ v0)
-    (hN : ∀ j, j ≤ N → exc1 j = none ∧ exc2 j = none)
-    (hdeclN1 : ∀ k p, exc1 k = some p →
-      p.1 ≤ N ∧ p.2 ≤ N ∧ ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0)
-    (hcharged1 : ∀ k, ν1 k ≠ 0 → exc1 k = none → k ≤ N ∧ ν2 k ≠ 0)
-    (hdeclN2 : ∀ k p, exc2 k = some p →
-      p.1 ≤ N ∧ p.2 ≤ N ∧ ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
-    (hcharged2 : ∀ k, ν2 k ≠ 0 → exc2 k = none → k ≤ N ∧ ν1 k ≠ 0)
-    (hpair1 : ∀ k p, exc1 k = some p → ∀ j, j ≤ p.1 → exc1 j = none)
-    (hpair2 : ∀ k p, exc2 k = some p → ∀ j, j ≤ p.1 → exc2 j = none)
-    (hdecl1 : ∀ k p, exc1 k = some p → ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
-    (hdecl2 : ∀ k p, exc2 k = some p → ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0)
-    (hsup1 : ∀ k, (ν1 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K1)
-    (hsup2 : ∀ k, (ν2 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K2)
-    (hS1 : ∀ k, k ∈ S ↔ ((ν1 k : ℝ≥0∞) ≠ 0 ∧ exc1 k = none))
-    (hSne : S.Nonempty)
-    (hEg1 : ∀ p, p ∈ E1 ↔ ∃ z, (ν1 z : ℝ≥0∞) ≠ 0 ∧ exc1 z = some p)
-    (hEg2 : ∀ p, p ∈ E2 ↔ ∃ z, (ν2 z : ℝ≥0∞) ≠ 0 ∧ exc2 z = some p)
-    (hdom : cMpBudget (compEM exc1 exc2 ν1 ν2)
-          (8 * compT exc1 exc2 ν1 ν2 K1 K2) (cMx K1 K2)
-        * (2 * (2 * compC exc1 exc2 ν1 ν2 K1 K2) ^ cRank N)
-        ≤ compC exc1 exc2 ν1 ν2 K1 K2)
-    (heta : etaG (5 / 2) Rv μ
-      ≤ compEtaStar exc1 exc2 ν1 ν2 K1 K2 N)
-    (Xs Ys : (n : ℕ) → Omega → FullLab (CState V) n)
-    (hXs : ∀ n omega, restrictLab n (Xs (n + 1) omega) = Xs n omega)
-    (hYs : ∀ n omega, restrictLab n (Ys (n + 1) omega) = Ys n omega)
-    (hpairM : ∀ n, Measurable (fun omega => (Xs n omega, Ys n omega)))
-    (hlaw : ∀ n, Pm.map (fun omega => (Xs n omega, Ys n omega)) =
-      (prodPMF (cT exc1 μ ν1 v0 n) (cT exc2 μ ν2 v0 n)).toMeasure) :
-    compKcFinal exc1 exc2 ν1 ν2 K1 K2 N * etaG (5 / 2) Rv μ ≤ 2⁻¹
-      ∧ 1 - compKcFinal exc1 exc2 ν1 ν2 K1 K2 N * etaG (5 / 2) Rv μ
-        ≤ Pm {omega | InfMatch (cRel Rv)
-            (fun n => Xs n omega) (fun n => Ys n omega)} := by
-  have hT1 : cTiltSum (5 / 2) exc1 μ ν1 v0
-      ≤ compT exc1 exc2 ν1 ν2 K1 K2 := by
-    rw [compT]
-    exact le_trans (cTiltSum_le_compTiltBound exc1 ν1 μ v0 hsup1 hhalf)
-      (le_max_left _ _)
-  have hT2 : cTiltSum (5 / 2) exc2 μ ν2 v0
-      ≤ compT exc1 exc2 ν1 ν2 K1 K2 := by
-    rw [compT]
-    exact le_trans (cTiltSum_le_compTiltBound exc2 ν2 μ v0 hsup2 hhalf)
-      (le_max_right _ _)
-  have heM1 : cExcMass exc1 ν1 ≤ compEM exc1 exc2 ν1 ν2 := by
-    rw [compEM]
-    exact le_max_left _ _
-  have heM2 : cExcMass exc2 ν2 ≤ compEM exc1 exc2 ν1 ν2 := by
-    rw [compEM]
-    exact le_max_right _ _
-  have hκ1 : (K1.card : ℝ≥0∞) ≤ (cMx K1 K2 : ℝ≥0∞) :=
-    Nat.cast_le.mpr (le_trans (le_max_left _ _) (le_max_left _ _))
-  have hκ2 : (K2.card : ℝ≥0∞) ≤ (cMx K1 K2 : ℝ≥0∞) :=
-    Nat.cast_le.mpr (le_trans (le_max_right _ _) (le_max_left _ _))
-  have hchi0 := compChi_ne_zero exc1 exc2 ν1 ν2 K1 K2 N hsup1 hdecl1
-    hsup2 hdecl2
-  have hC : cNcBudget (8 * compT exc1 exc2 ν1 ν2 K1 K2) (cMx K1 K2)
-      ≤ compC exc1 exc2 ν1 ν2 K1 K2 := le_of_eq (by rw [compC])
-  have hafford := compChi_afford exc1 exc2 ν1 ν2 K1 K2 N hsup1 hdecl1
-    hsup2 hdecl2 hdom
-  have hcu : 2 ≤ compCu exc1 exc2 ν1 ν2 K1 K2 := by
-    rw [compCu]
-    exact le_trans (by norm_num : (2 : ℝ≥0∞) ≤ 3) le_add_self
-  have hsmall := compChi_smallness exc1 exc2 ν1 ν2 K1 K2 N
-  have hetaHu : compHuCOf (compT exc1 exc2 ν1 ν2 K1 K2)
-      (cMx K1 K2 : ℝ≥0∞) (compX exc1 exc2 ν1 ν2 K1 K2 N)
-      (cLz N K1 K2) * etaG (5 / 2) Rv μ ≤ 1 := by
-    refine mul_le_one_of_le_inv (le_trans heta ?_)
-    rw [compEtaStar]
-    exact le_trans (min_le_right _ _) (min_le_left _ _)
-  have hu := cG_le_of_compHuCOf Rv μ v0 hhalf
-    (compT exc1 exc2 ν1 ν2 K1 K2) (cMx K1 K2 : ℝ≥0∞)
-    (compX exc1 exc2 ν1 ν2 K1 K2 N) (cLz N K1 K2) hetaHu
-  have hetaStar : etaG (5 / 2) Rv μ
-      ≤ cEtaStar (5 / 2) (1 / 8) (1 / 4) (4 / 27) μ v0
-          (compT exc1 exc2 ν1 ν2 K1 K2) (cMx K1 K2 : ℝ≥0∞)
-          (compX exc1 exc2 ν1 ν2 K1 K2 N) := by
-    refine le_trans heta (le_trans ?_
-      (compEtaOf_le_cEtaStar μ v0 hhalf _ _ _))
-    rw [compEtaStar]
-    exact min_le_left _ _
-  have hKcle : cKc (1 / 8) (1 / 4) (4 / 27) μ v0
-      (compT exc1 exc2 ν1 ν2 K1 K2) (cMx K1 K2 : ℝ≥0∞)
-      (compX exc1 exc2 ν1 ν2 K1 K2 N)
-      ≤ compKcFinal exc1 exc2 ν1 ν2 K1 K2 N := by
-    rw [compKcFinal]
-    exact cKc_le_compKcOf μ v0 hhalf _ _ _
-  constructor
-  · -- the half-barrier clause
-    have h2 : etaG (5 / 2) Rv μ
-        ≤ (2 * compKcFinal exc1 exc2 ν1 ν2 K1 K2 N)⁻¹ := by
-      refine le_trans heta ?_
-      rw [compEtaStar]
-      exact le_trans (min_le_right _ _) (min_le_right _ _)
-    calc compKcFinal exc1 exc2 ν1 ν2 K1 K2 N * etaG (5 / 2) Rv μ
-        ≤ compKcFinal exc1 exc2 ν1 ν2 K1 K2 N
-          * (2 * compKcFinal exc1 exc2 ν1 ν2 K1 K2 N)⁻¹ :=
-          mul_le_mul_right h2 _
-      _ ≤ 2⁻¹ := by
-          rw [ENNReal.le_inv_iff_mul_le]
-          calc compKcFinal exc1 exc2 ν1 ν2 K1 K2 N
-              * (2 * compKcFinal exc1 exc2 ν1 ν2 K1 K2 N)⁻¹ * 2
-              = 2 * compKcFinal exc1 exc2 ν1 ν2 K1 K2 N
-                * (2 * compKcFinal exc1 exc2 ν1 ν2 K1 K2 N)⁻¹ := by
-                ring
-            _ ≤ 1 := ENNReal.mul_inv_le_one _
-  · -- the matching probability
-    have hmain := composite_matching_le_final (5 / 2 : ℝ) Rv μ v0
-      exc1 exc2 ν1 ν2 K1 K2 S E1 E2 N Pm
-      (δ := 1 / 8) (L := 1 / 4) (K := 4 / 27)
-      (by norm_num) (by norm_num) (by norm_num) quarter_L_bound
-      (by norm_num) fourTwentySeventh_K_bound
-      hRv hsymm hμ0 hhalf hN hdeclN1 hcharged1 hdeclN2 hcharged2
-      hpair1 hpair2 hdecl1 hdecl2 hsup1 hsup2 hS1 hSne hEg1 hEg2
-      (compT exc1 exc2 ν1 ν2 K1 K2) 8 (compEM exc1 exc2 ν1 ν2)
-      (cMx K1 K2 : ℝ≥0∞)
-      hT1 hT2 (rootTilt_le Rv μ v0 hhalf) heM1 heM2 hκ1 hκ2
-      compLamS_lt_one
-      (compChi exc1 exc2 ν1 ν2 K1 K2 N)
-      (compC exc1 exc2 ν1 ν2 K1 K2)
-      (compCu exc1 exc2 ν1 ν2 K1 K2)
-      hchi0 hC hafford hcu hsmall hu hetaStar
-      Xs Ys hXs hYs hpairM hlaw
-    refine le_trans ?_ hmain
-    exact tsub_le_tsub_left (mul_le_mul_left hKcle _) 1
-
 /-! ### The no-exception witness -/
 
 /-- The retained exceptional mass of the empty chart vanishes. -/
@@ -1141,229 +918,6 @@ theorem composite_failure_bound_no_exceptions
     hKne hEg hEg hdom heta
 
 end Headline
-
-/-! ### The merged μ-free constants -/
-
-/-- The merged row budget `2·C`: with the rare rows folded into the
-nilpotent block at raw weight, the common and the exceptional rows
-together occupy at most `(1 + eM)·C ≤ 2·C` (`compMpBudget_eq`,
-`compEM_le_one`). -/
-noncomputable def compCM (exc1 exc2 : ℕ → Option (ℕ × ℕ))
-    (ν1 ν2 : PMF ℕ) (K1 K2 : Finset ℕ) : ℝ≥0∞ :=
-  2 * compC exc1 exc2 ν1 ν2 K1 K2
-
-/-- The merged Green debt multiplier `X = cX (2C) (cRank N) cu`. -/
-noncomputable def compXM (exc1 exc2 : ℕ → Option (ℕ × ℕ))
-    (ν1 ν2 : PMF ℕ) (K1 K2 : Finset ℕ) (N : ℕ) : ℝ≥0∞ :=
-  cX (compCM exc1 exc2 ν1 ν2 K1 K2) (cRank N)
-    (compCu exc1 exc2 ν1 ν2 K1 K2)
-
-/-- **The merged μ-free ordinary barrier**: `compKcOf` at the merged
-row budget; the failure constant of
-`composite_failure_bound_massfree`. -/
-noncomputable def compKcFinalM (exc1 exc2 : ℕ → Option (ℕ × ℕ))
-    (ν1 ν2 : PMF ℕ) (K1 K2 : Finset ℕ) (N : ℕ) : ℝ≥0∞ :=
-  compKcOf (compT exc1 exc2 ν1 ν2 K1 K2) (cMx K1 K2 : ℝ≥0∞)
-    (compXM exc1 exc2 ν1 ν2 K1 K2 N)
-
-/-- **The merged μ-free threshold**: the minimum of the absorption
-entry, the screen-closure entry, and the half-barrier entry, all at
-the merged Green debt multiplier. -/
-noncomputable def compEtaStarM (exc1 exc2 : ℕ → Option (ℕ × ℕ))
-    (ν1 ν2 : PMF ℕ) (K1 K2 : Finset ℕ) (N : ℕ) : ℝ≥0∞ :=
-  min ((compC2Of (compT exc1 exc2 ν1 ν2 K1 K2) (cMx K1 K2 : ℝ≥0∞)
-        (compXM exc1 exc2 ν1 ν2 K1 K2 N)
-      + compC3Of (compT exc1 exc2 ν1 ν2 K1 K2) (cMx K1 K2 : ℝ≥0∞)
-          (compXM exc1 exc2 ν1 ν2 K1 K2 N) + 1)⁻¹)
-    (min ((compHuCOf (compT exc1 exc2 ν1 ν2 K1 K2) (cMx K1 K2 : ℝ≥0∞)
-          (compXM exc1 exc2 ν1 ν2 K1 K2 N) (cLz N K1 K2))⁻¹)
-      ((2 * compKcFinalM exc1 exc2 ν1 ν2 K1 K2 N)⁻¹))
-
-/-! ### `eq:composite-K-eps` in closed form -/
-
-/-- The linear debt coefficient at `δ = 1/8` in closed form:
-`B₁ = (25/4 + 4Tκ)·X`. -/
-lemma cLinB_eq (T κ X : ℝ≥0∞) :
-    cLinB (1 / 8) T κ X = (25 / 4 + 4 * T * κ) * X := by
-  have h94 : ENNReal.ofReal (2 * (1 + 1 / 8)) = 9 / 4 := by
-    rw [show (2 : ℝ) * (1 + 1 / 8) = 9 / 4 by norm_num,
-      ENNReal.ofReal_div_of_pos (by norm_num)]
-    norm_num
-  have h164 : (4 : ℝ≥0∞) = 16 / 4 := by
-    rw [ENNReal.eq_div_iff (by norm_num) (by norm_num)]
-    norm_num
-  have h25 : (9 : ℝ≥0∞) / 4 + 4 = 25 / 4 := by
-    nth_rewrite 2 [h164]
-    rw [ENNReal.div_add_div_same]
-    norm_num
-  rw [cLinB, h94, h25]
-
-/-- **`C_W` of `eq:composite-K-eps`**: the merged row budget in closed form,
-`C_W = 32m + 256m²T` at `m = cMx`. -/
-lemma compCM_eq (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ) (K1 K2 : Finset ℕ) :
-    compCM exc1 exc2 ν1 ν2 K1 K2
-      = 32 * (cMx K1 K2 : ℝ≥0∞)
-        + 256 * (cMx K1 K2 : ℝ≥0∞) ^ 2 * compT exc1 exc2 ν1 ν2 K1 K2 := by
-  rw [compCM, compC, cNcBudget]
-  ring
-
-/-- **`Ξ` of `eq:composite-K-eps`**: the merged Green debt multiplier in closed form,
-`Ξ = 2(16T + 3)·∑_{j<r}(2C_W)^j` at `r = cRank N`. -/
-lemma compXM_eq (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ)
-    (K1 K2 : Finset ℕ) (N : ℕ) :
-    compXM exc1 exc2 ν1 ν2 K1 K2 N
-      = 2 * (16 * compT exc1 exc2 ν1 ν2 K1 K2 + 3)
-        * ∑ j : Fin (cRank N), (2 * compCM exc1 exc2 ν1 ν2 K1 K2) ^ (j : ℕ) := by
-  rw [compXM, cX, graftGreenMultiplier, graftGreenRemainder, compCu]
-  ring
-
-/-- **`K` of `eq:composite-K-eps`**: the merged ordinary barrier in closed form,
-`K = 6(4 + (25/4 + 4Tm)Ξ)`. -/
-lemma compKcFinalM_eq (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ)
-    (K1 K2 : Finset ℕ) (N : ℕ) :
-    compKcFinalM exc1 exc2 ν1 ν2 K1 K2 N
-      = 6 * (4 + (25 / 4 + 4 * compT exc1 exc2 ν1 ν2 K1 K2 * (cMx K1 K2 : ℝ≥0∞))
-          * compXM exc1 exc2 ν1 ν2 K1 K2 N) := by
-  rw [compKcFinalM, compKcOf, cLinB_eq]
-  ring
-
-/-- **`B` of `eq:composite-K-eps`**: the μ-free quadratic coefficient in closed form,
-`B = 160K² + 12KΞ(1 + Tκ) + 4Tκ·Ξ²`. -/
-lemma compB2Of_eq (T κ X : ℝ≥0∞) :
-    compB2Of T κ X
-      = 160 * compKcOf T κ X ^ 2
-        + 12 * compKcOf T κ X * X * (1 + T * κ) + 4 * T * κ * X ^ 2 := by
-  rw [compB2Of]
-  ring
-
-/-- **`A` of `eq:composite-K-eps`**: the absorption entry in closed form,
-`A = 16B + 15(K + (25/4 + 4Tκ)Ξ) + 1`. -/
-lemma compAM_eq (T κ X : ℝ≥0∞) :
-    compC2Of T κ X + compC3Of T κ X + 1
-      = 16 * compB2Of T κ X
-        + 15 * (compKcOf T κ X + (25 / 4 + 4 * T * κ) * X) + 1 := by
-  rw [compC2Of, compC3Of, cLinB_eq]
-  ring
-
-/-- **`H` of `eq:composite-K-eps`**: the screen-closure entry in closed form,
-`H = 3K + (1 + 8T)(24KΞ + 16(n_A·m·Ξ)²)` at the singleton-length budget
-`Lz = 2·n_A·m`. -/
-lemma compHuCOf_eq (T κ X : ℝ≥0∞) (nA m : ℕ) :
-    compHuCOf T κ X (2 * (nA * m))
-      = 3 * compKcOf T κ X
-        + (1 + 8 * T) * (24 * (compKcOf T κ X * X)
-            + 16 * ((nA : ℝ≥0∞) * (m : ℝ≥0∞) * X) ^ 2) := by
-  rw [compHuCOf]
-  push_cast
-  ring
-
-/-- **`ε` of `eq:composite-K-eps`**: the merged threshold is the inverse of the maximum
-of the absorption entry, the screen-closure entry, and twice the barrier,
-`ε⁻¹ = max {A, H, 2K}`. -/
-lemma compEtaStarM_eq (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ)
-    (K1 K2 : Finset ℕ) (N : ℕ) :
-    compEtaStarM exc1 exc2 ν1 ν2 K1 K2 N
-      = (max (compC2Of (compT exc1 exc2 ν1 ν2 K1 K2) (cMx K1 K2 : ℝ≥0∞)
-            (compXM exc1 exc2 ν1 ν2 K1 K2 N)
-          + compC3Of (compT exc1 exc2 ν1 ν2 K1 K2) (cMx K1 K2 : ℝ≥0∞)
-              (compXM exc1 exc2 ν1 ν2 K1 K2 N) + 1)
-        (max (compHuCOf (compT exc1 exc2 ν1 ν2 K1 K2) (cMx K1 K2 : ℝ≥0∞)
-            (compXM exc1 exc2 ν1 ν2 K1 K2 N) (cLz N K1 K2))
-          (2 * compKcFinalM exc1 exc2 ν1 ν2 K1 K2 N)))⁻¹ := by
-  have hminmax : ∀ a b : ℝ≥0∞, min a⁻¹ b⁻¹ = (max a b)⁻¹ := by
-    intro a b
-    rcases le_total a b with h | h
-    · rw [max_eq_right h, min_eq_right (ENNReal.inv_le_inv.mpr h)]
-    · rw [max_eq_left h, min_eq_left (ENNReal.inv_le_inv.mpr h)]
-  rw [compEtaStarM, hminmax, hminmax]
-
-/-! ### Finiteness and positivity of the merged constants -/
-
-section MergedInstance
-
-variable (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ)
-variable (K1 K2 : Finset ℕ) (N : ℕ)
-
-lemma compCM_ne_top
-    (hsup1 : ∀ k, (ν1 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K1)
-    (hdecl1 : ∀ k p, exc1 k = some p → ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
-    (hsup2 : ∀ k, (ν2 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K2)
-    (hdecl2 : ∀ k p, exc2 k = some p → ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0) :
-    compCM exc1 exc2 ν1 ν2 K1 K2 ≠ ⊤ := by
-  rw [compCM]
-  exact ENNReal.mul_ne_top ENNReal.ofNat_ne_top
-    (compC_ne_top exc1 exc2 ν1 ν2 K1 K2 hsup1 hdecl1 hsup2 hdecl2)
-
-lemma compXM_ne_top
-    (hsup1 : ∀ k, (ν1 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K1)
-    (hdecl1 : ∀ k p, exc1 k = some p → ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
-    (hsup2 : ∀ k, (ν2 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K2)
-    (hdecl2 : ∀ k p, exc2 k = some p → ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0) :
-    compXM exc1 exc2 ν1 ν2 K1 K2 N ≠ ⊤ := by
-  rw [compXM, cX, graftGreenMultiplier, graftGreenRemainder]
-  refine ENNReal.mul_ne_top (ENNReal.mul_ne_top ENNReal.ofNat_ne_top ?_)
-    (compCu_ne_top exc1 exc2 ν1 ν2 K1 K2 hsup1 hdecl1 hsup2 hdecl2)
-  refine ENNReal.sum_ne_top.mpr fun j _ => ENNReal.pow_ne_top ?_
-  exact ENNReal.mul_ne_top ENNReal.ofNat_ne_top
-    (compCM_ne_top exc1 exc2 ν1 ν2 K1 K2 hsup1 hdecl1 hsup2 hdecl2)
-
-/-- **Finiteness of the merged failure constant.** -/
-theorem compKcFinalM_ne_top
-    (hsup1 : ∀ k, (ν1 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K1)
-    (hdecl1 : ∀ k p, exc1 k = some p → ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
-    (hsup2 : ∀ k, (ν2 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K2)
-    (hdecl2 : ∀ k p, exc2 k = some p → ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0) :
-    compKcFinalM exc1 exc2 ν1 ν2 K1 K2 N ≠ ⊤ := by
-  rw [compKcFinalM]
-  exact compKcOf_ne_top
-    (compT_ne_top exc1 exc2 ν1 ν2 K1 K2 hsup1 hdecl1 hsup2 hdecl2)
-    (ENNReal.natCast_ne_top _)
-    (compXM_ne_top exc1 exc2 ν1 ν2 K1 K2 N hsup1 hdecl1 hsup2 hdecl2)
-
-/-- **Positivity of the merged threshold**: under chargedness of the
-declared pairs all three entries of the minimum are positive. -/
-theorem compEtaStarM_pos
-    (hsup1 : ∀ k, (ν1 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K1)
-    (hdecl1 : ∀ k p, exc1 k = some p → ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
-    (hsup2 : ∀ k, (ν2 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K2)
-    (hdecl2 : ∀ k p, exc2 k = some p → ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0) :
-    0 < compEtaStarM exc1 exc2 ν1 ν2 K1 K2 N := by
-  have hT := compT_ne_top exc1 exc2 ν1 ν2 K1 K2 hsup1 hdecl1 hsup2 hdecl2
-  have hκ : (cMx K1 K2 : ℝ≥0∞) ≠ ⊤ := ENNReal.natCast_ne_top _
-  have hX := compXM_ne_top exc1 exc2 ν1 ν2 K1 K2 N hsup1 hdecl1 hsup2
-    hdecl2
-  rw [compEtaStarM]
-  refine lt_min_iff.mpr ⟨?_, lt_min_iff.mpr ⟨?_, ?_⟩⟩
-  · rw [ENNReal.inv_pos]
-    exact ENNReal.add_ne_top.mpr
-      ⟨ENNReal.add_ne_top.mpr
-        ⟨compC2Of_ne_top hT hκ hX, compC3Of_ne_top hT hκ hX⟩,
-        ENNReal.one_ne_top⟩
-  · rw [ENNReal.inv_pos]
-    exact compHuCOf_ne_top hT hκ hX _
-  · rw [ENNReal.inv_pos]
-    refine ENNReal.mul_ne_top ENNReal.ofNat_ne_top ?_
-    exact compKcFinalM_ne_top exc1 exc2 ν1 ν2 K1 K2 N hsup1 hdecl1
-      hsup2 hdecl2
-
-/-- The merged threshold is nonzero (the form used by the headline
-hypotheses). -/
-theorem compEtaStarM_ne_zero
-    (hsup1 : ∀ k, (ν1 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K1)
-    (hdecl1 : ∀ k p, exc1 k = some p → ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
-    (hsup2 : ∀ k, (ν2 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K2)
-    (hdecl2 : ∀ k p, exc2 k = some p → ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0) :
-    compEtaStarM exc1 exc2 ν1 ν2 K1 K2 N ≠ 0 :=
-  (compEtaStarM_pos exc1 exc2 ν1 ν2 K1 K2 N hsup1 hdecl1 hsup2
-    hdecl2).ne'
-
-/-- The merged threshold is finite: the absorption entry is at most
-one. -/
-theorem compEtaStarM_ne_top :
-    compEtaStarM exc1 exc2 ν1 ν2 K1 K2 N ≠ ⊤ := by
-  refine ne_top_of_le_ne_top ENNReal.one_ne_top ?_
-  rw [compEtaStarM]
-  exact le_trans (min_le_left _ _) (ENNReal.inv_le_one.mpr le_add_self)
 
 /-! ### The merged constants at an arbitrary tilt budget -/
 
@@ -1449,6 +1003,190 @@ lemma compXMT_mono {T T' : ℝ≥0∞} (h : T ≤ T') (K1 K2 : Finset ℕ) (N : 
     cNcBudget, cNcBudget]
   gcongr
 
+/-- The threshold at any tilt budget is finite: the absorption entry is at
+most one. -/
+theorem compEtaStarMT_ne_top (T : ℝ≥0∞) (K1 K2 : Finset ℕ) (N : ℕ) :
+    compEtaStarMT T K1 K2 N ≠ ⊤ := by
+  refine ne_top_of_le_ne_top ENNReal.one_ne_top ?_
+  rw [compEtaStarMT]
+  exact le_trans (min_le_left _ _) (ENNReal.inv_le_one.mpr le_add_self)
+
+/-! ### The merged μ-free constants -/
+
+/-- The merged row budget `2·C`, the budgeted `compCMT` at the μ-free tilt
+budget `compT`: with the rare rows folded into the nilpotent block at raw
+weight, the common and the exceptional rows together occupy at most
+`(1 + eM)·C ≤ 2·C` (`compMpBudget_eq`, `compEM_le_one`). -/
+noncomputable def compCM (exc1 exc2 : ℕ → Option (ℕ × ℕ))
+    (ν1 ν2 : PMF ℕ) (K1 K2 : Finset ℕ) : ℝ≥0∞ :=
+  compCMT (compT exc1 exc2 ν1 ν2 K1 K2) K1 K2
+
+/-- The merged Green debt multiplier `X = cX (2C) (cRank N) cu`, the budgeted `compXMT` at `compT`. -/
+noncomputable def compXM (exc1 exc2 : ℕ → Option (ℕ × ℕ))
+    (ν1 ν2 : PMF ℕ) (K1 K2 : Finset ℕ) (N : ℕ) : ℝ≥0∞ :=
+  compXMT (compT exc1 exc2 ν1 ν2 K1 K2) K1 K2 N
+
+/-- **The merged μ-free ordinary barrier**: `compKcOf` at the merged
+row budget; the failure constant of
+`composite_failure_bound_massfree`. -/
+noncomputable def compKcFinalM (exc1 exc2 : ℕ → Option (ℕ × ℕ))
+    (ν1 ν2 : PMF ℕ) (K1 K2 : Finset ℕ) (N : ℕ) : ℝ≥0∞ :=
+  compKcFinalMT (compT exc1 exc2 ν1 ν2 K1 K2) K1 K2 N
+
+/-- **The merged μ-free threshold**: the minimum of the absorption
+entry, the screen-closure entry, and the half-barrier entry, all at
+the merged Green debt multiplier. -/
+noncomputable def compEtaStarM (exc1 exc2 : ℕ → Option (ℕ × ℕ))
+    (ν1 ν2 : PMF ℕ) (K1 K2 : Finset ℕ) (N : ℕ) : ℝ≥0∞ :=
+  compEtaStarMT (compT exc1 exc2 ν1 ν2 K1 K2) K1 K2 N
+
+/-! ### `eq:composite-K-eps` in closed form -/
+
+/-- The linear debt coefficient at `δ = 1/8` in closed form:
+`B₁ = (25/4 + 4Tκ)·X`. -/
+lemma cLinB_eq (T κ X : ℝ≥0∞) :
+    cLinB (1 / 8) T κ X = (25 / 4 + 4 * T * κ) * X := by
+  have h94 : ENNReal.ofReal (2 * (1 + 1 / 8)) = 9 / 4 := by
+    rw [show (2 : ℝ) * (1 + 1 / 8) = 9 / 4 by norm_num,
+      ENNReal.ofReal_div_of_pos (by norm_num)]
+    norm_num
+  have h164 : (4 : ℝ≥0∞) = 16 / 4 := by
+    rw [ENNReal.eq_div_iff (by norm_num) (by norm_num)]
+    norm_num
+  have h25 : (9 : ℝ≥0∞) / 4 + 4 = 25 / 4 := by
+    nth_rewrite 2 [h164]
+    rw [ENNReal.div_add_div_same]
+    norm_num
+  rw [cLinB, h94, h25]
+
+/-- **`C_W` of `eq:composite-K-eps`**: the merged row budget in closed form,
+`C_W = 32m + 256m²T` at `m = cMx`. -/
+lemma compCM_eq (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ) (K1 K2 : Finset ℕ) :
+    compCM exc1 exc2 ν1 ν2 K1 K2
+      = 32 * (cMx K1 K2 : ℝ≥0∞)
+        + 256 * (cMx K1 K2 : ℝ≥0∞) ^ 2 * compT exc1 exc2 ν1 ν2 K1 K2 := by
+  rw [compCM, compCMT, cNcBudget]
+  ring
+
+/-- **`Ξ` of `eq:composite-K-eps`**: the merged Green debt multiplier in closed form,
+`Ξ = 2(16T + 3)·∑_{j<r}(2C_W)^j` at `r = cRank N`. -/
+lemma compXM_eq (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ)
+    (K1 K2 : Finset ℕ) (N : ℕ) :
+    compXM exc1 exc2 ν1 ν2 K1 K2 N
+      = 2 * (16 * compT exc1 exc2 ν1 ν2 K1 K2 + 3)
+        * ∑ j : Fin (cRank N), (2 * compCM exc1 exc2 ν1 ν2 K1 K2) ^ (j : ℕ) := by
+  rw [compXM, compXMT, cX, graftGreenMultiplier, graftGreenRemainder, compCuT, ← compCM]
+  ring
+
+/-- **`K` of `eq:composite-K-eps`**: the merged ordinary barrier in closed form,
+`K = 6(4 + (25/4 + 4Tm)Ξ)`. -/
+lemma compKcFinalM_eq (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ)
+    (K1 K2 : Finset ℕ) (N : ℕ) :
+    compKcFinalM exc1 exc2 ν1 ν2 K1 K2 N
+      = 6 * (4 + (25 / 4 + 4 * compT exc1 exc2 ν1 ν2 K1 K2 * (cMx K1 K2 : ℝ≥0∞))
+          * compXM exc1 exc2 ν1 ν2 K1 K2 N) := by
+  rw [compKcFinalM, compKcFinalMT, compKcOf, cLinB_eq, ← compXM]
+  ring
+
+/-- **`B` of `eq:composite-K-eps`**: the μ-free quadratic coefficient in closed form,
+`B = 160K² + 12KΞ(1 + Tκ) + 4Tκ·Ξ²`. -/
+lemma compB2Of_eq (T κ X : ℝ≥0∞) :
+    compB2Of T κ X
+      = 160 * compKcOf T κ X ^ 2
+        + 12 * compKcOf T κ X * X * (1 + T * κ) + 4 * T * κ * X ^ 2 := by
+  rw [compB2Of]
+  ring
+
+/-- **`A` of `eq:composite-K-eps`**: the absorption entry in closed form,
+`A = 16B + 15(K + (25/4 + 4Tκ)Ξ) + 1`. -/
+lemma compAM_eq (T κ X : ℝ≥0∞) :
+    compC2Of T κ X + compC3Of T κ X + 1
+      = 16 * compB2Of T κ X
+        + 15 * (compKcOf T κ X + (25 / 4 + 4 * T * κ) * X) + 1 := by
+  rw [compC2Of, compC3Of, cLinB_eq]
+  ring
+
+/-- **`H` of `eq:composite-K-eps`**: the screen-closure entry in closed form,
+`H = 3K + (1 + 8T)(24KΞ + 16(n_A·m·Ξ)²)` at the singleton-length budget
+`Lz = 2·n_A·m`. -/
+lemma compHuCOf_eq (T κ X : ℝ≥0∞) (nA m : ℕ) :
+    compHuCOf T κ X (2 * (nA * m))
+      = 3 * compKcOf T κ X
+        + (1 + 8 * T) * (24 * (compKcOf T κ X * X)
+            + 16 * ((nA : ℝ≥0∞) * (m : ℝ≥0∞) * X) ^ 2) := by
+  rw [compHuCOf]
+  push_cast
+  ring
+
+/-- **`ε` of `eq:composite-K-eps`**: the merged threshold is the inverse of the maximum
+of the absorption entry, the screen-closure entry, and twice the barrier,
+`ε⁻¹ = max {A, H, 2K}`. -/
+lemma compEtaStarM_eq (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ)
+    (K1 K2 : Finset ℕ) (N : ℕ) :
+    compEtaStarM exc1 exc2 ν1 ν2 K1 K2 N
+      = (max (compC2Of (compT exc1 exc2 ν1 ν2 K1 K2) (cMx K1 K2 : ℝ≥0∞)
+            (compXM exc1 exc2 ν1 ν2 K1 K2 N)
+          + compC3Of (compT exc1 exc2 ν1 ν2 K1 K2) (cMx K1 K2 : ℝ≥0∞)
+              (compXM exc1 exc2 ν1 ν2 K1 K2 N) + 1)
+        (max (compHuCOf (compT exc1 exc2 ν1 ν2 K1 K2) (cMx K1 K2 : ℝ≥0∞)
+            (compXM exc1 exc2 ν1 ν2 K1 K2 N) (cLz N K1 K2))
+          (2 * compKcFinalM exc1 exc2 ν1 ν2 K1 K2 N)))⁻¹ := by
+  have hminmax : ∀ a b : ℝ≥0∞, min a⁻¹ b⁻¹ = (max a b)⁻¹ := by
+    intro a b
+    rcases le_total a b with h | h
+    · rw [max_eq_right h, min_eq_right (ENNReal.inv_le_inv.mpr h)]
+    · rw [max_eq_left h, min_eq_left (ENNReal.inv_le_inv.mpr h)]
+  rw [compEtaStarM, compEtaStarMT, ← compXM, ← compKcFinalM, hminmax, hminmax]
+
+/-! ### Finiteness and positivity of the merged constants -/
+
+section MergedInstance
+
+variable (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ)
+variable (K1 K2 : Finset ℕ) (N : ℕ)
+
+lemma compCM_ne_top
+    (hsup1 : ∀ k, (ν1 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K1)
+    (hdecl1 : ∀ k p, exc1 k = some p → ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
+    (hsup2 : ∀ k, (ν2 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K2)
+    (hdecl2 : ∀ k p, exc2 k = some p → ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0) :
+    compCM exc1 exc2 ν1 ν2 K1 K2 ≠ ⊤ :=
+  compCMT_ne_top (compT_ne_top exc1 exc2 ν1 ν2 K1 K2 hsup1 hdecl1 hsup2 hdecl2) K1 K2
+
+lemma compXM_ne_top
+    (hsup1 : ∀ k, (ν1 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K1)
+    (hdecl1 : ∀ k p, exc1 k = some p → ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
+    (hsup2 : ∀ k, (ν2 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K2)
+    (hdecl2 : ∀ k p, exc2 k = some p → ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0) :
+    compXM exc1 exc2 ν1 ν2 K1 K2 N ≠ ⊤ :=
+  compXMT_ne_top (compT_ne_top exc1 exc2 ν1 ν2 K1 K2 hsup1 hdecl1 hsup2 hdecl2) K1 K2 N
+
+/-- **Finiteness of the merged failure constant.** -/
+theorem compKcFinalM_ne_top
+    (hsup1 : ∀ k, (ν1 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K1)
+    (hdecl1 : ∀ k p, exc1 k = some p → ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
+    (hsup2 : ∀ k, (ν2 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K2)
+    (hdecl2 : ∀ k p, exc2 k = some p → ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0) :
+    compKcFinalM exc1 exc2 ν1 ν2 K1 K2 N ≠ ⊤ :=
+  compKcFinalMT_ne_top (compT_ne_top exc1 exc2 ν1 ν2 K1 K2 hsup1 hdecl1 hsup2 hdecl2) K1 K2 N
+
+/-- **Positivity of the merged threshold**: under chargedness of the
+declared pairs the μ-free tilt budget is finite, and the budgeted
+threshold is positive at every finite budget. -/
+theorem compEtaStarM_pos
+    (hsup1 : ∀ k, (ν1 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K1)
+    (hdecl1 : ∀ k p, exc1 k = some p → ν1 p.1 ≠ 0 ∧ ν1 p.2 ≠ 0)
+    (hsup2 : ∀ k, (ν2 k : ℝ≥0∞) ≠ 0 ↔ k ∈ K2)
+    (hdecl2 : ∀ k p, exc2 k = some p → ν2 p.1 ≠ 0 ∧ ν2 p.2 ≠ 0) :
+    0 < compEtaStarM exc1 exc2 ν1 ν2 K1 K2 N :=
+  compEtaStarMT_pos (compT_ne_top exc1 exc2 ν1 ν2 K1 K2 hsup1 hdecl1 hsup2 hdecl2) K1 K2 N
+
+/-- The merged threshold is finite: the absorption entry is at most
+one. -/
+theorem compEtaStarM_ne_top :
+    compEtaStarM exc1 exc2 ν1 ν2 K1 K2 N ≠ ⊤ :=
+  compEtaStarMT_ne_top _ K1 K2 N
+
 /-- The linear debt coefficient is monotone in the tilt budget and the multiplier. -/
 lemma cLinB_mono {T T' X X' : ℝ≥0∞} (κ : ℝ≥0∞) (hT : T ≤ T') (hX : X ≤ X') :
     cLinB (1 / 8) T κ X ≤ cLinB (1 / 8) T' κ X' := by
@@ -1516,7 +1254,7 @@ lemma compKcFinalM_mul_le_half {η : ℝ≥0∞}
     compKcFinalM exc1 exc2 ν1 ν2 K1 K2 N * η ≤ 2⁻¹ := by
   have h2 : η ≤ (2 * compKcFinalM exc1 exc2 ν1 ν2 K1 K2 N)⁻¹ := by
     refine le_trans heta ?_
-    rw [compEtaStarM]
+    rw [compEtaStarM, compEtaStarMT]
     exact le_trans (min_le_right _ _) (min_le_right _ _)
   calc compKcFinalM exc1 exc2 ν1 ν2 K1 K2 N * η
       ≤ compKcFinalM exc1 exc2 ν1 ν2 K1 K2 N
@@ -1588,8 +1326,8 @@ theorem composite_failure_bound_massfree
       + cMpBudget (compEM exc1 exc2 ν1 ν2)
           (8 * compT exc1 exc2 ν1 ν2 K1 K2) (cMx K1 K2)
       ≤ compCM exc1 exc2 ν1 ν2 K1 K2 := by
-    rw [compMpBudget_eq exc1 exc2 ν1 ν2 K1 K2, compCM, two_mul]
-    refine add_le_add (le_of_eq (by rw [compC])) ?_
+    rw [compMpBudget_eq exc1 exc2 ν1 ν2 K1 K2, compCM, compCMT, ← compC, two_mul]
+    refine add_le_add le_rfl ?_
     calc compEM exc1 exc2 ν1 ν2 * compC exc1 exc2 ν1 ν2 K1 K2
         ≤ 1 * compC exc1 exc2 ν1 ν2 K1 K2 :=
           mul_le_mul_left (compEM_le_one exc1 exc2 ν1 ν2) _
@@ -1601,7 +1339,7 @@ theorem composite_failure_bound_massfree
       (cMx K1 K2 : ℝ≥0∞) (compXM exc1 exc2 ν1 ν2 K1 K2 N)
       (cLz N K1 K2) * etaG (5 / 2) Rv μ ≤ 1 := by
     refine mul_le_one_of_le_inv (le_trans heta ?_)
-    rw [compEtaStarM]
+    rw [compEtaStarM, compEtaStarMT]
     exact le_trans (min_le_right _ _) (min_le_left _ _)
   have hu := cG_le_of_compHuCOf Rv μ v0 hhalf
     (compT exc1 exc2 ν1 ν2 K1 K2) (cMx K1 K2 : ℝ≥0∞)
@@ -1612,7 +1350,7 @@ theorem composite_failure_bound_massfree
           (compXM exc1 exc2 ν1 ν2 K1 K2 N) := by
     refine le_trans heta (le_trans ?_
       (compEtaOf_le_cEtaStar μ v0 hhalf _ _ _))
-    rw [compEtaStarM]
+    rw [compEtaStarM, compEtaStarMT]
     exact min_le_left _ _
   have hmain := composite_failure_le_merged (5 / 2 : ℝ) Rv μ v0
     exc1 exc2 ν1 ν2 K1 K2 S E1 E2 N
@@ -1630,7 +1368,7 @@ theorem composite_failure_bound_massfree
     hC hcu hu hetaStar
   intro h
   refine le_trans (hmain h) (mul_le_mul_left ?_ _)
-  rw [compKcFinalM]
+  rw [compKcFinalM, compKcFinalMT]
   exact cKc_le_compKcOf μ v0 hhalf _ _ _
 
 /-- **The composite two-law matching theorem, mass-free form**
@@ -1699,8 +1437,8 @@ theorem composite_matching_bound_massfree {Omega : Type*}
       + cMpBudget (compEM exc1 exc2 ν1 ν2)
           (8 * compT exc1 exc2 ν1 ν2 K1 K2) (cMx K1 K2)
       ≤ compCM exc1 exc2 ν1 ν2 K1 K2 := by
-    rw [compMpBudget_eq exc1 exc2 ν1 ν2 K1 K2, compCM, two_mul]
-    refine add_le_add (le_of_eq (by rw [compC])) ?_
+    rw [compMpBudget_eq exc1 exc2 ν1 ν2 K1 K2, compCM, compCMT, ← compC, two_mul]
+    refine add_le_add le_rfl ?_
     calc compEM exc1 exc2 ν1 ν2 * compC exc1 exc2 ν1 ν2 K1 K2
         ≤ 1 * compC exc1 exc2 ν1 ν2 K1 K2 :=
           mul_le_mul_left (compEM_le_one exc1 exc2 ν1 ν2) _
@@ -1712,7 +1450,7 @@ theorem composite_matching_bound_massfree {Omega : Type*}
       (cMx K1 K2 : ℝ≥0∞) (compXM exc1 exc2 ν1 ν2 K1 K2 N)
       (cLz N K1 K2) * etaG (5 / 2) Rv μ ≤ 1 := by
     refine mul_le_one_of_le_inv (le_trans heta ?_)
-    rw [compEtaStarM]
+    rw [compEtaStarM, compEtaStarMT]
     exact le_trans (min_le_right _ _) (min_le_left _ _)
   have hu := cG_le_of_compHuCOf Rv μ v0 hhalf
     (compT exc1 exc2 ν1 ν2 K1 K2) (cMx K1 K2 : ℝ≥0∞)
@@ -1723,20 +1461,20 @@ theorem composite_matching_bound_massfree {Omega : Type*}
           (compXM exc1 exc2 ν1 ν2 K1 K2 N) := by
     refine le_trans heta (le_trans ?_
       (compEtaOf_le_cEtaStar μ v0 hhalf _ _ _))
-    rw [compEtaStarM]
+    rw [compEtaStarM, compEtaStarMT]
     exact min_le_left _ _
   have hKcle : cKc (1 / 8) (1 / 4) (4 / 27) μ v0
       (compT exc1 exc2 ν1 ν2 K1 K2) (cMx K1 K2 : ℝ≥0∞)
       (compXM exc1 exc2 ν1 ν2 K1 K2 N)
       ≤ compKcFinalM exc1 exc2 ν1 ν2 K1 K2 N := by
-    rw [compKcFinalM]
+    rw [compKcFinalM, compKcFinalMT]
     exact cKc_le_compKcOf μ v0 hhalf _ _ _
   constructor
   · -- the half-barrier clause
     have h2 : etaG (5 / 2) Rv μ
         ≤ (2 * compKcFinalM exc1 exc2 ν1 ν2 K1 K2 N)⁻¹ := by
       refine le_trans heta ?_
-      rw [compEtaStarM]
+      rw [compEtaStarM, compEtaStarMT]
       exact le_trans (min_le_right _ _) (min_le_right _ _)
     calc compKcFinalM exc1 exc2 ν1 ν2 K1 K2 N * etaG (5 / 2) Rv μ
         ≤ compKcFinalM exc1 exc2 ν1 ν2 K1 K2 N
@@ -1781,7 +1519,7 @@ lemma compKcFinalM_le_MT {T : ℝ≥0∞}
         = compXMT (compT exc1 exc2 ν1 ν2 K1 K2) K1 K2 N := rfl
     rw [h1]
     exact compXMT_mono hT K1 K2 N
-  rw [compKcFinalM, compKcFinalMT]
+  unfold compKcFinalM compKcFinalMT
   exact compKcOf_mono _ hT hXM
 
 /-- At any tilt budget dominating both μ-free tilt sums, the budgeted threshold is
@@ -1797,7 +1535,7 @@ lemma compEtaStarMT_le_M {T : ℝ≥0∞}
     rw [h1]
     exact compXMT_mono hT K1 K2 N
   have hKc := compKcFinalM_le_MT exc1 exc2 ν1 ν2 K1 K2 N hT1 hT2
-  rw [compEtaStarMT, compEtaStarM]
+  unfold compEtaStarM compEtaStarMT
   refine min_le_min (ENNReal.inv_le_inv.mpr ?_)
     (min_le_min (ENNReal.inv_le_inv.mpr ?_) (ENNReal.inv_le_inv.mpr ?_))
   · exact add_le_add (add_le_add (compC2Of_mono _ hT hXM)

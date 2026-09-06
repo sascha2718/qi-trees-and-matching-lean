@@ -17,8 +17,6 @@ namespace GraphMarkovMatching
 open GraphMarkovMatching.Support Real
 open scoped ENNReal Classical
 
-set_option maxHeartbeats 1600000
-
 universe u
 variable {X : Type u}
 
@@ -65,6 +63,7 @@ lemma sorted_bound_to_S {α L A0 A1 B0 B1 : ℝ}
 
 /-! ### The pointwise main bound -/
 
+set_option maxHeartbeats 1600000 in
 /-- **The pointwise four-law bound** on a good pair. -/
 lemma phi_Q_split_four {α L : ℝ} (hα1 : 1 ≤ α)
     (hL0 : 0 ≤ L) (hL : ∀ t : ℝ, 0 ≤ t → t / (1 + t) ^ α ≤ L)

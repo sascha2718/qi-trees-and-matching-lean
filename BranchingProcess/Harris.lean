@@ -140,37 +140,14 @@ theorem sampleMeasure_root_decorated (θ : Offspring J) (hJN : J ≤ N)
         * (∏ m ∈ Finset.range k, survivalMeasure θ (A m))
         * ∏ m ∈ Finset.range (j - k), bushMeasure θ (B m) := by
   classical
-  have hdecomp : ((({c : Word N → ℕ | c [] = j} ∩ {c : Word N → ℕ | skeletonDegree c = k})
-        ∩ {c : Word N → ℕ | ∀ m : ℕ, m < k → bushAt c m ∈ A m})
+  have h := measure_root_skeletonDegree_eq_sum (sampleMeasure (N := N) θ) j k
+    (X := {c : Word N → ℕ | ∀ m : ℕ, m < k → bushAt c m ∈ A m}
       ∩ {c : Word N → ℕ | ∀ m : ℕ, m < j - k → dyingAt c m ∈ B m})
-      = ⋃ S ∈ (childSet N j).powersetCard k,
-          ((({c : Word N → ℕ | c [] = j} ∩ {c : Word N → ℕ | survivors c = S})
-              ∩ {c : Word N → ℕ | ∀ m : ℕ, m < S.card → bushOf S m c ∈ A m})
-            ∩ {c : Word N → ℕ | ∀ m : ℕ, m < j - k → dyingAt c m ∈ B m}) := by
-    ext c
-    simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_iUnion, Finset.mem_powersetCard,
-      exists_prop]
-    constructor
-    · rintro ⟨⟨⟨hroot, hk⟩, hbush⟩, hdy⟩
-      refine ⟨survivors c, ⟨?_, hk⟩, ⟨⟨hroot, rfl⟩, fun m hm ↦ hbush m (hk ▸ hm)⟩, hdy⟩
-      rw [← hroot]
-      exact survivors_subset c
-    · rintro ⟨S, ⟨-, hcard⟩, ⟨⟨hroot, rfl⟩, hbush⟩, hdy⟩
-      exact ⟨⟨⟨hroot, hcard⟩, fun m hm ↦ hbush m (hcard ▸ hm)⟩, hdy⟩
-  have hdisj : ((childSet N j).powersetCard k : Set (Finset (Fin N))).PairwiseDisjoint
-      (fun S ↦ ((({c : Word N → ℕ | c [] = j} ∩ {c : Word N → ℕ | survivors c = S})
-          ∩ {c : Word N → ℕ | ∀ m : ℕ, m < S.card → bushOf S m c ∈ A m})
-        ∩ {c : Word N → ℕ | ∀ m : ℕ, m < j - k → dyingAt c m ∈ B m})) := by
-    intro S _ T _ hST
-    refine Set.disjoint_left.mpr fun c hc hc' ↦ hST ?_
-    rw [← hc.1.1.2]
-    exact hc'.1.1.2
-  have hmeas : ∀ S ∈ (childSet N j).powersetCard k,
-      MeasurableSet ((({c : Word N → ℕ | c [] = j} ∩ {c : Word N → ℕ | survivors c = S})
-          ∩ {c : Word N → ℕ | ∀ m : ℕ, m < S.card → bushOf S m c ∈ A m})
-        ∩ {c : Word N → ℕ | ∀ m : ℕ, m < j - k → dyingAt c m ∈ B m}) := fun S _ ↦
-    (((measurableSet_root_eq j).inter (measurableSet_survivors_eq S)).inter
-      (measurableSet_forall_bushOf S hA)).inter (measurableSet_forall_dyingAt (j - k) hB)
+    (fun S ↦ {c : Word N → ℕ | ∀ m : ℕ, m < S.card → bushOf S m c ∈ A m}
+      ∩ {c : Word N → ℕ | ∀ m : ℕ, m < j - k → dyingAt c m ∈ B m})
+    (fun S ↦ (measurableSet_forall_bushOf S hA).inter (measurableSet_forall_dyingAt (j - k) hB))
+    (fun c _ hk ↦ by subst hk; exact Iff.rfl)
+  simp only [← Set.inter_assoc] at h
   have hterm : ∀ S ∈ (childSet N j).powersetCard k,
       sampleMeasure (N := N) θ
           ((({c : Word N → ℕ | c [] = j} ∩ {c : Word N → ℕ | survivors c = S})
@@ -222,16 +199,8 @@ theorem sampleMeasure_root_decorated (θ : Offspring J) (hJN : J ≤ N)
       rw [Finset.prod_congr rfl fun i _ ↦ by rw [rankSets_coe],
         prod_rankOf (childSet N j \ S) fun m ↦ bushMeasure (N := N) θ (B m), hDcard]
     rw [hdying]
-  have hnn1 : (0 : ℝ) ≤ 1 - θ.extinction := by linarith [θ.extinction_le_one]
-  have hnn2 : (0 : ℝ) ≤ θ j * (j.choose k : ℝ) :=
-    mul_nonneg (θ.nonneg j) (Nat.cast_nonneg _)
-  have hnn3 : (0 : ℝ) ≤ θ j * (j.choose k : ℝ) * (1 - θ.extinction) ^ k :=
-    mul_nonneg hnn2 (pow_nonneg hnn1 k)
-  rw [hdecomp, measure_biUnion_finset hdisj hmeas, Finset.sum_congr rfl hterm,
-    Finset.sum_const, Finset.card_powersetCard, card_childSet hj, nsmul_eq_mul,
-    ENNReal.ofReal_mul hnn3, ENNReal.ofReal_mul hnn2, ENNReal.ofReal_mul (θ.nonneg j),
-    ENNReal.ofReal_natCast, ENNReal.ofReal_pow hnn1, ENNReal.ofReal_pow θ.extinction_nonneg]
-  ring
+  rw [h, Finset.sum_congr rfl hterm, ← Finset.sum_mul, ← Finset.sum_mul,
+    sum_powersetCard_pattern θ hj k]
 
 /-- **The joint root step under the conditioned law**: the decoration of the root
 carries the weight `decorationMass`, and the surviving subtrees are independent

@@ -16,7 +16,6 @@ name = "GraphMarkovMatching"
 name = "ChainClasses"
 
 # Public classification entry point: `import ChainClasses.Classification`.
-# `ChainClasses.AxCheck` remains separately buildable and is not imported by the umbrella module.
 
 [[lean_lib]]
 name = "BranchingProcess"

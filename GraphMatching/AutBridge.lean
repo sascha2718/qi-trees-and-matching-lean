@@ -1,6 +1,6 @@
 /-
 The bridge of design decision D4 (`graph_matching_selfcontained.tex`, `sec:setup`): the
-swap group `Tree.Aut` is the automorphism group of the rooted binary tree as a graph.
+swap group `Aut h` is the automorphism group of the rooted binary tree as a graph.
 
 The tree is the graph on the finite binary words whose edges join a word to its one-letter
 extensions, truncated at height `h` by restricting to words of length at most `h`.  A swap
@@ -19,8 +19,8 @@ is one root-fixing automorphism of the infinite tree.
 * `aut_ext`: the action determines the swap element.
 * `exists_aut_of`: **every root-fixing graph automorphism is an action**: a length- and
   child-preserving injection of the truncated tree is the action of a swap element.
-* `iso_length`, `iso_parent`, `exists_aut_of_iso`: the properties hold for every
-  root-fixing graph automorphism.
+* `iso_child`, `exists_aut_of_iso`: the properties hold for every root-fixing graph
+  automorphism.
 * `fullMatchesA_iff_coord`, `fullSim_iff_graphAut`: **`x ≈_h y` over graph
   automorphisms**, in the form of the paper.
 * `infMatch_iff_graphAut`: **the infinite matching over one automorphism of the infinite
@@ -57,16 +57,10 @@ def treeGraphInf : SimpleGraph (List Bool) where
     rcases h with ⟨c, hc⟩ | ⟨c, hc⟩ <;>
       exact absurd (congrArg List.length hc) (by simp)
 
-lemma treeGraphInf_adj {s t : List Bool} :
-    treeGraphInf.Adj s t ↔ (∃ c, t = s ++ [c]) ∨ (∃ c, s = t ++ [c]) := Iff.rfl
-
 /-- The tree truncated at height `h`: the induced graph on the words of length at
 most `h`. -/
 def treeGraph (h : ℕ) : SimpleGraph {s : List Bool // s.length ≤ h} :=
   SimpleGraph.comap Subtype.val treeGraphInf
-
-lemma treeGraph_adj {h : ℕ} {u v : {s : List Bool // s.length ≤ h}} :
-    (treeGraph h).Adj u v ↔ (∃ c, v.1 = u.1 ++ [c]) ∨ (∃ c, u.1 = v.1 ++ [c]) := Iff.rfl
 
 /-- The root of the truncated tree. -/
 def treeRoot (h : ℕ) : {s : List Bool // s.length ≤ h} := ⟨[], by simp⟩
@@ -154,25 +148,6 @@ lemma autAct_adj (h : ℕ) (π : Aut h) {s t : List Bool} (hadj : treeGraphInf.A
   · obtain ⟨c', hc'⟩ := autAct_append_single h π t c
     exact Or.inr ⟨c', hc'⟩
 
-/-- The action as a permutation of the words. -/
-def autPermInf (h : ℕ) (π : Aut h) : Equiv.Perm (List Bool) where
-  toFun := autAct h π
-  invFun := autAct h (autInv h π)
-  left_inv := autInv_autAct h π
-  right_inv := autAct_autInv h π
-
-/-- **The action is a graph automorphism of the infinite tree.** -/
-def autIsoInf (h : ℕ) (π : Aut h) : treeGraphInf ≃g treeGraphInf where
-  toEquiv := autPermInf h π
-  map_rel_iff' := by
-    intro s t
-    show treeGraphInf.Adj (autAct h π s) (autAct h π t) ↔ treeGraphInf.Adj s t
-    constructor
-    · intro hadj
-      have h1 := autAct_adj h (autInv h π) hadj
-      rwa [autInv_autAct, autInv_autAct] at h1
-    · exact autAct_adj h π
-
 /-- **The action is a root-fixing graph automorphism of the truncated tree.** -/
 def autIso (h : ℕ) (π : Aut h) : treeGraph h ≃g treeGraph h where
   toEquiv :=
@@ -215,19 +190,6 @@ lemma aut_ext : ∀ (h : ℕ) (π π' : Aut h),
         have h1 := hact (true :: t) (by simpa using Nat.succ_le_succ ht)
         simpa [autAct] using h1)
       rw [h₀, h₁]
-
-/-- Equal actions have equal inverse actions, on the truncated tree. -/
-lemma autInv_act_congr (h : ℕ) (π π' : Aut h)
-    (hact : ∀ s : List Bool, s.length ≤ h → autAct h π s = autAct h π' s) :
-    ∀ s : List Bool, s.length ≤ h → autAct h (autInv h π) s = autAct h (autInv h π') s := by
-  intro s hs
-  have hlen : (autAct h (autInv h π) s).length ≤ h := by rw [autAct_length]; exact hs
-  have h1 : autAct h π' (autAct h (autInv h π) s) = s := by
-    rw [← hact _ hlen, autAct_autInv]
-  calc autAct h (autInv h π) s
-      = autAct h (autInv h π') (autAct h π' (autAct h (autInv h π) s)) :=
-        (autInv_autAct h π' _).symm
-    _ = autAct h (autInv h π') s := by rw [h1]
 
 /-! ### Every root-fixing graph automorphism is an action -/
 
@@ -365,26 +327,6 @@ lemma iso_child {h : ℕ} (g : treeGraph h ≃g treeGraph h)
           have := congrArg (fun v => (Subtype.val v : List Bool).length) hv
           simp at this
     · exact ⟨c', hc'⟩
-
-/-- A root-fixing automorphism of the truncated tree preserves lengths. -/
-lemma iso_length {h : ℕ} (g : treeGraph h ≃g treeGraph h)
-    (hroot : g (treeRoot h) = treeRoot h) :
-    ∀ (s : List Bool) (hs : s.length ≤ h), (g ⟨s, hs⟩).1.length = s.length := by
-  intro s
-  induction s using List.reverseRecOn with
-  | nil =>
-      intro hs
-      have hrt : (⟨[], hs⟩ : {s : List Bool // s.length ≤ h}) = treeRoot h := rfl
-      rw [hrt, hroot]
-      rfl
-  | append_singleton u d ihu =>
-      intro hs
-      have hu : u.length ≤ h := by
-        simp only [List.length_append, List.length_singleton] at hs
-        omega
-      obtain ⟨c', hc'⟩ := iso_child g hroot u.length u hu d hs rfl
-      rw [hc']
-      simp [ihu hu]
 
 /-- **Every root-fixing graph automorphism of the truncated tree is the action of a swap
 element.** -/
@@ -684,17 +626,6 @@ lemma isoInf_child (g : treeGraphInf ≃g treeGraphInf) (hroot : g [] = []) :
           have := congrArg List.length hv
           simp at this
     · exact ⟨c', hc'⟩
-
-/-- A root-fixing automorphism of the infinite tree preserves lengths. -/
-lemma isoInf_length (g : treeGraphInf ≃g treeGraphInf) (hroot : g [] = []) :
-    ∀ s : List Bool, (g s).length = s.length := by
-  intro s
-  induction s using List.reverseRecOn with
-  | nil => rw [hroot]
-  | append_singleton u d ihu =>
-      obtain ⟨c', hc'⟩ := isoInf_child g hroot u.length u d rfl
-      rw [hc']
-      simp [ihu]
 
 /-- **Every root-fixing graph automorphism of the infinite tree is the action of a
 compatible family of swap elements.** -/

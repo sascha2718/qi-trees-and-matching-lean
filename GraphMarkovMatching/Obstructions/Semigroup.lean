@@ -14,7 +14,7 @@ spine.  At each attempt its conditional probability is at least `p/2`,
 where `p` is the mass of an incompatible label.  The final lemma certifies
 that the resulting avoidance bound `(1-p/2)^n` tends to zero.
 -/
-import GraphMarkovMatching.Tail.Combinatorics
+import GraphMarkovMatching.Grammar.Depths
 import GraphMarkovMatching.Closure.Examples
 import Mathlib.Probability.Distributions.Uniform
 
@@ -47,14 +47,6 @@ lemma nuFourSeven_support : nuFourSeven.support = ({4, 7} : Set ℕ) := by
     rcases h with rfl | rfl
     · exact ⟨false, by simp⟩
     · exact ⟨true, by simp⟩
-
-lemma nuFourSeven_four : nuFourSeven 4 = 2⁻¹ := by
-  rw [nuFourSeven, PMF.map_apply]
-  simp [PMF.uniformOfFintype_apply]
-
-lemma nuFourSeven_seven : nuFourSeven 7 = 2⁻¹ := by
-  rw [nuFourSeven, PMF.map_apply]
-  simp [PMF.uniformOfFintype_apply]
 
 private lemma closure_three_eq_three_six :
     AddSubmonoid.closure ({3} : Set ℕ) =
@@ -149,16 +141,6 @@ theorem fresh_return_three_nuFourSeven :
   apply AddSubmonoid.subset_closure
   rw [depthSet_four_seven]
   simp
-
-/-- The rare label `2` in the small-potential three-state example has
-strictly positive mass. -/
-lemma exp3_two_ne_zero {D : ℝ} (hD : 5 ≤ D) : exp3PMF hD 2 ≠ 0 := by
-  rw [exp3PMF_apply, exp3F_two]
-  positivity
-
-/-- Labels `0` and `2` are incompatible in the path relation. -/
-lemma zero_two_incompatible : ¬ pathCompat 0 2 := by
-  simp [pathCompat]
 
 /-- The selected-spine avoidance bound used in the counterexample tends
 to zero for every positive incompatible-label mass `p ≤ 1`. -/

@@ -1,4 +1,10 @@
-/-
+import ChainClasses.Chain.Eta
+import ChainClasses.Chain.GWInstance
+import ChainClasses.Chain.Isometry
+import ChainClasses.Chain.Transfer
+import GraphMatching.Kolmogorov
+
+/-!
 `thm:twovalue` of `prelims.tex`, assembled as in `sec:proof-main` of
 `gw_classes_simple.tex`: two independent samples of the two-value offspring law
 are quasi-isometric with high probability, at the rate `eq:rate`.
@@ -24,13 +30,8 @@ are quasi-isometric with high probability, at the rate `eq:rate`.
   `twovalue_ae_tree` state the same bounds for the sampled trees themselves.
 
 The four largeness conditions `eq:d0-conditions` are carried as hypotheses,
-exactly as in `ChainClasses.Eta`.
+exactly as in `ChainClasses.Chain.Eta`.
 -/
-import ChainClasses.Eta
-import ChainClasses.GWInstance
-import ChainClasses.Isometry
-import ChainClasses.Transfer
-import GraphMatching.Kolmogorov
 
 namespace ChainClasses
 
@@ -60,8 +61,8 @@ noncomputable def labSnd (ω : (Word → Bool) × (Word → Bool)) : Word → �
 /-! ### The quantised labels of one sample
 
 The coordinate family of `chainMeasure` is the offspring field, so the three
-hypotheses of `ChainClasses.Geometric` are available in the concrete form
-recorded in `ChainClasses.GWInstance`. -/
+hypotheses of `ChainClasses.Chain.Geometric` are available in the concrete form
+recorded in `ChainClasses.Chain.GWInstance`. -/
 
 /-- The offspring field of `chainMeasure`, as a family of coordinates. -/
 noncomputable def chainField : Word → (Word → Bool) → Bool :=
@@ -98,7 +99,7 @@ lemma chainQPMF_apply (ht : 0 < t) (ht1 : t ≤ 1) {D : ℕ} (hD : 2 ≤ D) (k :
     chainQPMF ht ht1 hD k = ENNReal.ofReal (qF (1 - t) D k) := rfl
 
 /-- **The marginal clause of `thm:chain-classes`**: the quantised label of a
-vertex has the quantised geometric law, `ℙ(ℓ_D(λ(w)) = k) = q_k`. -/
+vertex has the quantised geometric law, `ℙ(ℓ_D(λ(w)) = k) = p^{(D)}_k`. -/
 theorem chainMeasure_level_marginal (ht : 0 < t) (ht1 : t ≤ 1) {D : ℕ} (hD : 2 ≤ D)
     (w : Word) (k : ℕ) :
     chainMeasure ht ht1 {χ : Word → Bool | levelMap D (labAux χ w) = k}

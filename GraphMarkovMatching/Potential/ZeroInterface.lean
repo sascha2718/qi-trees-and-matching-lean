@@ -13,9 +13,7 @@ distinguished label with `μ(v0) ≥ 1/2`:
 * `qE_zero_le`: the far tail `μ{v : ¬ v0 ∼ v} ≤ 2η`;
 * `far_tilt_le`: the far-restricted inverse moment
   `∑_{v far} μ(v) r(v)^{-α} ≤ 2η`;
-* `tilt_le_pow_add`: the inverse moment `∑_v μ(v) r(v)^{-α} ≤ 2^α + 2η`;
-* `exceptional_pair_le`: the pair version: the `r^{-α} ⊗ r^{-α}`-tilted
-  mass of `{some coordinate far}` is at most `2·(2η)·(2^α + 2η)`.
+* `tilt_le_pow_add`: the inverse moment `∑_v μ(v) r(v)^{-α} ≤ 2^α + 2η`.
 
 These estimates make the per-level exceptional charges of the block
 recursion linear in `η`, uniformly over frozen cells.
@@ -158,44 +156,5 @@ lemma tilt_le_pow_add (hα : 0 < α) (hsymm : ∀ a b, Rv a b → Rv b a)
     _ ≤ (2 : ℝ≥0∞) ^ α + 2 * etaG α Rv μ := by
         refine add_le_add ?_ (far_tilt_le α Rv μ v0 hα hsymm hhalf)
         rw [ENNReal.tsum_mul_right, PMF.tsum_coe, one_mul]
-
-/-! ### The pair version -/
-
-/-- **The exceptional pair bound**: the `r^{-α} ⊗ r^{-α}`-tilted mass of
-pairs with some far coordinate is at most `2·(2η)·(2^α + 2η)`. -/
-lemma exceptional_pair_le (hα : 0 < α) (hsymm : ∀ a b, Rv a b → Rv b a)
-    (hhalf : 2⁻¹ ≤ μ v0) :
-    (∑' p : V × V, if ¬ Rv v0 p.1 ∨ ¬ Rv v0 p.2 then
-        (μ p.1 * (rE μ Rv p.1) ^ (-α)) * (μ p.2 * (rE μ Rv p.2) ^ (-α)) else 0)
-      ≤ 2 * ((2 * etaG α Rv μ) * ((2 : ℝ≥0∞) ^ α + 2 * etaG α Rv μ)) := by
-  set f : V → ℝ≥0∞ := fun v => μ v * (rE μ Rv v) ^ (-α) with hf
-  set g : V → ℝ≥0∞ := fun v => if Rv v0 v then 0 else μ v * (rE μ Rv v) ^ (-α)
-    with hg
-  have hsplit : ∀ p : V × V,
-      (if ¬ Rv v0 p.1 ∨ ¬ Rv v0 p.2 then f p.1 * f p.2 else 0)
-        ≤ g p.1 * f p.2 + f p.1 * g p.2 := by
-    intro p
-    by_cases h1 : Rv v0 p.1 <;> by_cases h2 : Rv v0 p.2
-    · rw [if_neg (by tauto)]
-      exact zero_le
-    · rw [if_pos (by tauto), hg]
-      simp only [if_neg h2]
-      exact le_add_self
-    · rw [if_pos (by tauto), hg]
-      simp only [if_neg h1]
-      exact le_self_add
-    · rw [if_pos (by tauto), hg]
-      simp only [if_neg h1]
-      exact le_self_add
-  calc (∑' p : V × V, if ¬ Rv v0 p.1 ∨ ¬ Rv v0 p.2 then f p.1 * f p.2 else 0)
-      ≤ ∑' p : V × V, (g p.1 * f p.2 + f p.1 * g p.2) :=
-        ENNReal.tsum_le_tsum hsplit
-    _ = (∑' v, g v) * (∑' v, f v) + (∑' v, f v) * (∑' v, g v) := by
-        rw [ENNReal.tsum_add, tsum_prod_split g f, tsum_prod_split f g]
-    _ = 2 * ((∑' v, g v) * (∑' v, f v)) := by ring
-    _ ≤ 2 * ((2 * etaG α Rv μ) * ((2 : ℝ≥0∞) ^ α + 2 * etaG α Rv μ)) := by
-        refine mul_le_mul_right (mul_le_mul' ?_ ?_) _
-        · exact far_tilt_le α Rv μ v0 hα hsymm hhalf
-        · exact tilt_le_pow_add α Rv μ v0 hα hsymm hhalf
 
 end GraphMarkovMatching

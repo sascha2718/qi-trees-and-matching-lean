@@ -271,11 +271,7 @@ lemma measurableSet_skelBox (j : ℕ) (S : Finset (Fin N)) (i : Option (Fin N)) 
     MeasurableSet (skelBox (N := N) j S i) := by
   cases i with
   | none =>
-      have h : skelBox (N := N) j S none
-          = (fun u : Branch N none → ℕ ↦ u rootIdx) ⁻¹' {j} := rfl
-      rw [h]
-      exact measurable_pi_apply (X := fun _ : Branch N none ↦ ℕ) rootIdx
-        MeasurableSet.of_discrete
+      exact measurableSet_rootIdx_preimage {j}
   | some i =>
       rw [skelBox_some]
       split
@@ -408,6 +404,66 @@ lemma skeletonWeight_of_ne_zero (θ : Offspring J) {k : ℕ} (hk : k ≠ 0) :
 
 end Offspring
 
+/-- The offspring count at the root is a measurable coordinate. -/
+lemma measurableSet_root_eq (j : ℕ) : MeasurableSet {c : Word N → ℕ | c [] = j} := by
+  have h : {c : Word N → ℕ | c [] = j} = (fun c : Word N → ℕ ↦ c []) ⁻¹' {j} := rfl
+  rw [h]
+  exact measurable_pi_apply ([] : Word N) MeasurableSet.of_discrete
+
+/-- **Decomposition over the survival patterns.**  An event asking that the root have
+`j` children of which `k` survive, refined by a condition that may read the survivor
+set, is the disjoint union over the `k`-subsets `S` of the `j` children of the events
+naming `S` as the survivors. -/
+lemma measure_root_skeletonDegree_eq_sum (μ : MeasureTheory.Measure (Word N → ℕ))
+    (j k : ℕ) {X : Set (Word N → ℕ)} (Q : Finset (Fin N) → Set (Word N → ℕ))
+    (hQ : ∀ S, MeasurableSet (Q S))
+    (hX : ∀ c, c [] = j → skeletonDegree c = k → (c ∈ X ↔ c ∈ Q (survivors c))) :
+    μ (({c : Word N → ℕ | c [] = j} ∩ {c : Word N → ℕ | skeletonDegree c = k}) ∩ X)
+      = ∑ S ∈ (childSet N j).powersetCard k,
+          μ (({c : Word N → ℕ | c [] = j} ∩ {c : Word N → ℕ | survivors c = S}) ∩ Q S) := by
+  classical
+  have hdecomp : (({c : Word N → ℕ | c [] = j} ∩ {c : Word N → ℕ | skeletonDegree c = k}) ∩ X)
+      = ⋃ S ∈ (childSet N j).powersetCard k,
+          (({c : Word N → ℕ | c [] = j} ∩ {c : Word N → ℕ | survivors c = S}) ∩ Q S) := by
+    ext c
+    simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_iUnion, Finset.mem_powersetCard,
+      exists_prop]
+    constructor
+    · rintro ⟨⟨hroot, hk⟩, hXc⟩
+      refine ⟨survivors c, ⟨?_, hk⟩, ⟨hroot, rfl⟩, (hX c hroot hk).mp hXc⟩
+      rw [← hroot]
+      exact survivors_subset c
+    · rintro ⟨S, ⟨-, hcard⟩, ⟨hroot, rfl⟩, hQc⟩
+      exact ⟨⟨hroot, hcard⟩, (hX c hroot hcard).mpr hQc⟩
+  have hdisj : ((childSet N j).powersetCard k : Set (Finset (Fin N))).PairwiseDisjoint
+      (fun S ↦ ({c : Word N → ℕ | c [] = j} ∩ {c : Word N → ℕ | survivors c = S}) ∩ Q S) := by
+    intro S _ T _ hST
+    refine Set.disjoint_left.mpr fun c hc hc' ↦ hST ?_
+    rw [← hc.1.2]
+    exact hc'.1.2
+  have hmeas : ∀ S ∈ (childSet N j).powersetCard k,
+      MeasurableSet (({c : Word N → ℕ | c [] = j} ∩ {c : Word N → ℕ | survivors c = S}) ∩ Q S) :=
+    fun S _ ↦ ((measurableSet_root_eq j).inter (measurableSet_survivors_eq S)).inter (hQ S)
+  rw [hdecomp, MeasureTheory.measure_biUnion_finset hdisj hmeas]
+
+/-- **The mass of a survival pattern, summed over the patterns**: `j` children with `k`
+survivors carry `θ_j C(j,k) (1-q)^k q^{j-k}`. -/
+lemma sum_powersetCard_pattern (θ : Offspring J) {j : ℕ} (hj : j ≤ N) (k : ℕ) :
+    ∑ _S ∈ (childSet N j).powersetCard k,
+        ENNReal.ofReal (θ j) * ENNReal.ofReal (1 - θ.extinction) ^ k
+          * ENNReal.ofReal θ.extinction ^ (j - k)
+      = ENNReal.ofReal
+          (θ j * (j.choose k : ℝ) * (1 - θ.extinction) ^ k * θ.extinction ^ (j - k)) := by
+  have hnn1 : (0 : ℝ) ≤ 1 - θ.extinction := by linarith [θ.extinction_le_one]
+  have hnn2 : (0 : ℝ) ≤ θ j * (j.choose k : ℝ) :=
+    mul_nonneg (θ.nonneg j) (Nat.cast_nonneg _)
+  have hnn3 : (0 : ℝ) ≤ θ j * (j.choose k : ℝ) * (1 - θ.extinction) ^ k :=
+    mul_nonneg hnn2 (pow_nonneg hnn1 k)
+  rw [Finset.sum_const, Finset.card_powersetCard, card_childSet hj, nsmul_eq_mul,
+    ENNReal.ofReal_mul hnn3, ENNReal.ofReal_mul hnn2, ENNReal.ofReal_mul (θ.nonneg j),
+    ENNReal.ofReal_natCast, ENNReal.ofReal_pow hnn1, ENNReal.ofReal_pow θ.extinction_nonneg]
+  ring
+
 /-- **The one-root count.** The root has `j` children of which `k` survive with
 probability `θ_j C(j,k) (1-q)^k q^{j-k}`: the survival patterns of `j` children with `k`
 survivors are the `k`-element subsets of the `j` letters, and each carries the mass of
@@ -419,33 +475,9 @@ theorem sampleMeasure_root_skeletonDegree (θ : Offspring J) (hJN : J ≤ N) {j 
       = ENNReal.ofReal
           (θ j * (j.choose k : ℝ) * (1 - θ.extinction) ^ k * θ.extinction ^ (j - k)) := by
   classical
-  have hdecomp : {c : Word N → ℕ | c [] = j} ∩ {c : Word N → ℕ | skeletonDegree c = k}
-      = ⋃ S ∈ (childSet N j).powersetCard k,
-          ({c : Word N → ℕ | c [] = j} ∩ {c : Word N → ℕ | survivors c = S}) := by
-    ext c
-    simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_iUnion, Finset.mem_powersetCard,
-      exists_prop]
-    constructor
-    · rintro ⟨hroot, hk⟩
-      refine ⟨survivors c, ⟨?_, hk⟩, hroot, rfl⟩
-      rw [← hroot]
-      exact survivors_subset c
-    · rintro ⟨S, ⟨-, hcard⟩, hroot, rfl⟩
-      exact ⟨hroot, hcard⟩
-  have hdisj : ((childSet N j).powersetCard k : Set (Finset (Fin N))).PairwiseDisjoint
-      (fun S ↦ {c : Word N → ℕ | c [] = j} ∩ {c : Word N → ℕ | survivors c = S}) := by
-    intro S _ T _ hST
-    refine Set.disjoint_left.mpr fun c hc hc' ↦ hST ?_
-    rw [← hc.2]
-    exact hc'.2
-  have hmeas : ∀ S ∈ (childSet N j).powersetCard k,
-      MeasurableSet ({c : Word N → ℕ | c [] = j} ∩ {c : Word N → ℕ | survivors c = S}) := by
-    intro S _
-    have hroot : MeasurableSet {c : Word N → ℕ | c [] = j} := by
-      have h : {c : Word N → ℕ | c [] = j} = (fun c : Word N → ℕ ↦ c []) ⁻¹' {j} := rfl
-      rw [h]
-      exact measurable_pi_apply ([] : Word N) MeasurableSet.of_discrete
-    exact hroot.inter (measurableSet_survivors_eq S)
+  have h := measure_root_skeletonDegree_eq_sum (sampleMeasure (N := N) θ) j k
+    (X := Set.univ) (fun _ ↦ Set.univ) (fun _ ↦ MeasurableSet.univ) (fun _ _ _ ↦ Iff.rfl)
+  simp only [Set.inter_univ] at h
   have hterm : ∀ S ∈ (childSet N j).powersetCard k,
       sampleMeasure (N := N) θ
           ({c : Word N → ℕ | c [] = j} ∩ {c : Word N → ℕ | survivors c = S})
@@ -454,16 +486,7 @@ theorem sampleMeasure_root_skeletonDegree (θ : Offspring J) (hJN : J ≤ N) {j 
     intro S hSmem
     rw [Finset.mem_powersetCard] at hSmem
     rw [sampleMeasure_root_survivors θ hJN hj hSmem.1, hSmem.2]
-  have hnn1 : (0 : ℝ) ≤ 1 - θ.extinction := by linarith [θ.extinction_le_one]
-  have hnn2 : (0 : ℝ) ≤ θ j * (j.choose k : ℝ) :=
-    mul_nonneg (θ.nonneg j) (Nat.cast_nonneg _)
-  have hnn3 : (0 : ℝ) ≤ θ j * (j.choose k : ℝ) * (1 - θ.extinction) ^ k :=
-    mul_nonneg hnn2 (pow_nonneg hnn1 k)
-  rw [hdecomp, measure_biUnion_finset hdisj hmeas, Finset.sum_congr rfl hterm,
-    Finset.sum_const, Finset.card_powersetCard, card_childSet hj, nsmul_eq_mul,
-    ENNReal.ofReal_mul hnn3, ENNReal.ofReal_mul hnn2, ENNReal.ofReal_mul (θ.nonneg j),
-    ENNReal.ofReal_natCast, ENNReal.ofReal_pow hnn1, ENNReal.ofReal_pow θ.extinction_nonneg]
-  ring
+  rw [h, Finset.sum_congr rfl hterm, sum_powersetCard_pattern θ hj k]
 
 /-- **The law of the skeleton degree.** Summing the one-root count over the offspring
 count at the root, the number of surviving children of the root is `k` with probability

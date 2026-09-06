@@ -14,7 +14,6 @@ The probability space and its level projections enter as an interface (`hmeas`,
 point of use (`Closure/Measure.lean`, `Archive/Extension.lean`).
 -/
 import GraphMarkovMatching.Support.Konig
-import GraphMarkovMatching.Support.ConcreteBlock
 import Mathlib.MeasureTheory.Measure.MeasureSpace
 import Mathlib.MeasureTheory.Measure.Typeclasses.Probability
 import Mathlib.Probability.ProbabilityMassFunction.Constructions
@@ -150,47 +149,5 @@ instance instMeasurableSingletonFullLab [MeasurableSpace V] [MeasurableSingleton
   | n + 1 => by
       haveI : MeasurableSingletonClass (FullLab V n) := instMeasurableSingletonFullLab n
       exact inferInstanceAs (MeasurableSingletonClass (V × (FullLab V n × FullLab V n)))
-
-/-- **The `G_k` matching theorem on the infinite tree, from the product law.**
-If the height-`n` projections `(X_n, Y_n)` have the i.i.d. pair law
-`fullMuK ⊗ fullMuK` at the root phase `k-1` (the Kolmogorov marginals), then
-under the parameter and numeric hypotheses of `ConcreteBlock.lean`,
-
-    P(some g ∈ G_k matches every vertex) ≥ 1 - (2+ρ)^(k-1)·41e.
-
-This closes the infinite-tree case up to the standard existence of the i.i.d.
-product measure (the pending `GraphMatching/Kolmogorov.lean` port). -/
-theorem karyMatching_infinite {Ω : Type*} [MeasurableSpace Ω] (P : Measure Ω)
-    [IsProbabilityMeasure P] [Countable V] [MeasurableSpace V] [MeasurableSingletonClass V]
-    {α δ L K ρ e : ℝ} (hα : 1 ≤ α) (hδ : 0 < δ)
-    (hL0 : 0 ≤ L) (hK0 : 0 ≤ K)
-    (hL : ∀ t : ℝ, 0 ≤ t → t / (1 + t) ^ α ≤ L)
-    (hK : ∀ t : ℝ, 0 ≤ t → t ≤ 1 → t * (1 - t) ^ α ≤ K)
-    (hρ0 : 0 < ρ) (hρ1 : ρ ≤ 1) (he : 0 ≤ e)
-    (ν : ℕ → PMF V) (R₀ : V → V → Prop)
-    (hrefl : ∀ v, R₀ v v) (hsymm : ∀ a b, R₀ a b → R₀ b a) (k : ℕ)
-    (hη : ∀ m, m ≤ k - 1 → Phi α (ν m) R₀ ≤ ENNReal.ofReal e)
-    (hsmall : 2 * α * ((2 + ρ) ^ (k - 1) * (41 * e)) ≤ ρ / 2)
-    (hAm : (2 * L + 2 * (1 + δ) * K) * ((2 + ρ) ^ (k - 1) * 41) ≤ 35)
-    (hCm : (2 * L * chordConst α + 5 / 2 + 2 * (1 + δ⁻¹) * α ^ 2)
-        * ((2 + ρ) ^ (k - 1) * (41 * e)) * ((2 + ρ) ^ (k - 1) * 41) ≤ 1)
-    (X Y : (n : ℕ) → Ω → FullLab V n)
-    (hX : ∀ n ω, restrictLab n (X (n + 1) ω) = X n ω)
-    (hY : ∀ n ω, restrictLab n (Y (n + 1) ω) = Y n ω)
-    (hpair : ∀ n, Measurable (fun ω => (X n ω, Y n ω)))
-    (hlaw : ∀ n, P.map (fun ω => (X n ω, Y n ω))
-        = (prodPMF (fullMuK ν k (k - 1) n) (fullMuK ν k (k - 1) n)).toMeasure) :
-    1 - ENNReal.ofReal ((2 + ρ) ^ (k - 1) * (41 * e))
-      ≤ P {ω | InfMatchK R₀ k (k - 1) (fun n => X n ω) (fun n => Y n ω)} := by
-  refine infinite_tree_matchingK_prob P R₀ k (k - 1) X Y hX hY (fun n => ?_) _ (fun n => ?_)
-  · exact (hpair n)
-      ((Set.to_countable
-        {p : FullLab V n × FullLab V n | fullSimK R₀ k (k - 1) n p.1 p.2}).measurableSet)
-  · rw [show {ω | ¬ fullSimK R₀ k (k - 1) n (X n ω) (Y n ω)}
-          = (fun ω => (X n ω, Y n ω)) ⁻¹' {p | ¬ fullSimK R₀ k (k - 1) n p.1 p.2} from rfl,
-      ← Measure.map_apply (hpair n) ((Set.to_countable _).measurableSet), hlaw n,
-      prodPMF_toMeasure_not_rel]
-    exact karyMatching_failure_le hα hδ hL0 hK0 hL hK hρ0 hρ1 he ν R₀ hrefl hsymm k
-      hη hsmall hAm hCm n
 
 end GraphMarkovMatching.Support

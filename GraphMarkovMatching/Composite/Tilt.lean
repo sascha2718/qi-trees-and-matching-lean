@@ -19,8 +19,7 @@ quantities only, never by a bare exceptional mass.
 * `invTilt`, `invTilt_le_of_mul_le`: the inverse `α`-power tilt in the
   safe convention, and its pointwise pricing under a component floor
   (the `c ≠ ⊤` side condition is not needed and not assumed);
-* `simDeg_le_one`, `pmf_apply_ne_top`, `simDeg_bind`,
-  `exists_component_of_simDeg_cXiBar_ne_zero`: degree bounds and the
+* `simDeg_bind`, `exists_component_of_simDeg_cXiBar_ne_zero`: the
   mixture covering: a charged mixture degree has a charged component;
 * `invTilt_simDeg_cXiBar_le` (`thm:mixture-tilt-composite`): at every
   point charged by the fresh cell mixture, the tilt of the mixture degree
@@ -48,13 +47,6 @@ its graph state and forgets its tagged counter. -/
 def stateMap : (h : ℕ) → FullLab (CState V) h → FullLab V h
   | 0, x => leaf x.1
   | h + 1, x => branch x.1.1 (stateMap h x.2.1, stateMap h x.2.2)
-
-lemma stateMap_leaf (s : CState V) : stateMap 0 (leaf s) = leaf s.1 := rfl
-
-lemma stateMap_branch (h : ℕ) (s : CState V)
-    (p : FullLab (CState V) h × FullLab (CState V) h) :
-    stateMap (h + 1) (branch s p)
-      = branch s.1 (stateMap h p.1, stateMap h p.2) := rfl
 
 /-- **State-blindness of the matching relation**: labels compare through
 their graph states only, so two tagged labellings match exactly when
@@ -254,25 +246,10 @@ private lemma tsum_ite_comp {A B : Type} (ρ : PMF A) (f : A → B)
     (Q : B → Prop) :
     (∑' a, if Q (f a) then ρ a else 0)
       = ∑' b, if Q b then (ρ.map f) b else 0 := by
-  symm
-  calc (∑' b, if Q b then (ρ.map f) b else 0)
-      = ∑' b, ∑' a, (if Q b then (if b = f a then ρ a else 0) else 0) := by
-        refine tsum_congr fun b => ?_
-        by_cases hb : Q b
-        · rw [if_pos hb, PMF.map_apply]
-          exact tsum_congr fun a => (if_pos hb).symm
-        · rw [if_neg hb]
-          exact (ENNReal.tsum_eq_zero.mpr fun a => if_neg hb).symm
-    _ = ∑' a, ∑' b, (if Q b then (if b = f a then ρ a else 0) else 0) :=
-        ENNReal.tsum_comm
-    _ = ∑' a, (if Q (f a) then ρ a else 0) := by
-        refine tsum_congr fun a => ?_
-        rw [show (fun b => if Q b then (if b = f a then ρ a else 0) else 0)
-            = fun b => if b = f a then (if Q b then ρ a else 0) else 0 from
-          funext fun b => by
-            by_cases hb : Q b <;> by_cases hba : b = f a <;>
-              simp [hb, hba]]
-        exact tsum_ite_eq (f a) fun b => if Q b then ρ a else 0
+  have h := PMF.toOuterMeasure_map_apply f ρ {b | Q b}
+  rw [PMF.toOuterMeasure_apply, PMF.toOuterMeasure_apply] at h
+  simp only [Set.indicator_apply, Set.mem_preimage, Set.mem_setOf_eq] at h
+  exact h.symm
 
 /-- Degrees against a relation that transports along a projection only
 see the projected law. -/
@@ -336,20 +313,6 @@ lemma invTilt_le_of_mul_le {α : ℝ} (hα : 0 ≤ α) {c t t' : ℝ≥0∞}
     _ = c ^ (-α) * t ^ (-α) := ENNReal.mul_rpow_of_ne_zero hc0 ht (-α)
 
 /-! ### Degree bounds and the mixture covering -/
-
-/-- Degrees are at most one. -/
-lemma simDeg_le_one {X : Type} (ρ : PMF X) (Rel : X → X → Prop) (x : X) :
-    simDeg ρ Rel x ≤ 1 := by
-  rw [simDeg]
-  refine le_trans (ENNReal.tsum_le_tsum fun y => ?_) (le_of_eq ρ.tsum_coe)
-  by_cases hy : Rel x y
-  · exact le_of_eq (if_pos hy)
-  · rw [if_neg hy]
-    exact zero_le
-
-/-- PMF values are finite. -/
-lemma pmf_apply_ne_top {A : Type} (p : PMF A) (a : A) : p a ≠ ⊤ :=
-  (lt_of_le_of_lt (pmf_apply_le_one p a) ENNReal.one_lt_top).ne
 
 /-- The degree of a mixture is the mixture of degrees. -/
 lemma simDeg_bind {A X : Type} (w : PMF A) (f : A → PMF X)

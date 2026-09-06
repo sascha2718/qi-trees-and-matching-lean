@@ -26,9 +26,9 @@ The recursion
 `D = Cr·(Cr/cr^α)` then closes to a height-uniform bound under a closure
 inequality, and the mean bad degree bounds the matching failure
 probability.  At `α = 5/2`, `δ = 1` the linear constant `A` is the constant
-`A₄` of `thm:four-law`, and with `cr = ν₂`, `Cr = C̄` the factor `D` is the
-`D = C̄²/ν₂^{5/2}` of the retired draft's halving corollary; the pipeline
-is described in `sec:lean` of `appendices.tex`.
+`A₄` of `thm:four-law`, and with `cr = ν₂`, `Cr = C̄` the factor `D` is
+`D = C̄²/ν₂^{5/2}`; the pipeline is described in `app:lean` of
+`appendices.tex`.
 -/
 import GraphMarkovMatching.Process.Kernel
 import GraphMarkovMatching.FourLaw.Assembly

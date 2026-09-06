@@ -36,17 +36,7 @@ lemma qE_pure {X : Type u} (b : X) (R : X → X → Prop) (z : X) :
   rw [qE_eq_tsum_mul]
   exact tsum_pure_mul b (badInd R z)
 
-/-! ### The directed tree potentials and the kernel budget -/
-
 variable (α : ℝ) (P : S → PMF (S × S)) (R₀ : S → S → Prop)
-
-/-- The directed tree potential `Φ_n(s,t)` of ordered root states. -/
-noncomputable def PhiM (s t : S) (n : ℕ) : ℝ≥0∞ :=
-  PhiD α (muM P s n) (muM P t n) (fullSim R₀ n)
-
-/-- The kernel mismatch potential `η(s,t) = Φ_α(P s → P t; R₀^{(2)})`. -/
-noncomputable def etaD (s t : S) : ℝ≥0∞ :=
-  PhiD α (P s) (P t) (SquareRel R₀)
 
 /-! ### The bad degree along the recursion -/
 

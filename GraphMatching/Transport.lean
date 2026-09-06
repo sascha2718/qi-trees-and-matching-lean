@@ -36,19 +36,7 @@ noncomputable def transportPMF (e : X ≃ Y) (μ : PMF X) : PMF Y :=
 def transportRel (e : X ≃ Y) (R : X → X → Prop) : Y → Y → Prop :=
   fun a b => R (e.symm a) (e.symm b)
 
-lemma transportRel_refl (e : X ≃ Y) {R : X → X → Prop} (h : ∀ x, R x x) :
-    ∀ y, transportRel e R y y := fun y => h (e.symm y)
-
-lemma transportRel_symm (e : X ≃ Y) {R : X → X → Prop} (h : ∀ a b, R a b → R b a) :
-    ∀ a b, transportRel e R a b → transportRel e R b a := fun _ _ hab => h _ _ hab
-
 /-! ### Transport of the degrees and the potential -/
-
-lemma rE_transport (e : X ≃ Y) (μ : PMF X) (R : X → X → Prop) (y : Y) :
-    rE (transportPMF e μ) (transportRel e R) y = rE μ R (e.symm y) := by
-  rw [rE, rE, ← Equiv.tsum_eq e]
-  refine tsum_congr fun x => ?_
-  simp only [transportRel, transportPMF_apply, Equiv.symm_apply_apply]
 
 lemma qE_transport (e : X ≃ Y) (μ : PMF X) (R : X → X → Prop) (y : Y) :
     qE (transportPMF e μ) (transportRel e R) y = qE μ R (e.symm y) := by

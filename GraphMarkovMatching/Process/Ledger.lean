@@ -15,6 +15,9 @@ interface, whose mass is the extra additive term: these are the
 * `PhiDres`: the restricted directed potential `(†)`;
 * `zMass`: the zero-interface mass `z(ρ_s,ρ_t)` of a source law against a
   target law;
+* `failureD`: the directed mismatch mass `∑ ρ_s(x) q_{ρ_t}(x)`, at most
+  the restricted potential plus the zero-interface mass
+  (`failureD_le_PhiDres_add_zMass`);
 * `q_lt_one_of_rE_ne_zero`: positivity gives `q < 1` pointwise;
 * `phiE_square_main_le`: the pointwise main bound on doubly-positive
   pairs, in the safe `ℝ≥0∞` form;
@@ -46,6 +49,35 @@ zero good degree toward `ρ_t`. -/
 noncomputable def zMass (ρs ρt : PMF X) (R : X → X → Prop) : ℝ≥0∞ :=
   ∑' y, ρs y * (if rE ρt R y = 0 then 1 else 0)
 
+/-- The directed mismatch mass `∑_x ρ_s(x) q_{ρ_t}(x)` between two laws. -/
+noncomputable def failureD (ρs ρt : PMF X) (R : X → X → Prop) : ℝ≥0∞ :=
+  ∑' x, ρs x * qE ρt R x
+
+/-- Raw directed failure is bounded by the restricted potential plus its
+zero interface: on the positive set `q ≤ φ_α(q)`, and on the zero
+interface the bad degree is at most one. -/
+lemma failureD_le_PhiDres_add_zMass (α : ℝ) (hα0 : 0 ≤ α)
+    (ρs ρt : PMF X) (R : X → X → Prop) :
+    failureD ρs ρt R ≤ PhiDres α ρs ρt R + zMass ρs ρt R := by
+  rw [failureD, PhiDres, zMass, ← ENNReal.tsum_add]
+  refine ENNReal.tsum_le_tsum fun x => ?_
+  by_cases hr : rE ρt R x = 0
+  · simp only [hr, if_true, mul_zero, zero_add, mul_one]
+    calc
+      ρs x * qE ρt R x = qE ρt R x * ρs x := mul_comm _ _
+      _ ≤ 1 * ρs x := mul_le_mul_left qE_le_one _
+      _ = ρs x := one_mul _
+  · simp only [hr, if_false]
+    have hqE : qE ρt R x = ENNReal.ofReal (q ρt R x) :=
+      (ENNReal.ofReal_toReal qE_ne_top).symm
+    rw [hqE, mul_zero, add_zero]
+    calc
+      ρs x * ENNReal.ofReal (q ρt R x)
+          = ENNReal.ofReal (q ρt R x) * ρs x := mul_comm _ _
+      _ ≤ phiE α (q ρt R x) * ρs x :=
+        mul_le_mul_left (ofReal_le_phiE hα0 q_nonneg q_le_one) _
+      _ = ρs x * phiE α (q ρt R x) := mul_comm _ _
+
 /-- The restricted inverse-power weight. -/
 noncomputable def WresD (α : ℝ) (ρt : PMF X) (R : X → X → Prop) (x : X) : ℝ≥0∞ :=
   if rE ρt R x = 0 then 0 else WnnD α ρt R x
@@ -58,14 +90,6 @@ noncomputable def HresD (α : ℝ) (ρs ρt : PMF X) (R : X → X → Prop) (y :
 noncomputable def KresD (α : ℝ) (ρs ρt : PMF X) (R : X → X → Prop) (y : X) : ℝ≥0∞ :=
   ∑' x, ρs x * (if ¬ R x y then
     (if rE ρt R x = 0 then 0 else phiE α (q ρt R x)) else 0)
-
-/-- The restricted potential is at most the full one. -/
-lemma PhiDres_le_PhiD (α : ℝ) (ρs ρt : PMF X) (R : X → X → Prop) :
-    PhiDres α ρs ρt R ≤ PhiD α ρs ρt R := by
-  refine ENNReal.tsum_le_tsum fun x => mul_le_mul_right ?_ _
-  by_cases h : rE ρt R x = 0
-  · rw [if_pos h]; exact zero_le
-  · rw [if_neg h]
 
 /-- On the positive set the bad degree is below one. -/
 lemma q_lt_one_of_rE_ne_zero {ρ : PMF X} {R : X → X → Prop} {x : X}
@@ -1063,22 +1087,6 @@ lemma screenE_pair (ρs : PMF X) (R : X → X → Prop) (ρc ρd : PMF X)
     simp [screenInd]
   rw [hind, mul_assoc]
 
-/-- The diagonal-reserve inverse moment: on the support the diagonal
-degree is positive, so the raw tilt is the restricted weight. -/
-lemma tsum_diag_rpow_le {α : ℝ} (hα : 1 ≤ α) (ρ : PMF X)
-    (R : X → X → Prop) (hrefl : ∀ x, R x x) :
-    ∑' x, ρ x * (rE ρ R x) ^ (-α)
-      ≤ 1 + ENNReal.ofReal α * PhiDres α ρ ρ R := by
-  have h1 : ∀ x, ρ x * (rE ρ R x) ^ (-α) = ρ x * WresD α ρ R x := by
-    intro x
-    by_cases hx : ρ x = 0
-    · rw [hx, zero_mul, zero_mul]
-    · have hne : rE ρ R x ≠ 0 := fun h0 =>
-        hx (le_antisymm (h0 ▸ le_rE_of_refl (hrefl x)) zero_le)
-      rw [rE_rpow_neg_eq_WresD ρ R x hne]
-  rw [tsum_congr h1]
-  exact tsum_WresD_le hα ρ ρ R
-
 /-- **The survivor split of an alternative tilt**: the inverse square
 degree of a product alternative is dominated by the sum of the two
 pairings' factorized tilts; the dead pairing contributes a vanishing
@@ -1243,230 +1251,6 @@ lemma deadScreen_factorize (ρa ρb ρc ρd : PMF X) (R : X → X → Prop)
               (fun x => ρb x * ((if rE ρd R x = 0 then 1 else 0) * G₁ x)),
             ← screenE_singleton, ← screenE_singleton]
         rw [e0, e1, e2, e3]
-
-/-- **Hall factorization of the diagonal pair screen** (`sec:rows`,
-screen rows; the zero-row/zero-column table of `thm:hall`): the
-diagonal-tilted mass of a dead product target factorizes into
-single-coordinate diagonal screens: a zero row gives one two-list screen
-times a diagonal inverse moment, a zero column gives a product of two
-singleton screens (quadratic). -/
-theorem diagPairScreen_le {α : ℝ} (hα : 1 ≤ α)
-    (ρa ρb ρc ρd : PMF X) (R : X → X → Prop) (hrefl : ∀ x, R x x)
-    (M : ℝ≥0∞)
-    (haa : PhiDres α ρa ρa R ≤ M) (hbb : PhiDres α ρb ρb R ≤ M) :
-    ∑' xp : X × X, prodPMF ρa ρb xp
-        * ((if rE (prodPMF ρc ρd) (SquareRel R) xp = 0 then 1 else 0)
-          * (rE (prodPMF ρa ρb) (SquareRel R) xp) ^ (-α))
-      ≤ (screenE ρa R [ρc, ρd] (fun x => (rE ρa R x) ^ (-α))
-          + screenE ρb R [ρc, ρd] (fun x => (rE ρb R x) ^ (-α)))
-        * (1 + ENNReal.ofReal α * M)
-        + screenE ρa R [ρc] (fun x => (rE ρa R x) ^ (-α))
-          * screenE ρb R [ρc] (fun x => (rE ρb R x) ^ (-α))
-        + screenE ρa R [ρd] (fun x => (rE ρa R x) ^ (-α))
-          * screenE ρb R [ρd] (fun x => (rE ρb R x) ^ (-α)) := by
-  have hα0 : (0 : ℝ) ≤ α := by linarith
-  have hpt : ∀ xp : X × X, prodPMF ρa ρb xp
-      * ((if rE (prodPMF ρc ρd) (SquareRel R) xp = 0 then 1 else 0)
-        * (rE (prodPMF ρa ρb) (SquareRel R) xp) ^ (-α))
-      ≤ prodPMF ρa ρb xp
-          * (((if rE ρc R xp.1 = 0 ∧ rE ρd R xp.1 = 0 then 1 else 0)
-              * (rE ρa R xp.1) ^ (-α)) * ((rE ρb R xp.2) ^ (-α)))
-        + prodPMF ρa ρb xp
-          * (((rE ρa R xp.1) ^ (-α))
-            * ((if rE ρc R xp.2 = 0 ∧ rE ρd R xp.2 = 0 then 1 else 0)
-              * (rE ρb R xp.2) ^ (-α)))
-        + prodPMF ρa ρb xp
-          * (((if rE ρc R xp.1 = 0 then 1 else 0) * (rE ρa R xp.1) ^ (-α))
-            * ((if rE ρc R xp.2 = 0 then 1 else 0) * (rE ρb R xp.2) ^ (-α)))
-        + prodPMF ρa ρb xp
-          * (((if rE ρd R xp.1 = 0 then 1 else 0) * (rE ρa R xp.1) ^ (-α))
-            * ((if rE ρd R xp.2 = 0 then 1 else 0)
-              * (rE ρb R xp.2) ^ (-α))) := by
-    rintro ⟨x₀, x₁⟩
-    by_cases hz : prodPMF ρa ρb (x₀, x₁) = 0
-    · rw [hz, zero_mul]
-      exact zero_le
-    · obtain ⟨ha0, hb1⟩ := mul_ne_zero_iff.mp
-        (by rwa [prodPMF_apply] at hz)
-      have hrea : rE ρa R x₀ ≠ 0 := fun h0 =>
-        ha0 (le_antisymm (h0 ▸ le_rE_of_refl (hrefl x₀)) zero_le)
-      have hreb : rE ρb R x₁ ≠ 0 := fun h0 =>
-        hb1 (le_antisymm (h0 ▸ le_rE_of_refl (hrefl x₁)) zero_le)
-      by_cases hdead : rE (prodPMF ρc ρd) (SquareRel R) (x₀, x₁) = 0
-      · have htilt : (rE (prodPMF ρa ρb) (SquareRel R) (x₀, x₁)) ^ (-α)
-            ≤ (rE ρa R x₀) ^ (-α) * (rE ρb R x₁) ^ (-α) := by
-          calc (rE (prodPMF ρa ρb) (SquareRel R) (x₀, x₁)) ^ (-α)
-              ≤ (rE ρa R x₀ * rE ρb R x₁) ^ (-α) :=
-                rpow_neg_antitone hα0 (straight_le_rE_square ρa ρb R x₀ x₁)
-            _ = (rE ρa R x₀) ^ (-α) * (rE ρb R x₁) ^ (-α) :=
-                ENNReal.mul_rpow_of_ne_zero hrea hreb (-α)
-        rw [if_pos hdead, one_mul]
-        have hbase : prodPMF ρa ρb (x₀, x₁)
-            * (rE (prodPMF ρa ρb) (SquareRel R) (x₀, x₁)) ^ (-α)
-            ≤ prodPMF ρa ρb (x₀, x₁)
-              * ((rE ρa R x₀) ^ (-α) * (rE ρb R x₁) ^ (-α)) :=
-          mul_le_mul_right htilt _
-        rcases (rE_square_eq_zero_iff_hall ρc ρd R x₀ x₁).mp hdead with
-          (hrow | hrow) | (hcol | hcol)
-        · refine le_trans (le_trans hbase (le_of_eq ?_))
-            (le_trans le_self_add (le_trans le_self_add le_self_add))
-          rw [if_pos hrow, one_mul]
-        · refine le_trans (le_trans hbase (le_of_eq ?_))
-            (le_trans (le_add_self) (le_trans le_self_add le_self_add))
-          rw [if_pos hrow, one_mul]
-        · refine le_trans (le_trans hbase (le_of_eq ?_))
-            (le_trans le_add_self le_self_add)
-          rw [if_pos hcol.1, if_pos hcol.2, one_mul, one_mul]
-        · refine le_trans (le_trans hbase (le_of_eq ?_)) le_add_self
-          rw [if_pos hcol.1, if_pos hcol.2, one_mul, one_mul]
-      · rw [if_neg hdead, zero_mul, mul_zero]
-        exact zero_le
-  calc ∑' xp : X × X, prodPMF ρa ρb xp
-        * ((if rE (prodPMF ρc ρd) (SquareRel R) xp = 0 then 1 else 0)
-          * (rE (prodPMF ρa ρb) (SquareRel R) xp) ^ (-α))
-      ≤ (∑' xp : X × X, prodPMF ρa ρb xp
-          * (((if rE ρc R xp.1 = 0 ∧ rE ρd R xp.1 = 0 then 1 else 0)
-              * (rE ρa R xp.1) ^ (-α)) * ((rE ρb R xp.2) ^ (-α))))
-        + (∑' xp : X × X, prodPMF ρa ρb xp
-          * (((rE ρa R xp.1) ^ (-α))
-            * ((if rE ρc R xp.2 = 0 ∧ rE ρd R xp.2 = 0 then 1 else 0)
-              * (rE ρb R xp.2) ^ (-α))))
-        + (∑' xp : X × X, prodPMF ρa ρb xp
-          * (((if rE ρc R xp.1 = 0 then 1 else 0) * (rE ρa R xp.1) ^ (-α))
-            * ((if rE ρc R xp.2 = 0 then 1 else 0)
-              * (rE ρb R xp.2) ^ (-α))))
-        + (∑' xp : X × X, prodPMF ρa ρb xp
-          * (((if rE ρd R xp.1 = 0 then 1 else 0) * (rE ρa R xp.1) ^ (-α))
-            * ((if rE ρd R xp.2 = 0 then 1 else 0)
-              * (rE ρb R xp.2) ^ (-α)))) := by
-        rw [← ENNReal.tsum_add, ← ENNReal.tsum_add, ← ENNReal.tsum_add]
-        exact ENNReal.tsum_le_tsum hpt
-    _ ≤ (screenE ρa R [ρc, ρd] (fun x => (rE ρa R x) ^ (-α))
-          + screenE ρb R [ρc, ρd] (fun x => (rE ρb R x) ^ (-α)))
-        * (1 + ENNReal.ofReal α * M)
-        + screenE ρa R [ρc] (fun x => (rE ρa R x) ^ (-α))
-          * screenE ρb R [ρc] (fun x => (rE ρb R x) ^ (-α))
-        + screenE ρa R [ρd] (fun x => (rE ρa R x) ^ (-α))
-          * screenE ρb R [ρd] (fun x => (rE ρb R x) ^ (-α)) := by
-        have hrow0 : (∑' xp : X × X, prodPMF ρa ρb xp
-            * (((if rE ρc R xp.1 = 0 ∧ rE ρd R xp.1 = 0 then 1 else 0)
-                * (rE ρa R xp.1) ^ (-α)) * ((rE ρb R xp.2) ^ (-α))))
-            ≤ screenE ρa R [ρc, ρd] (fun x => (rE ρa R x) ^ (-α))
-              * (1 + ENNReal.ofReal α * M) := by
-          rw [tsum_congr fun xp : X × X => show prodPMF ρa ρb xp
-              * (((if rE ρc R xp.1 = 0 ∧ rE ρd R xp.1 = 0 then 1 else 0)
-                  * (rE ρa R xp.1) ^ (-α)) * ((rE ρb R xp.2) ^ (-α)))
-              = (ρa xp.1 * ((if rE ρc R xp.1 = 0 ∧ rE ρd R xp.1 = 0
-                    then 1 else 0) * (rE ρa R xp.1) ^ (-α)))
-                * (ρb xp.2 * (rE ρb R xp.2) ^ (-α))
-              from by rw [prodPMF_apply]; ring,
-            tsum_prod_split
-              (fun x => ρa x * ((if rE ρc R x = 0 ∧ rE ρd R x = 0
-                then 1 else 0) * (rE ρa R x) ^ (-α)))
-              (fun x => ρb x * (rE ρb R x) ^ (-α)),
-            ← screenE_pair]
-          exact mul_le_mul' le_rfl (le_trans (tsum_diag_rpow_le hα ρb R hrefl)
-            (add_le_add le_rfl (mul_le_mul_right hbb _)))
-        have hrow1 : (∑' xp : X × X, prodPMF ρa ρb xp
-            * (((rE ρa R xp.1) ^ (-α))
-              * ((if rE ρc R xp.2 = 0 ∧ rE ρd R xp.2 = 0 then 1 else 0)
-                * (rE ρb R xp.2) ^ (-α))))
-            ≤ screenE ρb R [ρc, ρd] (fun x => (rE ρb R x) ^ (-α))
-              * (1 + ENNReal.ofReal α * M) := by
-          rw [tsum_congr fun xp : X × X => show prodPMF ρa ρb xp
-              * (((rE ρa R xp.1) ^ (-α))
-                * ((if rE ρc R xp.2 = 0 ∧ rE ρd R xp.2 = 0 then 1 else 0)
-                  * (rE ρb R xp.2) ^ (-α)))
-              = (ρa xp.1 * (rE ρa R xp.1) ^ (-α))
-                * (ρb xp.2 * ((if rE ρc R xp.2 = 0 ∧ rE ρd R xp.2 = 0
-                    then 1 else 0) * (rE ρb R xp.2) ^ (-α)))
-              from by rw [prodPMF_apply]; ring,
-            tsum_prod_split
-              (fun x => ρa x * (rE ρa R x) ^ (-α))
-              (fun x => ρb x * ((if rE ρc R x = 0 ∧ rE ρd R x = 0
-                then 1 else 0) * (rE ρb R x) ^ (-α))),
-            ← screenE_pair, mul_comm]
-          exact mul_le_mul' le_rfl (le_trans (tsum_diag_rpow_le hα ρa R hrefl)
-            (add_le_add le_rfl (mul_le_mul_right haa _)))
-        have hcolc : (∑' xp : X × X, prodPMF ρa ρb xp
-            * (((if rE ρc R xp.1 = 0 then 1 else 0) * (rE ρa R xp.1) ^ (-α))
-              * ((if rE ρc R xp.2 = 0 then 1 else 0)
-                * (rE ρb R xp.2) ^ (-α))))
-            = screenE ρa R [ρc] (fun x => (rE ρa R x) ^ (-α))
-              * screenE ρb R [ρc] (fun x => (rE ρb R x) ^ (-α)) := by
-          rw [tsum_congr fun xp : X × X => show prodPMF ρa ρb xp
-              * (((if rE ρc R xp.1 = 0 then 1 else 0)
-                  * (rE ρa R xp.1) ^ (-α))
-                * ((if rE ρc R xp.2 = 0 then 1 else 0)
-                  * (rE ρb R xp.2) ^ (-α)))
-              = (ρa xp.1 * ((if rE ρc R xp.1 = 0 then 1 else 0)
-                  * (rE ρa R xp.1) ^ (-α)))
-                * (ρb xp.2 * ((if rE ρc R xp.2 = 0 then 1 else 0)
-                  * (rE ρb R xp.2) ^ (-α)))
-              from by rw [prodPMF_apply]; ring,
-            tsum_prod_split
-              (fun x => ρa x * ((if rE ρc R x = 0 then 1 else 0)
-                * (rE ρa R x) ^ (-α)))
-              (fun x => ρb x * ((if rE ρc R x = 0 then 1 else 0)
-                * (rE ρb R x) ^ (-α))),
-            ← screenE_singleton, ← screenE_singleton]
-        have hcold : (∑' xp : X × X, prodPMF ρa ρb xp
-            * (((if rE ρd R xp.1 = 0 then 1 else 0) * (rE ρa R xp.1) ^ (-α))
-              * ((if rE ρd R xp.2 = 0 then 1 else 0)
-                * (rE ρb R xp.2) ^ (-α))))
-            = screenE ρa R [ρd] (fun x => (rE ρa R x) ^ (-α))
-              * screenE ρb R [ρd] (fun x => (rE ρb R x) ^ (-α)) := by
-          rw [tsum_congr fun xp : X × X => show prodPMF ρa ρb xp
-              * (((if rE ρd R xp.1 = 0 then 1 else 0)
-                  * (rE ρa R xp.1) ^ (-α))
-                * ((if rE ρd R xp.2 = 0 then 1 else 0)
-                  * (rE ρb R xp.2) ^ (-α)))
-              = (ρa xp.1 * ((if rE ρd R xp.1 = 0 then 1 else 0)
-                  * (rE ρa R xp.1) ^ (-α)))
-                * (ρb xp.2 * ((if rE ρd R xp.2 = 0 then 1 else 0)
-                  * (rE ρb R xp.2) ^ (-α)))
-              from by rw [prodPMF_apply]; ring,
-            tsum_prod_split
-              (fun x => ρa x * ((if rE ρd R x = 0 then 1 else 0)
-                * (rE ρa R x) ^ (-α)))
-              (fun x => ρb x * ((if rE ρd R x = 0 then 1 else 0)
-                * (rE ρb R x) ^ (-α))),
-            ← screenE_singleton, ← screenE_singleton]
-        calc (∑' xp : X × X, prodPMF ρa ρb xp
-              * (((if rE ρc R xp.1 = 0 ∧ rE ρd R xp.1 = 0 then 1 else 0)
-                  * (rE ρa R xp.1) ^ (-α)) * ((rE ρb R xp.2) ^ (-α))))
-            + (∑' xp : X × X, prodPMF ρa ρb xp
-              * (((rE ρa R xp.1) ^ (-α))
-                * ((if rE ρc R xp.2 = 0 ∧ rE ρd R xp.2 = 0 then 1 else 0)
-                  * (rE ρb R xp.2) ^ (-α))))
-            + (∑' xp : X × X, prodPMF ρa ρb xp
-              * (((if rE ρc R xp.1 = 0 then 1 else 0)
-                  * (rE ρa R xp.1) ^ (-α))
-                * ((if rE ρc R xp.2 = 0 then 1 else 0)
-                  * (rE ρb R xp.2) ^ (-α))))
-            + (∑' xp : X × X, prodPMF ρa ρb xp
-              * (((if rE ρd R xp.1 = 0 then 1 else 0)
-                  * (rE ρa R xp.1) ^ (-α))
-                * ((if rE ρd R xp.2 = 0 then 1 else 0)
-                  * (rE ρb R xp.2) ^ (-α))))
-            ≤ screenE ρa R [ρc, ρd] (fun x => (rE ρa R x) ^ (-α))
-                * (1 + ENNReal.ofReal α * M)
-              + screenE ρb R [ρc, ρd] (fun x => (rE ρb R x) ^ (-α))
-                * (1 + ENNReal.ofReal α * M)
-              + screenE ρa R [ρc] (fun x => (rE ρa R x) ^ (-α))
-                * screenE ρb R [ρc] (fun x => (rE ρb R x) ^ (-α))
-              + screenE ρa R [ρd] (fun x => (rE ρa R x) ^ (-α))
-                * screenE ρb R [ρd] (fun x => (rE ρb R x) ^ (-α)) :=
-            add_le_add (add_le_add (add_le_add hrow0 hrow1)
-              (le_of_eq hcolc)) (le_of_eq hcold)
-          _ = (screenE ρa R [ρc, ρd] (fun x => (rE ρa R x) ^ (-α))
-                + screenE ρb R [ρc, ρd] (fun x => (rE ρb R x) ^ (-α)))
-              * (1 + ENNReal.ofReal α * M)
-              + screenE ρa R [ρc] (fun x => (rE ρa R x) ^ (-α))
-                * screenE ρb R [ρc] (fun x => (rE ρb R x) ^ (-α))
-              + screenE ρa R [ρd] (fun x => (rE ρa R x) ^ (-α))
-                * screenE ρb R [ρd] (fun x => (rE ρb R x) ^ (-α)) := by
-              ring
 
 end CellRow
 

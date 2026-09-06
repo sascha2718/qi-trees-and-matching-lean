@@ -18,13 +18,12 @@ uniform failure theorem.
   remaining assembly), the base values, and the closure inequalities,
   the matching failure is at most `Kc·η` at every height.
 -/
-import GraphMarkovMatching.Delta3.Rows
-import GraphMarkovMatching.Delta3.ScreensA
-import GraphMarkovMatching.Delta3.ScreensB
 import GraphMarkovMatching.Delta3.Base
 import GraphMarkovMatching.Process.Failure
 import GraphMarkovMatching.Grammar.Nilpotence
-import GraphMarkovMatching.Potential.Numerals
+import GraphMarkovMatching.Delta3.Rows
+import GraphMarkovMatching.Delta3.ScreensA
+import GraphMarkovMatching.Delta3.ScreensB
 
 namespace GraphMarkovMatching
 

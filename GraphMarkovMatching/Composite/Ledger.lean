@@ -19,9 +19,6 @@ index of screens.
   finite universe of letters, the induced finite universe of screens
   (cells from the letter universe, zero lists among its subsets), and the
   product-powerset cardinality bound;
-* `no_step_cycle`, `ledger_nilpotentE`: the entrance-inclusive analogues
-  over `CommonStepE` edges via `no_live_step_cycle`, under the standing
-  membership of the declared pairs of both sides in the common support;
 * `no_step_cycleS`, `ledger_nilpotentES`: the source-entrance analogues
   over `CommonStepES` edges via `no_live_step_cycleS`, under the
   standing membership of the declared pairs of the source side in the
@@ -179,89 +176,6 @@ lemma screenUniv_card_le (S : Finset ℕ) (C : Finset (ℕ × ℕ)) (dmax : ℕ)
         Finset.card_image_le
     _ = (letterUniv S C dmax).card * 2 ^ (letterUniv S C dmax).card := by
         rw [Finset.card_product, Finset.card_powerset]
-
-/-! ### Entrance-inclusive edges -/
-
-/-- **No cycle of good entrance-inclusive steps** (`thm:composite-acyclic`,
-rank paragraph, entrance-inclusive form).  A directed cycle of
-entrance-inclusive full-successor steps through screens that are
-F-diagonal-free, zero-list nonempty, and anchored at some depth is
-impossible when every declared pair of either side lies in the common
-support: the cycle unfolds to a periodic path of entrance-inclusive
-steps, and `no_live_step_cycle` forbids such a path. -/
-theorem no_step_cycle
-    (S : Finset ℕ) (hSne : S.Nonempty) (Esrc Etgt : Finset (ℕ × ℕ))
-    (hEsrc : ∀ p ∈ Esrc, p.1 ∈ S ∧ p.2 ∈ S)
-    (hEtgt : ∀ p ∈ Etgt, p.1 ∈ S ∧ p.2 ∈ S)
-    (Good : Screen → Prop)
-    (hdiag : ∀ s, Good s → ¬(s.cell = Letter.F ∧ Letter.F ∈ s.zlist))
-    (hzne : ∀ s, Good s → s.zlist.Nonempty)
-    (hanch : ∀ s, Good s → ∃ δ, ScreenAnchored S Esrc Etgt δ s) :
-    ∀ s, ¬ Relation.TransGen
-      (fun u u' => CommonStepE S Etgt u u' ∧ Good u ∧ Good u') s s := by
-  intro s hcyc
-  obtain ⟨n, f, hn, hf0, hfn, hchain⟩ := exists_chain hcyc
-  have hmodlt : ∀ j : ℕ, j % n < n := fun j => Nat.mod_lt j (by omega)
-  have hgood : ∀ j : ℕ, Good (f (j % n)) := fun j => (hchain _ (hmodlt j)).2.1
-  -- the cyclic extension steps by entrance-inclusive steps at every index
-  have hstep : ∀ j : ℕ, CommonStepE S Etgt (f (j % n)) (f ((j + 1) % n)) := by
-    intro j
-    have hR := (hchain (j % n) (hmodlt j)).1
-    rcases Nat.lt_or_ge (j % n + 1) n with hlt | hge
-    · have heq : (j + 1) % n = j % n + 1 := by
-        have hdm : n * (j / n) + j % n = j := Nat.div_add_mod j n
-        have h1 : j + 1 = n * (j / n) + (j % n + 1) := by omega
-        rw [h1, Nat.mul_add_mod, Nat.mod_eq_of_lt hlt]
-      rw [heq]
-      exact hR
-    · have hn1 : j % n + 1 = n := by
-        have := hmodlt j
-        omega
-      have heq : (j + 1) % n = 0 := by
-        have hdm : n * (j / n) + j % n = j := Nat.div_add_mod j n
-        have hmul : n * (j / n + 1) = n * (j / n) + n := by ring
-        have h1 : j + 1 = n * (j / n + 1) := by omega
-        rw [h1, Nat.mul_mod_right]
-      have hfn0 : f (j % n + 1) = f 0 := by rw [hn1, hfn, hf0]
-      rw [heq, ← hfn0]
-      exact hR
-  have hper : ∀ j : ℕ, f ((j + n) % n) = f (j % n) := by
-    intro j
-    rw [Nat.add_mod_right]
-  obtain ⟨δ0, hδ0⟩ := hanch _ (hgood 0)
-  exact no_live_step_cycle S hSne Esrc Etgt hEsrc hEtgt (fun j => f (j % n))
-    n hn hstep hper δ0 hδ0 (hzne _ (hgood 0))
-    (fun j => hdiag (f (j % n)) (hgood j))
-
-/-- **Nilpotence of the ledger transfer matrix, entrance-inclusive form**
-(`eq:composite-nilpotent`).  Over a finite index of screens, a transfer
-matrix whose support consists of good entrance-inclusive steps is
-annihilated by `Fintype.card` applications: a support cycle would
-transport through the index map to a cycle of good entrance-inclusive
-steps. -/
-theorem ledger_nilpotentE
-    (S : Finset ℕ) (hSne : S.Nonempty) (Esrc Etgt : Finset (ℕ × ℕ))
-    (hEsrc : ∀ p ∈ Esrc, p.1 ∈ S ∧ p.2 ∈ S)
-    (hEtgt : ∀ p ∈ Etgt, p.1 ∈ S ∧ p.2 ∈ S)
-    (Good : Screen → Prop)
-    (hdiag : ∀ s, Good s → ¬(s.cell = Letter.F ∧ Letter.F ∈ s.zlist))
-    (hzne : ∀ s, Good s → s.zlist.Nonempty)
-    (hanch : ∀ s, Good s → ∃ δ, ScreenAnchored S Esrc Etgt δ s)
-    {ι : Type*} [Fintype ι] {α : Type*} [NonUnitalNonAssocSemiring α]
-    (emb : ι → Screen) (Nmat : ι → ι → α)
-    (hsupp : ∀ i j, Nmat i j ≠ 0 →
-      CommonStepE S Etgt (emb i) (emb j) ∧ Good (emb i) ∧ Good (emb j)) :
-    ∀ v : ι → α, (matApply Nmat)^[Fintype.card ι] v = fun _ => 0 := by
-  intro v
-  refine nilpotent_of_acyclic Nmat (fun i hcyc => ?_) v
-  have htrans : Relation.TransGen
-      (fun u u' => CommonStepE S Etgt u u' ∧ Good u ∧ Good u')
-      (emb i) (emb i) := by
-    refine Relation.TransGen.lift emb ?_ i i hcyc
-    intro a b hab
-    exact hsupp a b hab
-  exact no_step_cycle S hSne Esrc Etgt hEsrc hEtgt Good hdiag hzne hanch
-    (emb i) htrans
 
 /-! ### Source-entrance edges -/
 

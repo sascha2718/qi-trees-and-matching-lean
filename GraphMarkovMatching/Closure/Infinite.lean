@@ -8,6 +8,8 @@ process laws, admit a single automorphism of the infinite binary tree
 matching every vertex, with probability at least `1 - ε` whenever
 every finite height fails with probability at most `ε`.
 
+* `Tlaw_map_restrictLab`: the marginal consistency of the process law,
+  from the root-mixture consistency of the Markov tree law;
 * `varyingMatching_infinite`: the interface form: the level failure
   bounds are hypotheses, to be supplied by the general closure
   theorem; marginal consistency comes from `Tlaw_map_restrictLab`;
@@ -16,7 +18,8 @@ every finite height fails with probability at most `ε`.
   trajectory measures, and the matching theorem on it, with no
   probability space assumed.
 -/
-import GraphMarkovMatching.Delta3.Infinite
+import GraphMarkovMatching.Process.Kernel
+import GraphMarkovMatching.Closure.Measure
 import GraphMarkovMatching.Support.Trajectory
 
 namespace GraphMarkovMatching
@@ -26,6 +29,13 @@ open scoped ENNReal Classical
 open MeasureTheory
 
 variable {V : Type} (Rv : V → V → Prop) (μ : PMF V) (ν : PMF ℕ) (v0 : V)
+
+/-- **Marginal consistency of the process law**: restricting a
+height-`(n + 1)` sample of the varying-offspring process to height `n`
+recovers the height-`n` law. -/
+lemma Tlaw_map_restrictLab (n : ℕ) :
+    (Tlaw μ ν v0 (n + 1)).map (restrictLab n) = Tlaw μ ν v0 n :=
+  mix_map_restrictLab (varyK μ ν v0) (freshQ μ ν) n
 
 /-- **The general varying-offspring matching theorem on the infinite
 tree**, in interface form.  Two independent infinite varying-offspring

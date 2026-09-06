@@ -68,7 +68,7 @@ one remaining analytic input; it is isolated as the single named Prop
 -/
 import GraphMarkovMatching.Composite.Main
 import GraphMarkovMatching.Composite.Ledger
-import GraphMarkovMatching.Closure.Green
+import GraphMarkovMatching.Composite.Green
 
 namespace GraphMarkovMatching
 namespace Composite
@@ -401,11 +401,6 @@ section BaseRows
 variable (α : ℝ) (Rv : V → V → Prop) (μ : PMF V) (v0 : V)
 variable (exc1 exc2 : ℕ → Option (ℕ × ℕ)) (ν1 ν2 : PMF ℕ)
 
-private lemma screenInd_le_one' {X : Type} (R : X → X → Prop)
-    (zs : List (PMF X)) (x : X) : screenInd R zs x ≤ 1 := by
-  rw [screenInd]
-  split_ifs <;> simp
-
 private lemma screenE_mono_g {X : Type} (ρs : PMF X) (R : X → X → Prop)
     (zs : List (PMF X)) {g g' : X → ℝ≥0∞} (hg : ∀ x, g x ≤ g' x) :
     screenE ρs R zs g ≤ screenE ρs R zs g' := by
@@ -558,7 +553,7 @@ theorem cScr_base_cT_source_tiltT_le (hα : 0 < α)
                   (leaf ((w : V), CtrC.ord k)))
           ≤ freshQ μ ν1 (w, k) * (1 * (rE μ Rv w) ^ (-α)) :=
             mul_le_mul_right
-              (mul_le_mul' (screenInd_le_one' _ _ _) hW) _
+              (mul_le_mul' (screenInd_le_one _ _ _) hW) _
         _ = ((μ w : ℝ≥0∞) * (rE μ Rv w) ^ (-α)) * ν1 k := by
             rw [show freshQ μ ν1 (w, k) = μ w * ν1 k from rfl, one_mul]
             ring

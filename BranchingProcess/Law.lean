@@ -24,8 +24,7 @@ identified with the probability that the sample dies out.
 * `sampleMeasure_noLevel_succ` and `sampleMeasure_noLevel`: the recursion
   `q_{n+1} = f(q_n)`, and the masses read off as the iterates.
 * `sampleMeasure_not_survives`: **the extinction probability is the probability
-  of extinction**, `P(¬ Survives) = q`, with `toReal_sampleMeasure_not_survives`,
-  `sampleMeasure_survives` and `gen_extinctionProb`.
+  of extinction**, `P(¬ Survives) = q`, with `sampleMeasure_survives`.
 
 The alphabet has to be wide enough to carry the law: the theorems of the last
 three groups hypothesise `J ≤ N`, without which a vertex of the sample keeps
@@ -286,6 +285,11 @@ def rootSplit : (i : Option (Fin N)) → Branch N i → Word N
 /-- The single coordinate carried by the root block. -/
 def rootIdx : Branch N none := ()
 
+/-- Constraining the root coordinate of the branch space is a measurable event. -/
+lemma measurableSet_rootIdx_preimage (s : Set ℕ) :
+    MeasurableSet ((fun u : Branch N none → ℕ ↦ u rootIdx) ⁻¹' s) :=
+  measurable_pi_apply (X := fun _ : Branch N none ↦ ℕ) rootIdx MeasurableSet.of_discrete
+
 @[simp] lemma rootSplit_none (u : Branch N none) : rootSplit none u = ([] : Word N) := rfl
 
 @[simp] lemma rootSplit_some (j : Fin N) (w : Branch N (some j)) :
@@ -355,11 +359,7 @@ lemma measurableSet_levelBox (n k : ℕ) (i : Option (Fin N)) :
     MeasurableSet (levelBox (N := N) n k i) := by
   cases i with
   | none =>
-      have h : levelBox (N := N) n k none
-          = (fun u : Branch N none → ℕ ↦ u rootIdx) ⁻¹' {k} := rfl
-      rw [h]
-      exact measurable_pi_apply (X := fun _ : Branch N none ↦ ℕ) rootIdx
-        MeasurableSet.of_discrete
+      exact measurableSet_rootIdx_preimage {k}
   | some j =>
       rw [levelBox_some]
       split
@@ -531,11 +531,6 @@ theorem sampleMeasure_not_survives (θ : Offspring J) (hJN : J ≤ N) :
   rw [notSurvives_eq_iUnion]
   exact tendsto_nhds_unique h1 h2
 
-/-- The real form of the theorem: the sample dies out with probability `q`. -/
-theorem toReal_sampleMeasure_not_survives (θ : Offspring J) (hJN : J ≤ N) :
-    (sampleMeasure (N := N) θ {c : Word N → ℕ | ¬ Survives c}).toReal = θ.extinction := by
-  rw [sampleMeasure_not_survives θ hJN, ENNReal.toReal_ofReal θ.extinction_nonneg]
-
 /-- **The survival probability** is `1 - q`; it is positive exactly for a
 supercritical law, by `extinction_lt_one_of_supercritical`. -/
 theorem sampleMeasure_survives (θ : Offspring J) (hJN : J ≤ N) :
@@ -547,12 +542,5 @@ theorem sampleMeasure_survives (θ : Offspring J) (hJN : J ≤ N) :
     simp
   rw [h, prob_compl_eq_one_sub hns, sampleMeasure_not_survives θ hJN,
     ENNReal.ofReal_sub 1 θ.extinction_nonneg, ENNReal.ofReal_one]
-
-/-- **The probability of extinction is a fixed point of the generating
-function**, the identity the classical recursion is read off from. -/
-theorem gen_extinctionProb (θ : Offspring J) (hJN : J ≤ N) :
-    Offspring.gen θ (sampleMeasure (N := N) θ {c : Word N → ℕ | ¬ Survives c}).toReal
-      = (sampleMeasure (N := N) θ {c : Word N → ℕ | ¬ Survives c}).toReal := by
-  rw [toReal_sampleMeasure_not_survives θ hJN, θ.gen_extinction]
 
 end BranchingProcess

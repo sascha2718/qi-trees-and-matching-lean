@@ -16,22 +16,28 @@ it; nothing here consumes `ChainClasses`, `GraphMatching` or
 * `Sample`: the genealogical tree cut out by a field of offspring counts, the
   branching property of the subtree at a vertex, survival, the skeleton of
   vertices with infinite progeny, and the rays it carries.
-* `Field`: the i.i.d. coordinate field over an arbitrary index type, built on
-  `Measure.infinitePi`, with the Bernoulli specialisation in the shape the
-  chain half of the paper consumes.
+* `Law`: the law of a sample, tying the two halves together. The extinction
+  probability of `Offspring` is the probability that the sample of `Sample` is
+  finite, provided the alphabet carries the support.
 * `Conditioned`: the law conditioned on survival, the law of the root's
   surviving-child count, which is the Harris transform, and the conjugate tilt
   at the root of a subtree conditioned to die.
 * `Skeleton`: trees as a measurable space, the law of a sample as a measure on
-  them, the reduced law as an `Offspring`, and the skeleton as a measurable map
-  with the branching property at one surviving child.
+  them, the reduced and the conjugate law as an `Offspring`, the skeleton as a
+  measurable map with the branching property at the root, and the containment
+  events as a generating π-system.
 * `Decorated`: the joint box, constraining the surviving and the dying children
   of a vertex at once.
+* `Harris`: **the Harris decomposition** `thm:harris` in its joint form, at
+  general bounded support: conditionally on the skeleton, the decorations are
+  independent conjugate samples, as one identity of laws.
+* `Progeny`: a finite sample, the probability that the tree is exactly a
+  prescribed one, and the number of its vertices.
+* `Field`: the i.i.d. coordinate field over an arbitrary index type, built on
+  `Measure.infinitePi`, with the Bernoulli specialisation in the shape the
+  chain half of the paper consumes.
 * `Geometry`: the coarse geometry of trees on `SimpleGraph`, with the two
   separations `thm:hair-separation` and `thm:three-rays`.
-* `Law`: the law of a sample, tying the two halves together. The extinction
-  probability of `Offspring` is the probability that the sample of `Sample` is
-  finite, provided the alphabet carries the support.
 -/
 import BranchingProcess.Word
 import BranchingProcess.Offspring
@@ -44,4 +50,3 @@ import BranchingProcess.Harris
 import BranchingProcess.Progeny
 import BranchingProcess.Field
 import BranchingProcess.Geometry
-import BranchingProcess.AxCheck

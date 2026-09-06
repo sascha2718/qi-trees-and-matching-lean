@@ -33,8 +33,6 @@ namespace GraphMarkovMatching
 open GraphMarkovMatching.Support Real
 open scoped ENNReal Classical
 
-set_option maxHeartbeats 800000
-
 /-! ### The product argument -/
 
 /-- **The product argument**: `φ_α(xy) ≤ (L/2)(φ_α(x) + φ_α(y))` under the
@@ -164,6 +162,7 @@ lemma fourlaw_strong_le (hα : 0 ≤ α)
         gcongr
     _ = phi α d0 * phi α e1 := rfl
 
+set_option maxHeartbeats 800000 in
 /-- **The weak-pair dichotomy**: chord route for small strong degrees,
 bounded-ratio route (threshold `4`) otherwise; the stated bound is the sum of
 the two routes and is valid unconditionally. -/

@@ -55,8 +55,8 @@ They classify the four infinite classes (R), (F), `(C_Λ)`, and (B). The element
 
 The façade is split into `ChainClasses.Classification.Simple` and
 `ChainClasses.Classification.Complete`. The proof implementation remains in
-`ChainClasses.Trichotomy`, `ChainClasses.GeneralTrichotomy`, and
-`ChainClasses.ChainSeparationProof`.
+`ChainClasses.Bushy.Trichotomy`, `ChainClasses.Universality.GeneralTrichotomy`, and
+`ChainClasses.Universality.ChainSeparationProof`.
 
 ## Build and audit
 
@@ -66,18 +66,7 @@ Run commands from the repository root. To build all four libraries:
 lake build
 ```
 
-The principal axiom audits are separately buildable:
-
-```bash
-lake build GraphMatching.AxCheck
-lake build GraphMarkovMatching.AxCheck GraphMarkovMatching.Composite.AxCheck
-lake build ChainClasses.AxCheck BranchingProcess.AxCheck
-```
-
-They report only the permitted axioms `propext`, `Classical.choice`, and `Quot.sound`, or a
-subset of them.
-
-`Challenge.lean` restates the audited theorem surface using Mathlib alone, while `Solution.lean`
+The axiom audit is the comparator run. `Challenge.lean` restates the audited theorem surface using Mathlib alone, while `Solution.lean`
 discharges those statements from the four libraries. Build the two modules with
 
 ```bash
