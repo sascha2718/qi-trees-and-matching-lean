@@ -4,17 +4,3 @@ build/
 *.ilean
 *.trace
 
-# blueprint build output
-blueprint/web/
-blueprint/print/
-blueprint/src/*.aux
-blueprint/src/*.fdb_latexmk
-blueprint/src/*.fls
-blueprint/src/*.log
-blueprint/src/*.out
-blueprint/src/*.pdf
-blueprint/src/*.toc
-blueprint/src/*.xdv
-blueprint/src/*.synctex.gz
-blueprint/src/*.paux
-blueprint/lean_decls

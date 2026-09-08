@@ -5,16 +5,12 @@ support Galton--Watson trees up to quasi-isometry. It includes the probabilistic
 matching libraries, the geometric assembly, and the public same-class/different-class
 classification theorems.
 
-- [Blueprint and dependency graph](https://sascha2718.github.io/qi-trees-and-matching-lean/)
-- [Printable blueprint](https://sascha2718.github.io/qi-trees-and-matching-lean/blueprint.pdf)
-- [Generated API documentation](https://sascha2718.github.io/qi-trees-and-matching-lean/docs/)
-
-The blueprint follows the mathematical proof in reading order. Each formalised statement links to
-its Lean declaration, and the web version displays the theorem-dependency graph.
+- [Source repository](https://github.com/sascha2718/qi-trees-and-matching-lean)
+- [Generated API documentation](https://sascha2718.github.io/qi-trees-and-matching-lean/)
 
 ## Libraries
 
-The project has four default library targets. 
+The project has four default library targets.
 
 | Library | Role |
 |---|---|
@@ -84,27 +80,8 @@ general Markov matching theorem (the latter over an actual root-fixing graph aut
 leaf, full, and infinite i.i.d. matching theorems, the complete conditioned-infinite
 Galton--Watson classification, and both the qualitative and quantitative two-value results.
 
-## Build the blueprint locally
-
-The printable and web sources are in `blueprint/src`. A local PDF build requires XeLaTeX and
-`latexmk`:
-
-```bash
-cd blueprint/src
-latexmk
-```
-
-This writes `print.pdf`. To build the web version, install `leanblueprint`, `plasTeX`,
-`plastexdepgraph`, and `plastexshowmore`, then run:
-
-```bash
-cd blueprint/src
-plastex -c plastex.cfg web.tex
-```
-
-The web entry point is written to `blueprint/web/index.html`. The GitHub Actions workflows build
-the libraries, comparator audit, blueprint, and API documentation, then deploy the combined site
-to GitHub Pages.
+The GitHub Actions workflows build the libraries, run the comparator audit, and generate the API
+documentation, which is deployed to GitHub Pages.
 
 ## License
 
