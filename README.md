@@ -6,7 +6,6 @@ matching libraries, the geometric assembly, and the public same-class/different-
 classification theorems.
 
 - [Source repository](https://github.com/sascha2718/qi-trees-and-matching-lean)
-- [Generated API documentation](https://sascha2718.github.io/qi-trees-and-matching-lean/)
 
 ## Libraries
 
@@ -80,8 +79,7 @@ general Markov matching theorem (the latter over an actual root-fixing graph aut
 leaf, full, and infinite i.i.d. matching theorems, the complete conditioned-infinite
 Galton--Watson classification, and both the qualitative and quantitative two-value results.
 
-The GitHub Actions workflows build the libraries, run the comparator audit, and generate the API
-documentation, which is deployed to GitHub Pages.
+The GitHub Actions workflow builds the libraries and runs the comparator audit.
 
 ## License
 
