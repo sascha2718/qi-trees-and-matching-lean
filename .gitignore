@@ -4,3 +4,7 @@ build/
 *.ilean
 *.trace
 
+Archive/
+Archive.lean
+texput.log
+.DS_Store

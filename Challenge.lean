@@ -26,6 +26,7 @@ noncomputable def rE (μ : PMF X) (R : X → X → Prop) (x : X) : ℝ≥0∞ :=
 noncomputable def qE (μ : PMF X) (R : X → X → Prop) (x : X) : ℝ≥0∞ :=
   ∑' y, if R x y then 0 else μ y
 
+/-- The bad degree as a real number, `q(x) = μ{y : ¬ x R y}`. -/
 noncomputable def q (μ : PMF X) (R : X → X → Prop) (x : X) : ℝ := (qE μ R x).toReal
 
 /-- The weight `φ_α t = t / (1-t)^α`. -/
@@ -51,8 +52,10 @@ def FullLab (S : Type*) : ℕ → Type _
   | 0 => S
   | n + 1 => S × (FullLab S n × FullLab S n)
 
+/-- The height-`0` labelling consisting of the root label `s`. -/
 def leaf (s : S) : FullLab S 0 := s
 
+/-- The height-`n+1` labelling with root label `s` and the two height-`n` subtrees `p`. -/
 def branch {n : ℕ} (s : S) (p : FullLab S n × FullLab S n) : FullLab S (n + 1) := (s, p.1, p.2)
 
 /-- The law of the height-`n` sample rooted at `s`, for the kernel `P`. -/
@@ -67,6 +70,8 @@ def AutK (k : ℕ) : ℕ → ℕ → Type
   | 0, n + 1 => Bool × AutK k (k - 1) n × AutK k (k - 1) n
   | m + 1, n + 1 => AutK k m n × AutK k m n
 
+/-- `fullMatchesK R₀ k m n π x y`: the restricted automorphism `π` carries every vertex of `x`
+to an `R₀`-compatible vertex of `y`, swapping subtrees only where a swap bit is available. -/
 def fullMatchesK (R₀ : S → S → Prop) (k : ℕ) :
     (m : ℕ) → (n : ℕ) → AutK k m n → FullLab S n → FullLab S n → Prop
   | _, 0, _, x, y => R₀ x y
@@ -79,6 +84,8 @@ def fullMatchesK (R₀ : S → S → Prop) (k : ℕ) :
         ∧ fullMatchesK R₀ k m n π.1 x.2.1 y.2.1
         ∧ fullMatchesK R₀ k m n π.2 x.2.2 y.2.2
 
+/-- Matching of two height-`n` labellings by some element of the restricted group
+`AutK k m n`. -/
 def fullSimK (R₀ : S → S → Prop) (k m n : ℕ) (x y : FullLab S n) : Prop :=
   ∃ π : AutK k m n, fullMatchesK R₀ k m n π x y
 
@@ -103,6 +110,8 @@ def Aut : ℕ → Type
   | 0 => Unit
   | h + 1 => Bool × Aut h × Aut h
 
+/-- `matchesA R₀ h π x y`: the automorphism `π` carries every leaf of `x` to an
+`R₀`-compatible leaf of `y`. -/
 def matchesA (R₀ : V → V → Prop) : (h : ℕ) → Aut h → Leaf V h → Leaf V h → Prop
   | 0, _, x, y => R₀ x y
   | h + 1, π, x, y =>
@@ -113,6 +122,8 @@ def matchesA (R₀ : V → V → Prop) : (h : ℕ) → Aut h → Leaf V h → Le
 def leafSim (R₀ : V → V → Prop) (h : ℕ) (x y : Leaf V h) : Prop :=
   ∃ π : Aut h, matchesA R₀ h π x y
 
+/-- `fullMatchesA R₀ h π x y`: the automorphism `π` carries every vertex of `x` to an
+`R₀`-compatible vertex of `y`. -/
 def fullMatchesA (R₀ : V → V → Prop) : (h : ℕ) → Aut h → FullLab V h → FullLab V h → Prop
   | 0, _, x, y => R₀ x y
   | h + 1, π, x, y =>
@@ -188,24 +199,29 @@ structure Offspring (J : ℕ) where
   pmf : PMF ℕ
   vanishing : ∀ j, J < j → pmf j = 0
 
+/-- An offspring law applied to `j` is the real probability `θ(j)` of `j` children. -/
 instance {J : ℕ} : CoeFun (Offspring J) (fun _ => ℕ → ℝ) :=
   ⟨fun theta j => (theta.pmf j).toReal⟩
 
 namespace Offspring
 
+/-- The mean offspring number `∑_j j θ(j)`. -/
 noncomputable def mean {J : ℕ} (theta : Offspring J) : ℝ :=
   ∑ j ∈ Finset.range (J + 1), (j : ℝ) * theta j
 
+/-- Supercriticality: the mean offspring number exceeds `1`. -/
 def IsSupercritical {J : ℕ} (theta : Offspring J) : Prop := 1 < theta.mean
 
 end Offspring
 
+/-- Vertex addresses of the `N`-ary tree, as words over `Fin N`. -/
 abbrev GWWord (N : ℕ) : Type := List (Fin N)
 
 /-- Membership in the tree cut out by an offspring-count field. -/
 def inGWSample {N : ℕ} (c : GWWord N → ℕ) (v : GWWord N) : Prop :=
   ∀ i, (h : i < v.length) → ((v.get ⟨i, h⟩ : Fin N) : ℕ) < c (v.take i)
 
+/-- Survival: the sample tree cut out by the offspring-count field `c` is infinite. -/
 def gwSurvives {N : ℕ} (c : GWWord N → ℕ) : Prop :=
   {v | inGWSample c v}.Infinite
 
@@ -213,15 +229,18 @@ def gwSurvives {N : ℕ} (c : GWWord N → ℕ) : Prop :=
 noncomputable def gwField {J N : ℕ} (theta : Offspring J) : Measure (GWWord N → ℕ) :=
   Measure.infinitePi (fun _ : GWWord N => theta.pmf.toMeasure)
 
+/-- The law of the i.i.d. offspring field conditioned on an infinite sample tree. -/
 noncomputable def conditionedGW {J N : ℕ} (theta : Offspring J) :
     Measure (GWWord N → ℕ) :=
   ProbabilityTheory.cond (gwField (N := N) theta) {c | gwSurvives c}
 
+/-- The common prefix of two addresses. -/
 def wedgeN {N : ℕ} : GWWord N → GWWord N → GWWord N
   | [], _ => []
   | _, [] => []
   | a :: v, b :: w => if a = b then a :: wedgeN v w else []
 
+/-- The tree distance between two addresses: `|v| + |w| - 2|v ∧ w|`. -/
 def treeDistN {N : ℕ} (v w : GWWord N) : ℕ :=
   v.length + w.length - 2 * (wedgeN v w).length
 
@@ -230,12 +249,15 @@ def gwTreeGraph {N : ℕ} (c : GWWord N → ℕ) :
     SimpleGraph {w : GWWord N // inGWSample c w} :=
   SimpleGraph.fromRel fun u v => treeDistN u.1 v.1 = 1
 
+/-- `GraphQIWith D G G' f`: `f` is a `D`-quasi-isometry from `G` to `G'` for the graph
+metrics, with `D`-dense image. -/
 structure GraphQIWith {V V' : Type*} (D : ℕ) (G : SimpleGraph V)
     (G' : SimpleGraph V') (f : V → V') : Prop where
   upper : ∀ x y, G'.dist (f x) (f y) ≤ D * G.dist x y + D
   lower : ∀ x y, G.dist x y ≤ D * G'.dist (f x) (f y) + D * D
   dense : ∀ y', ∃ x, G'.dist (f x) y' ≤ D
 
+/-- Two graphs are quasi-isometric: some map is a `D`-quasi-isometry for some `D`. -/
 def GraphQuasiIsometric {V V' : Type*} (G : SimpleGraph V) (G' : SimpleGraph V') : Prop :=
   ∃ (D : ℕ) (f : V → V'), GraphQIWith D G G' f
 

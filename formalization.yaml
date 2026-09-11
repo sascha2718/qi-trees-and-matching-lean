@@ -1,0 +1,234 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+# Provenance metadata for the Lean formalisation accompanying
+# "The quasi-isometry classes of Galton--Watson trees" (Athreya and Troscheit).
+# Follows the mathlib-initiative formalization.yaml v0.4 self-reporting format.
+#
+# Before submission to the Palomar Registry: add the arXiv identifier of the manuscript to
+# sources[0].id and sources[0].location, confirm the automation cost entries, and confirm the
+# classification codes.
+
+version: "v0.4"
+
+project:
+  name: "The quasi-isometry classes of Galton--Watson trees: Lean formalisation"
+  description: >-
+    Lean 4 formalisation of the automorphism-matching theorems and the quasi-isometry
+    classification of Galton--Watson trees from the paper "The quasi-isometry classes of
+    Galton--Watson trees" by Jayadev S. Athreya and Sascha Troscheit. The audited statements
+    are: the i.i.d. matching theorem on the binary tree (leaf and full bounds, and the existence
+    of a root-fixing automorphism of the infinite binary tree matching two independent i.i.d.
+    labellings with probability at least 1 - 16 Phi); the general Markov matching theorem for
+    typed label processes on the binary tree, in its finite-type and zero-compatible forms at
+    finite and at infinite height, with a failure probability at most a constant multiple of
+    the one-site defect; the complete classification, up to quasi-isometry, of Galton--Watson
+    trees with finitely supported offspring law conditioned on infinite diameter, into the ray
+    class, the binary-tree class, one chain class for each branching semigroup, and the bushy
+    class, with two independent conditioned trees almost surely quasi-isometric exactly when
+    their laws share a class; and, for offspring supported on {1,2}, almost sure quasi-isometry
+    together with an explicit exponential bound on the failure probability of a
+    (D^2+3)-quasi-isometry. The statements are made in Challenge.lean over Mathlib alone and
+    discharged by Solution.lean from four library targets.
+  authors:
+    - "Jayadev S. Athreya"
+    - "Sascha Troscheit"
+  license: "Apache-2.0"
+  responsible_maintainers:
+    - "Sascha Troscheit"
+
+classification:
+  arxiv: ["math.PR", "math.MG"]
+  msc2020: ["60J80", "05C80", "51F30", "05C05"]
+
+sources:
+  - title: "The quasi-isometry classes of Galton--Watson trees"
+    authors:
+      - "Jayadev S. Athreya"
+      - "Sascha Troscheit"
+    type: "preprint"
+    relationship: "formalizes"
+    note: >-
+      The manuscript whose matching theorems and classification are formalised here. The
+      formalisation and the manuscript were developed together by the same authors; the paper's
+      appendix records the statement-by-statement correspondence with the Lean declarations.
+      No novelty is claimed here beyond what the manuscript itself claims.
+    license: "unknown"
+    author_endorsement: "participated"
+  - title: "Branching Processes"
+    authors:
+      - "Krishna B. Athreya"
+      - "Peter E. Ney"
+    type: "book"
+    location: "Springer, Die Grundlehren der mathematischen Wissenschaften 196, 1972"
+    relationship: "background"
+    note: "Standard reference for the Galton--Watson foundations used by the BranchingProcess library."
+
+related_formalizations: []
+
+status:
+  scope: >-
+    Formalised and audited: the ten theorems listed in comparator-config.json, namely the i.i.d.
+    matching theorem (Theorem 5.1 of the manuscript: leaf bound, full bound and the infinite
+    tree), the Markov matching theorem (Theorem 6.1, in four forms: finite-type and
+    zero-compatible alternatives, each at finite height and at infinite height), the complete
+    conditioned-infinite classification (Theorem 1.2) and the two-value universality theorem
+    with its quantitative rate (Theorem 1.3). Beyond these endpoints the four libraries
+    machine-check the numbered statements of the matching parts, the Galton--Watson
+    foundations and the geometric obstructions, as recorded in the paper's appendix.
+    Not formalised: the elementary finite-diameter class, which lies outside the
+    conditioned-infinite endpoint; the quasisymmetry corollary for the boundaries
+    (Corollary 1.4) and the fractal percolation application (Theorem 3.1); and the two families
+    of binary trees with continuous random branching times (Section 7). The analytic constants
+    of the i.i.d. theorem are machine-checked through rational upper bounds for the closed-form
+    maxima.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: []
+
+automation:
+  methods:
+    - method: "agent"
+      models: ["Claude (Anthropic)"]
+      framework: "Claude Code (Anthropic)"
+      tool_setup: >-
+        Agentic Lean development in Claude Code, including multi-agent sessions with one agent
+        per file, used to write, refactor and repair library proofs against a fixed statement
+        surface. Every retained argument was selected, checked and curated by the authors.
+      cost:
+        wall_time: "not tracked"
+        spend_usd: "subscription-based"
+        hardware: "local machine"
+      prompting_notes: "n/a"
+    - method: "other"
+      models: []
+      framework: "vibefeld (Tobias Osborne)"
+      tool_setup: >-
+        AI-assisted formalisation workflow that produced a readable intermediate formalisation,
+        later superseded by the present development.
+      cost:
+        wall_time: "not tracked"
+        spend_usd: "not tracked"
+        hardware: "local machine"
+      prompting_notes: "n/a"
+    - method: "copilot"
+      models: ["ChatGPT (OpenAI)"]
+      framework: "n/a"
+      tool_setup: >-
+        Interactive assistance with individual Lean arguments, optimisation of parts of the
+        original proofs, and copy-editing.
+      cost:
+        wall_time: "not tracked"
+        spend_usd: "subscription-based"
+        hardware: "API-only"
+      prompting_notes: "n/a"
+    - method: "manual"
+      models: []
+      framework: "n/a"
+      tool_setup: >-
+        Statement design, the Challenge and Solution modules, the comparator configuration,
+        mathematical review of every retained argument, and the correspondence appendix.
+      cost:
+        wall_time: "not tracked"
+        spend_usd: "not tracked"
+        hardware: "local machine"
+      prompting_notes: "n/a"
+  spend_usd: "not tracked"
+  notes: >-
+    AI tools were used extensively during the Lean formalisation, following the principles of
+    the Leiden Declaration on the responsible use of artificial intelligence in research. The
+    Challenge module, which fixes the audited statements, was written and reviewed by the
+    authors. The authors verified every non-human part of the formalisation and accept full
+    responsibility for its contents.
+
+fidelity:
+  divergences: >-
+    The Lean statements are the manuscript's statements with these presentational differences.
+    Vertices of the infinite binary tree are addressed by List Bool where the prose uses words
+    over {1,2}, and Galton--Watson vertices by words over Fin N. Finite-height labellings and
+    the automorphism group are defined by recursion on the height rather than through an
+    alphabet; the library proves the recursive matching relation equal to matching over
+    root-fixing graph automorphisms. The classification is stated for laws packaged with a
+    support bound J at most the arity N and with the top-support hypothesis of the paper. The
+    i.i.d. constants are checked through rational upper bounds for the closed-form maxima
+    L_{5/2}, K_{5/2} and C_{5/2}. Challenge.lean contains one sorry per audited theorem, which
+    Solution.lean supplies; comparator-config.json declares no definition_names, so no part of
+    the statement vocabulary is left open for the solution to instantiate.
+
+review:
+  status: "self-assessed"
+  reviewers:
+    - "Sascha Troscheit"
+    - "Jayadev S. Athreya"
+  notes: >-
+    No independent human review of the Lean development. The authors audited the statement
+    surface in Challenge.lean against the manuscript, and the comparator independently checks
+    that Solution.lean proves those statements from propext, Classical.choice and Quot.sound
+    alone. Neither check assesses whether the informal statements are the right formalisation
+    of the manuscript's theorems; that correspondence is documented in the paper's appendix.
+
+alignment:
+  namespace: "Challenge"
+  statements:
+    - source: "Theorem 5.1 (Matching theorem), the leaf bound"
+      lean: "Challenge.audit_graph_leaf_matching_bound"
+      module: "Challenge"
+      status: "proved"
+      note: "Proved in Solution from GraphMatching.Graph."
+    - source: "Theorem 5.1 (Matching theorem), the full bound"
+      lean: "Challenge.audit_graph_full_matching_bound"
+      module: "Challenge"
+      status: "proved"
+      note: "Proved in Solution from GraphMatching.Graph."
+    - source: "Theorem 5.1 (Matching theorem), the infinite tree"
+      lean: "Challenge.audit_exists_infinite_tree_matching_graphAut"
+      module: "Challenge"
+      status: "proved"
+      note: >-
+        Asserts a root-fixing graph automorphism of the infinite binary tree matching the two
+        consistent i.i.d. labellings at every vertex. Proved in Solution from
+        GraphMatching.Kolmogorov and GraphMatching.AutBridge.
+    - source: "Theorem 1.2 (Complete quasi-isometry classification), conditioned-infinite part"
+      lean: "Challenge.audit_offspring_classification_ae_iff"
+      module: "Challenge"
+      status: "proved"
+      note: >-
+        Two conditioned infinite trees are quasi-isometric almost surely exactly when the two
+        laws lie in the ray class, the binary-tree class, the same chain class, or the bushy
+        class. Proved in Solution from ChainClasses.Classification.
+    - source: "Theorem 1.3 (Universality in the two-value family), almost sure statement"
+      lean: "Challenge.audit_twovalue_ae_tree_family"
+      module: "Challenge"
+      status: "proved"
+      note: "Proved in Solution from ChainClasses.TwoValue."
+    - source: "Theorem 1.3 (Universality in the two-value family), the rate (1.1)"
+      lean: "Challenge.audit_twovalue_rate_tree"
+      module: "Challenge"
+      status: "proved"
+      note: >-
+        The failure probability of a (D^2+3)-quasi-isometry above a threshold D_0 is at most
+        256 sqrt(theta_1^{D(2D-5)}), the square-root form of the paper's rate. Proved in
+        Solution from ChainClasses.TwoValue.
+    - source: "Theorem 6.1 (Markov matching), finite alternative"
+      lean: "Challenge.audit_markov_matching_finite"
+      module: "Challenge"
+      status: "proved"
+      note: "Proved in Solution from GraphMarkovMatching.Stopped.Main."
+    - source: "Theorem 6.1 (Markov matching), zero-compatible alternative"
+      lean: "Challenge.audit_markov_matching_zero"
+      module: "Challenge"
+      status: "proved"
+      note: "Proved in Solution from GraphMarkovMatching.Stopped.Main."
+    - source: "Theorem 6.1 (Markov matching), finite alternative at infinite height"
+      lean: "Challenge.audit_markov_matching_finite_infinite"
+      module: "Challenge"
+      status: "proved"
+      note: "Proved in Solution from GraphMarkovMatching.Stopped.Main."
+    - source: "Theorem 6.1 (Markov matching), zero-compatible alternative at infinite height"
+      lean: "Challenge.audit_markov_matching_zero_infinite"
+      module: "Challenge"
+      status: "proved"
+      note: "Proved in Solution from GraphMarkovMatching.Stopped.Main."
+
+acknowledgements: >-
+  Lean 4 and Mathlib (leanprover-community), the leanprover comparator, lean4export and
+  nanoda, Tobias Osborne for the vibefeld workflow, and Anthropic and OpenAI models as
+  recorded under automation.
