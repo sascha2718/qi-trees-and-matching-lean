@@ -217,6 +217,42 @@ unweighted two-law closure forces the trivial level), and
                      potentials are infinite for the pure-ternary law
 * `Tail/QuenchedObstruction` a quenched fresh mode keeps a screen charged
 * `Obstructions/Semigroup`   the finite-support obstruction to an asymmetric two-law theorem
+# The standalone Markov proof (`markov_matching_new_proof.tex`)
+
+The stopped-expansion proof of the general Markov matching theorem, in `Stopped/`:
+
+* `Stopped/Model`      the Markov label models, their laws on typed labellings, the
+                     matching degrees and the support of the laws
+* `Stopped/Constants`  the one-site quantities `η`, `δ`, `ζ`, `f`, `R_μ`, `D_μ` and their bounds
+* `Stopped/Paths`      restricted potentials, zero events, phases, possible paths, the stopping
+                     predicate, transition selections and the explicit scalar functions
+* `Stopped/Scalar`     `L_α(β)`, `K_α(β)`, `λ_α`, `C_α(u)` and the pointwise inequalities
+* `Stopped/Moments`    the inverse moments, the selected inverse mixture, positivity at `δ = 0`,
+                     the root factors
+* `Stopped/ZeroExpansion`     the unweighted stopped expansion (`thm:explicit-zero-bound`)
+* `Stopped/WeightedExpansion` the weighted stopped expansion (`thm:explicit-weighted-bound`)
+* `Stopped/FourLaw`    the four-law contraction with the mean cancellation
+                     (`thm:four-law-contraction`)
+* `Stopped/Mixture`    zero-mixture convexity and the averaging of the transitions
+* `Stopped/Root`       the independent root
+* `Stopped/Induction`  the height induction and the finite-height failure bounds
+* `Stopped/Infinite`   the pair of infinite processes and the infinite failure bound
+* `Stopped/Threshold`  the scalar threshold `ε_K` and the quadratic `M_η`
+* `Stopped/Main`       `thm:markov-matching` assembled, both alternatives
+* `Stopped/Profiles`   marked binary profiles, composites, grafting and the height bounds
+* `Stopped/Semigroup`  the branching semigroup, its atoms, and the finiteness of atoms
+* `Stopped/Presentation` the model of a common-core presentation, fresh positivity and the
+                     selected core transitions
+* `Stopped/Returns`    the phase map and the return bound (`thm:bounded-return`)
+* `Stopped/Application` the matching theorem for product laws with a common core
+* `Stopped/Consequences` the explicit consequences at exponents `2` and `4/3`
+* `Stopped/Numerics`   the exponent range, the exponents `4/3` and `2`
+* `Stopped/LowerBounds` the lower bound for the linear coefficient and the order of the
+                     failure probability
+* `Stopped/ProfileObstruction` the obstruction for preassigned profiles
+* `Stopped/Geometric`  the chain and bushy one-site estimates, the probability-one conclusion
+* `Stopped/Unbounded`  the finite-height truncation estimate
+
 -/
 
 -- ## The support layer
@@ -345,3 +381,29 @@ import GraphMarkovMatching.Composite.Numeric
 import GraphMarkovMatching.Obstructions.CrossedContext
 import GraphMarkovMatching.Tail.QuenchedObstruction
 import GraphMarkovMatching.Obstructions.Semigroup
+
+-- ## The standalone Markov proof
+
+import GraphMarkovMatching.Stopped.Model
+import GraphMarkovMatching.Stopped.Constants
+import GraphMarkovMatching.Stopped.Paths
+import GraphMarkovMatching.Stopped.Scalar
+import GraphMarkovMatching.Stopped.Moments
+import GraphMarkovMatching.Stopped.ZeroExpansion
+import GraphMarkovMatching.Stopped.WeightedExpansion
+import GraphMarkovMatching.Stopped.FourLaw
+import GraphMarkovMatching.Stopped.Mixture
+import GraphMarkovMatching.Stopped.Root
+import GraphMarkovMatching.Stopped.Induction
+import GraphMarkovMatching.Stopped.Infinite
+import GraphMarkovMatching.Stopped.Threshold
+import GraphMarkovMatching.Stopped.Main
+import GraphMarkovMatching.Stopped.Profiles
+import GraphMarkovMatching.Stopped.Semigroup
+import GraphMarkovMatching.Stopped.Presentation
+import GraphMarkovMatching.Stopped.Returns
+import GraphMarkovMatching.Stopped.Numerics
+import GraphMarkovMatching.Stopped.LowerBounds
+import GraphMarkovMatching.Stopped.ProfileObstruction
+import GraphMarkovMatching.Stopped.Geometric
+import GraphMarkovMatching.Stopped.Unbounded

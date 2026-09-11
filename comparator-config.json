@@ -9,7 +9,11 @@
         "Challenge.audit_exists_infinite_tree_matching_graphAut",
         "Challenge.audit_offspring_classification_ae_iff",
         "Challenge.audit_twovalue_ae_tree_family",
-        "Challenge.audit_twovalue_rate_tree"
+        "Challenge.audit_twovalue_rate_tree",
+        "Challenge.audit_markov_matching_finite",
+        "Challenge.audit_markov_matching_zero",
+        "Challenge.audit_markov_matching_finite_infinite",
+        "Challenge.audit_markov_matching_zero_infinite"
     ],
     "definition_names": [],
     "permitted_axioms": [

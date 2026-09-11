@@ -473,4 +473,275 @@ theorem audit_twovalue_rate_tree {t : ℝ} (ht0 : 0 < t) (ht1 : t < 1) :
             IsQIWith (D ^ 2 + 3) (InTree ω.1) (InTree ω.2) f}
         ≤ ENNReal.ofReal (256 * qBound (1 - t) D) := sorry
 
+/-! ## The stopped Markov matching theorem: the model -/
+
+section StoppedPotential
+variable {X : Type*}
+
+/-- The symmetrised square `R^□`: straight or crossed compatibility of pairs. -/
+def SquareRel (R : X → X → Prop) : X × X → X × X → Prop :=
+  fun x y => (R x.1 y.1 ∧ R x.2 y.2) ∨ (R x.1 y.2 ∧ R x.2 y.1)
+
+/-- The positive-set restricted directed potential
+`Φres(ρ_s → ρ_t) = 𝔼_{X∼ρ_s}[𝟙_{r_{ρ_t}(X)>0} φ_α(q_{ρ_t}(X))]`. -/
+noncomputable def PhiDres (α : ℝ) (ρs ρt : PMF X) (R : X → X → Prop) : ℝ≥0∞ :=
+  ∑' x, ρs x * (if rE ρt R x = 0 then 0 else phiE α (q ρt R x))
+
+/-- The zero-interface mass: the `ρ_s`-mass of points with zero good degree toward `ρ_t`. -/
+noncomputable def zMass (ρs ρt : PMF X) (R : X → X → Prop) : ℝ≥0∞ :=
+  ∑' y, ρs y * (if rE ρt R y = 0 then 1 else 0)
+
+/-- The directed mismatch mass `∑_x ρ_s(x) q_{ρ_t}(x)` between two laws. -/
+noncomputable def failureD (ρs ρt : PMF X) (R : X → X → Prop) : ℝ≥0∞ :=
+  ∑' x, ρs x * qE ρt R x
+
+end StoppedPotential
+
+namespace Stopped
+
+/-- A Markov label model (`sec:statement`): states with a compatibility relation and a
+distinguished state, a fresh state law, and types with a fresh subset and a child-type
+kernel. -/
+structure Model (V I : Type) where
+  /-- compatibility of states, `v ∼ w` -/
+  R : V → V → Prop
+  /-- the distinguished state `0` -/
+  zero : V
+  /-- the fresh state law -/
+  μ : PMF V
+  /-- the fresh types -/
+  fresh : I → Prop
+  /-- the kernel on ordered child-type pairs -/
+  π : I → PMF (I × I)
+
+namespace Model
+
+variable {V I : Type} (M : Model V I)
+
+/-- Reflexivity and symmetry of the compatibility relation. -/
+structure IsCompat (M : Model V I) : Prop where
+  refl : ∀ v, M.R v v
+  symm : ∀ v w, M.R v w → M.R w v
+
+/-- The state-only relation on typed states. -/
+def srel : I × V → I × V → Prop := fun a b => M.R a.2 b.2
+
+/-- The root state law of a type: `μ` at a fresh type, the point mass at `0` otherwise. -/
+noncomputable def rootLaw (t : I) : PMF V :=
+  if M.fresh t then M.μ else PMF.pure M.zero
+
+/-- The typed root law. -/
+noncomputable def rootT (t : I) : PMF (I × V) :=
+  (M.rootLaw t).map fun v => (t, v)
+
+/-- The child kernel on typed states: draw the child-type pair from `π`, then independent
+root states. -/
+noncomputable def kernel : I × V → PMF ((I × V) × (I × V)) := fun s =>
+  (M.π s.1).bind fun j => prodPMF (M.rootT j.1) (M.rootT j.2)
+
+/-- The height-`h` law `ρ_{t,h}` of the labelling of type `t`, as a typed labelling. -/
+noncomputable def rho (t : I) (h : ℕ) : PMF (FullLab (I × V) h) :=
+  (M.rootT t).bind fun s => muM M.kernel s h
+
+/-- The child-pair mixture of type `t` at height `h`: the law of the two subtrees below a
+vertex of type `t`. -/
+noncomputable def childMix (t : I) (h : ℕ) :
+    PMF (FullLab (I × V) h × FullLab (I × V) h) :=
+  (M.π t).bind fun j => prodPMF (M.rho j.1 h) (M.rho j.2 h)
+
+/-- Matching at height `h`: state compatibility at every vertex under some rooted
+automorphism, `x ≈_h y`. -/
+abbrev sim (h : ℕ) : FullLab (I × V) h → FullLab (I × V) h → Prop :=
+  fullSim M.srel h
+
+/-- The matching degree `r_{t,h}(x) = ρ_{t,h}{y : x ≈_h y}`. -/
+noncomputable def deg (t : I) (h : ℕ) (x : FullLab (I × V) h) : ℝ≥0∞ :=
+  rE (M.rho t h) (M.sim h) x
+
+/-- The realised states `V_μ = supp μ ∪ {0}`. -/
+def Vmu : Set V := {v | M.μ v ≠ 0} ∪ {M.zero}
+
+/-- All states of a typed labelling lie in `A`. -/
+def StatesIn (A : Set V) : (h : ℕ) → FullLab (I × V) h → Prop
+  | 0, x => x.2 ∈ A
+  | _ + 1, x => x.1.2 ∈ A ∧ StatesIn A _ x.2.1 ∧ StatesIn A _ x.2.2
+
+/-- The graph potential `η_{G,α}(μ) = ∑_v μ(v) φ_α(1 - b(v))` (`eq:root-defect`). -/
+noncomputable def eta (α : ℝ) : ℝ≥0∞ := PhiD α M.μ M.μ M.R
+
+/-- The incompatible root mass `δ = 1 - b(0) = μ{v : v ≁ 0}` (`eq:root-defect`). -/
+noncomputable def delta : ℝ≥0∞ := qE M.μ M.R M.zero
+
+/-- The forced-state term `e_0 = φ_α(δ)`, infinite when `b(0) = 0` (`eq:root-defect`). -/
+noncomputable def e0 (α : ℝ) : ℝ≥0∞ := phiE α (q M.μ M.R M.zero)
+
+/-- The one-site defect `ζ_α = max{η_α, φ_α(δ)}` (`eq:root-defect`). -/
+noncomputable def zeta (α : ℝ) : ℝ≥0∞ := max (M.eta α) (M.e0 α)
+
+/-- The restricted potential `P_h(s,t) = ∫_{r_{t,h} > 0} φ_α(1 - r_{t,h}) dρ_{s,h}`
+(`sec:restricted-potential`). -/
+noncomputable def P (α : ℝ) (s t : I) (h : ℕ) : ℝ≥0∞ :=
+  PhiDres α (M.rho s h) (M.rho t h) (M.sim h)
+
+/-- The zero mass `ρ_{s,h}{r_{t,h} = 0}` (`sec:restricted-potential`). -/
+noncomputable def z (s t : I) (h : ℕ) : ℝ≥0∞ :=
+  zMass (M.rho s h) (M.rho t h) (M.sim h)
+
+/-- The failure probability `P(M_h(s,t)^c) = ∑_x ρ_{s,h}(x) q_{ρ_{t,h}}(x)`
+(`sec:completion`). -/
+noncomputable def failProb (s t : I) (h : ℕ) : ℝ≥0∞ :=
+  failureD (M.rho s h) (M.rho t h) (M.sim h)
+
+/-- A phase map (`sec:finite-hypotheses`): fresh types have phase zero and every child in
+a charged transition has phase one greater than its parent. -/
+structure Phase (M : Model V I) (g : ℕ) where
+  θ : I → ZMod g
+  fresh_zero : ∀ t, M.fresh t → θ t = 0
+  child : ∀ t j, M.π t j ≠ 0 → θ j.1 = θ t + 1 ∧ θ j.2 = θ t + 1
+
+/-- The number of types of phase `i` (`eq:transition-budget`). -/
+noncomputable def Phase.count {M : Model V I} [Fintype I] {g : ℕ} (Θ : Phase M g)
+    (i : ZMod g) : ℕ :=
+  (Finset.univ.filter fun t => Θ.θ t = i).card
+
+/-- A possible child: some charged transition produces it. -/
+def child (t t' : I) : Prop := ∃ j, M.π t j ≠ 0 ∧ (t' = j.1 ∨ t' = j.2)
+
+/-- The possible children of a set of types. -/
+def children (D : Set I) : Set I := {t' | ∃ t ∈ D, M.child t t'}
+
+/-- The types reachable from `D` by possible paths of length `n`. -/
+def reach (D : Set I) : ℕ → Set I
+  | 0 => D
+  | n + 1 => children M (reach D n)
+
+/-- A possible type path of length `n`: successive possible children. -/
+def IsPath (p : ℕ → I) (n : ℕ) : Prop := ∀ i < n, M.child (p i) (p (i + 1))
+
+/-- The stopping predicate (`sec:finite-hypotheses`): every possible source path of
+length `n` from `s` passes, at some depth `k ≤ n`, a fresh type at which some type reachable
+from `D` in `k` steps is fresh. -/
+def Stops (s : I) (D : Set I) (n : ℕ) : Prop :=
+  ∀ p : ℕ → I, p 0 = s → M.IsPath p n → ∃ k ≤ n, M.fresh (p k) ∧ ∃ f ∈ M.reach D k, M.fresh f
+
+/-- Common returns (`sec:finite-hypotheses`): from any two equal-phase types, every
+possible source path reaches a fresh type at a depth at most `H` at which some possible
+target path is fresh as well. -/
+def CommonReturns {g : ℕ} (Θ : Phase M g) (H : ℕ) : Prop :=
+  ∀ s t, Θ.θ s = Θ.θ t → M.Stops s {t} H
+
+/-- Fresh positivity (`sec:finite-hypotheses`): every charged realisation of a fresh type
+has positive degree against every fresh type. -/
+def FreshPositive : Prop :=
+  ∀ (h : ℕ) (f f' : I) (x : FullLab (I × V) h),
+    M.fresh f → M.fresh f' → M.rho f h x ≠ 0 → M.deg f' h x ≠ 0
+
+/-- A transition selection (`eq:transition-budget`): for every target type a nonempty
+finite set of charged child pairs such that, for every source child pair with states in
+`V_μ`, positive degree against the full child-pair mixture implies positive degree against
+some selected component. -/
+structure Selection (M : Model V I) where
+  J : I → Finset (I × I)
+  nonempty : ∀ t, (J t).Nonempty
+  charged : ∀ t, ∀ j ∈ J t, M.π t j ≠ 0
+  positive : ∀ (t : I) (h : ℕ) (p : FullLab (I × V) h × FullLab (I × V) h),
+    StatesIn M.Vmu h p.1 → StatesIn M.Vmu h p.2 →
+    rE (M.childMix t h) (SquareRel (M.sim h)) p ≠ 0 →
+    ∃ j ∈ J t, rE (prodPMF (M.rho j.1 h) (M.rho j.2 h)) (SquareRel (M.sim h)) p ≠ 0
+
+/-- The inverse-probability budget `∑_{j ∈ J_t} π_t(j)^{-α}` of a type
+(`eq:transition-budget`). -/
+noncomputable def Selection.budget {M : Model V I} (Sel : Selection M) (α : ℝ) (t : I) :
+    ℝ≥0∞ :=
+  ∑ j ∈ Sel.J t, (M.π t j) ^ (-α)
+
+end Model
+
+/-- The summand of `L_α(β)` at `q` (`eq:mean-constants`). -/
+noncomputable def Lsummand (α β q : ℝ) : ℝ := q / (1 + q) ^ α + β * (1 - q) ^ α
+
+/-- `L_α(β) = max_{0 ≤ q ≤ 1} (q/(1+q)^α + β(1-q)^α)` (`eq:mean-constants`). -/
+noncomputable def Lfun (α β : ℝ) : ℝ := sSup (Lsummand α β '' Set.Icc 0 1)
+
+/-- `K_α(β) = α^α/(α+1)^{α+1} (1-β)^{α+1}` (`eq:mean-constants`). -/
+noncomputable def Kfun (α β : ℝ) : ℝ := α ^ α / (α + 1) ^ (α + 1) * (1 - β) ^ (α + 1)
+
+/-- `λ_α = 2 min_{0 ≤ β ≤ 1} (L_α(β) + K_α(β))` (`eq:mean-constants`). -/
+noncomputable def lambda (α : ℝ) : ℝ :=
+  2 * sInf ((fun β => Lfun α β + Kfun α β) '' Set.Icc 0 1)
+
+end Stopped
+
+/-! ## The stopped Markov matching theorem -/
+
+/-- `thm:markov-matching`, finite alternative: under the exponent condition `λ_α < 1`,
+there are constants `K`, `ε > 0` depending only on `α, H, T, B` such that every finite
+model with a phase map of class size at most `T`, a transition selection of budget at most
+`B`, fresh positivity and common returns within `H`, and one-site defect `ζ_α ≤ ε`, has
+every equal-phase pair failing to match at every height with probability at most `K ζ_α`. -/
+theorem audit_markov_matching_finite {α : ℝ} (hα : 1 ≤ α) (hlam : Stopped.lambda α < 1)
+    (H T : ℕ) (hT : 1 ≤ T) (B : ℝ) (hB : 1 ≤ B) :
+    ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} [Fintype I] (M : Stopped.Model V I), M.IsCompat →
+      ∀ {g : ℕ} (Θ : Stopped.Model.Phase M g), (∀ i, Θ.count i ≤ T) →
+      ∀ (Sel : Stopped.Model.Selection M), (∀ t, Sel.budget α t ≤ ENNReal.ofReal B) →
+      M.FreshPositive → M.CommonReturns Θ H → M.zeta α ≤ ENNReal.ofReal ε →
+      ∀ s t, Θ.θ s = Θ.θ t → ∀ h, M.failProb s t h ≤ ENNReal.ofReal Kc * M.zeta α := sorry
+
+/-- `thm:markov-matching`, zero-compatible alternative: under the exponent condition
+`λ_α < 1`, there are constants `K`, `ε > 0` depending only on `α` such that every model
+with `δ = 0` and `ζ_α ≤ ε` has every pair of types failing to match at every height with
+probability at most `K ζ_α`. -/
+theorem audit_markov_matching_zero {α : ℝ} (hα : 1 ≤ α) (hlam : Stopped.lambda α < 1) :
+    ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} (M : Stopped.Model V I), M.IsCompat → M.delta = 0 →
+      M.zeta α ≤ ENNReal.ofReal ε → ∀ s t h,
+        M.failProb s t h ≤ ENNReal.ofReal Kc * M.zeta α := sorry
+
+/-- `thm:markov-matching`, finite alternative at infinite height: two independent
+consistent processes of equal-phase types admit one root-fixing infinite-tree
+automorphism matching their states at every vertex with probability at least
+`1 - K ζ_α`. -/
+theorem audit_markov_matching_finite_infinite {α : ℝ} (hα : 1 ≤ α)
+    (hlam : Stopped.lambda α < 1) (H T : ℕ) (hT : 1 ≤ T) (B : ℝ) (hB : 1 ≤ B) :
+    ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} [Fintype I] [Countable V] [MeasurableSpace V]
+      [MeasurableSingletonClass V] [MeasurableSpace I] [MeasurableSingletonClass I]
+      (M : Stopped.Model V I), M.IsCompat →
+      ∀ {g : ℕ} (Θ : Stopped.Model.Phase M g), (∀ i, Θ.count i ≤ T) →
+      ∀ (Sel : Stopped.Model.Selection M), (∀ t, Sel.budget α t ≤ ENNReal.ofReal B) →
+      M.FreshPositive → M.CommonReturns Θ H → M.zeta α ≤ ENNReal.ofReal ε →
+      ∀ s t, Θ.θ s = Θ.θ t →
+      ∃ (Omega : Type) (_ : MeasurableSpace Omega) (P : Measure Omega)
+        (_ : IsProbabilityMeasure P) (X Y : (n : ℕ) → Omega → FullLab (I × V) n),
+        (∀ n omega, restrictLab n (X (n + 1) omega) = X n omega) ∧
+        (∀ n omega, restrictLab n (Y (n + 1) omega) = Y n omega) ∧
+        (∀ n, Measurable (fun omega => (X n omega, Y n omega))) ∧
+        (∀ n, P.map (fun omega => (X n omega, Y n omega))
+          = (prodPMF (M.rho s n) (M.rho t n)).toMeasure) ∧
+        1 - ENNReal.ofReal Kc * M.zeta α
+          ≤ P {omega | ∃ aut : List Bool ≃ List Bool, IsTreeAut aut ∧
+            ∀ w : List Bool, M.srel
+              (coord (aut w).length (X (aut w).length omega) (aut w))
+              (coord w.length (Y w.length omega) w)} := sorry
+
+/-- `thm:markov-matching`, zero-compatible alternative at infinite height: two independent
+consistent processes of any two types admit one root-fixing infinite-tree automorphism
+matching their states at every vertex with probability at least `1 - K ζ_α`. -/
+theorem audit_markov_matching_zero_infinite {α : ℝ} (hα : 1 ≤ α)
+    (hlam : Stopped.lambda α < 1) :
+    ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} [Countable V] [MeasurableSpace V]
+      [MeasurableSingletonClass V] [Countable I] [MeasurableSpace I]
+      [MeasurableSingletonClass I] (M : Stopped.Model V I), M.IsCompat → M.delta = 0 →
+      M.zeta α ≤ ENNReal.ofReal ε → ∀ s t,
+      ∃ (Omega : Type) (_ : MeasurableSpace Omega) (P : Measure Omega)
+        (_ : IsProbabilityMeasure P) (X Y : (n : ℕ) → Omega → FullLab (I × V) n),
+        (∀ n omega, restrictLab n (X (n + 1) omega) = X n omega) ∧
+        (∀ n omega, restrictLab n (Y (n + 1) omega) = Y n omega) ∧
+        (∀ n, Measurable (fun omega => (X n omega, Y n omega))) ∧
+        (∀ n, P.map (fun omega => (X n omega, Y n omega))
+          = (prodPMF (M.rho s n) (M.rho t n)).toMeasure) ∧
+        1 - ENNReal.ofReal Kc * M.zeta α
+          ≤ P {omega | ∃ aut : List Bool ≃ List Bool, IsTreeAut aut ∧
+            ∀ w : List Bool, M.srel
+              (coord (aut w).length (X (aut w).length omega) (aut w))
+              (coord w.length (Y w.length omega) w)} := sorry
+
 end Challenge

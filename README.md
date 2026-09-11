@@ -15,7 +15,7 @@ The project has four default library targets.
 |---|---|
 | `BranchingProcess` | Galton--Watson trees, conditioning, skeletons, and geometric obstructions |
 | `GraphMatching` | Matching i.i.d. labels on the binary tree by automorphisms |
-| `GraphMarkovMatching` | The one-law and two-law matching engine for tree-indexed Markov label fields |
+| `GraphMarkovMatching` | The one-law and two-law matching engine for tree-indexed Markov label fields, and the stopped-expansion proof of the general Markov matching theorem (`Stopped/`) |
 | `ChainClasses` | Chain and shape encodings, transfer, universality, separation, and classification |
 
 The toolchain is pinned to Lean `v4.32.2`, with Mathlib pinned to the matching release in
