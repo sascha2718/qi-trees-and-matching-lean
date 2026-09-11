@@ -80,6 +80,7 @@ import ChainClasses.General.GeneralShrinkScale
 import ChainClasses.General.GeneralAssembly
 import ChainClasses.General.GeneralCascade
 import ChainClasses.General.GeneralBushPoint
+import ChainClasses.General.GeneralNeck
 import ChainClasses.General.GeneralShapeMass
 import ChainClasses.General.GeneralCoupling
 import ChainClasses.General.GeneralShapeTail
@@ -87,27 +88,24 @@ import ChainClasses.General.GeneralShapeCoupling
 import ChainClasses.General.GeneralShapeEta
 import ChainClasses.General.GeneralLabelField
 
--- ## The chain regime at general support and the matched presentations
+-- ## The original chain neck and arity laws at general support
 
-import ChainClasses.Regime.SemigroupMerge
-import ChainClasses.Regime.ChainRegime
-import ChainClasses.Regime.RenewalAlignment
-import ChainClasses.Regime.MatchedIdeal
-import ChainClasses.Regime.MatchedCouple
-import ChainClasses.Regime.MatchedPresentation
-import ChainClasses.Regime.ChainCross
-import ChainClasses.Regime.ClusterField
-import ChainClasses.Regime.ClusterRoot
-import ChainClasses.Regime.ClusterIID
 import ChainClasses.Regime.UniformField
-import ChainClasses.Regime.ChainLabelField
-import ChainClasses.Regime.MatchedRule
-import ChainClasses.Regime.BlobField
-import ChainClasses.Regime.BlobRoot
-import ChainClasses.Regime.BlobLaw
+import ChainClasses.Regime.ChainNeckLaw
+import ChainClasses.Regime.DirectChainLabels
 
--- ## The bridges to the engine
+-- ## Arbitrary bounded profiles and the stopped Markov matching theorem
 
+import ChainClasses.Engine.ReducedProfiles
+import ChainClasses.Engine.SkeletonPatterns
+import ChainClasses.Engine.ProfileKernel
+import ChainClasses.Engine.ProfileLaw
+import ChainClasses.Engine.ProfileProjection
+import ChainClasses.Engine.ProfileMatching
+import ChainClasses.Engine.ProfileGeometry
+import ChainClasses.Engine.ProfileAssembly
+import ChainClasses.Engine.BushyProfileBridge
+import ChainClasses.Engine.QuantisedProfiles
 import ChainClasses.Engine.EngineBridge
 import ChainClasses.Engine.ChainEngineBridge
 
@@ -121,17 +119,16 @@ import ChainClasses.Universality.SampleAssembly
 import ChainClasses.Universality.BAssembly
 import ChainClasses.Universality.FullTree
 import ChainClasses.Universality.HairyGeneral
-import ChainClasses.Universality.Piece
-import ChainClasses.Universality.ChainBlob
-import ChainClasses.Universality.BlobPiece
-import ChainClasses.Universality.BlobPresented
-import ChainClasses.Universality.BlobAssembly
+import ChainClasses.Universality.ChainPieces
+import ChainClasses.Universality.DirectChainGeometry
 import ChainClasses.Universality.ChainGeneral
 import ChainClasses.Universality.StarGeometry
 import ChainClasses.Universality.StarSeparation
 import ChainClasses.Universality.ChainSeparationProof
 import ChainClasses.Universality.GeneralTrichotomy
 import ChainClasses.Classification
+import ChainClasses.Engine.ChainWitnesses
+import ChainClasses.Engine.ProfileWeightObstruction
 
 /-!
 # `ChainClasses`
@@ -149,8 +146,8 @@ that follow the paper: `Chain/` (the chain encoding, transfer, quantisation and 
 `Scalar/` (marked quasi-isometries, shape masses and potentials, the scalar constants),
 `Shape/` (shapes, their metric and their contractions), `Bushy/` (the bushy regime and the
 simple classification), `General/` (general bounded support), `Regime/` (the chain regime
-at general support and the matched presentations), `Engine/` (the bridges to
-`GraphMarkovMatching`), `Universality/` (the universality propositions and the general
+at general support through its original neck and arity laws), `Engine/` (bounded profiles
+and the bridges to `GraphMarkovMatching.Stopped`), `Universality/` (the universality propositions and the general
 classification), and `Classification/` (the public API).  `TwoValue` stays at the top
 level, where `Solution.lean` imports it.
 -/

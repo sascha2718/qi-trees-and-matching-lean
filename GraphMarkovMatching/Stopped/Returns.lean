@@ -22,7 +22,7 @@ presentation.
   `H = 2ℓ`, and the explicit conductor `g (a_0 - 1)(b_0 - 1)`.
 -/
 import GraphMarkovMatching.Stopped.Presentation
-import GraphMarkovMatching.Grammar.Depths
+import GraphMarkovMatching.Support.Arithmetic
 
 namespace GraphMarkovMatching.Stopped
 

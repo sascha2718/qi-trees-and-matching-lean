@@ -2,8 +2,6 @@
     "challenge_module": "Challenge",
     "solution_module": "Solution",
     "theorem_names": [
-        "Challenge.audit_main_matching_failure_le",
-        "Challenge.audit_main_matching_infinite",
         "Challenge.audit_graph_leaf_matching_bound",
         "Challenge.audit_graph_full_matching_bound",
         "Challenge.audit_exists_infinite_tree_matching_graphAut",

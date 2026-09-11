@@ -1,7 +1,7 @@
 /-
 The obstruction for preassigned profiles of `markov_matching_new_proof.tex`
 (`sec:profile-obstruction`): equal branching semigroups alone do not ensure matching for
-fixed binary encodings.  The two varying-offspring processes of `Process/Kernel.lean` with
+fixed binary encodings.  The two varying-offspring processes of `Models/Counter.lean` with
 `ν_L = δ₄` and `ν_R = (δ₄ + δ₇)/2`, the path relation `0 – 1 – 2` on `Fin 3` and the
 state law `μ_t = (1/2) δ₀ + (1/2 - t) δ₁ + t δ₂` have
 
@@ -20,9 +20,9 @@ The last paragraph of the section, the law `(1-t) δ₂ + t δ₁` with `η_α =
 is `etaG_muTwoOne_eq_zero` and `rE_zero_muTwoOne`.
 -/
 import GraphMarkovMatching.Stopped.Paths
-import GraphMarkovMatching.Process.Kernel
-import GraphMarkovMatching.Obstructions.Semigroup
-import GraphMarkovMatching.Closure.Infinite
+import GraphMarkovMatching.Models.Counter
+import GraphMarkovMatching.Models.Examples
+import GraphMarkovMatching.Support.Trajectory
 
 namespace GraphMarkovMatching.Stopped
 

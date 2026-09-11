@@ -15,7 +15,7 @@ The project has four default library targets.
 |---|---|
 | `BranchingProcess` | Galton--Watson trees, conditioning, skeletons, and geometric obstructions |
 | `GraphMatching` | Matching i.i.d. labels on the binary tree by automorphisms |
-| `GraphMarkovMatching` | The one-law and two-law matching engine for tree-indexed Markov label fields, and the stopped-expansion proof of the general Markov matching theorem (`Stopped/`) |
+| `GraphMarkovMatching` | The general Markov matching theorem and its common-semigroup applications (`Stopped/`) |
 | `ChainClasses` | Chain and shape encodings, transfer, universality, separation, and classification |
 
 The toolchain is pinned to Lean `v4.32.2`, with Mathlib pinned to the matching release in
@@ -74,10 +74,14 @@ and run the independent kernel audit with
 ./comparator-audit.sh
 ```
 
-The audited endpoints are listed in `comparator-config.json`. They cover the finite and infinite
-general Markov matching theorem (the latter over an actual root-fixing graph automorphism), the
-leaf, full, and infinite i.i.d. matching theorems, the complete conditioned-infinite
-Galton--Watson classification, and both the qualitative and quantitative two-value results.
+The ten audited endpoints are listed in `comparator-config.json`: four general Markov
+statements (finite types and zero-compatible types, each at finite and infinite height),
+three i.i.d. matching statements (leaf, full and infinite), the complete conditioned-infinite
+classification, and the qualitative and quantitative two-value statements. The infinite
+matching statements assert existence of an actual root-fixing graph automorphism. The challenge
+imports Mathlib alone and contains only statement vocabulary and theorem holes; Solution and
+the libraries contain the proofs. The comparator permits only `propext`, `Classical.choice`
+and `Quot.sound`, with no literature axioms.
 
 The GitHub Actions workflow builds the libraries and runs the comparator audit.
 

@@ -1,6 +1,6 @@
 import ChainClasses.General.GeneralBushPoint
 import ChainClasses.General.GeneralShapeIID
-import ChainClasses.Regime.ClusterRoot
+import ChainClasses.General.GeneralNeck
 
 /-!
 `thm:mass-uniform` and `thm:conditional-explicit` of `matching_classes_general.tex`:

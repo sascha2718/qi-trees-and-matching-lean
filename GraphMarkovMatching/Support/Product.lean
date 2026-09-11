@@ -132,8 +132,7 @@ lemma ofReal_expand {c a b : ℝ} (hc : 0 ≤ c) (ha : 0 ≤ a) (hb : 0 ≤ b) :
   rw [ENNReal.ofReal_add (by positivity) (by positivity), ENNReal.ofReal_add ha hb,
     ENNReal.ofReal_mul hc, ENNReal.ofReal_mul ha]
 
-/-- **The product lemma at exponent α** (the product form of the split
-algebra of `arbitrary_offspring_matching.tex` `eq:split`):
+/-- **The product lemma at exponent α**:
 
     Φ_α(R₁ ⊗ R₂, μ₁ ⊗ μ₂) ≤ Φ₁ + Φ₂ + 2α Φ₁ Φ₂.
 

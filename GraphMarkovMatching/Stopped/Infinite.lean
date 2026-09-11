@@ -17,7 +17,7 @@ at infinite height.
 import GraphMarkovMatching.Stopped.Paths
 import GraphMarkovMatching.Support.Trajectory
 import GraphMarkovMatching.Support.Measure
-import GraphMarkovMatching.Closure.Measure
+import GraphMarkovMatching.Process.Consistency
 
 namespace GraphMarkovMatching.Stopped
 

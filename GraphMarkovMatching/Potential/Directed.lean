@@ -1,5 +1,5 @@
 /-
-Directed potentials (`arbitrary_offspring_matching.tex` `sec:four-law`).
+Directed potentials for two probability laws and a compatibility relation.
 Two changes against the `Phi` of the support layer:
 
 * **Directed**: the row law `μ` and the column law `ν` are different PMFs;
@@ -122,5 +122,8 @@ lemma tsum_qE_le_PhiD {α : ℝ} (hα : 0 ≤ α) (μ ν : PMF X) (R : X → X �
     rw [q, ENNReal.ofReal_toReal qE_ne_top]
   rw [hq]
   exact mul_le_mul_right (ofReal_le_phiE hα q_nonneg q_le_one) _
+
+
+noncomputable def etaG {V : Type} (α : ℝ) (Rv : V → V → Prop) (μ : PMF V) : ℝ≥0∞ := PhiD α μ μ Rv
 
 end GraphMarkovMatching

@@ -31,7 +31,7 @@ Organisation of the proof:
 * `fourLaw_contraction`: the assembly.
 -/
 import GraphMarkovMatching.Stopped.Scalar
-import GraphMarkovMatching.Process.Ledger
+import GraphMarkovMatching.Potential.Restricted
 
 namespace GraphMarkovMatching.Stopped
 

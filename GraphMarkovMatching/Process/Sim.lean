@@ -1,6 +1,5 @@
 /-
-The matching relation over the full automorphism group
-(`arbitrary_offspring_matching.tex` `eq:matching-event`): `fullSim R₀ n` is
+The matching relation over the full automorphism group: `fullSim R₀ n` is
 matchability of two labellings of `𝔹_n` by some rooted automorphism. The
 group is `AutK 1` of the `Support` support layer: at `k = 1` every
 vertex carries a swap bit, which is the full group, and the recursion

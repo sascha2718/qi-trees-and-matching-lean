@@ -1,6 +1,6 @@
 import ChainClasses.General.GeneralCascade
 import ChainClasses.General.GeneralShapeIID
-import ChainClasses.Regime.ClusterRoot
+import ChainClasses.General.GeneralNeck
 import ChainClasses.Bushy.Trichotomy
 import BranchingProcess.Geometry
 import BranchingProcess.Harris

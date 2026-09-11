@@ -1,6 +1,5 @@
 /-
-The trajectory measure behind the infinite-tree endpoints
-(`arbitrary_offspring_matching.tex`, the infinite labellings of `eq:matching-event-infinite`).
+The trajectory measure behind the infinite-tree matching theorems.
 
 The infinite endpoints consume a probability space carrying, for each height, a level
 labelling, consistent under restriction, measurable, and with the process pair law.  This

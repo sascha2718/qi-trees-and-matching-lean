@@ -1,7 +1,5 @@
 /-
-The abstract Markov label system behind the varying-offspring process of
-`arbitrary_offspring_matching.tex` (`sec:statement`): a countable state space
-`S` with a child kernel `P : S → PMF (S × S)`, the height-`n` tree law `muM`
+Abstract Markov label systems: a state space `S` with a child kernel `P : S → PMF (S × S)`, the height-`n` tree law `muM`
 started from a frozen root state, and the pair mixture `pairMix` that the
 recursion consumes.
 

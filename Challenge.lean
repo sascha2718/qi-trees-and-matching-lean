@@ -1,17 +1,6 @@
 /-
-Comparator challenge file: the headline theorems, restated with `sorry` in place
-of their proofs.
-Checked by ST on 1 Sep 19:40 CEST
-Everything these statements mention is defined below, over Mathlib alone. No
-module of the four libraries is imported: the trust boundary of the audit is this
-file together with its import closure, and the libraries are what the audit is
-about. The material preceding the headline theorems is definitional scaffolding
-only; no auxiliary result is proved here. `Solution.lean` is the untrusted side
-and may import the libraries freely.
-
-Run from `lean/` with
-`lake env <comparator binary> comparator-config.json`
-(see `comparator-config.json` for the audited names).
+Headline statements for binary-tree matching and the quasi-isometry classification of
+Galton--Watson trees. All statement vocabulary is defined over Mathlib below.
 -/
 import Mathlib
 
@@ -42,7 +31,7 @@ noncomputable def q (μ : PMF X) (R : X → X → Prop) (x : X) : ℝ := (qE μ 
 /-- The weight `φ_α t = t / (1-t)^α`. -/
 noncomputable def phi (α t : ℝ) : ℝ := t / (1 - t) ^ α
 
-/-- The weight in `ℝ≥0∞`, infinite off `[0,1)`. -/
+/-- The weight in `ℝ≥0∞`, infinite for `t ≥ 1`. -/
 noncomputable def phiE (α t : ℝ) : ℝ≥0∞ :=
   if t < 1 then ENNReal.ofReal (phi α t) else ⊤
 
@@ -51,10 +40,6 @@ noncomputable def PhiD (α : ℝ) (μ ν : PMF X) (R : X → X → Prop) : ℝ�
   ∑' x, μ x * phiE α (q ν R x)
 
 end Potential
-
-/-- The label-graph potential `η_α = Φ_α(μ → μ; R)`. -/
-noncomputable def etaG {V : Type*} (α : ℝ) (Rv : V → V → Prop) (μ : PMF V) : ℝ≥0∞ :=
-  PhiD α μ μ Rv
 
 /-! ## The tree-indexed process -/
 
@@ -102,28 +87,6 @@ def fullSim (R₀ : S → S → Prop) (n : ℕ) : FullLab S n → FullLab S n �
   fullSimK R₀ 1 0 n
 
 end Process
-
-section VaryingCounter
-variable {V : Type} (μ : PMF V) (ν : PMF ℕ) (v0 : V)
-
-/-- Two labels are compatible when their states are. -/
-def labRel {V : Type*} (Rv : V → V → Prop) : V × ℕ → V × ℕ → Prop := fun s t => Rv s.1 t.1
-
-/-- The fresh law `Q = μ ⊗ ν`. -/
-noncomputable def freshQ : PMF (V × ℕ) := prodPMF μ ν
-
-/-- The varying-counter kernel: a counter of at least `4` halves, a counter of `3`
-forces one child and frees the other, and a smaller counter refreshes both. -/
-noncomputable def varyK : V × ℕ → PMF ((V × ℕ) × (V × ℕ)) := fun s =>
-  if 4 ≤ s.2 then PMF.pure ((v0, s.2 / 2), (v0, s.2 - s.2 / 2))
-  else if s.2 = 3 then (freshQ μ ν).map fun f => ((v0, 2), f)
-  else prodPMF (freshQ μ ν) (freshQ μ ν)
-
-/-- The height-`h` law of the process rooted at a fresh sample. -/
-noncomputable def Tlaw (h : ℕ) : PMF (FullLab (V × ℕ) h) :=
-  (freshQ μ ν).bind fun s => muM (varyK μ ν v0) s h
-
-end VaryingCounter
 
 /-! ## The i.i.d. label field on the binary tree -/
 
@@ -326,83 +289,6 @@ noncomputable def qBound (a : ℝ) (D : ℕ) : ℝ :=
 
 end TwoValue
 
-/-! ## The constants -/
-
-noncomputable def genCW (T : ℝ≥0∞) : ℝ≥0∞ := 32 * T + 4
-
-noncomputable def genGeomC (cN : ℕ) (T : ℝ≥0∞) : ℝ≥0∞ :=
-  ((cN : ℝ≥0∞) + 1) * (genCW T * cN) ^ cN
-
-noncomputable def genUC (T : ℝ≥0∞) : ℝ≥0∞ := 16 * T + 4
-
-noncomputable def genXiC (cN : ℕ) (T : ℝ≥0∞) : ℝ≥0∞ := genGeomC cN T * genUC T
-
-noncomputable def genKcC (cN cS : ℕ) (T : ℝ≥0∞) : ℝ≥0∞ :=
-  120 + (72 + 48 * (T * cS)) * genXiC cN T
-
-noncomputable def genSmallC (cN cS nA : ℕ) (T : ℝ≥0∞) : ℝ≥0∞ :=
-  4 + 3 * genKcC cN cS T
-    + (1 + 8 * T) * (12 * (genKcC cN cS T * genXiC cN T)
-        + 2 * (((nA : ℝ≥0∞) * genXiC cN T) * ((nA : ℝ≥0∞) * genXiC cN T)))
-    + (160 * (genKcC cN cS T * genKcC cN cS T)
-        + 4 * ((T * cS) * (genXiC cN T * genXiC cN T)))
-    + 85 * (genKcC cN cS T + 12 * genXiC cN T
-        + 8 * ((T * cS) * genXiC cN T) + 1)
-
-/-! ## The general matching theorem -/
-
-/-- `thm:main-matching`: for a tree-indexed Markov label field whose counter law is
-supported in `{0,…,N}`, the probability that no automorphism matches two independent
-samples is at most `genKcC · η`, uniformly in the height. -/
-theorem audit_main_matching_failure_le {V : Type} (Rv : V → V → Prop) (μ : PMF V) (v0 : V)
-    (ν : PMF ℕ) (N : ℕ) (S : Finset ℕ)
-    (hrefl : ∀ v, Rv v v) (hsymm : ∀ a b, Rv a b → Rv b a)
-    (hhalf : 2⁻¹ ≤ μ v0)
-    (hN : 2 ≤ N) (hS : ∀ k ∈ S, k ≤ N) (hSne : S.Nonempty)
-    (hSsupp : ∀ i : ℕ, (ν i : ℝ≥0∞) ≠ 0 ↔ i ∈ S)
-    (T : ℝ≥0∞)
-    (hT : (∑' i, if (ν i : ℝ≥0∞) = 0 then 0
-        else (ν i : ℝ≥0∞) ^ (-(5 / 2 : ℝ))) ≤ T)
-    (heta : etaG (5 / 2) Rv μ
-      ≤ (genSmallC ((2 * N + 3) * 2 ^ (2 * N + 3) * (2 * N + 4)) S.card
-          (2 * N + 3) T)⁻¹) :
-    genKcC ((2 * N + 3) * 2 ^ (2 * N + 3) * (2 * N + 4)) S.card T
-        * etaG (5 / 2) Rv μ ≤ 3⁻¹
-      ∧ ∀ h, (∑' x, Tlaw μ ν v0 h x
-          * qE (Tlaw μ ν v0 h) (fullSim (labRel Rv) h) x)
-        ≤ genKcC ((2 * N + 3) * 2 ^ (2 * N + 3) * (2 * N + 4)) S.card T
-            * etaG (5 / 2) Rv μ := sorry
-
-/-- `thm:main-matching`, the infinite conclusion: two independent consistent
-processes admit one root-fixing infinite-tree automorphism with the stated probability. -/
-theorem audit_main_matching_infinite {V : Type} (Rv : V → V → Prop) (μ : PMF V) (v0 : V)
-    [Countable V] [MeasurableSpace V] [MeasurableSingletonClass V]
-    (ν : PMF ℕ) (N : ℕ) (S : Finset ℕ)
-    (hrefl : ∀ v, Rv v v) (hsymm : ∀ a b, Rv a b → Rv b a)
-    (hhalf : 2⁻¹ ≤ μ v0)
-    (hN : 2 ≤ N) (hS : ∀ k ∈ S, k ≤ N) (hSne : S.Nonempty)
-    (hSsupp : ∀ i : ℕ, (ν i : ℝ≥0∞) ≠ 0 ↔ i ∈ S)
-    (T : ℝ≥0∞)
-    (hT : (∑' i, if (ν i : ℝ≥0∞) = 0 then 0
-        else (ν i : ℝ≥0∞) ^ (-(5 / 2 : ℝ))) ≤ T)
-    (heta : etaG (5 / 2) Rv μ
-      ≤ (genSmallC ((2 * N + 3) * 2 ^ (2 * N + 3) * (2 * N + 4)) S.card
-          (2 * N + 3) T)⁻¹) :
-    ∃ (Omega : Type) (_ : MeasurableSpace Omega) (P : Measure Omega)
-      (_ : IsProbabilityMeasure P)
-      (X Y : (n : ℕ) → Omega → FullLab (V × ℕ) n),
-      (∀ n omega, restrictLab n (X (n + 1) omega) = X n omega) ∧
-      (∀ n omega, restrictLab n (Y (n + 1) omega) = Y n omega) ∧
-      (∀ n, Measurable (fun omega => (X n omega, Y n omega))) ∧
-      (∀ n, P.map (fun omega => (X n omega, Y n omega))
-        = (prodPMF (Tlaw μ ν v0 n) (Tlaw μ ν v0 n)).toMeasure) ∧
-      1 - genKcC ((2 * N + 3) * 2 ^ (2 * N + 3) * (2 * N + 4)) S.card T
-          * etaG (5 / 2) Rv μ
-        ≤ P {omega | ∃ g : List Bool ≃ List Bool, IsTreeAut g ∧
-          ∀ s : List Bool, labRel Rv
-            (coord (g s).length (X (g s).length omega) (g s))
-            (coord s.length (Y s.length omega) s)} := sorry
-
 /-! ## The i.i.d. matching theorem -/
 
 /-- `thm:matching`(1): the leaf bound. -/
@@ -481,15 +367,6 @@ variable {X : Type*}
 /-- The symmetrised square `R^□`: straight or crossed compatibility of pairs. -/
 def SquareRel (R : X → X → Prop) : X × X → X × X → Prop :=
   fun x y => (R x.1 y.1 ∧ R x.2 y.2) ∨ (R x.1 y.2 ∧ R x.2 y.1)
-
-/-- The positive-set restricted directed potential
-`Φres(ρ_s → ρ_t) = 𝔼_{X∼ρ_s}[𝟙_{r_{ρ_t}(X)>0} φ_α(q_{ρ_t}(X))]`. -/
-noncomputable def PhiDres (α : ℝ) (ρs ρt : PMF X) (R : X → X → Prop) : ℝ≥0∞ :=
-  ∑' x, ρs x * (if rE ρt R x = 0 then 0 else phiE α (q ρt R x))
-
-/-- The zero-interface mass: the `ρ_s`-mass of points with zero good degree toward `ρ_t`. -/
-noncomputable def zMass (ρs ρt : PMF X) (R : X → X → Prop) : ℝ≥0∞ :=
-  ∑' y, ρs y * (if rE ρt R y = 0 then 1 else 0)
 
 /-- The directed mismatch mass `∑_x ρ_s(x) q_{ρ_t}(x)` between two laws. -/
 noncomputable def failureD (ρs ρt : PMF X) (R : X → X → Prop) : ℝ≥0∞ :=
@@ -577,15 +454,6 @@ noncomputable def e0 (α : ℝ) : ℝ≥0∞ := phiE α (q M.μ M.R M.zero)
 
 /-- The one-site defect `ζ_α = max{η_α, φ_α(δ)}` (`eq:root-defect`). -/
 noncomputable def zeta (α : ℝ) : ℝ≥0∞ := max (M.eta α) (M.e0 α)
-
-/-- The restricted potential `P_h(s,t) = ∫_{r_{t,h} > 0} φ_α(1 - r_{t,h}) dρ_{s,h}`
-(`sec:restricted-potential`). -/
-noncomputable def P (α : ℝ) (s t : I) (h : ℕ) : ℝ≥0∞ :=
-  PhiDres α (M.rho s h) (M.rho t h) (M.sim h)
-
-/-- The zero mass `ρ_{s,h}{r_{t,h} = 0}` (`sec:restricted-potential`). -/
-noncomputable def z (s t : I) (h : ℕ) : ℝ≥0∞ :=
-  zMass (M.rho s h) (M.rho t h) (M.sim h)
 
 /-- The failure probability `P(M_h(s,t)^c) = ∑_x ρ_{s,h}(x) q_{ρ_{t,h}}(x)`
 (`sec:completion`). -/

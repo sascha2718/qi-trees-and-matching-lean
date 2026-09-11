@@ -230,10 +230,9 @@ theorem presentation_matching (p : Params) {c : ℝ} (hc0 : 0 < c) (hc1 : c ≤ 
       (P.toModel R zero μ).zeta p.α ≤ ENNReal.ofReal ε →
         ∀ σ σ' h, (P.toModel R zero μ).failProb (P.freshL σ) (P.freshL σ') h
           ≤ ENNReal.ofReal Kc * (P.toModel R zero μ).zeta p.α := by
-  have hK : finiteK0 p P.Hret (P.coreBudget c p.α) < finiteK0 p P.Hret (P.coreBudget c p.α) + 1 := by
-    linarith
-  refine ⟨finiteK0 p P.Hret (P.coreBudget c p.α) + 1,
-    finiteEps p P.Hret P.Tcount (P.coreBudget c p.α) (finiteK0 p P.Hret (P.coreBudget c p.α) + 1),
+  set K0 := finiteK0 p P.Hret (P.coreBudget c p.α) with hK0
+  have hK : K0 < K0 + 1 := by linarith
+  refine ⟨K0 + 1, finiteEps p P.Hret P.Tcount (P.coreBudget c p.α) (K0 + 1),
     finiteEps_pos p P.Hret P.Tcount P.one_le_Tcount _ (P.one_le_coreBudget hc0 hc1 p.α_nonneg)
       _ hK, ?_⟩
   intro V R zero μ hcompat hζ

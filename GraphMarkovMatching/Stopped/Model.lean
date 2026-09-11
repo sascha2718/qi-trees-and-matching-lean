@@ -28,11 +28,10 @@ König/trajectory endpoints.
 The one-site quantities are in `Constants.lean`; the restricted potentials, the
 zero events, the phases, the paths and the selections in `Paths.lean`.
 -/
-import GraphMarkovMatching.Process.Ledger
-import GraphMarkovMatching.Process.Cells
-import GraphMarkovMatching.Process.Descent
-import GraphMarkovMatching.Process.Failure
-import GraphMarkovMatching.Closure.Measure
+import GraphMarkovMatching.Potential.Restricted
+import GraphMarkovMatching.Process.Recursion
+import GraphMarkovMatching.Potential.Degrees
+import GraphMarkovMatching.Process.Consistency
 
 namespace GraphMarkovMatching.Stopped
 

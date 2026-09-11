@@ -1,6 +1,5 @@
 /-
-The infinite-tree / König step for `G_k` (the combinatorial core of
-`thm:konig` in `arbitrary_offspring_matching.tex`). A restricted automorphism of `𝔹_{n+1}` restricts to one
+The infinite-tree König step for `G_k`. A restricted automorphism of `𝔹_{n+1}` restricts to one
 of `𝔹_n` at the same phase (`restrictAutK`), and restriction preserves matching
 (`fullMatchesK_restrict`). So if a matching automorphism exists at every finite
 height, the sets `𝓕_n ⊆ AutK k m n` are nonempty and finite and form an

@@ -1,17 +1,12 @@
 /-
-The infinite-tree / measure step for `G_k` (the measure half of
-`thm:konig` in `arbitrary_offspring_matching.tex`). Two independent infinite labelled
-trees carry, at each finite height `n`, the pair of restrictions `(X_n, Y_n)`;
-the height-`n` matching event is `E_n = {ω : fullSimK R₀ k m n (X_n ω) (Y_n ω)}`.
-Restriction gives `E_{n+1} ⊆ E_n` (`fullSimK_restrict`), König's lemma gives
-`M = ⋂ E_n` (`infMatchK_iff_forall_level`), and continuity from above lifts the
-uniform finite bound of `ConcreteBlock.lean` to the infinite tree:
+Uniform finite-height matching bounds pass to the infinite tree. Restriction makes the
+finite matching events decrease; König's lemma identifies their intersection with the
+infinite matching event, and continuity of probability gives a matching probability of
+at least `1 - b` from a uniform finite failure bound `b`.
 
-    P(some g ∈ G_k matches every vertex) ≥ 1 - (2+ρ)^(k-1)·41e.
-
-The probability space and its level projections enter as an interface (`hmeas`,
-`hlaw`); the Kolmogorov-type construction discharging them is supplied at the
-point of use (`Closure/Measure.lean`, `Archive/Extension.lean`).
+The probability space and consistent measurable level projections are arbitrary.
+`Support.Trajectory` constructs such a space from consistent finite laws, while
+`Stopped.Transfer` applies the estimate on a prescribed probability space.
 -/
 import GraphMarkovMatching.Support.Konig
 import Mathlib.MeasureTheory.Measure.MeasureSpace

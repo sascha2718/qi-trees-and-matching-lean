@@ -1,7 +1,6 @@
 /-
 The countable probability space `(X, μ)` with a symmetric reflexive relation
-`R`, the bad and good degrees `q` and `r`, and the potential `Φ(R,μ)` (the
-diagonal case of `arbitrary_offspring_matching.tex` `sec:four-law`).
+`R`, the bad and good degrees `q` and `r`, and the potential `Φ(R,μ)`.
 
 Design:
 
