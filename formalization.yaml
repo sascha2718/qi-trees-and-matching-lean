@@ -81,7 +81,7 @@ status:
     machine-check the numbered statements of the matching parts, the Galton--Watson
     foundations and the geometric obstructions, as recorded in the paper's appendix.
     Not formalised: the quasisymmetry corollary for the boundaries
-    (Corollary 1.4) and the fractal percolation application (Theorem 3.1); and the two families
+    (Corollary 1.4) and the fractal percolation application (Corollary 3.1); and the two families
     of binary trees with continuous random branching times (Section 7). The analytic constants
     of the i.i.d. theorem are machine-checked through rational upper bounds for the closed-form
     maxima.
@@ -150,9 +150,15 @@ fidelity:
     Vertices of the infinite binary tree are addressed by List Bool where the prose uses words
     over {1,2}, and Galton--Watson vertices by words over Fin N. Finite-height labellings and
     the automorphism group are defined by recursion on the height rather than through an
-    alphabet; the library proves the recursive matching relation equal to matching over
-    root-fixing graph automorphisms. The classification is stated for laws packaged with a
-    support bound J at most the arity N and with the top-support hypothesis of the paper. The
+    alphabet; one unrestricted matching relation serves both the i.i.d. and Markov results.
+    The library proves the recursive matching relation equal to matching over root-fixing
+    graph automorphisms. Markov laws are stated directly on state labellings, with types
+    indexing the laws; the solution proves that these are the projections of the typed
+    implementation. The finite-type transition bound sums over the full positive support,
+    as in the manuscript's headline theorem. The classification is stated for laws packaged
+    with an upper support bound J at most the arity N. No positive mass at J is required:
+    the library tightens the support bound internally. The two-value and general
+    classification statements use the same parent-child graph and quasi-isometry definitions. The
     i.i.d. constants are checked through rational upper bounds for the closed-form maxima
     L_{5/2}, K_{5/2} and C_{5/2}. Challenge.lean contains one sorry per audited theorem, which
     Solution.lean supplies; comparator-config.json declares no definition_names, so no part of

@@ -64,18 +64,24 @@ Run commands from the repository root. To build all four libraries:
 lake build
 ```
 
-The axiom audit is the comparator run. `Challenge.lean` restates the audited theorem surface using Mathlib alone, while `Solution.lean`
-discharges those statements from the four libraries. Build the two modules with
-
-```bash
-lake build Challenge Solution
-```
-
-and run the independent kernel audit with
+`Challenge.lean` states the audited results using Mathlib alone. `Solution.lean` proves them
+from the four libraries, with its definitions and proof transports in `Solution/`. For trusted
+local development, run
 
 ```bash
 ./comparator-audit.sh
 ```
+
+Comparator builds Challenge and Solution, compares their statements and definitions, checks
+the permitted axioms, and replays the exported proofs through the Lean kernel. A separate
+`lake build Challenge Solution` is useful during development but is not a prerequisite.
+
+On macOS the local script uses Comparator's development shim, which does not sandbox the
+builds. On Linux it defaults to real `landrun`. This local development command should not be
+confused with the fresh audit of potentially untrusted code: the CI comparator job uses a
+separate checkout, avoids compiling project code beforehand, and runs with real Landrun and
+additional systemd restrictions. Its verification tools are pinned to immutable revisions.
+The optional additional nanoda kernel is disabled in the current configuration.
 
 The twelve audited endpoints are listed in `comparator-config.json`: four general Markov
 statements (finite types and zero-compatible types, each at finite and infinite height),
@@ -90,6 +96,13 @@ the libraries contain the proofs. The comparator permits only `propext`, `Classi
 and `Quot.sound`, with no literature axioms.
 
 The GitHub Actions workflow builds the libraries and runs the comparator audit.
+
+The challenge uses one unrestricted automorphism family for both matching theorems, states
+the Markov laws directly on state labels, and uses the full transition-support bound from the
+paper. The two-value and general classification results share the parent-child graph and
+quasi-isometry definitions. Only an upper offspring-support bound is required; positive mass
+at that bound is not a hypothesis. The boundary and fractal applications and the continuous
+branching-time results are outside the formalised scope, as disclosed in the manuscript.
 
 ## License
 
