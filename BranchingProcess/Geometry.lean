@@ -494,4 +494,123 @@ theorem not_quasiIsometric_rayGraph (hG : G.IsTree) {v : V} {ray : Fin 3 → ℕ
   · exact key 1 2 (by decide) h
   · exact key 2 1 (by decide) h
 
+/-! ### Bounded graphs -/
+
+/-- A graph is bounded when its distances are: some `D` bounds the distance of every pair
+of vertices. -/
+def IsBoundedGraph (G : SimpleGraph V) : Prop := ∃ D : ℕ, ∀ x y, G.dist x y ≤ D
+
+/-- **Bounded graphs form one class**: any two nonempty bounded graphs are quasi-isometric,
+by a constant map. -/
+theorem quasiIsometric_of_bounded [Nonempty V] [Nonempty V'] (hG : IsBoundedGraph G)
+    (hG' : IsBoundedGraph G') : QuasiIsometric G G' := by
+  obtain ⟨D, hD⟩ := hG
+  obtain ⟨D', hD'⟩ := hG'
+  let y₀ : V' := Classical.arbitrary V'
+  refine ⟨D + D' + 1, fun _ => y₀, ?_, ?_, ?_⟩
+  · intro x y
+    simp only [SimpleGraph.dist_self]
+    exact Nat.zero_le _
+  · intro x y
+    have h1 : G.dist x y ≤ D := hD x y
+    have h2 : D ≤ (D + D' + 1) * (D + D' + 1) := by nlinarith
+    omega
+  · intro y'
+    refine ⟨Classical.arbitrary V, ?_⟩
+    have h1 : G'.dist y₀ y' ≤ D' := hD' y₀ y'
+    show G'.dist y₀ y' ≤ D + D' + 1
+    omega
+
+/-- A nonempty bounded graph is quasi-isometric to a point. -/
+theorem quasiIsometric_unit_of_bounded [Nonempty V] (hG : IsBoundedGraph G) :
+    QuasiIsometric G (⊥ : SimpleGraph Unit) := by
+  refine quasiIsometric_of_bounded hG ⟨0, fun x y => ?_⟩
+  have hxy : x = y := Subsingleton.elim x y
+  subst hxy
+  simp
+
+/-- The lower bound of a quasi-isometry carries boundedness back to the source. -/
+theorem IsBoundedGraph.of_quasiIsometric (h : QuasiIsometric G G') (hG' : IsBoundedGraph G') :
+    IsBoundedGraph G := by
+  obtain ⟨D, f, hf⟩ := h
+  obtain ⟨D', hD'⟩ := hG'
+  refine ⟨D * D' + D * D, fun x y => ?_⟩
+  have h1 := hf.lower x y
+  have h2 : D * G'.dist (f x) (f y) ≤ D * D' := Nat.mul_le_mul_left D (hD' _ _)
+  omega
+
+/-- Coarse density and the upper bound carry boundedness forward to a connected target. -/
+theorem IsBoundedGraph.of_quasiIsometric_of_connected (hG' : G'.Connected)
+    (h : QuasiIsometric G G') (hG : IsBoundedGraph G) : IsBoundedGraph G' := by
+  obtain ⟨D, f, hf⟩ := h
+  obtain ⟨Dg, hDg⟩ := hG
+  choose g hg using hf.dense
+  refine ⟨D + (D * Dg + D) + D, fun y₁ y₂ => ?_⟩
+  have h1 : G'.dist y₁ y₂ ≤ G'.dist y₁ (f (g y₂)) + G'.dist (f (g y₂)) y₂ :=
+    hG'.dist_triangle
+  have h2 : G'.dist y₁ (f (g y₂))
+      ≤ G'.dist y₁ (f (g y₁)) + G'.dist (f (g y₁)) (f (g y₂)) := hG'.dist_triangle
+  have h3 : G'.dist y₁ (f (g y₁)) ≤ D := by
+    rw [SimpleGraph.dist_comm]
+    exact hg y₁
+  have h4 : G'.dist (f (g y₂)) y₂ ≤ D := hg y₂
+  have h5 : G'.dist (f (g y₁)) (f (g y₂)) ≤ D * Dg + D := by
+    have h6 := hf.upper (g y₁) (g y₂)
+    have h7 : D * G.dist (g y₁) (g y₂) ≤ D * Dg := Nat.mul_le_mul_left D (hDg _ _)
+    omega
+  omega
+
+/-- **A quasi-isometry can be re-rooted.** Into a connected target, a quasi-isometry may be
+redefined at one vertex to send a chosen vertex to a chosen vertex; the constant grows by twice
+the displacement of the old image. -/
+theorem QuasiIsometric.exists_rooted (hG' : G'.Connected) (h : QuasiIsometric G G')
+    (r : V) (r' : V') : ∃ (D : ℕ) (f : V → V'), IsQIWith D G G' f ∧ f r = r' := by
+  classical
+  obtain ⟨D, f, hf⟩ := h
+  set c := G'.dist (f r) r' with hc
+  set g := Function.update f r r' with hg
+  have hgr : g r = r' := Function.update_self r r' f
+  -- The redefined map moves every image by at most the displacement of the root.
+  have hmove : ∀ x, G'.dist (g x) (f x) ≤ c := by
+    intro x
+    by_cases hx : x = r
+    · subst hx
+      rw [hgr, SimpleGraph.dist_comm]
+    · rw [hg, Function.update_of_ne hx, SimpleGraph.dist_self]
+      exact Nat.zero_le _
+  have hmove' : ∀ x, G'.dist (f x) (g x) ≤ c := fun x => by
+    rw [SimpleGraph.dist_comm]
+    exact hmove x
+  refine ⟨D + 2 * c, g, ⟨?_, ?_, ?_⟩, hgr⟩
+  · intro x y
+    have h1 : G'.dist (g x) (g y) ≤ G'.dist (g x) (f x) + G'.dist (f x) (g y) :=
+      hG'.dist_triangle
+    have h2 : G'.dist (f x) (g y) ≤ G'.dist (f x) (f y) + G'.dist (f y) (g y) :=
+      hG'.dist_triangle
+    have h3 := hmove x
+    have h4 := hmove' y
+    have h5 := hf.upper x y
+    have h6 : D * G.dist x y ≤ (D + 2 * c) * G.dist x y := Nat.mul_le_mul_right _ (by omega)
+    omega
+  · intro x y
+    have h1 : G'.dist (f x) (f y) ≤ G'.dist (f x) (g x) + G'.dist (g x) (f y) :=
+      hG'.dist_triangle
+    have h2 : G'.dist (g x) (f y) ≤ G'.dist (g x) (g y) + G'.dist (g y) (f y) :=
+      hG'.dist_triangle
+    have h3 := hmove' x
+    have h4 := hmove y
+    have h5 := hf.lower x y
+    have h6 : D * G'.dist (f x) (f y) ≤ D * (G'.dist (g x) (g y) + 2 * c) :=
+      Nat.mul_le_mul_left D (by omega)
+    have h7 : D * (G'.dist (g x) (g y) + 2 * c) + D * D
+        ≤ (D + 2 * c) * G'.dist (g x) (g y) + (D + 2 * c) * (D + 2 * c) := by
+      nlinarith
+    omega
+  · intro y'
+    obtain ⟨x, hx⟩ := hf.dense y'
+    refine ⟨x, ?_⟩
+    have h1 : G'.dist (g x) y' ≤ G'.dist (g x) (f x) + G'.dist (f x) y' := hG'.dist_triangle
+    have h2 := hmove x
+    omega
+
 end BranchingProcess

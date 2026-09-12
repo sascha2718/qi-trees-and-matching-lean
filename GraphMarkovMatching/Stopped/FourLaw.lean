@@ -1,6 +1,6 @@
 /-
 The four-law contraction of `markov_matching_new_proof.tex`
-(`sec:contraction-extension`, `thm:four-law-contraction`): for two source laws
+(`sec:local-estimate`, `thm:four-law-contraction`): for two source laws
 `ρ₁, ρ₂` and two target laws `τ₁, τ₂` whose eight restricted directed potentials are
 at most `M`, whose eight zero masses are at most `z`, and whose four weighted zero
 integrals are at most `e`,
@@ -64,7 +64,7 @@ lemma K_nonneg_of_hK {α β K : ℝ} (hβ0 : 0 ≤ β) (hβ1 : β ≤ 1)
 
 /-! ### The pointwise row estimate -/
 
-/-- **The row estimate** (`sec:contraction-extension`, the first row term): for bad
+/-- **The row estimate** (`sec:local-estimate`, the first row term): for bad
 degrees `a = q₁¹`, `b = q₁²`, `d = q₂¹`, `e = q₂²` in `[0,1)` and a pair good degree
 `rsq` dominating the straight pairing `(1-a)(1-e)` and the inclusion–exclusion value
 `r₁¹r₂² + r₁²r₂¹ - r₁¹r₁²`,
@@ -189,7 +189,7 @@ lemma row_pt_gen {α u a b d e : ℝ} {rsq : ℝ≥0∞} (hα : 1 ≤ α) (hu0 :
     ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_add hu' hα0,
     ENNReal.ofReal_add hφd hφe]
 
-/-- **The pointwise bound on a doubly-positive pair** (`sec:contraction-extension`):
+/-- **The pointwise bound on a doubly-positive pair** (`sec:local-estimate`):
 `eq:four-law-numerator` divided by `(r^□)^α`, the two row terms estimated by
 `row_pt_gen` and the two overlap terms by `eq:four-law-denominators`. -/
 lemma main_pt {X : Type} {α u : ℝ} (hα : 1 ≤ α) (hu0 : 0 < u) (hu1 : u < 1)
@@ -346,7 +346,7 @@ private noncomputable def weightFac {X : Type} (k : ℝ≥0∞) (α : ℝ) (τ�
     (R : X → X → Prop) (x : X) : ℝ≥0∞ :=
   k * (resPhi α τ₁ R x + resPhi α τ₂ R x)
 
-/-- The restricted potential is the integral of `resPhi` (`sec:contraction-extension`). -/
+/-- The restricted potential is the integral of `resPhi` (`sec:local-estimate`). -/
 private lemma PhiDres_eq_resPhi {X : Type} (α : ℝ) (ρ τ : PMF X) (R : X → X → Prop) :
     PhiDres α ρ τ R = ∑' x, ρ x * resPhi α τ R x := rfl
 
@@ -485,7 +485,7 @@ private lemma tsum_weightFac {X : Type} (k : ℝ≥0∞) (α : ℝ) (ρ τ₁ τ
 
 /-! ### The mean bad degrees -/
 
-/-- **Symmetry of the mean bad degree** (`sec:contraction-extension`):
+/-- **Symmetry of the mean bad degree** (`sec:local-estimate`):
 `∫ q_τ dρ = ∫ q_ρ dτ` by symmetry of `R` and Fubini's theorem. -/
 lemma failureD_symm {X : Type} (ρ τ : PMF X) (R : X → X → Prop)
     (hsymm : ∀ a b, R a b → R b a) : failureD ρ τ R = failureD τ ρ R := by
@@ -633,7 +633,7 @@ private lemma overlap_two_le {X : Type} {α β K : ℝ} (hα : 1 ≤ α) (hβ0 :
 
 /-! ### The pairs with a zero child degree -/
 
-/-- **The resolved pairs** (`sec:contraction-extension`, last paragraph): the restricted
+/-- **The resolved pairs** (`sec:local-estimate`, last paragraph): the restricted
 square potential is at most the integral over the doubly-positive set plus the four
 weighted zero integrals times the corresponding inverse moments. -/
 private lemma PhiDres_square_split {X : Type} {α : ℝ} (hα : 0 < α) (ρ₁ ρ₂ τ₁ τ₂ : PMF X)
@@ -746,7 +746,7 @@ private lemma PhiDres_square_split {X : Type} {α : ℝ} (hα : 0 < α) (ρ₁ �
 
 /-! ### The integral over the doubly-positive set -/
 
-/-- **Rows and overlaps** (`sec:contraction-extension`): the integral of the square
+/-- **Rows and overlaps** (`sec:local-estimate`): the integral of the square
 potential over `F₁ × F₂` is at most the four row products of `eq:four-law-rows` and the
 two overlap integrals `∫ H₁¹ H₂² dτ₁`, `∫ H₁² H₂¹ dτ₂` (`fubini_swap_two_res`). -/
 private lemma main_sum_le {X : Type} {α u : ℝ} (hα : 1 ≤ α) (hu0 : 0 < u) (hu1 : u < 1)

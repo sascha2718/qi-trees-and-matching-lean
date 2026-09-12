@@ -3,7 +3,7 @@ import ChainClasses.General.GeneralShapeCoupling
 
 /-!
 `thm:relabel` (`it:relabel-law`), `thm:product-form` of
-`matching_classes_general.tex` and `thm:hairy-cross` (`it:hairy-cross-product`)
+`matching_classes_general.tex` and `thm:cross-relabel` (`it:cross-relabel-law`)
 of `trichotomy.tex`: the labelled reduced skeleton, over the constructed space.
 
 The sample of `θ'` is paired with the uniform field of `UniformField`, one uniform
@@ -16,7 +16,7 @@ draw of the coupling and the product formula of `UniformField` make the partners
 with the mixture law and independent of the arity field, and the classes inherit the
 product law `Q = μ_D ⊗ ν̃`.  The mixture side `θ` and the labelled side `θ'` are two
 laws throughout: with `θ' = θ` this is `thm:relabel` and `thm:product-form`, with two
-laws coupled to the one mixture it is `thm:hairy-cross` (`it:hairy-cross-product`).
+laws coupled to the one mixture it is `thm:cross-relabel` (`it:cross-relabel-law`).
 
 * `gShapeEquivNat`, `GShape.instEncodable`: `𝒮` as an encodable type, through the
   enumeration of `GeneralShapeMetric`.
@@ -30,7 +30,7 @@ laws coupled to the one mixture it is `thm:hairy-cross` (`it:hairy-cross-product
   of the arities.
 * `gClassMass`, `gClassMass_eq_tsum_ite`: the mass of a class under `μ_D`.
 * `labelMeasure_label_pattern`: **`thm:product-form` and
-  `thm:hairy-cross` (`it:hairy-cross-product`)**, the pairs of a label and an
+  `thm:cross-relabel` (`it:cross-relabel-law`)**, the pairs of a label and an
   arity over a prefix-closed probe are i.i.d. with the product law `μ_D ⊗ ν̃`.
 * `labelMeasure_label_marginal`: the marginal of the label at the root is `μ_D`.
 -/
@@ -308,7 +308,7 @@ lemma gClassMass_eq_tsum_ite (θ : Offspring J) (D : ℝ) (a : ℕ) :
   refine tsum_congr fun σ ↦ ?_
   simp [Set.indicator_apply]
 
-/-- **`thm:product-form` and `thm:hairy-cross` (`it:hairy-cross-product`), over
+/-- **`thm:product-form` and `thm:cross-relabel` (`it:cross-relabel-law`), over
 the constructed space**: the pairs of a label and an arity over a prefix-closed probe
 of the reduced skeleton are independent with the product law `Q = μ_D ⊗ ν̃`, the class
 masses of the mixture of `θ` against the reduced weights of `θ'`. -/

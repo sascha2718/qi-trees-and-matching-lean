@@ -126,7 +126,7 @@ def pathGraph : SimpleGraph ℕ where
 lemma compat_pathGraph {j k : ℕ} : compat pathGraph j k ↔ j = k ∨ j + 1 = k ∨ k + 1 = j :=
   Iff.rfl
 
-/-- **`eq:eta-path`**: `η_{𝖯,α}(p)`, the path-graph potential at a general exponent. -/
+/-- **`sec:integer`**: `η_{𝖯,α}(p)`, the path-graph potential at a general exponent. -/
 noncomputable def etaPA (α : ℝ) (p : PMF ℕ) : ℝ≥0∞ := etaGA α p pathGraph
 
 /-- `η_{𝖯,α}(p)` at the pinned exponent, the form `thm:double-exp` is stated at. -/

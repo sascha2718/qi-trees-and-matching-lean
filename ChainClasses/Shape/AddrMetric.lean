@@ -2,7 +2,7 @@ import Mathlib.Tactic
 import ChainClasses.Shape.ContractAddr
 
 /-!
-The address layer of `sec:general-transfer` of `matching_classes_general.tex`: the
+The address layer of `sec:general-relabel` of `matching_classes_general.tex`: the
 metric of the ambient `ℕ`-ary tree on addresses `List ℕ`, and the identification of
 the graph metric of a rose tree with it.
 

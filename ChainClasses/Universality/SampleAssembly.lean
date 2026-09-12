@@ -1146,7 +1146,7 @@ lemma exists_code_transSampleN {c : GWord N → ℕ} (hc : IsGHairySample c) :
       rw [hy, transSampleN_concat, hx, sampleLetterN_vals, hmeq, vals_append, vals_cons, vals_nil]
 
 /-- **`thm:shape-iid` at general arity, the isometry** (the premise of
-**`it:general-glued`**): a hairy sample is isometric to the assembly of its own shapes
+**`it:general-glued`**): a bushy sample is isometric to the assembly of its own shapes
 over its reduced skeleton.  The isometry is the address translation: it reads the
 letters of the assembly one for one, sending the neck of a copy to the chain of its entry
 vertex, its bushes to the dying subtrees hanging off that chain, and the copies below

@@ -3,7 +3,7 @@ import ChainClasses.TwoValue
 import ChainClasses.Chain.TransferReal
 
 /-!
-`thm:cross-law` of `gw_classes_simple.tex`, assembled as in `sec:cross-law`:
+`thm:cross-law` of `gw_classes_simple.tex`, assembled as in `thm:cross-law`:
 two independent samples of two different two-value offspring laws are
 quasi-isometric with high probability, at the rate `eq:rate-cross`.
 
@@ -585,7 +585,7 @@ lemma cross_comparable (ha : 0 < a) (ha1 : a < 1) (hb : 0 < b) (hb1 : b < 1) {D 
     exact_mod_cast hR
   exact ⟨hceil m m' hstep2, hceil m' m hstep1⟩
 
-/-- **The deterministic core of `sec:cross-law`**: if a portrait matches the
+/-- **The deterministic core of `thm:cross-law`**: if a portrait matches the
 quantised labelling `ℓ_D ∘ λ` of the first sample with the coupled class field
 `ℓ'(λ', U)` of the second to within one level, then the two associated trees
 admit a `(⌈γ_* D²⌉+3)`-quasi-isometry. The matched classes force length ratios
@@ -617,7 +617,7 @@ theorem qi_of_cross_matching (ha : 0 < a) (ha1 : a < 1) (hb : 0 < b) (hb1 : b < 
     isometry_of_relabel σ (fun w ↦ hlam' _) hlam' fun _ ↦ rfl
   exact ⟨fun x ↦ g (psi lam (fun w ↦ lam' (autOf σ w)) x), hqi.comp_isometry hg1 hg2 hg3⟩
 
-/-- **The deterministic core of `sec:cross-law` at the real constant**: the matched
+/-- **The deterministic core of `thm:cross-law` at the real constant**: the matched
 classes force length ratios within `γ_* D²`, and the Transfer lemma at a real constant
 turns that into a `(γ_* D² + 3)`-quasi-isometry, the constant of `eq:rate-cross` with no
 rounding. -/

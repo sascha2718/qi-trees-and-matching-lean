@@ -516,7 +516,7 @@ def GRegime.IsChain : GRegime → Prop
   | .chain .. => True
   | _ => False
 
-/-- The branching semigroup `Λ_θ` of `eq:branching-semigroup`, the second invariant of the
+/-- The branching semigroup `Λ_θ` of `def:branching-semigroup`, the second invariant of the
 classification, carried by the chain regime; the whole of `ℕ` elsewhere. -/
 noncomputable def GRegime.semigroup : GRegime → AddSubmonoid ℕ
   | .chain θ .. => AddSubmonoid.closure (shiftSupp θ : Set ℕ)

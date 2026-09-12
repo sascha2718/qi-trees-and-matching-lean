@@ -2,7 +2,7 @@ import Mathlib.Tactic
 import ChainClasses.Scalar.MarkedQI
 
 /-!
-`sec:shape-coupling` and `sec:hairy-universality` of `gw_classes_simple.tex`:
+`sec:shape-coupling` and `sec:hairy` of `gw_classes_simple.tex`:
 the sharpness remark `rem:coupling-sharp` and the two arithmetic steps of
 `thm:hairy`.
 

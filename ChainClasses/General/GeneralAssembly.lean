@@ -5,7 +5,7 @@ import ChainClasses.General.GeneralShapeShrink
 import ChainClasses.Shape.AddrMetric
 
 /-!
-`sec:general-transfer` of `matching_classes_general.tex`, item `it:general-glued`:
+`sec:general-relabel` of `matching_classes_general.tex`, item `it:general-glued`:
 the assembly of a family of shapes at general arity and `thm:glued-transfer` over
 it.
 

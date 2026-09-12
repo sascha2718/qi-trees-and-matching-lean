@@ -1,7 +1,7 @@
 import ChainClasses.Bushy.HairyUniversality
 
 /-!
-`sec:shape-harris` of `matching_classes_simple.tex` and `sec:hairy-universality` of
+`sec:shape-harris` of `matching_classes_simple.tex` and `sec:hairy` of
 `gw_classes_simple.tex`: the shape law is a probability law, the label law it pushes
 forward along a label map, and the product form of the label field that `thm:hairy`
 consumes.

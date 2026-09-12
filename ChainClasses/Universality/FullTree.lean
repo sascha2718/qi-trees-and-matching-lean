@@ -7,7 +7,7 @@ import ChainClasses.Chain.WordGraph
 `thm:bushy` of `prelims.tex`: a rooted subtree of `𝒩(N)` in which every vertex has at
 least two children is quasi-isometric to the binary tree `𝔹`.  The paper cites
 Mosher, Sageev and Whyte; the proof here is direct and runs through the cascade of
-`thm:merge` (`it:merge-split`).
+`thm:bushy` (the coding in its proof).
 
 The cascade of depth `L = ⌈log₂ N⌉` sends the tree to a prefix-closed set of binary
 words in which every copy is a split, the slots of the children `0` and `1` leaving the

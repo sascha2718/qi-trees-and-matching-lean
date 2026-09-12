@@ -335,7 +335,7 @@ theorem ae_isHairySample_of_pos (θ : Offspring 2) (hq : θ.extinction < 1) (h2 
     ∀ᵐ c ∂(survivalMeasure (N := 2) θ), IsHairySample c :=
   ae_isHairySample θ hq (ae_splits θ hq (skeletonWeight_one_lt_one θ hq h2))
 
-/-- **`thm:shape-iid`, the last clause, almost surely**: almost every hairy sample
+/-- **`thm:shape-iid`, the last clause, almost surely**: almost every bushy sample
 conditioned on survival is isometric to the assembly of its own shapes. -/
 theorem ae_assembly_isometric_sample (θ : Offspring 2) (hq : θ.extinction < 1)
     (h2 : 0 < θ 2) :

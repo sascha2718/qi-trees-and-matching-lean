@@ -1,7 +1,7 @@
 import ChainClasses.Bushy.ShapeEtaSelf
 
 /-!
-`sec:shape-coupling` and `sec:hairy-universality` of `gw_classes_simple.tex`: the label
+`sec:shape-coupling` and `sec:hairy` of `gw_classes_simple.tex`: the label
 graph of `thm:shape-coupling` across two laws, and `thm:hairy` over it.
 
 The labels are the pairs of a coupling `π` of the two shape laws, as `thm:shape-coupling`

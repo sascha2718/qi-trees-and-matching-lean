@@ -1,7 +1,7 @@
 import ChainClasses.General.GeneralShapeMetric
 
 /-!
-`sec:general-transfer` of `matching_classes_general.tex`: `thm:shape-connected` at
+`sec:general-relabel` of `matching_classes_general.tex`: `thm:shape-connected` at
 general arity, the leaf deletion of a realisation as a `1`-marked quasi-isometry, and
 the connectivity of the label graph `G_D` over the enumeration of `𝒮` by size.
 

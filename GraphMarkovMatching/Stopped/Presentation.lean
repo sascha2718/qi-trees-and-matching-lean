@@ -1,6 +1,6 @@
 /-
 The Markov model of a common-core presentation (`markov_matching_new_proof.tex`,
-`sec:common-presentations`, `sec:types`): two arity laws `ν_L, ν_R` with finite supports, a
+`sec:common-presentations`, `sec:markov-hypotheses`): two arity laws `ν_L, ν_R` with finite supports, a
 common core `S` with core profiles `D a` (`a ∈ S`), and for every supported arity `k` on
 either side a composite profile `C σ k` with `k` leaves built from the core profiles, the
 core arities using the one-term expression `C σ a = D a`.
@@ -20,8 +20,8 @@ core arities using the one-term expression `C σ a = D a`.
 * `side_change` (the target-side reproduction in `thm:fresh-positive`): a charged
   realisation of a type matching a source can be replaced by a charged realisation of the
   same remaining tree on the other side matching the same source;
-* `freshPositive` (`thm:fresh-positive`), `selection` with `budget_le`
-  (`thm:atomic-normalisation`, the budget `B = max_σ ∑_{a ∈ S} ν_σ(a)^{-α}`), `card_live_le`
+* `freshPositive` (`thm:fresh-positive`), `selection` with `inverseSum_le`
+  (`thm:atomic-normalisation`, the bound `B = max_σ ∑_{a ∈ S} ν_σ(a)^{-α}`), `card_live_le`
   (`eq:type-count`).
 
 The phases and the return bound `thm:bounded-return` are in `Returns.lean`.
@@ -141,7 +141,7 @@ lemma rootPair_gnode (σ : Bool) (l r : MTree) :
     rootPair σ (MTree.gnode l r) = (typeOf σ l, typeOf σ r) := rfl
 
 /-- A forced type is live exactly when its remaining tree is a proper subtree, other than
-a leaf, of a supported profile of its side (`sec:types`). -/
+a leaf, of a supported profile of its side (`sec:markov-hypotheses`). -/
 lemma mem_live_some_iff (σ : Bool) (τ : MTree) :
     (σ, some τ) ∈ P.live
       ↔ ∃ k ∈ P.supp σ,
@@ -359,7 +359,7 @@ lemma eq_of_kernelL_forced_ne_zero {σ : Bool} {τ : MTree} (h : (σ, some τ) �
   exact hj rfl
 
 /-- The core transition at a fresh type is charged: the root pair of the core block of a
-core profile (`sec:positive-fresh`). -/
+core profile (`sec:positive-matching`). -/
 lemma kernelL_fresh_core_ne_zero (σ : Bool) {a : ℕ} (ha : a ∈ P.S) {l r : MTree}
     (hD : MTree.node l r = P.D a) (hl : typeOf σ l ∈ P.live) (hr : typeOf σ r ∈ P.live) :
     P.kernelL (P.freshL σ) (⟨typeOf σ l, hl⟩, ⟨typeOf σ r, hr⟩) ≠ 0 := by
@@ -378,7 +378,7 @@ private lemma rE_ne_zero_iff' {X : Type} (ν : PMF X) (Q : X → X → Prop) (x 
   refine exists_congr fun y => ?_
   by_cases h : Q x y <;> simp [h]
 
-/-- Every realised state has a charged compatible state (`sec:positive-fresh`): a state in
+/-- Every realised state has a charged compatible state (`sec:positive-matching`): a state in
 the support by reflexivity, the state `0` by `b(0) > 0`. -/
 lemma exists_fresh_state (hc : (P.toModel R zero μ).IsCompat) (hb0 : rE μ R zero ≠ 0)
     {v : V} (hv : v ∈ (P.toModel R zero μ).Vmu) : ∃ w, μ w ≠ 0 ∧ R v w := by
@@ -768,7 +768,7 @@ theorem freshPositive (hc : (P.toModel R zero μ).IsCompat) (hb0 : rE μ R zero 
   rw [Model.deg, rE_ne_zero_iff']
   exact ⟨y', Exists.intro π hm', hy'⟩
 
-/-- The selected transitions (`eq:transition-budget`, `sec:positive-fresh`): the root pairs
+/-- The selected transitions (`eq:transition-budget`, `sec:positive-matching`): the root pairs
 of the core profiles at a fresh type, the unique transition at a forced type. -/
 noncomputable def selJ (t : P.Live) : Finset (P.Live × P.Live) :=
   match t.1 with
@@ -872,11 +872,11 @@ noncomputable def selection (hc : (P.toModel R zero μ).IsCompat) (hb0 : rE μ R
         rw [prodPMF_apply]
         exact mul_ne_zero hy1' hy2'
 
-/-- **The budget** (`sec:positive-fresh`): `∑_{j ∈ J_t} π_t(j)^{-α} ≤ max_σ ∑_{a ∈ S} ν_σ(a)^{-α}`
+/-- **The inverse-probability sum** (`sec:positive-matching`): `∑_{j ∈ J_t} π_t(j)^{-α} ≤ max_σ ∑_{a ∈ S} ν_σ(a)^{-α}`
 for every live type. -/
-theorem budget_le (hc : (P.toModel R zero μ).IsCompat) (hb0 : rE μ R zero ≠ 0) {α : ℝ}
+theorem inverseSum_le (hc : (P.toModel R zero μ).IsCompat) (hb0 : rE μ R zero ≠ 0) {α : ℝ}
     (hα : 0 ≤ α) (t : P.Live) :
-    (P.selection R zero μ hc hb0).budget α t
+    (P.selection R zero μ hc hb0).inverseSum α t
       ≤ max (∑ a ∈ P.S, (P.ν false a) ^ (-α)) (∑ a ∈ P.S, (P.ν true a) ^ (-α)) := by
   have hmax : ∀ σ, (∑ a ∈ P.S, (P.ν σ a) ^ (-α))
       ≤ max (∑ a ∈ P.S, (P.ν false a) ^ (-α)) (∑ a ∈ P.S, (P.ν true a) ^ (-α)) := by

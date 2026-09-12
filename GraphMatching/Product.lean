@@ -1,5 +1,5 @@
 /-
-`sec:product` of `graph_matching_selfcontained.tex`: `thm:product`, the product of
+`sec:contraction` of `graph_matching_selfcontained.tex`: `thm:product`, the product of
 relations.
 
     Phi(R1 (x) R2, mu1 (x) mu2)  <=  Phi1 + Phi2 + 5 * Phi1 * Phi2

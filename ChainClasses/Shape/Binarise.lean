@@ -1534,7 +1534,7 @@ lemma nodup_addrList : ∀ t : Tri, (addrList t).Nodup := by
       rcases hc with hc | hc <;> rw [List.mem_map] at hc <;> obtain ⟨z, -, hz⟩ := hc <;>
         exact absurd hz (by simp)
 
-/-- A depth budget for a finite set of addresses. -/
+/-- A depth bound for a finite set of addresses. -/
 def maxLen (L : List Word) : ℕ := L.foldr (fun x acc => max x.length acc) 0
 
 lemma le_maxLen : ∀ {L : List Word} {x : Word}, x ∈ L → x.length ≤ maxLen L := by

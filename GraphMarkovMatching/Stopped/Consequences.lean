@@ -123,7 +123,7 @@ private lemma fourLawAtZero_two (hc : M.IsCompat) (hδ : M.delta = 0) (h : ℕ) 
 end Model
 
 /-- **The explicit consequence at exponent two** (`sec:two-exponent-values`): for every
-model with `δ = 0` (countably many types, no return or budget assumption) and
+model with `δ = 0` (countably many types, no return or transition-bound assumption) and
 `η_2(μ) ≤ 1/2500`, the failure probability of every pair of types at every height is at
 most `(1024/131) η_2(μ)`. The scalar barrier `η + (1 + 3η)(aM + bM²) ≤ M` holds at
 `M = (1024/131) η` by `two_exponent_criterion`. -/
@@ -194,7 +194,7 @@ from the rational parameters `paramsFourThirds`: constants depending only on `H`
 theorem markov_matching_fourThirds (H T : ℕ) (hT : 1 ≤ T) (B : ℝ) (hB : 1 ≤ B) :
     ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} [Fintype I] (M : Model V I) (hc : M.IsCompat) {g : ℕ}
       (Θ : Model.Phase M g), (∀ i, Θ.count i ≤ T) → ∀ (Sel : Model.Selection M),
-      (∀ t, Sel.budget (4 / 3) t ≤ ENNReal.ofReal B) → M.FreshPositive →
+      (∀ t, Sel.inverseSum (4 / 3) t ≤ ENNReal.ofReal B) → M.FreshPositive →
       M.CommonReturns Θ H → M.zeta (4 / 3) ≤ ENNReal.ofReal ε → ∀ s t, Θ.θ s = Θ.θ t →
         ∀ h, M.failProb s t h ≤ ENNReal.ofReal Kc * M.zeta (4 / 3) :=
   markov_matching_finite_exists paramsFourThirds H T hT B hB
@@ -205,7 +205,7 @@ from the rational parameters `paramsTwo`: constants depending only on `H`, `T`, 
 theorem markov_matching_two (H T : ℕ) (hT : 1 ≤ T) (B : ℝ) (hB : 1 ≤ B) :
     ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} [Fintype I] (M : Model V I) (hc : M.IsCompat) {g : ℕ}
       (Θ : Model.Phase M g), (∀ i, Θ.count i ≤ T) → ∀ (Sel : Model.Selection M),
-      (∀ t, Sel.budget 2 t ≤ ENNReal.ofReal B) → M.FreshPositive →
+      (∀ t, Sel.inverseSum 2 t ≤ ENNReal.ofReal B) → M.FreshPositive →
       M.CommonReturns Θ H → M.zeta 2 ≤ ENNReal.ofReal ε → ∀ s t, Θ.θ s = Θ.θ t →
         ∀ h, M.failProb s t h ≤ ENNReal.ofReal Kc * M.zeta 2 :=
   markov_matching_finite_exists paramsTwo H T hT B hB

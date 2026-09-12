@@ -24,7 +24,9 @@ project:
     trees with finitely supported offspring law conditioned on infinite diameter, into the ray
     class, the binary-tree class, one chain class for each branching semigroup, and the bushy
     class, with two independent conditioned trees almost surely quasi-isometric exactly when
-    their laws share a class; and, for offspring supported on {1,2}, almost sure quasi-isometry
+    their laws share a class, together with the finite class, so that over the unconditioned
+    laws two trees are almost surely quasi-isometric exactly when both are finite or both are
+    infinite with laws in the same class; and, for offspring supported on {1,2}, almost sure quasi-isometry
     together with an explicit exponential bound on the failure probability of a
     (D^2+3)-quasi-isometry. The statements are made in Challenge.lean over Mathlib alone and
     discharged by Solution.lean from four library targets.
@@ -66,16 +68,19 @@ related_formalizations: []
 
 status:
   scope: >-
-    Formalised and audited: the ten theorems listed in comparator-config.json, namely the i.i.d.
+    Formalised and audited: the twelve theorems listed in comparator-config.json, namely the i.i.d.
     matching theorem (Theorem 5.1 of the manuscript: leaf bound, full bound and the infinite
     tree), the Markov matching theorem (Theorem 6.1, in four forms: finite-type and
     zero-compatible alternatives, each at finite height and at infinite height), the complete
-    conditioned-infinite classification (Theorem 1.2) and the two-value universality theorem
+    classification (Theorem 1.2) in three statements (bounded connected graphs are
+    quasi-isometric to a point, laws with mean at most one and theta_1 different from 1 die
+    out almost surely, and the classification itself over the unconditioned product law, in
+    which two trees are almost surely quasi-isometric exactly when both are finite or both are
+    infinite with laws in the same infinite class), and the two-value universality theorem
     with its quantitative rate (Theorem 1.3). Beyond these endpoints the four libraries
     machine-check the numbered statements of the matching parts, the Galton--Watson
     foundations and the geometric obstructions, as recorded in the paper's appendix.
-    Not formalised: the elementary finite-diameter class, which lies outside the
-    conditioned-infinite endpoint; the quasisymmetry corollary for the boundaries
+    Not formalised: the quasisymmetry corollary for the boundaries
     (Corollary 1.4) and the fractal percolation application (Theorem 3.1); and the two families
     of binary trees with continuous random branching times (Section 7). The analytic constants
     of the i.i.d. theorem are machine-checked through rational upper bounds for the closed-form
@@ -186,14 +191,25 @@ alignment:
         Asserts a root-fixing graph automorphism of the infinite binary tree matching the two
         consistent i.i.d. labellings at every vertex. Proved in Solution from
         GraphMatching.Kolmogorov and GraphMatching.AutBridge.
-    - source: "Theorem 1.2 (Complete quasi-isometry classification), conditioned-infinite part"
-      lean: "Challenge.audit_offspring_classification_ae_iff"
+    - source: "Theorem 1.2, finite class: bounded connected graphs are quasi-isometric to a point"
+      lean: "Challenge.audit_bounded_graph_qi_point"
+      module: "Challenge"
+      status: "proved"
+      note: "Proved in Solution from BranchingProcess.Geometry."
+    - source: "Theorem 1.2, finite class: laws with mean at most one die out almost surely"
+      lean: "Challenge.audit_extinction_of_not_supercritical"
+      module: "Challenge"
+      status: "proved"
+      note: "Excludes the deterministic single child theta_1 = 1. Proved in Solution from BranchingProcess.Law."
+    - source: "Theorem 1.2 (Complete quasi-isometry classification), including the finite class"
+      lean: "Challenge.audit_full_classification_ae_iff"
       module: "Challenge"
       status: "proved"
       note: >-
-        Two conditioned infinite trees are quasi-isometric almost surely exactly when the two
-        laws lie in the ray class, the binary-tree class, the same chain class, or the bushy
-        class. Proved in Solution from ChainClasses.Classification.
+        Over the unconditioned product law, two independent trees almost surely admit a
+        root-preserving quasi-isometry exactly when both are finite, or both are infinite and
+        the laws lie in the same infinite class, and admit no quasi-isometry otherwise. Proved
+        in Solution from ChainClasses.Classification.Finite.
     - source: "Theorem 1.3 (Universality in the two-value family), almost sure statement"
       lean: "Challenge.audit_twovalue_ae_tree_family"
       module: "Challenge"

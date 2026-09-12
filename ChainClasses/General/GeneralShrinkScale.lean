@@ -3,7 +3,7 @@ import ChainClasses.General.GeneralContraction
 import ChainClasses.General.GeneralShrink
 
 /-!
-`sec:general-transfer` of `matching_classes_general.tex`: the shrinking map of
+`sec:general-relabel` of `matching_classes_general.tex`: the shrinking map of
 `thm:shape-shrink` (`it:shape-shrink`) at general bounded support, the map the
 cascade coupling behind `thm:relabel` and `thm:cross-relabel` runs on.
 

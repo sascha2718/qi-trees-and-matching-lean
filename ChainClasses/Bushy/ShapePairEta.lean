@@ -1,7 +1,7 @@
 import ChainClasses.Bushy.ShapeCouplingBuild
 
 /-!
-`sec:shape-coupling` and `sec:hairy-universality` of `gw_classes_simple.tex` at the
+`sec:shape-coupling` and `sec:hairy` of `gw_classes_simple.tex` at the
 constants of the paper.  The label graph of `thm:shape-coupling` joins two charged pairs
 when all four cross comparisons hold at the edge scale `27D⁴` of `def:shape-net`, matched
 labels give a `972D⁴`-marked quasi-isometry, and `eq:hairy-rate` across two laws holds at

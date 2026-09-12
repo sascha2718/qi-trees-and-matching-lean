@@ -5,7 +5,7 @@ import ChainClasses.Scalar.Hairy
 import ChainClasses.General.GeneralConstants
 
 /-!
-`sec:general-shapes` and `sec:general-cross` of `matching_classes_general.tex`: the
+`sec:general-shapes` and `thm:cross-relabel` of `matching_classes_general.tex`: the
 metric realisation of `def:shape-general` and the comparability clause of
 `thm:cross-relabel`.
 

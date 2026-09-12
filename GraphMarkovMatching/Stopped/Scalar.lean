@@ -59,7 +59,7 @@ AM–GM inequality with weights `1/(γ+1)`, `γ/(γ+1)`, raised to the power `γ
 supplies the maximum of `(q-β)(1-q)^α` (`Kfun_bound`) and the value of `L_α` for
 `α ≥ 2` (`Lfun_zero_eq_of_two_le`). -/
 
-/-- Weighted AM–GM in power form (`sec:contraction-extension`). -/
+/-- Weighted AM–GM in power form (`sec:local-estimate`). -/
 lemma amgm_pow {γ x y : ℝ} (hγ : 0 ≤ γ) (hx : 0 ≤ x) (hy : 0 ≤ y) :
     y * x ^ γ ≤ ((y + γ * x) / (γ + 1)) ^ (γ + 1) := by
   have hγ1 : (0 : ℝ) < γ + 1 := by linarith
@@ -197,7 +197,7 @@ lemma Kfun_nonneg {α β : ℝ} (hα : 0 ≤ α) (hβ1 : β ≤ 1) : 0 ≤ Kfun 
   have h3 : 0 ≤ (1 - β) ^ (α + 1) := Real.rpow_nonneg (by linarith) _
   exact mul_nonneg (div_nonneg h1 h2) h3
 
-/-- The maximum of `(q - β)(1-q)^α` on `[0,1]` is `K_α(β)` (`sec:contraction-extension`):
+/-- The maximum of `(q - β)(1-q)^α` on `[0,1]` is `K_α(β)` (`sec:local-estimate`):
 weighted AM–GM at `v = (q-β)/(1-β)`. -/
 lemma Kfun_bound {α β q : ℝ} (hα : 1 ≤ α) (hβ0 : 0 ≤ β) (hβ1 : β ≤ 1) (hq0 : 0 ≤ q)
     (hq1 : q ≤ 1) : (q - β) * (1 - q) ^ α ≤ Kfun α β := by

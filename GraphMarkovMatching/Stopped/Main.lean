@@ -366,14 +366,14 @@ end Model
 
 /-- **`thm:markov-matching`, finite alternative, with the explicit constants**
 (`sec:completion`): for every finite model with a phase map of class size at most `T`, a
-transition selection of budget at most `B`, fresh positivity and common returns within `H`,
+transition selection with inverse-probability sums at most `B`, fresh positivity and common returns within `H`,
 if `ζ_α ≤ ε_K` then every equal-phase pair fails at every height with probability at most
 `K_match ζ_α`, fresh pairs with probability at most `K ζ_α`, and every equal-phase
 restricted potential is at most `K ζ_α`. -/
 theorem markov_matching_finite (p : Params) (H T : ℕ) (hT : 1 ≤ T) (B : ℝ) (hB : 1 ≤ B)
     (Kc : ℝ) (hK : finiteK0 p H B < Kc) {V I : Type} [Fintype I] (M : Model V I)
     (hc : M.IsCompat) {g : ℕ} (Θ : Model.Phase M g) (hTc : ∀ i, Θ.count i ≤ T)
-    (Sel : Model.Selection M) (hBs : ∀ t, Sel.budget p.α t ≤ ENNReal.ofReal B)
+    (Sel : Model.Selection M) (hBs : ∀ t, Sel.inverseSum p.α t ≤ ENNReal.ofReal B)
     (hFP : M.FreshPositive) (hCR : M.CommonReturns Θ H)
     (hζ : M.zeta p.α ≤ ENNReal.ofReal (finiteEps p H T B Kc)) :
     (∀ s t, Θ.θ s = Θ.θ t → ∀ h,
@@ -423,7 +423,7 @@ theorem markov_matching_finite_infinite (p : Params) (H T : ℕ) (hT : 1 ≤ T) 
     [Countable V] [MeasurableSpace V] [MeasurableSingletonClass V] [MeasurableSpace I]
     [MeasurableSingletonClass I] (M : Model V I) (hc : M.IsCompat) {g : ℕ}
     (Θ : Model.Phase M g) (hTc : ∀ i, Θ.count i ≤ T) (Sel : Model.Selection M)
-    (hBs : ∀ t, Sel.budget p.α t ≤ ENNReal.ofReal B) (hFP : M.FreshPositive)
+    (hBs : ∀ t, Sel.inverseSum p.α t ≤ ENNReal.ofReal B) (hFP : M.FreshPositive)
     (hCR : M.CommonReturns Θ H) (hζ : M.zeta p.α ≤ ENNReal.ofReal (finiteEps p H T B Kc)) :
     (∀ s t, Θ.θ s = Θ.θ t →
         M.trajPair s t (M.InfMatchEv s t)ᶜ ≤ ENNReal.ofReal (finiteKmatch H Kc) * M.zeta p.α)
@@ -441,7 +441,7 @@ theorem markov_matching_finite_exists (p : Params) (H T : ℕ) (hT : 1 ≤ T) (B
     (hB : 1 ≤ B) :
     ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} [Fintype I] (M : Model V I) (hc : M.IsCompat) {g : ℕ}
       (Θ : Model.Phase M g) (hTc : ∀ i, Θ.count i ≤ T) (Sel : Model.Selection M)
-      (hBs : ∀ t, Sel.budget p.α t ≤ ENNReal.ofReal B) (hFP : M.FreshPositive)
+      (hBs : ∀ t, Sel.inverseSum p.α t ≤ ENNReal.ofReal B) (hFP : M.FreshPositive)
       (hCR : M.CommonReturns Θ H),
       M.zeta p.α ≤ ENNReal.ofReal ε → ∀ s t, Θ.θ s = Θ.θ t →
         ∀ h, M.failProb s t h ≤ ENNReal.ofReal Kc * M.zeta p.α := by
@@ -459,7 +459,7 @@ theorem markov_matching_finite_exists_infinite (p : Params) (H T : ℕ) (hT : 1 
       [MeasurableSingletonClass V] [MeasurableSpace I] [MeasurableSingletonClass I]
       (M : Model V I) (hc : M.IsCompat) {g : ℕ} (Θ : Model.Phase M g)
       (hTc : ∀ i, Θ.count i ≤ T) (Sel : Model.Selection M)
-      (hBs : ∀ t, Sel.budget p.α t ≤ ENNReal.ofReal B) (hFP : M.FreshPositive)
+      (hBs : ∀ t, Sel.inverseSum p.α t ≤ ENNReal.ofReal B) (hFP : M.FreshPositive)
       (hCR : M.CommonReturns Θ H),
       M.zeta p.α ≤ ENNReal.ofReal ε → ∀ s t, Θ.θ s = Θ.θ t →
         M.trajPair s t (M.InfMatchEv s t)ᶜ ≤ ENNReal.ofReal Kc * M.zeta p.α := by
@@ -473,7 +473,7 @@ theorem markov_matching_finite_exists_infinite (p : Params) (H T : ℕ) (hT : 1 
 theorem markov_matching_finite_eta (p : Params) (H T : ℕ) (hT : 1 ≤ T) (B : ℝ) (hB : 1 ≤ B)
     (Kc : ℝ) (hK : finiteK0 p H B < Kc) {V I : Type} [Fintype I] (M : Model V I)
     (hc : M.IsCompat) {g : ℕ} (Θ : Model.Phase M g) (hTc : ∀ i, Θ.count i ≤ T)
-    (Sel : Model.Selection M) (hBs : ∀ t, Sel.budget p.α t ≤ ENNReal.ofReal B)
+    (Sel : Model.Selection M) (hBs : ∀ t, Sel.inverseSum p.α t ≤ ENNReal.ofReal B)
     (hFP : M.FreshPositive) (hCR : M.CommonReturns Θ H) {p0 : ℝ} (hp0 : 0 < p0)
     (hp1 : p0 ≤ 1) (hμ : ENNReal.ofReal p0 ≤ M.μ M.zero)
     (hη : M.eta p.α ≤ ENNReal.ofReal (p0 * finiteEps p H T B Kc)) :
@@ -499,7 +499,7 @@ theorem markov_matching_finite_eta (p : Params) (H T : ℕ) (hT : 1 ≤ T) (B : 
 /-! ### The zero-compatible alternative (`thm:markov-matching`, `sec:completion`) -/
 
 /-- **`thm:markov-matching`, zero-compatible alternative**: countably many types, no return
-or budget assumption; constants depending only on `α`. -/
+or transition-bound assumption; constants depending only on `α`. -/
 theorem markov_matching_zero (p : Params) (Kc : ℝ) (hK : 1 / (1 - p.a) < Kc) {V I : Type}
     (M : Model V I) (hc : M.IsCompat) (hδ : M.delta = 0)
     (hζ : M.zeta p.α ≤ ENNReal.ofReal (epsK0 p.α p.a p.b Kc)) :
@@ -570,7 +570,7 @@ theorem markov_matching_zero_exists (p : Params) :
 
 /-- **`eq:zero-compatible-quadratic`**: with `d = 1 + (2α-1)η`, `d a < 1` and
 `(1-da)² ≥ 4 d b η`, the failure probabilities are at most `M_η`, without any type-count
-or budget assumption. -/
+or transition-bound assumption. -/
 theorem markov_matching_zero_quadratic (p : Params) {V I : Type} (M : Model V I)
     (hc : M.IsCompat) (hδ : M.delta = 0) (hfin : M.eta p.α ≠ ⊤)
     (h1 : (1 + (2 * p.α - 1) * (M.eta p.α).toReal) * p.a < 1)
@@ -623,7 +623,7 @@ theorem markov_matching_of_lambda {α : ℝ} (hα : 1 ≤ α) (hlam : lambda α 
     (hT : 1 ≤ T) (B : ℝ) (hB : 1 ≤ B) :
     ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} [Fintype I] (M : Model V I) (hc : M.IsCompat) {g : ℕ}
       (Θ : Model.Phase M g), (∀ i, Θ.count i ≤ T) → ∀ (Sel : Model.Selection M),
-      (∀ t, Sel.budget α t ≤ ENNReal.ofReal B) → M.FreshPositive → M.CommonReturns Θ H →
+      (∀ t, Sel.inverseSum α t ≤ ENNReal.ofReal B) → M.FreshPositive → M.CommonReturns Θ H →
       M.zeta α ≤ ENNReal.ofReal ε → ∀ s t, Θ.θ s = Θ.θ t →
         ∀ h, M.failProb s t h ≤ ENNReal.ofReal Kc * M.zeta α :=
   markov_matching_finite_exists (Params.ofLambda hα hlam) H T hT B hB

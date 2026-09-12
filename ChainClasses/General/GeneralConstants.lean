@@ -2,13 +2,13 @@ import ChainClasses.Scalar.MarkedQI
 
 /-!
 The scalar constants of the general document: the comparability composition of the
-transport relabelling and the constants of `it:general-hairy`.
+transport relabelling and the constants of `thm:hairy-general`.
 
 * `markedQI_relabel` and `relabel_scale`: the comparability composition of the
   transport relabelling (`thm:relabel` of the general document), `27K₁³K₂` in
   general and `3¹⁵D¹⁶` at the net scales.
 * `general_rate_to_one`, `relabel_glued_scale`, `cascade_depth` and
-  `cascade_depth_le`: the constants of `it:general-hairy`.  The failure rates
+  `cascade_depth_le`: the constants of `thm:hairy-general`.  The failure rates
   `K_ν̃ e^{-c₃D²}` fall below `ε_ν̃` past an explicit threshold, the gluing at
   `K = 3¹⁵D¹⁶` is an `8·3³⁰D³²`-quasi-isometry, and the forced cascade
   encoding a `k`-split has depth `⌈log₂ k⌉ ≤ ⌈log₂ b⌉`, so the padding of the
@@ -39,10 +39,10 @@ coupling support and `K₂ = 729D⁷` from equal-or-adjacent classes give
 lemma relabel_scale (D : ℝ) :
     27 * (9 * D ^ 3) ^ 3 * (729 * D ^ 7) = 14348907 * D ^ 16 := by ring
 
-/-! ### The constants of `it:general-hairy` -/
+/-! ### The constants of `thm:hairy-general` -/
 
 /-- **The last display of `thm:hairy` at general support**: the failure rates
-`K_ν̃ e^{-c₃D²}` of `it:general-hairy` fall below any threshold, with the
+`K_ν̃ e^{-c₃D²}` of `thm:hairy-general` fall below any threshold, with the
 explicit bound `D ≥ K_ν̃/(c₃ε) + 1`. -/
 theorem general_rate_to_one {A c ε : ℝ} (hA : 0 < A) (hc : 0 < c) (hε : 0 < ε) :
     ∃ D₀ : ℕ, ∀ D : ℕ, D₀ ≤ D → A * Real.exp (-(c * (D : ℝ) ^ 2)) < ε := by
@@ -71,12 +71,12 @@ theorem general_rate_to_one {A c ε : ℝ} (hA : 0 < A) (hc : 0 < c) (hε : 0 < 
   have hmul : y * (A * Real.exp (-y)) < y * ε := by nlinarith [Real.exp_pos (-y)]
   exact lt_of_mul_lt_mul_left hmul hypos.le
 
-/-- The gluing scale of `it:general-hairy`: `thm:glued-transfer` applied at
+/-- The gluing scale of `thm:hairy-general`: `thm:glued-transfer` applied at
 the relabelling constant `K = 3¹⁵D¹⁶` gives an `8·3³⁰D³²`-quasi-isometry. -/
 lemma relabel_glued_scale (D : ℝ) :
     8 * (14348907 * D ^ 16) ^ 2 = 8 * 14348907 ^ 2 * D ^ 32 := by ring
 
-/-- **`it:general-hairy`, the cascade depth**: the forced cascade encoding a
+/-- **`thm:hairy-general`, the cascade depth**: the forced cascade encoding a
 `k`-split reaches `k` slots at depth `⌈log₂ k⌉`. -/
 lemma cascade_depth (k : ℕ) : k ≤ 2 ^ Nat.clog 2 k :=
   Nat.le_pow_clog (by norm_num) k

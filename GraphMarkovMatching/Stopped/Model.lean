@@ -1,5 +1,5 @@
 /-
-The Markov label models of `markov_matching_new_proof.tex` (`sec:statement`):
+The Markov label models of `markov_matching_new_proof.tex` (`sec:markov-proof`):
 a countable state space `V` with a compatibility relation `R`, a distinguished
 state `zero`, and a state law `μ`; a countable type set `I` with the fresh
 types and the child-type kernel `π`.  A vertex of a fresh type carries a state
@@ -40,7 +40,7 @@ open scoped ENNReal Classical
 
 /-! ### The model -/
 
-/-- A Markov label model (`sec:statement`): states with a compatibility relation and a
+/-- A Markov label model (`sec:markov-proof`): states with a compatibility relation and a
 distinguished state, a fresh state law, and types with a fresh subset and a child-type
 kernel. -/
 structure Model (V I : Type) where
@@ -201,7 +201,7 @@ lemma rho_zero_ne_zero_iff (t : I) (s : I × V) :
   · rw [if_neg hst]
     exact ⟨fun h => absurd rfl h, fun h => absurd h.1 hst⟩
 
-/-- Attaching a root is injective in both arguments (`sec:statement`). -/
+/-- Attaching a root is injective in both arguments (`sec:markov-proof`). -/
 lemma branch_inj {S : Type} {n : ℕ} {s s' : S} {p p' : FullLab S n × FullLab S n} :
     branch s p = branch s' p' ↔ s = s' ∧ p = p' := by
   constructor
@@ -213,7 +213,7 @@ lemma branch_inj {S : Type} {n : ℕ} {s s' : S} {p p' : FullLab S n × FullLab 
     rfl
 
 /-- The mass of a branch: the typed root mass times the child-pair mass
-(`sec:statement`). -/
+(`sec:markov-proof`). -/
 lemma rho_succ_apply (t : I) (h : ℕ) (s : I × V)
     (p : FullLab (I × V) h × FullLab (I × V) h) :
     M.rho t (h + 1) (branch s p) = M.rootT t s * M.childMix t h p := by

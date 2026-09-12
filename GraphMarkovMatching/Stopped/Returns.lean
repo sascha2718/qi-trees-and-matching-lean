@@ -1,11 +1,11 @@
 /-
-The phases and the return bound of `markov_matching_new_proof.tex` (`sec:types`, "Available
+The phases and the return bound of `markov_matching_new_proof.tex` (`sec:markov-hypotheses`, "Available
 fresh return times", `thm:bounded-return`) for the Markov model of a common-core
 presentation.
 
 * `Model.reach_trans`, `Model.mem_reach_succ_of_child`, `Model.Phase.reach_eq`,
   `Model.Phase.path_eq`: reachability composes and the phase advances by one per step;
-* `schur_conductor_bound`: every multiple of the gcd `g` of a finite set of positive
+* `schur_threshold_bound`: every multiple of the gcd `g` of a finite set of positive
   integers with least element `a` and greatest element `b` that is at least
   `g (a/g - 1)(b/g - 1)` is a sum of elements of the set;
 * `coreDepths`, `gPhase`, `Gamma`: the core leaf depths `R_0`, their gcd `g` and the
@@ -17,9 +17,9 @@ presentation.
 * `exists_fresh_reach`, `fresh_within_ell`, `gamma_return`: a fresh type is reachable
   within `ℓ` steps, every possible path is fresh within `ℓ` steps of every position, and
   every element of `Γ` is a fresh-to-fresh return length;
-* `exists_conductor`, `commonReturns_explicit`, `commonReturns`, `commonReturns_depthOne`,
-  `conductor_bound`: `thm:bounded-return` with `H = c_Γ + 2ℓ`, the depth-one case
-  `H = 2ℓ`, and the explicit conductor `g (a_0 - 1)(b_0 - 1)`.
+* `exists_returnThreshold`, `commonReturns_explicit`, `commonReturns`, `commonReturns_depthOne`,
+  `returnThreshold_bound`: `thm:bounded-return` with `H = c_Γ + 2ℓ`, the depth-one case
+  `H = 2ℓ`, and the explicit return threshold `g (a_0 - 1)(b_0 - 1)`.
 -/
 import GraphMarkovMatching.Stopped.Presentation
 import GraphMarkovMatching.Support.Arithmetic
@@ -59,7 +59,7 @@ lemma mem_reach_succ_of_child {t t' f : I} (hc : M.child t t') {m : ℕ}
   exact M.reach_mono (Set.singleton_subset_iff.mpr ht') m hf
 
 /-- The phase advances by one per step: a type reached in `d` steps has phase `θ t + d`
-(`sec:types`). -/
+(`sec:markov-hypotheses`). -/
 lemma Phase.reach_eq {g : ℕ} (Θ : Phase M g) {t : I} :
     ∀ {d : ℕ} {f : I}, f ∈ M.reach {t} d → Θ.θ f = Θ.θ t + d := by
   intro d
@@ -72,7 +72,7 @@ lemma Phase.reach_eq {g : ℕ} (Θ : Phase M g) {t : I} :
     rintro f ⟨f', hf', hc⟩
     rw [Θ.child_eq hc, ih hf', Nat.cast_succ, add_assoc]
 
-/-- The phase along a possible path: position `k` has phase `θ (p 0) + k` (`sec:types`). -/
+/-- The phase along a possible path: position `k` has phase `θ (p 0) + k` (`sec:markov-hypotheses`). -/
 lemma Phase.path_eq {g : ℕ} (Θ : Phase M g) {p : ℕ → I} {n : ℕ} (hp : M.IsPath p n) :
     ∀ k ≤ n, Θ.θ (p k) = Θ.θ (p 0) + k := by
   intro k
@@ -87,7 +87,7 @@ lemma Phase.path_eq {g : ℕ} (Θ : Phase M g) {p : ℕ → I} {n : ℕ} (hp : M
 
 end Model
 
-/-! ### The conductor bound of a numerical semigroup (`thm:bounded-return`) -/
+/-! ### The threshold of a numerical semigroup (`thm:bounded-return`) -/
 
 /-- **The residue-class argument of `thm:bounded-return`**: let `A` be a finite set of
 positive integers, all multiples of `g > 0`, with least element `a` and greatest element
@@ -235,10 +235,10 @@ theorem schur_core (A : Finset ℕ) (g a b : ℕ) (hg0 : 0 < g) (hgA : ∀ r ∈
     simp only [Nat.add_sub_cancel] at hn hxle
     nlinarith
 
-/-- **Schur's conductor bound** (`thm:bounded-return`): for a nonempty finite set `A` of
+/-- **Schur's bound on the threshold** (`thm:bounded-return`): for a nonempty finite set `A` of
 positive integers with gcd `g`, least element `a` and greatest element `b`, every multiple
 of `g` that is at least `g (a/g - 1)(b/g - 1)` is a sum of elements of `A`. -/
-theorem schur_conductor_bound (A : Finset ℕ) (hA : A.Nonempty) (h0 : 0 ∉ A) :
+theorem schur_threshold_bound (A : Finset ℕ) (hA : A.Nonempty) (h0 : 0 ∉ A) :
     ∀ n, A.gcd id * ((A.min' hA / A.gcd id - 1) * (A.max' hA / A.gcd id - 1)) ≤ n →
       A.gcd id ∣ n → n ∈ AddSubmonoid.closure (↑A : Set ℕ) := by
   have haA := Finset.min'_mem A hA
@@ -255,26 +255,26 @@ theorem schur_conductor_bound (A : Finset ℕ) (hA : A.Nonempty) (h0 : 0 ∉ A) 
   exact schur_core A _ _ _ hg0 hgA haA hbA (fun r hr => Finset.min'_le A r hr)
     (fun r hr => Finset.le_max' A r hr) ha0 ⟨N, fun m hm => hN m hm⟩
 
-/-! ### Phases of a presentation (`sec:types`) -/
+/-! ### Phases of a presentation (`sec:markov-hypotheses`) -/
 
 namespace Presentation
 
 variable (P : Presentation) {V : Type} (R : V → V → Prop) (zero : V) (μ : PMF V)
 
-/-- The core leaf depths `R_0`: the leaf depths of the core profiles (`sec:types`). -/
+/-- The core leaf depths `R_0`: the leaf depths of the core profiles (`sec:markov-hypotheses`). -/
 noncomputable def coreDepths : Finset ℕ := P.S.biUnion fun a => (P.D a).leafDepths
 
-/-- `g = gcd R_0` (`sec:types`). -/
+/-- `g = gcd R_0` (`sec:markov-hypotheses`). -/
 noncomputable def gPhase : ℕ := P.coreDepths.gcd id
 
-/-- `Γ = ⟨R_0⟩` (`sec:types`). -/
+/-- `Γ = ⟨R_0⟩` (`sec:markov-hypotheses`). -/
 noncomputable def Gamma : AddSubmonoid ℕ := AddSubmonoid.closure ↑P.coreDepths
 
-/-- The core leaf depths lie in `Γ` (`sec:types`). -/
+/-- The core leaf depths lie in `Γ` (`sec:markov-hypotheses`). -/
 lemma coreDepths_subset_Gamma : ∀ d ∈ P.coreDepths, d ∈ P.Gamma :=
   fun _ hd => AddSubmonoid.subset_closure (Finset.mem_coe.mpr hd)
 
-/-- Every element of `Γ` is a multiple of `g` (`sec:types`). -/
+/-- Every element of `Γ` is a multiple of `g` (`sec:markov-hypotheses`). -/
 lemma gPhase_dvd_of_mem_Gamma {n : ℕ} (hn : n ∈ P.Gamma) : P.gPhase ∣ n := by
   unfold Gamma at hn
   induction hn using AddSubmonoid.closure_induction with
@@ -282,7 +282,7 @@ lemma gPhase_dvd_of_mem_Gamma {n : ℕ} (hn : n ∈ P.Gamma) : P.gPhase ∣ n :=
   | zero => exact dvd_zero _
   | add x y _ _ hx hy => exact dvd_add hx hy
 
-/-- The residue modulo `g` of an element of `Γ` vanishes (`sec:types`). -/
+/-- The residue modulo `g` of an element of `Γ` vanishes (`sec:markov-hypotheses`). -/
 lemma cast_eq_zero_of_mem_Gamma {n : ℕ} (hn : n ∈ P.Gamma) : (n : ZMod P.gPhase) = 0 :=
   (CharP.cast_eq_zero_iff (ZMod P.gPhase) P.gPhase n).mpr (P.gPhase_dvd_of_mem_Gamma hn)
 
@@ -301,7 +301,7 @@ lemma zero_not_mem_coreDepths : 0 ∉ P.coreDepths := by
   simp [MTree.leafDepths] at h
 
 /-- Every leaf depth of a composite profile is a leaf depth of its flattening plus an
-element of `Γ` (`sec:types`: a leaf depth of a composite profile is a sum of core leaf
+element of `Γ` (`sec:markov-hypotheses`: a leaf depth of a composite profile is a sum of core leaf
 depths). -/
 private lemma leafDepths_aux : ∀ t : MTree, MTree.AllComp P.S P.D t →
     ∀ d ∈ t.leafDepths, ∃ d' ∈ t.flatten.leafDepths, ∃ e ∈ P.Gamma, d = d' + e := by
@@ -344,7 +344,7 @@ private lemma leafDepths_aux : ∀ t : MTree, MTree.AllComp P.S P.D t →
       simp only [MTree.leafDepths, Finset.mem_image, Finset.mem_union]
       exact ⟨d', Or.inr hd', rfl⟩
 
-/-- Every leaf depth of a composite profile lies in `Γ` (`sec:types`: a sum of core leaf
+/-- Every leaf depth of a composite profile lies in `Γ` (`sec:markov-hypotheses`: a sum of core leaf
 depths). -/
 theorem leafDepths_mem_Gamma (t : MTree) (ht : MTree.AllComp P.S P.D t)
     (hg : ∃ l r, t = MTree.gnode l r) : ∀ d ∈ t.leafDepths, d ∈ P.Gamma := by
@@ -403,7 +403,7 @@ lemma of_mem_live_forced (σ : Bool) (τ : MTree) (h : (σ, some τ) ∈ P.live)
   obtain ⟨σ', k, hk, τ', ⟨h1, h2, h3⟩, rfl, rfl⟩ := h
   exact ⟨k, hk, h1, h2, h3⟩
 
-/-- All leaf depths of a live remaining tree are congruent modulo `g` (`sec:types`). -/
+/-- All leaf depths of a live remaining tree are congruent modulo `g` (`sec:markov-hypotheses`). -/
 theorem leafDepths_congr (σ : Bool) (τ : MTree) (h : (σ, some τ) ∈ P.live) :
     ∀ d ∈ τ.leafDepths, ∀ d' ∈ τ.leafDepths, (d : ZMod P.gPhase) = d' := by
   obtain ⟨k, hk, hsub, -, -⟩ := P.of_mem_live_forced σ τ h
@@ -436,7 +436,7 @@ lemma toLive_val {t : PType} (h : t ∈ P.live) : (P.toLive t).1 = t := by
 lemma toLive_fresh (σ : Bool) : P.toLive (σ, none) = P.freshL σ :=
   P.toLive_of_mem' (P.fresh_mem_live σ)
 
-/-- The phase of a live type (`sec:types`): `0` at a fresh type, `-d (mod g)` at a forced
+/-- The phase of a live type (`sec:markov-hypotheses`): `0` at a fresh type, `-d (mod g)` at a forced
 type with a leaf at depth `d`. -/
 noncomputable def theta (t : P.Live) : ZMod P.gPhase :=
   match t.1 with
@@ -482,7 +482,7 @@ lemma rawKernel_forced_ne_zero_iff' (σ : Bool) (τ : MTree) (p : PType × PType
 
 /-- The children in a charged transition are the types below the two root children of a
 profile, and their least leaf depths plus one are congruent to minus the parent phase
-(`sec:types`: each child has phase one greater than its parent). -/
+(`sec:markov-hypotheses`: each child has phase one greater than its parent). -/
 lemma theta_of_charged (t : P.Live) (p : PType × PType) (hp : P.rawKernel t.1 p ≠ 0) :
     ∃ σ l r, p = (typeOf σ l, typeOf σ r)
       ∧ (l.minLeafDepth : ZMod P.gPhase) + 1 = -P.theta t
@@ -540,7 +540,7 @@ lemma theta_of_charged (t : P.Live) (p : PType × PType) (hp : P.rawKernel t.1 p
           _ (MTree.minLeafDepth_mem_leafDepths _)
         exact_mod_cast this
 
-/-- **The phase map** (`sec:types`): fresh types have phase `0`, children have phase one
+/-- **The phase map** (`sec:markov-hypotheses`): fresh types have phase `0`, children have phase one
 greater. -/
 noncomputable def phase : Model.Phase (P.toModel R zero μ) P.gPhase where
   θ := P.theta
@@ -566,7 +566,7 @@ lemma count_le_card (i : ZMod P.gPhase) : (P.phase R zero μ).count i ≤ P.live
   rw [Finset.card_univ]
   exact le_of_eq (Fintype.card_coe P.live)
 
-/-! ### Possible paths of a presentation (`sec:types`) -/
+/-! ### Possible paths of a presentation (`sec:markov-hypotheses`) -/
 
 /-- A possible child of a live type is a component of a charged raw transition. -/
 lemma child_iff (t t' : P.Live) :
@@ -594,7 +594,7 @@ lemma child_toLive_of_raw (t : P.Live) (p : PType × PType) (hp : P.rawKernel t.
     (P.child_iff R zero μ t _).mpr ⟨p, hp, Or.inr (P.toLive_val h2)⟩⟩
 
 /-- Following a leaf of the remaining tree at depth `d` reaches the fresh type of the side
-in `d` steps (`sec:types`). -/
+in `d` steps (`sec:markov-hypotheses`). -/
 lemma freshL_mem_reach (σ : Bool) : ∀ (τ : MTree), typeOf σ τ ∈ P.live →
     ∀ d ∈ τ.leafDepths,
       P.freshL σ ∈ (P.toModel R zero μ).reach {P.toLive (typeOf σ τ)} d := by
@@ -634,7 +634,7 @@ lemma freshL_mem_reach (σ : Bool) : ∀ (τ : MTree), typeOf σ τ ∈ P.live �
     · exact Model.mem_reach_succ_of_child hcr (ihr hr d₀ hd₀)
 
 /-- From every live type some possible path reaches a fresh type within `ℓ` steps
-(`sec:types`: choose a leaf of the remaining tree). -/
+(`sec:markov-hypotheses`: choose a leaf of the remaining tree). -/
 theorem exists_fresh_reach (t : P.Live) :
     ∃ d ≤ P.ell, ∃ f ∈ (P.toModel R zero μ).reach {t} d, (P.toModel R zero μ).fresh f := by
   obtain ⟨⟨σ, o⟩, hmem⟩ := t
@@ -719,7 +719,7 @@ lemma remHeight_lt_of_child {t t' : P.Live} (hc : (P.toModel R zero μ).child t 
         omega
 
 /-- Along every possible path, from every position a fresh type is visited within `ℓ`
-steps (`sec:types`: gaps between fresh visits are at most `ℓ`). -/
+steps (`sec:markov-hypotheses`: gaps between fresh visits are at most `ℓ`). -/
 theorem fresh_within_ell (p : ℕ → P.Live) (n : ℕ) (hp : (P.toModel R zero μ).IsPath p n)
     (i : ℕ) (hi : i + P.ell ≤ n) :
     ∃ k, i ≤ k ∧ k ≤ i + P.ell ∧ (P.toModel R zero μ).fresh (p k) := by
@@ -744,7 +744,7 @@ theorem fresh_within_ell (p : ℕ → P.Live) (n : ℕ) (hp : (P.toModel R zero 
   omega
 
 /-- From a fresh type, every element of `Γ` is a possible fresh-to-fresh return length
-(`sec:types`: choose core arities and follow a leaf of the required depth). -/
+(`sec:markov-hypotheses`: choose core arities and follow a leaf of the required depth). -/
 theorem gamma_return (σ : Bool) (d : ℕ) (hd : d ∈ P.Gamma) :
     P.freshL σ ∈ (P.toModel R zero μ).reach {P.freshL σ} d := by
   unfold Gamma at hd
@@ -771,14 +771,14 @@ theorem gamma_return (σ : Bool) (d : ℕ) (hd : d ∈ P.Gamma) :
   | zero => exact Set.mem_singleton _
   | add x y _ _ hx hy => exact Model.reach_trans hx hy
 
-/-- The conductor: every multiple of `g` at least `c_Γ` lies in `Γ`
+/-- The return threshold: every multiple of `g` at least `c_Γ` lies in `Γ`
 (`thm:bounded-return`, from `Nat.exists_mem_closure_of_ge`). -/
-theorem exists_conductor : ∃ c : ℕ, ∀ n, c ≤ n → P.gPhase ∣ n → n ∈ P.Gamma := by
+theorem exists_returnThreshold : ∃ c : ℕ, ∀ n, c ≤ n → P.gPhase ∣ n → n ∈ P.Gamma := by
   obtain ⟨c, hc⟩ := Nat.exists_mem_closure_of_ge (↑P.coreDepths : Set ℕ)
   rw [setGcd_coe_finset] at hc
   exact ⟨c, fun n hn hdvd => hc n hn hdvd⟩
 
-/-- **`thm:bounded-return`** with an explicit conductor: if every multiple of `g` at least
+/-- **`thm:bounded-return`** with an explicit return threshold: if every multiple of `g` at least
 `c` lies in `Γ`, common returns hold with `H = c + 2ℓ`. -/
 theorem commonReturns_explicit (hS : P.S.Nonempty) {c : ℕ}
     (hc : ∀ n, c ≤ n → P.gPhase ∣ n → n ∈ P.Gamma) :
@@ -808,11 +808,11 @@ theorem commonReturns_explicit (hS : P.S.Nonempty) {c : ℕ}
   have := Model.reach_trans hf (P.gamma_return R zero μ σ (k - d) hΓ)
   rwa [Nat.add_sub_of_le hdk] at this
 
-/-- **`thm:bounded-return`**: with `H = c_Γ + 2ℓ` for a conductor `c_Γ`, common returns
+/-- **`thm:bounded-return`**: with `H = c_Γ + 2ℓ` for a return threshold `c_Γ`, common returns
 hold. -/
 theorem commonReturns (hS : P.S.Nonempty) :
     ∃ H, (P.toModel R zero μ).CommonReturns (P.phase R zero μ) H := by
-  obtain ⟨c, hc⟩ := P.exists_conductor
+  obtain ⟨c, hc⟩ := P.exists_returnThreshold
   exact ⟨c + 2 * P.ell, P.commonReturns_explicit R zero μ hS hc⟩
 
 /-- The depth-one case of `thm:bounded-return`: if some core profile has a leaf at depth
@@ -829,13 +829,13 @@ theorem commonReturns_depthOne (hS : P.S.Nonempty) (h1 : ∃ a ∈ P.S, 1 ∈ (P
   have := P.commonReturns_explicit R zero μ hS hc
   rwa [zero_add] at this
 
-/-- The explicit conductor bound of `sec:types`: with `a₀ = min R_0/g` and
+/-- The explicit return-threshold bound of `sec:markov-hypotheses`: with `a₀ = min R_0/g` and
 `b₀ = max R_0/g`, every multiple of `g` at least `g (a₀-1)(b₀-1)` lies in `Γ`. -/
-theorem conductor_bound (hS : P.S.Nonempty) :
+theorem returnThreshold_bound (hS : P.S.Nonempty) :
     ∀ n, P.gPhase * ((P.coreDepths.min' (P.coreDepths_nonempty hS) / P.gPhase - 1)
       * (P.coreDepths.max' (P.coreDepths_nonempty hS) / P.gPhase - 1)) ≤ n →
       P.gPhase ∣ n → n ∈ P.Gamma :=
-  schur_conductor_bound P.coreDepths (P.coreDepths_nonempty hS) P.zero_not_mem_coreDepths
+  schur_threshold_bound P.coreDepths (P.coreDepths_nonempty hS) P.zero_not_mem_coreDepths
 
 end Presentation
 

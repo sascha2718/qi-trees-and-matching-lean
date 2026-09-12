@@ -20,8 +20,12 @@ are quasi-isometric with high probability, at the rate `eq:rate`.
   the potential bound of `thm:eta-bound` supplies its hypothesis.
 * `portrait_of_matchEvent`: on the matching event a single portrait matches the
   two quantised fields to within one level.
+* `psi_nil`, `relabelMap_nil`, `IsQIWith.exists_root_fixing`:
+  the transfer and relabelling maps fix the root, and a quasi-isometry into a
+  subtree containing the root can be redefined at the root so that it fixes it.
 * `qi_of_matching`: the deterministic core, `level_close_comparable` into
-  `transfer` and `isometry_of_relabel`, giving a `(D²+3)`-quasi-isometry.
+  `transfer` and `relabelMap_isometry`, giving a root-fixing
+  `(D²+3)`-quasi-isometry.
 * `twovalue_rate`: `eq:rate`, the failure probability at scale `D` is at most
   `256 θ₁^{D(D-5/2)}`; `twovalue_ae` is the almost sure statement obtained by
   letting the scale run.
@@ -525,6 +529,76 @@ lemma IsQIWith.comp_isometry {K : ℕ} {T T₂ T' : Word → Prop} {f g : Word �
     obtain ⟨x, hx, hd⟩ := hf.dense z hz
     exact ⟨x, hx, by rw [hdist _ _ (hf.maps x hx) hz]; exact hd⟩
 
+/-! ### Root-fixing maps
+
+The maps of `thm:transfer` and `thm:isometry` send the root to the root, and a
+quasi-isometry between two subtrees containing the root can be redefined at the
+root alone so that it fixes the root, at the cost of a larger constant. -/
+
+/-- The transfer map fixes the root. -/
+lemma psi_nil {lam lam' : Word → ℕ} (hlam : ∀ u, 1 ≤ lam u) : psi lam lam' [] = [] := by
+  have h := psi_apply (lam' := lam') hlam (w := []) (l := 0) (Nat.zero_le _)
+  simpa [levelPhi] using h
+
+/-- The relabelling map fixes the root. -/
+lemma relabelMap_nil (σ : Word → Bool ≃ Bool) {lam : Word → ℕ} (lam' : Word → ℕ)
+    (hlam : ∀ u, 1 ≤ lam u) : relabelMap σ lam lam' [] = [] := by
+  have h := relabelMap_apply σ lam' hlam (w := []) (l := 0) (Nat.zero_le _)
+  simpa using h
+
+/-- A quasi-isometry into a subtree containing the root can be redefined to fix
+the root: moving the image of the root costs twice its depth in the constant. -/
+lemma IsQIWith.exists_root_fixing {K : ℕ} {T T' : Word → Prop} {f : Word → Word}
+    (h : IsQIWith K T T' f) (hT' : T' []) :
+    ∃ (K' : ℕ) (g : Word → Word), IsQIWith K' T T' g ∧ g [] = [] := by
+  obtain ⟨c, hc⟩ : ∃ c : ℕ, c = treeDist (f []) [] := ⟨_, rfl⟩
+  set g : Word → Word := Function.update f [] [] with hg
+  have hg0 : g [] = [] := Function.update_self _ _ _
+  refine ⟨K + 2 * c, g, ?_, hg0⟩
+  -- every vertex moves by at most `c`
+  have hclose : ∀ x, treeDist (g x) (f x) ≤ c := by
+    intro x
+    by_cases hx : x = []
+    · subst hx
+      rw [hg0, treeDist_comm]
+      exact hc.ge
+    · rw [hg, Function.update_of_ne hx, treeDist_self]
+      exact Nat.zero_le _
+  refine ⟨fun x hx ↦ ?_, fun x y hx hy ↦ ?_, fun x y hx hy ↦ ?_, fun y' hy' ↦ ?_⟩
+  · -- the redefined map still lands in `T'`
+    by_cases hx0 : x = []
+    · subst hx0
+      rw [hg0]
+      exact hT'
+    · rw [hg, Function.update_of_ne hx0]
+      exact h.maps x hx
+  · -- upper bound: the two endpoints move by at most `c` each
+    have h1 := treeDist_triangle (g x) (f x) (g y)
+    have h2 := treeDist_triangle (f x) (f y) (g y)
+    have h3 := hclose x
+    have h4 := hclose y
+    have e4 := treeDist_comm (f y) (g y)
+    have h5 := h.upper x y hx hy
+    have h6 : treeDist (g x) (g y) ≤ treeDist (f x) (f y) + 2 * c := by omega
+    nlinarith [Nat.zero_le (c * treeDist x y)]
+  · -- lower bound: the images move by at most `c` each
+    have h1 := treeDist_triangle (f x) (g x) (f y)
+    have h2 := treeDist_triangle (g x) (g y) (f y)
+    have h3 := hclose x
+    have h4 := hclose y
+    have e3 := treeDist_comm (f x) (g x)
+    have h5 := h.lower x y hx hy
+    have h6 : treeDist (f x) (f y) ≤ treeDist (g x) (g y) + 2 * c := by omega
+    have h7 : K * treeDist (f x) (f y) ≤ K * (treeDist (g x) (g y) + 2 * c) :=
+      Nat.mul_le_mul_left K h6
+    nlinarith [Nat.zero_le (c * treeDist (g x) (g y)), Nat.zero_le (c * c), Nat.zero_le (K * c)]
+  · -- density: the preimage of `h` still serves
+    obtain ⟨x, hx, hd⟩ := h.dense y' hy'
+    refine ⟨x, hx, ?_⟩
+    have h1 := treeDist_triangle (g x) (f x) y'
+    have h3 := hclose x
+    omega
+
 /-- **The deterministic core of `sec:proof-main`**: if a portrait matches the
 quantised labellings `ℓ_D ∘ λ` and `ℓ_D ∘ λ'` to within one level, then the two
 associated trees admit a `(D²+3)`-quasi-isometry. The levels within one force
@@ -534,7 +608,8 @@ identifies that tree with the tree of `λ'`. -/
 theorem qi_of_matching {D : ℕ} (hD : 2 ≤ D) (σ : Word → Bool ≃ Bool) {lam lam' : Word → ℕ}
     (hlam : ∀ w, 1 ≤ lam w) (hlam' : ∀ w, 1 ≤ lam' w)
     (hmatch : ∀ w, compat pathGraph (levelMap D (lam w)) (levelMap D (lam' (autOf σ w)))) :
-    ∃ f : Word → Word, IsQIWith (D ^ 2 + 3) (InAssoc lam) (InAssoc lam') f := by
+    ∃ f : Word → Word,
+      IsQIWith (D ^ 2 + 3) (InAssoc lam) (InAssoc lam') f ∧ f [] = [] := by
   have hcomp : ∀ u, lam u ≤ D ^ 2 * lam' (autOf σ u) ∧ lam' (autOf σ u) ≤ D ^ 2 * lam u := by
     intro u
     have h := hmatch u
@@ -545,14 +620,13 @@ theorem qi_of_matching {D : ℕ} (hD : 2 ≤ D) (σ : Word → Bool ≃ Bool) {l
   have hqi : IsQIWith (D ^ 2 + 3) (InAssoc lam) (InAssoc fun w ↦ lam' (autOf σ w))
       (psi lam fun w ↦ lam' (autOf σ w)) :=
     transfer hlam (fun w ↦ hlam' _) (Nat.one_le_pow 2 D (by omega)) hcomp
-  obtain ⟨g, hg1, hg2, hg3⟩ :
-      ∃ g : Word → Word,
-        (∀ x, InAssoc (fun w ↦ lam' (autOf σ w)) x → InAssoc lam' (g x)) ∧
-        (∀ y, InAssoc lam' y → ∃ x, InAssoc (fun w ↦ lam' (autOf σ w)) x ∧ g x = y) ∧
-        (∀ x y, InAssoc (fun w ↦ lam' (autOf σ w)) x → InAssoc (fun w ↦ lam' (autOf σ w)) y →
-          treeDist (g x) (g y) = treeDist x y) :=
-    isometry_of_relabel σ (fun w ↦ hlam' _) hlam' fun _ ↦ rfl
-  exact ⟨fun x ↦ g (psi lam (fun w ↦ lam' (autOf σ w)) x), hqi.comp_isometry hg1 hg2 hg3⟩
+  obtain ⟨hg1, hg2, hg3⟩ :=
+    relabelMap_isometry σ (lam := fun w ↦ lam' (autOf σ w)) (lam' := lam') (fun w ↦ hlam' _)
+      fun _ ↦ rfl
+  refine ⟨fun x ↦ relabelMap σ (fun w ↦ lam' (autOf σ w)) lam'
+    (psi lam (fun w ↦ lam' (autOf σ w)) x), hqi.comp_isometry hg1 hg2 hg3, ?_⟩
+  show relabelMap σ (fun w ↦ lam' (autOf σ w)) lam' (psi lam (fun w ↦ lam' (autOf σ w)) []) = []
+  rw [psi_nil hlam, relabelMap_nil σ lam' fun w ↦ hlam' _]
 
 /-! ### The good event and `thm:chains` -/
 
@@ -609,7 +683,7 @@ theorem twovalue_rate (ht : 0 < t) (ht1 : t < 1) {D : ℕ} (hD : 5 ≤ D)
     (h3 : 36 * (1 - t) ^ (5 * D - 2) ≤ 1) (h4 : 16 * qBound (1 - t) D ≤ 1 / 10000) :
     twoSampleMeasure ht ht1.le
         {ω | ¬ ∃ f : Word → Word,
-          IsQIWith (D ^ 2 + 3) (InAssoc (labFst ω)) (InAssoc (labSnd ω)) f}
+          IsQIWith (D ^ 2 + 3) (InAssoc (labFst ω)) (InAssoc (labSnd ω)) f ∧ f [] = []}
       ≤ ENNReal.ofReal (256 * qBound (1 - t) D) := by
   have hD2 : 2 ≤ D := by omega
   have hqb : (0 : ℝ) ≤ qBound (1 - t) D := qBound_nonneg _ _
@@ -625,7 +699,7 @@ theorem twovalue_rate (ht : 0 < t) (ht1 : t < 1) {D : ℕ} (hD : 5 ≤ D)
           ENNReal.sub_sub_cancel ENNReal.one_ne_top hc1
   have hbad := twoSampleMeasure_not_chains ht ht1.le
   have hsub : {ω : (Word → Bool) × (Word → Bool) | ¬ ∃ f : Word → Word,
-        IsQIWith (D ^ 2 + 3) (InAssoc (labFst ω)) (InAssoc (labSnd ω)) f}
+        IsQIWith (D ^ 2 + 3) (InAssoc (labFst ω)) (InAssoc (labSnd ω)) f ∧ f [] = []}
       ⊆ (matchEvent D)ᶜ
         ∪ {ω : (Word → Bool) × (Word → Bool) | ¬ (Chains ω.1 ∧ Chains ω.2)} := by
     intro ω hω
@@ -635,7 +709,7 @@ theorem twovalue_rate (ht : 0 < t) (ht1 : t < 1) {D : ℕ} (hD : 5 ≤ D)
       exact qi_of_matching hD2 σ (one_le_labAux hch.1) (one_le_labAux hch.2) hσ
     · exact Or.inl hM
   calc twoSampleMeasure ht ht1.le {ω | ¬ ∃ f : Word → Word,
-          IsQIWith (D ^ 2 + 3) (InAssoc (labFst ω)) (InAssoc (labSnd ω)) f}
+          IsQIWith (D ^ 2 + 3) (InAssoc (labFst ω)) (InAssoc (labSnd ω)) f ∧ f [] = []}
       ≤ twoSampleMeasure ht ht1.le ((matchEvent D)ᶜ
           ∪ {ω : (Word → Bool) × (Word → Bool) | ¬ (Chains ω.1 ∧ Chains ω.2)}) :=
         measure_mono hsub
@@ -657,13 +731,14 @@ theorem twovalue_ae (ht : 0 < t) (ht1 : t < 1) :
   have hsub : {ω : (Word → Bool) × (Word → Bool) | ¬ ∃ (K : ℕ) (f : Word → Word),
         IsQIWith K (InAssoc (labFst ω)) (InAssoc (labSnd ω)) f}
       ⊆ {ω : (Word → Bool) × (Word → Bool) | ¬ ∃ f : Word → Word,
-        IsQIWith (D ^ 2 + 3) (InAssoc (labFst ω)) (InAssoc (labSnd ω)) f} := by
-    rintro ω hω ⟨f, hf⟩
+        IsQIWith (D ^ 2 + 3) (InAssoc (labFst ω)) (InAssoc (labSnd ω)) f ∧ f [] = []} := by
+    rintro ω hω ⟨f, hf, -⟩
     exact hω ⟨D ^ 2 + 3, f, hf⟩
   calc twoSampleMeasure ht ht1.le {ω | ¬ ∃ (K : ℕ) (f : Word → Word),
           IsQIWith K (InAssoc (labFst ω)) (InAssoc (labSnd ω)) f}
       ≤ twoSampleMeasure ht ht1.le {ω | ¬ ∃ f : Word → Word,
-          IsQIWith (D ^ 2 + 3) (InAssoc (labFst ω)) (InAssoc (labSnd ω)) f} := measure_mono hsub
+          IsQIWith (D ^ 2 + 3) (InAssoc (labFst ω)) (InAssoc (labSnd ω)) f ∧ f [] = []} :=
+        measure_mono hsub
     _ ≤ ENNReal.ofReal (256 * qBound (1 - t) D) := twovalue_rate ht ht1 hD h1 h2 h3 h4
     _ ≤ (ε : ℝ≥0∞) := by
         rw [← ENNReal.ofReal_coe_nnreal]
@@ -680,12 +755,12 @@ theorem twovalue_rate_tree (ht : 0 < t) (ht1 : t < 1) {D : ℕ} (hD : 5 ≤ D)
     (h1 : (1 - t) ^ (D - 1) ≤ 1 / 10) (h2 : (1 - t) ^ (D ^ 2 - D) ≤ 1 / 2)
     (h3 : 36 * (1 - t) ^ (5 * D - 2) ≤ 1) (h4 : 16 * qBound (1 - t) D ≤ 1 / 10000) :
     twoSampleMeasure ht ht1.le
-        {ω | ¬ ∃ f : Word → Word, IsQIWith (D ^ 2 + 3) (InTree ω.1) (InTree ω.2) f}
+        {ω | ¬ ∃ f : Word → Word, IsQIWith (D ^ 2 + 3) (InTree ω.1) (InTree ω.2) f ∧ f [] = []}
       ≤ ENNReal.ofReal (256 * qBound (1 - t) D) := by
   have hsub : {ω : (Word → Bool) × (Word → Bool) | ¬ ∃ f : Word → Word,
-        IsQIWith (D ^ 2 + 3) (InTree ω.1) (InTree ω.2) f}
+        IsQIWith (D ^ 2 + 3) (InTree ω.1) (InTree ω.2) f ∧ f [] = []}
       ⊆ {ω : (Word → Bool) × (Word → Bool) | ¬ ∃ f : Word → Word,
-          IsQIWith (D ^ 2 + 3) (InAssoc (labFst ω)) (InAssoc (labSnd ω)) f}
+          IsQIWith (D ^ 2 + 3) (InAssoc (labFst ω)) (InAssoc (labSnd ω)) f ∧ f [] = []}
         ∪ {ω : (Word → Bool) × (Word → Bool) | ¬ (Chains ω.1 ∧ Chains ω.2)} := by
     intro ω hω
     by_cases hch : Chains ω.1 ∧ Chains ω.2
@@ -693,12 +768,12 @@ theorem twovalue_rate_tree (ht : 0 < t) (ht1 : t < 1) {D : ℕ} (hD : 5 ≤ D)
       rwa [inTree_eq_inAssoc hch.1, inTree_eq_inAssoc hch.2]
     · exact Or.inr hch
   calc twoSampleMeasure ht ht1.le
-        {ω | ¬ ∃ f : Word → Word, IsQIWith (D ^ 2 + 3) (InTree ω.1) (InTree ω.2) f}
+        {ω | ¬ ∃ f : Word → Word, IsQIWith (D ^ 2 + 3) (InTree ω.1) (InTree ω.2) f ∧ f [] = []}
       ≤ twoSampleMeasure ht ht1.le ({ω | ¬ ∃ f : Word → Word,
-            IsQIWith (D ^ 2 + 3) (InAssoc (labFst ω)) (InAssoc (labSnd ω)) f}
+            IsQIWith (D ^ 2 + 3) (InAssoc (labFst ω)) (InAssoc (labSnd ω)) f ∧ f [] = []}
           ∪ {ω | ¬ (Chains ω.1 ∧ Chains ω.2)}) := measure_mono hsub
     _ ≤ twoSampleMeasure ht ht1.le {ω | ¬ ∃ f : Word → Word,
-            IsQIWith (D ^ 2 + 3) (InAssoc (labFst ω)) (InAssoc (labSnd ω)) f}
+            IsQIWith (D ^ 2 + 3) (InAssoc (labFst ω)) (InAssoc (labSnd ω)) f ∧ f [] = []}
         + twoSampleMeasure ht ht1.le {ω | ¬ (Chains ω.1 ∧ Chains ω.2)} := measure_union_le _ _
     _ ≤ ENNReal.ofReal (256 * qBound (1 - t) D) := by
         rw [twoSampleMeasure_not_chains ht ht1.le, add_zero]
@@ -712,7 +787,8 @@ conditions `eq:d0-conditions` holding at every scale past `D₀` by
 theorem exists_twovalue_rate_tree (ht : 0 < t) (ht1 : t < 1) :
     ∃ D₀ : ℕ, ∀ D : ℕ, D₀ ≤ D →
       twoSampleMeasure ht ht1.le
-          {ω | ¬ ∃ f : Word → Word, IsQIWith (D ^ 2 + 3) (InTree ω.1) (InTree ω.2) f}
+          {ω | ¬ ∃ f : Word → Word,
+            IsQIWith (D ^ 2 + 3) (InTree ω.1) (InTree ω.2) f ∧ f [] = []}
         ≤ ENNReal.ofReal (256 * qBound (1 - t) D) := by
   obtain ⟨D₀, hD₀⟩ := forall_scale (by linarith : (0:ℝ) < 1 - t)
     (by linarith : (1:ℝ) - t < 1)
@@ -726,20 +802,27 @@ then almost surely the two sampled Galton-Watson trees are quasi-isometric, for
 some constant. -/
 theorem twovalue_ae_tree (ht : 0 < t) (ht1 : t < 1) :
     twoSampleMeasure ht ht1.le
-        {ω | ¬ ∃ (K : ℕ) (f : Word → Word), IsQIWith K (InTree ω.1) (InTree ω.2) f} = 0 := by
+        {ω | ¬ ∃ (K : ℕ) (f : Word → Word),
+          IsQIWith K (InTree ω.1) (InTree ω.2) f ∧ f [] = []} = 0 := by
   have hsub : {ω : (Word → Bool) × (Word → Bool) | ¬ ∃ (K : ℕ) (f : Word → Word),
-        IsQIWith K (InTree ω.1) (InTree ω.2) f}
+        IsQIWith K (InTree ω.1) (InTree ω.2) f ∧ f [] = []}
       ⊆ {ω : (Word → Bool) × (Word → Bool) | ¬ ∃ (K : ℕ) (f : Word → Word),
           IsQIWith K (InAssoc (labFst ω)) (InAssoc (labSnd ω)) f}
         ∪ {ω : (Word → Bool) × (Word → Bool) | ¬ (Chains ω.1 ∧ Chains ω.2)} := by
     intro ω hω
     by_cases hch : Chains ω.1 ∧ Chains ω.2
     · refine Or.inl fun hcon ↦ hω ?_
-      rwa [inTree_eq_inAssoc hch.1, inTree_eq_inAssoc hch.2]
+      obtain ⟨K, f, hf⟩ := hcon
+      rw [inTree_eq_inAssoc hch.1, inTree_eq_inAssoc hch.2]
+      refine hf.exists_root_fixing ?_
+      show InAssoc (labAux ω.2) []
+      rw [← inTree_eq_inAssoc hch.2]
+      exact InTree.root
     · exact Or.inr hch
   refine le_antisymm ?_ zero_le
   calc twoSampleMeasure ht ht1.le
-        {ω | ¬ ∃ (K : ℕ) (f : Word → Word), IsQIWith K (InTree ω.1) (InTree ω.2) f}
+        {ω | ¬ ∃ (K : ℕ) (f : Word → Word),
+          IsQIWith K (InTree ω.1) (InTree ω.2) f ∧ f [] = []}
       ≤ twoSampleMeasure ht ht1.le ({ω | ¬ ∃ (K : ℕ) (f : Word → Word),
             IsQIWith K (InAssoc (labFst ω)) (InAssoc (labSnd ω)) f}
           ∪ {ω | ¬ (Chains ω.1 ∧ Chains ω.2)}) := measure_mono hsub
@@ -798,7 +881,8 @@ lemma twovalue_ae_tree_const {t : ℝ} (ht0 : 0 ≤ t) (ht1 : t ≤ 1) (b : Bool
     (hb : t = if b then 1 else 0) :
     ((BranchingProcess.bernoulliField (ι := Word) ht0 ht1).prod
         (BranchingProcess.bernoulliField ht0 ht1))
-      {ω | ¬ ∃ (K : ℕ) (f : Word → Word), IsQIWith K (InTree ω.1) (InTree ω.2) f} = 0 := by
+      {ω | ¬ ∃ (K : ℕ) (f : Word → Word),
+        IsQIWith K (InTree ω.1) (InTree ω.2) f ∧ f [] = []} = 0 := by
   have hae := ae_iff.mp (bernoulliField_ae_const ht0 ht1 b hb)
   have hnull : ((BranchingProcess.bernoulliField (ι := Word) ht0 ht1).prod
       (BranchingProcess.bernoulliField ht0 ht1))
@@ -811,7 +895,7 @@ lemma twovalue_ae_tree_const {t : ℝ} (ht0 : 0 ≤ t) (ht1 : t ≤ 1) (b : Bool
   by_cases h1 : ∀ v : Word, ω.1 v = b
   · by_cases h2 : ∀ v : Word, ω.2 v = b
     · exfalso
-      refine hω ⟨1, id, ?_⟩
+      refine hω ⟨1, id, ?_, rfl⟩
       have he : InTree ω.1 = InTree ω.2 := by
         rw [funext h1, funext h2]
       rw [he]
@@ -827,7 +911,8 @@ tree, and in the interior the statement is `twovalue_ae_tree`. -/
 theorem twovalue_ae_tree_family {t : ℝ} (ht0 : 0 ≤ t) (ht1 : t ≤ 1) :
     ((BranchingProcess.bernoulliField (ι := Word) ht0 ht1).prod
         (BranchingProcess.bernoulliField ht0 ht1))
-      {ω | ¬ ∃ (K : ℕ) (f : Word → Word), IsQIWith K (InTree ω.1) (InTree ω.2) f} = 0 := by
+      {ω | ¬ ∃ (K : ℕ) (f : Word → Word),
+        IsQIWith K (InTree ω.1) (InTree ω.2) f ∧ f [] = []} = 0 := by
   rcases eq_or_lt_of_le ht0 with h0 | h0
   · exact twovalue_ae_tree_const ht0 ht1 false (by rw [← h0]; rfl)
   rcases eq_or_lt_of_le ht1 with h1 | h1

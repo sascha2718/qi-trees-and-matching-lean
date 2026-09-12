@@ -273,7 +273,7 @@ lemma decs_shapeAt_nil (c : Amb → ℕ) :
       = List.ofFn fun i : Fin (splitDepth c []) ↦ decAt c (neckRay c [] i) := by
   rw [shapeAt_decs, entryV_nil]
 
-/-- **The recursion of the shape at the root**: the shape of a hairy sample is its first
+/-- **The recursion of the shape at the root**: the shape of a bushy sample is its first
 decoration followed by the shape of the surviving subtree. -/
 lemma decs_shapeAt_nil_cons {c : Amb → ℕ} (hc : IsHairySample c) (o : Option Tri)
     (l : List (Option Tri)) :

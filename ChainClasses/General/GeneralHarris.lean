@@ -6,7 +6,7 @@ import Mathlib.Analysis.Calculus.Deriv.Mul
 import ChainClasses.Scalar.Harris
 
 /-!
-`sec:general-harris` of `matching_classes_general.tex`: the arithmetic of
+`sec:general-classes` of `matching_classes_general.tex`: the arithmetic of
 `thm:harris-general`, the Harris-Sevastyanov transform at general bounded
 support.
 
@@ -200,7 +200,7 @@ theorem tilde_sum (J : ℕ) (θ : ℕ → ℝ) {q : ℝ}
 noncomputable def reducedLaw (J : ℕ) (θ : ℕ → ℝ) (q : ℝ) (k : ℕ) : ℝ :=
   tilde J θ q k / (1 - tilde J θ q 1)
 
-/-- **The reduced law has full support in the hairy regime**: `ν̃_k > 0` for
+/-- **The reduced law has full support in the bushy regime**: `ν̃_k > 0` for
 every `2 ≤ k ≤ J`, because killing is available at every vertex.  This is what
 makes the branching semigroup trivial there
 (`branching_semigroup_eq_top`), and with it the cross-law obstruction that the

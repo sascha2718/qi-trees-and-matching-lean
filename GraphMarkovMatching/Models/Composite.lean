@@ -61,7 +61,7 @@ noncomputable def freshC (μ : PMF V) (ν : PMF ℕ) : PMF (CState V) :=
   exact CtrC.noConfusion (congrArg Prod.snd h)
 
 /-- The marker step of the pair `(a, b)` at stage `i`
-(`def:composite-kernel`, rules (ii) at `i = 0` and (iii) at
+(`sec:composite-process`, rules (ii) at `i = 0` and (iii) at
 `i ≥ 1`). -/
 noncomputable def markK (μ : PMF V) (ν : PMF ℕ) (v0 : V) (a b i : ℕ) :
     PMF (CState V × CState V) :=
@@ -89,7 +89,7 @@ lemma markK_of_ge {μ : PMF V} {ν : PMF ℕ} {v0 : V} {a b i : ℕ}
   rw [markK, if_neg (by omega), if_neg (by omega)]
 
 /-- The composite kernel of a side with exceptional data `exc`
-(`def:composite-kernel`). -/
+(`sec:composite-process`). -/
 noncomputable def compK (exc : ℕ → Option (ℕ × ℕ)) (μ : PMF V)
     (ν : PMF ℕ) (v0 : V) : CState V → PMF (CState V × CState V)
   | (_, CtrC.mark a b i) => markK μ ν v0 a b i

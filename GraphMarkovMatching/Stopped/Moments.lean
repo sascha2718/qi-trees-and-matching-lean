@@ -6,7 +6,7 @@ The moment estimates of `markov_matching_new_proof.tex`, `sec:restricted-potenti
 * `wZero_le_moment`, `wUnion_le` (`eq:zero-moment`, `eq:zero-union-moment`): the
   weighted zero integrals, the union bound applied to the constant part only;
 * `WresD_childMix_le` (`eq:selected-inverse-mixture`): the selected inverse mixture,
-  with total coefficient at most the budget;
+  with total coefficient at most the bound `B`;
 * `deg_ne_zero_of_delta_zero` (`sec:positive-degrees`): when `δ = 0` every charged
   realisation of any type has positive degree against every type;
 * `z_eq_zero_of_delta_zero`, `wZero_eq_zero_of_delta_zero`: the zero events are empty

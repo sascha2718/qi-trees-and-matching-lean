@@ -2,7 +2,7 @@ import Mathlib.Tactic
 import ChainClasses.General.GeneralShape
 
 /-!
-`sec:general-transfer` of `matching_classes_general.tex`,
+`sec:general-relabel` of `matching_classes_general.tex`,
 `it:general-dilution`: the greedy cut of `thm:dilution` at general arity.
 
 The cut is the recursion of `Dilution.lean` run on rose trees: walking up from

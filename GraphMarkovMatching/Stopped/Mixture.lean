@@ -385,7 +385,7 @@ lemma split_integral_le {α : ℝ} (hα : 1 ≤ α) {g : ℕ} (Θ : Phase M g) {
     _ = 4 * (1 + ENNReal.ofReal α * Mb) * E := by ring
 
 /-- The zero indicator of a target component pair degree is at most the sum of the two
-straight zero indicators (`thm:hall`, product form). -/
+straight zero indicators (`sec:averaging`, product form). -/
 lemma ite_pair_zero_le (j : I × I) (h : ℕ) (x : FullLab (I × V) h × FullLab (I × V) h) :
     (if rE (prodPMF (M.rho j.1 h) (M.rho j.2 h)) (SquareRel (M.sim h)) x = 0 then (1 : ℝ≥0∞)
         else 0)
@@ -405,7 +405,7 @@ lemma ite_pair_zero_le (j : I × I) (h : ℕ) (x : FullLab (I × V) h × FullLab
 potential of a charged source child pair against the target child-pair mixture is at most
 the fixed-pair four-law bound plus the mixture error `(α+1) B · 4 (1 + αM) E`. -/
 lemma pair_childMix_le {α : ℝ} (hα : 1 ≤ α) {g : ℕ} (Θ : Phase M g)
-    (Sel : Selection M) {B : ℝ≥0∞} (hB : ∀ t, Sel.budget α t ≤ B) {h : ℕ}
+    (Sel : Selection M) {B : ℝ≥0∞} (hB : ∀ t, Sel.inverseSum α t ≤ B) {h : ℕ}
     {a b γ Mb Zm E : ℝ≥0∞} (hfour : M.FourLawAt Θ α h a b γ Mb Zm E)
     (hM : ∀ s u, Θ.θ s = Θ.θ u → M.P α s u h ≤ Mb)
     (hz : ∀ s t, Θ.θ s = Θ.θ t → M.z s t h ≤ Zm)
@@ -556,9 +556,9 @@ lemma pair_childMix_le {α : ℝ} (hα : 1 ≤ α) {g : ℕ} (Θ : Phase M g)
               · rw [hj, zero_mul, zero_mul]
               · exact mul_le_mul' le_rfl (Finset.sum_le_sum fun j' hj' =>
                   mul_le_mul' le_rfl (hsplit j hj j' hj'))
-          _ = ENNReal.ofReal (α + 1) * (∑' j, M.π t j) * Sel.budget α t
+          _ = ENNReal.ofReal (α + 1) * (∑' j, M.π t j) * Sel.inverseSum α t
               * (4 * (1 + ENNReal.ofReal α * Mb) * E) := by
-              rw [← Finset.sum_mul, ENNReal.tsum_mul_right, Selection.budget]
+              rw [← Finset.sum_mul, ENNReal.tsum_mul_right, Selection.inverseSum]
               ring
           _ ≤ ENNReal.ofReal (α + 1) * 1 * B * (4 * (1 + ENNReal.ofReal α * Mb) * E) :=
               mul_le_mul' (mul_le_mul' (mul_le_mul' le_rfl (M.π t).tsum_coe.le) (hB t)) le_rfl
@@ -570,7 +570,7 @@ of the source child-pair mixture of `s` against the target child-pair mixture of
 at most `Q(M) = a M + b M² + (γ + 4αM) Z + C (1 + αM) E` with `C = 4 + 8(α+1)B`. -/
 theorem childPair_le_Qfun [Fintype I] (hc : M.IsCompat) (hb0 : rE M.μ M.R M.zero ≠ 0)
     {α : ℝ} (hα : 1 ≤ α) {g : ℕ} (Θ : Phase M g) (Sel : Selection M) {B : ℝ≥0∞}
-    (hB : ∀ t, Sel.budget α t ≤ B) {h : ℕ} {a b γ Mb Zm E : ℝ≥0∞}
+    (hB : ∀ t, Sel.inverseSum α t ≤ B) {h : ℕ} {a b γ Mb Zm E : ℝ≥0∞}
     (hfour : M.FourLawAt Θ α h a b γ Mb Zm E)
     (hM : ∀ s u, Θ.θ s = Θ.θ u → M.P α s u h ≤ Mb)
     (hz : ∀ s t, Θ.θ s = Θ.θ t → M.z s t h ≤ Zm)

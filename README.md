@@ -43,10 +43,13 @@ The main declarations below are in the `ChainClasses` namespace.
 | Different-class conclusion at general bounded support | `different_class_ae` |
 | Classification expanded for two offspring laws | `offspring_classification_ae_iff` |
 | General separation from the ray | `classification_not_ray_ae` |
+| Complete classification including the finite class, root-preserving | `full_classification_rooted_ae_iff` |
 
-These general declarations concern Galton--Watson laws conditioned on an infinite realisation.
-They classify the four infinite classes (R), (F), `(C_Λ)`, and (B). The elementary finite class
-`(Fin)` in the paper lies outside the conditioned-infinite Lean endpoint.
+The conditioned declarations concern Galton--Watson laws conditioned on an infinite realisation
+and classify the four infinite classes (R), (F), `(C_Λ)`, and (B). The last declaration is stated
+over the unconditioned laws and includes the finite class `(Fin)`: two independent trees are
+almost surely quasi-isometric exactly when both are finite, or both are infinite with laws in
+the same infinite class.
 
 The façade is split into `ChainClasses.Classification.Simple` and
 `ChainClasses.Classification.Complete`. The proof implementation remains in
@@ -74,11 +77,14 @@ and run the independent kernel audit with
 ./comparator-audit.sh
 ```
 
-The ten audited endpoints are listed in `comparator-config.json`: four general Markov
+The twelve audited endpoints are listed in `comparator-config.json`: four general Markov
 statements (finite types and zero-compatible types, each at finite and infinite height),
-three i.i.d. matching statements (leaf, full and infinite), the complete conditioned-infinite
-classification, and the qualitative and quantitative two-value statements. The infinite
-matching statements assert existence of an actual root-fixing graph automorphism. The challenge
+three i.i.d. matching statements (leaf, full and infinite), the complete classification in
+three statements (bounded connected graphs are quasi-isometric to a point, laws with mean at most
+one die out almost surely, and the classification itself over the unconditioned laws with the
+finite class included), and the qualitative and quantitative two-value statements. The infinite
+matching statements assert existence of an actual root-fixing graph automorphism, and the
+classification and two-value statements assert root-preserving quasi-isometries. The challenge
 imports Mathlib alone and contains only statement vocabulary and theorem holes; Solution and
 the libraries contain the proofs. The comparator permits only `propext`, `Classical.choice`
 and `Quot.sound`, with no literature axioms.

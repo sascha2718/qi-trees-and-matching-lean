@@ -10,7 +10,7 @@ glued transfer of `it:general-glued` runs over is the `𝔹`-assembly, the shape
 skeleton vertex placed at its cascade root and a one-vertex shape at every forced slot.
 Four deterministic facts carry the proof from there to a quasi-isometry of the samples.
 
-A hairy sample at general arity is isometric to the assembly of its own shapes over its
+A bushy sample at general arity is isometric to the assembly of its own shapes over its
 reduced skeleton, by the address translation of `ShapeDecomposition` redone at general
 arity: a word of the assembly is read letter by letter, the letter read at a vertex of the
 sample being chosen by the letter map of that vertex, which sends the bush indices of a
@@ -67,10 +67,10 @@ quasi-isometry of the sample graphs at the constant `216 L L'² K²`.
   `transSampleN_gCopyAddr`, `transSampleN_bush`, `transSampleN_code_spec`: **the
   dictionary**, the children of a vertex of the skeleton assembly and of its translate.
 * `gAssembly_isometric_sample`: **`thm:shape-iid` at general arity, the isometry**, the
-  premise of **`it:general-glued`**: a hairy sample is isometric to the assembly of its
+  premise of **`it:general-glued`**: a bushy sample is isometric to the assembly of its
   shapes over its reduced skeleton.
 * `sample_qi_of_bShape_matching`: **`thm:hairy-general`, the deterministic core**: two
-  hairy samples with encoded skeletons matched by an automorphism of `𝔹` at
+  bushy samples with encoded skeletons matched by an automorphism of `𝔹` at
   comparability `K` are `⌈216 L L'² K²⌉`-quasi-isometric as graphs.
 -/
 
@@ -82,7 +82,7 @@ variable {N : ℕ}
 
 /-! ### `thm:hairy-general`, the deterministic core -/
 
-/-- **`thm:hairy-general`, the deterministic core.**  Two hairy samples, over alphabets
+/-- **`thm:hairy-general`, the deterministic core.**  Two bushy samples, over alphabets
 `N` and `N'`, whose reduced skeletons are encoded into `𝔹` at depths `L` and `L'`, with an
 automorphism `π` of `𝔹` carrying one encoded skeleton onto the other and matching the
 shape labels at comparability `K`, are `⌈216 L L'² K²⌉`-quasi-isometric as graphs: each

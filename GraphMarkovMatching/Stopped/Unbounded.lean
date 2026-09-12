@@ -1,7 +1,6 @@
 /-
-The finite-height truncation estimate of `markov_matching_new_proof.tex`
-(`sec:unbounded-supports`, "A finite-height truncation estimate", `eq:truncation-bound`):
-two Markov models over the same states with the same fresh types whose kernels are within
+Finite-height stability under truncation: two Markov models over the same states with the
+same fresh types whose kernels are within
 `t` in total variation at every type have level laws within `(2^{h+1} - 1) t` at height `h`,
 so the failure probability of one is at most that of the other plus the sum of the two
 initial types' errors. A presentation whose arity laws are conditioned on `k ≤ N` keeps its
@@ -11,18 +10,18 @@ is the tail mass `t_σ(N) = ν_σ{k > N}`.
 
 * `tvDist`, `tvDist_comm`, `tsum_mul_le_add_tvDist`, `tvDist_bind_le`, `tvDist_map_le`,
   `tvDist_prodPMF_le`: the one-sided total variation `∑ (p x - q x)` and its behaviour under
-  bounded test functions, mixtures, pushforwards and products (the coupling of the note);
+  bounded test functions, mixtures, pushforwards and products;
 * `Model.tvDist_rho_le_of_hered`, `Model.tvDist_rho_le`: the level laws of two models with
   kernels within `d s` at every type, `d` nonincreasing along charged transitions, are within
-  `(2^{h+1} - 1) d s` at height `h` (the `2^{h+1} - 1` addresses of the note);
-* `Model.failProb_le_add_tvDist`, `Model.failProb_le_truncated`: `eq:truncation-bound` for
-  two arbitrary models, with the two sides' errors `d s` and `d t`;
+  `(2^{h+1} - 1) d s` at height `h`;
+* `Model.failProb_le_add_tvDist`, `Model.failProb_le_truncated`: the corresponding failure
+  bound for two arbitrary models, with the two sides' errors `d s` and `d t`;
 * `labMap`, `Model.IsEmbed`, `IsEmbed.rho`, `IsEmbed.failProb`: relabelling the types of a
   model along an embedding preserves the level laws and the failure probabilities;
 * `Presentation.tail`, `Presentation.truncate`, `Presentation.truncate_tail`,
   `Presentation.toModelTrunc`, `Presentation.tvDist_kernel_truncate`,
   `Presentation.failProb_toModelTrunc_eq`, `Presentation.failProb_le_truncate`: the truncated
-  presentation `ν_σ^{(N)}` and `eq:truncation-bound` for its model.
+  presentation `ν_σ^{(N)}` and the corresponding failure bound for its model.
 
 Formulation of the two-sided bound: the kernel distance is bounded by a function `d` of the
 type which is nonincreasing along charged transitions (hereditary), and the conclusion
@@ -37,11 +36,11 @@ namespace GraphMarkovMatching.Stopped
 open GraphMarkovMatching GraphMarkovMatching.Support
 open scoped ENNReal Classical
 
-/-! ### Total variation (`sec:unbounded-supports`, the coupling) -/
+/-! ### Total variation -/
 
 /-- The one-sided total variation `∑_x (p x - q x)` with truncated subtraction; for
 probability laws it equals `∑_x (q x - p x)` (`tvDist_comm`) and is the disagreement
-probability of the optimal coupling of the note. -/
+probability of an optimal coupling. -/
 noncomputable def tvDist {X : Type} (p q : PMF X) : ℝ≥0∞ := ∑' x, (p x - q x)
 
 /-- A law is at distance zero from itself. -/
@@ -56,8 +55,7 @@ private lemma tsub_add_min {X : Type} (p q : PMF X) (x : X) :
   · rw [tsub_eq_zero_of_le hab, min_eq_left hab, zero_add]
   · rw [min_eq_right hab, tsub_add_cancel_of_le hab]
 
-/-- The one-sided total variation is symmetric for probability laws
-(`sec:unbounded-supports`). -/
+/-- The one-sided total variation is symmetric for probability laws. -/
 lemma tvDist_comm {X : Type} (p q : PMF X) : tvDist p q = tvDist q p := by
   have hmin : (∑' x, min (p x) (q x)) ≠ ⊤ :=
     ne_top_of_le_ne_top ENNReal.one_ne_top
@@ -71,7 +69,7 @@ lemma tvDist_comm {X : Type} (p q : PMF X) : tvDist p q = tvDist q p := by
   exact (ENNReal.add_left_inj hmin).mp (h1.trans h2.symm)
 
 /-- The expectation of a test function bounded by one changes by at most the total
-variation (`sec:unbounded-supports`, the union bound over the coupling). -/
+variation. -/
 lemma tsum_mul_le_add_tvDist {X : Type} (p q : PMF X) (F : X → ℝ≥0∞)
     (hF : ∀ x, F x ≤ 1) : ∑' x, p x * F x ≤ (∑' x, q x * F x) + tvDist p q := by
   rw [tvDist, ← ENNReal.tsum_add]
@@ -82,8 +80,7 @@ lemma tsum_mul_le_add_tvDist {X : Type} (p q : PMF X) (F : X → ℝ≥0∞)
     _ = q x * F x + (p x - q x) := by rw [mul_one]
 
 /-- **Total variation of mixtures**: the distance of two mixtures is at most the distance
-of the mixing laws plus the mixture of the component distances
-(`sec:unbounded-supports`: the coupled draws at the root and below). -/
+of the mixing laws plus the mixture of the component distances. -/
 lemma tvDist_bind_le {A B : Type} (w w' : PMF A) (f f' : A → PMF B) :
     tvDist (w.bind f) (w'.bind f') ≤ tvDist w w' + ∑' a, w a * tvDist (f a) (f' a) := by
   have key : ∀ b, (w.bind f) b - (w'.bind f') b
@@ -113,8 +110,7 @@ lemma tvDist_bind_le {A B : Type} (w w' : PMF A) (f f' : A → PMF B) :
         · refine tsum_congr fun a => ?_
           rw [ENNReal.tsum_mul_left, tvDist]
 
-/-- A pushforward contracts the total variation (`sec:unbounded-supports`: the profile
-placed by a coupled arity draw). -/
+/-- A pushforward contracts the total variation. -/
 lemma tvDist_map_le {A B : Type} (p q : PMF A) (g : A → B) :
     tvDist (p.map g) (q.map g) ≤ tvDist p q := by
   have h := tvDist_bind_le p q (pure ∘ g) (pure ∘ g)
@@ -122,8 +118,7 @@ lemma tvDist_map_le {A B : Type} (p q : PMF A) (g : A → B) :
   refine h.trans (le_of_eq ?_)
   rw [ENNReal.tsum_eq_zero.mpr fun a => by rw [tvDist_self, mul_zero], add_zero]
 
-/-- The total variation of two products is at most the sum of the marginal distances
-(`sec:unbounded-supports`: independent coupled draws at the two children). -/
+/-- The total variation of two products is at most the sum of the marginal distances. -/
 lemma tvDist_prodPMF_le {A B : Type} (p p' : PMF A) (q q' : PMF B) :
     tvDist (prodPMF p q) (prodPMF p' q') ≤ tvDist p p' + tvDist q q' := by
   have key : ∀ z : A × B, prodPMF p q z - prodPMF p' q' z
@@ -146,9 +141,9 @@ lemma tvDist_prodPMF_le {A B : Type} (p p' : PMF A) (q q' : PMF B) :
           tvDist, tvDist]
     _ = tvDist p p' + tvDist q q' := by rw [mul_one, one_mul]
 
-/-! ### The level laws of two models (`sec:unbounded-supports`) -/
+/-! ### The level laws of two models -/
 
-/-- The address count of the note: `2^{h+2} - 1 = 1 + 2 (2^{h+1} - 1)`. -/
+/-- The address count `2^{h+2} - 1 = 1 + 2 (2^{h+1} - 1)`. -/
 lemma two_pow_sub_one_succ (h : ℕ) :
     (2 ^ (h + 2) - 1 : ℝ≥0∞) = 1 + 2 * (2 ^ (h + 1) - 1) := by
   have h1 : (1 : ℝ≥0∞) ≤ 2 ^ (h + 1) := one_le_pow₀ (by norm_num)
@@ -174,8 +169,8 @@ lemma rootT_eq_of (M M' : Model V I) (hz : M.zero = M'.zero) (hμ : M.μ = M'.μ
   funext t
   rw [rootT, rootT, rootLaw, rootLaw, hz, hμ, hf]
 
-/-- **The level laws of two models** (`sec:unbounded-supports`, the coupling at every
-address): if the kernels are within `d s` in total variation at every type `s`, with `d`
+/-- **The level laws of two models**: if the kernels are within `d s` in total variation at
+every type `s`, with `d`
 nonincreasing along charged transitions, then the level laws at height `h` are within
 `(2^{h+1} - 1) d s`, the number of addresses through depth `h` times the disagreement
 bound at each. -/
@@ -227,8 +222,8 @@ theorem tvDist_rho_le_of_hered (M M' : Model V I) (hz : M.zero = M'.zero) (hμ :
           ring
       _ = (2 ^ (h + 1 + 1) - 1) * d s := by rw [two_pow_sub_one_succ]
 
-/-- **The level laws under a uniform kernel distance** (`sec:unbounded-supports`): kernels
-within `t` at fresh types and equal at forced types give level laws within
+/-- **The level laws under a uniform kernel distance**: kernels within `t` at fresh types
+and equal at forced types give level laws within
 `(2^{h+1} - 1) t` at height `h`. -/
 theorem tvDist_rho_le (M M' : Model V I) (hz : M.zero = M'.zero) (hμ : M.μ = M'.μ)
     (hf : M.fresh = M'.fresh) (t : ℝ≥0∞)
@@ -238,8 +233,7 @@ theorem tvDist_rho_le (M M' : Model V I) (hz : M.zero = M'.zero) (hμ : M.μ = M
     (fun s => (hπ s).trans (by split_ifs <;> simp)) (fun _ _ _ => ⟨le_rfl, le_rfl⟩)
 
 /-- The failure probability of one model is at most that of the other plus the total
-variation of the two initial level laws (`sec:unbounded-supports`, the union bound over the
-two sides). -/
+variation of the two initial level laws. -/
 theorem failProb_le_add_tvDist (M M' : Model V I) (hR : M.R = M'.R) (s t : I) (h : ℕ) :
     M.failProb s t h ≤ M'.failProb s t h
       + (tvDist (M.rho s h) (M'.rho s h) + tvDist (M.rho t h) (M'.rho t h)) := by
@@ -268,8 +262,8 @@ theorem failProb_le_add_tvDist (M M' : Model V I) (hR : M.R = M'.R) (s t : I) (h
           ENNReal.tsum_mul_right, PMF.tsum_coe, one_mul]
     _ = _ := by ring
 
-/-- **`eq:truncation-bound` for two models** (`sec:unbounded-supports`): with kernels within
-`d s` at every type `s` and `d` nonincreasing along charged transitions, the failure
+/-- **Failure under truncated kernels**: with kernels within `d s` at every type `s` and
+`d` nonincreasing along charged transitions, the failure
 probability of the first model at height `h` is at most that of the second plus
 `(2^{h+1} - 1) (d s + d t)`, the two sides' errors at the initial types. -/
 theorem failProb_le_truncated (M M' : Model V I) (hR : M.R = M'.R) (hz : M.zero = M'.zero)
@@ -282,7 +276,7 @@ theorem failProb_le_truncated (M M' : Model V I) (hR : M.R = M'.R) (hz : M.zero 
   exact add_le_add le_rfl (add_le_add (M.tvDist_rho_le_of_hered M' hz hμ hf d hd hher h s)
     (M.tvDist_rho_le_of_hered M' hz hμ hf d hd hher h t))
 
-/-- `eq:truncation-bound` with a uniform kernel distance `t`: the error is
+/-- With a uniform kernel distance `t`, the error is
 `(2^{h+1} - 1) (t + t)`. -/
 theorem failProb_le_truncated_uniform (M M' : Model V I) (hR : M.R = M'.R)
     (hz : M.zero = M'.zero) (hμ : M.μ = M'.μ) (hf : M.fresh = M'.fresh) (t : ℝ≥0∞)
@@ -293,7 +287,7 @@ theorem failProb_le_truncated_uniform (M M' : Model V I) (hR : M.R = M'.R)
 
 end Model
 
-/-! ### Relabelling the types (`sec:unbounded-supports`, the truncated live types) -/
+/-! ### Relabelling the types -/
 
 /-- The product of two pushforwards is the pushforward of the product. -/
 lemma prodPMF_map_map {A B C D : Type} (p : PMF A) (q : PMF B) (f : A → C) (g : B → D) :
@@ -433,7 +427,7 @@ end IsEmbed
 
 end Model
 
-/-! ### The truncated presentation (`sec:unbounded-supports`) -/
+/-! ### The truncated presentation -/
 
 /-- The side of a type built from a remaining tree. -/
 lemma typeOf_fst (σ : Bool) (τ : MTree) : (typeOf σ τ).1 = σ := by
@@ -451,7 +445,7 @@ namespace Presentation
 
 variable (P : Presentation)
 
-/-- The raw kernel preserves the side (`sec:types`). -/
+/-- The raw kernel preserves the side (`sec:markov-hypotheses`). -/
 lemma rawKernel_side (t : PType) (p : PType × PType) (hp : P.rawKernel t p ≠ 0) :
     p.1.1 = t.1 ∧ p.2.1 = t.1 := by
   obtain ⟨σ, oτ⟩ := t
@@ -463,12 +457,12 @@ lemma rawKernel_side (t : PType) (p : PType × PType) (hp : P.rawKernel t p ≠ 
     obtain rfl := (P.rawKernel_forced_ne_zero_iff σ τ p).mp hp
     exact rootPair_fst σ τ
 
-/-- The live kernel preserves the side (`sec:types`). -/
+/-- The live kernel preserves the side (`sec:markov-hypotheses`). -/
 lemma kernelL_side (t : P.Live) (j : P.Live × P.Live) (hj : P.kernelL t j ≠ 0) :
     j.1.1.1 = t.1.1 ∧ j.2.1.1 = t.1.1 :=
   P.rawKernel_side t.1 (j.1.1, j.2.1) ((P.kernelL_ne_zero_iff t j).mp hj)
 
-/-- The tail mass `t_σ(N) = ν_σ{k > N}` (`sec:unbounded-supports`). -/
+/-- The tail mass `t_σ(N) = ν_σ{k > N}`. -/
 noncomputable def tail (σ : Bool) (N : ℕ) : ℝ≥0∞ := ∑' k, if N < k then P.ν σ k else 0
 
 /-- The event `k ≤ N` is charged once `N` bounds the core arities. -/
@@ -478,13 +472,12 @@ lemma exists_le_charged (N : ℕ) (hN : ∀ a ∈ P.S, a ≤ N) (σ : Bool) :
   exact ⟨a, hN a ha,
     (PMF.mem_support_iff _ _).mpr ((P.mem_supp σ a).mpr (P.S_subset_supp σ ha))⟩
 
-/-- The truncated arity law `ν_σ^{(N)}`: `ν_σ` conditioned on `k ≤ N`
-(`sec:unbounded-supports`). -/
+/-- The truncated arity law `ν_σ^{(N)}`: `ν_σ` conditioned on `k ≤ N`. -/
 noncomputable def nuTrunc (N : ℕ) (hN : ∀ a ∈ P.S, a ≤ N) (σ : Bool) : PMF ℕ :=
   (P.ν σ).filter {k | k ≤ N} (P.exists_le_charged N hN σ)
 
-/-- **The truncated presentation** (`sec:unbounded-supports`): the arity laws conditioned
-on `k ≤ N`, for `N` at least every core arity, with the same core, core profiles and
+/-- **The truncated presentation**: the arity laws conditioned on `k ≤ N`, for `N` at least
+every core arity, with the same core, core profiles and
 composite profiles; its supports still contain the core, hence generate the common
 semigroup. -/
 noncomputable def truncate (N : ℕ) (hN : ∀ a ∈ P.S, a ≤ N) : Presentation where
@@ -525,7 +518,7 @@ variable (N : ℕ) (hN : ∀ a ∈ P.S, a ≤ N)
 /-- The arity law of the truncation is the conditioned law. -/
 @[simp] lemma truncate_nu (σ : Bool) : (P.truncate N hN).ν σ = P.nuTrunc N hN σ := rfl
 
-/-- **The kernel distance of the truncation is the tail mass** (`sec:unbounded-supports`):
+/-- **The kernel distance of the truncation is the tail mass**:
 `∑_k (ν_σ(k) - ν_σ^{(N)}(k)) = t_σ(N)`, since the conditioned law dominates `ν_σ` on
 `k ≤ N` and vanishes on `k > N`. -/
 theorem truncate_tail (σ : Bool) : tvDist (P.ν σ) ((P.truncate N hN).ν σ) = P.tail σ N := by
@@ -571,7 +564,7 @@ noncomputable def toModelTrunc : Model V P.Live where
   π := fun t => ((P.truncate N hN).rawKernel t.1).map fun p => (P.toLive p.1, P.toLive p.2)
 
 /-- The kernels of the presentation and of its truncation are within the tail mass of the
-type's side; at forced types they agree (`sec:unbounded-supports`). -/
+type's side; at forced types they agree. -/
 theorem tvDist_kernel_truncate (t : P.Live) :
     tvDist ((P.toModel R zero μ).π t) ((P.toModelTrunc N hN R zero μ).π t)
       ≤ P.tail t.1.1 N := by
@@ -625,8 +618,8 @@ theorem failProb_toModelTrunc_eq (σ σ' : Bool) (h : ℕ) :
   exact (P.isEmbed_truncate N hN R zero μ).failProb ((P.truncate N hN).freshL σ)
     ((P.truncate N hN).freshL σ') h
 
-/-- **`eq:truncation-bound`** (`sec:unbounded-supports`): if `M_N` bounds the failure
-probability of the truncated presentation between the fresh types of sides `σ`, `σ'` at
+/-- **Failure under presentation truncation**: if `M_N` bounds the failure probability of
+the truncated presentation between the fresh types of sides `σ`, `σ'` at
 height `h`, then the failure probability of the presentation itself is at most
 `M_N + (2^{h+1} - 1) (t_σ(N) + t_{σ'}(N))`. -/
 theorem failProb_le_truncate (h : ℕ) (σ σ' : Bool) (MN : ℝ≥0∞)

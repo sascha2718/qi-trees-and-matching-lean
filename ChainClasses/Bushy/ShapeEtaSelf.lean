@@ -4,7 +4,7 @@ import ChainClasses.Bushy.ShapeCouplingSelf
 import ChainClasses.Shape.Binarise
 
 /-!
-`sec:shape-eta` and `sec:hairy-universality` of `gw_classes_simple.tex`: the potential
+`sec:shape-eta` and `sec:hairy` of `gw_classes_simple.tex`: the potential
 bound `thm:shape-eta` at the label law of `thm:shape-coupling` for one law, and
 `thm:hairy` over it with no hypothesis left.
 

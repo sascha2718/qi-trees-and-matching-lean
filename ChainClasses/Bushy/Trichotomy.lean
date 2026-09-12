@@ -922,7 +922,7 @@ theorem binary_chain_ae {t : ℝ} (ht : 0 < t) (ht1 : t < 1) :
   exact hω.1 (QuasiIsometric.symm
     (wordGraph_connected (prefixClosed_inTree _) ⟨⟨[], InTree.root⟩⟩) hqi)
 
-/-- **Class (B) against class `(C_ℕ₀)`**: the hairy sample has hairs of unbounded
+/-- **Class (B) against class `(C_ℕ₀)`**: the bushy sample has hairs of unbounded
 depth and the chain sample is a union of lines. -/
 theorem hairy_chain_ae (θ : Offspring 2) (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction)
     (h2 : 0 < θ 2) {t : ℝ} (ht : 0 < t) (ht1 : t < 1) :
@@ -1027,7 +1027,7 @@ theorem ray_chain_ae {t : ℝ} (ht : 0 < t) (ht1 : t < 1) :
   filter_upwards [ae_of_snd (μ := rayLaw.law) (not_ray_chain ht ht1)] with ω hω h
   exact hω (quasiIsometric_rayGraph_of_pairQI' h)
 
-/-! ### Three rays in the hairy sample
+/-! ### Three rays in the bushy sample
 
 `thm:regime-obstructions` (`it:obstr-rays`) in class (B). On the event
 `IsHairySample` the chain of the root ends at a split `u`, and the chain of the

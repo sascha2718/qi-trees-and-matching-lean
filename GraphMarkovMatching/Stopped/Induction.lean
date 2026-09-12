@@ -29,17 +29,17 @@ namespace Model
 
 variable {V I : Type} (M : Model V I)
 
-/-! ### The bridge to the four-law contraction (`sec:contraction-extension`) -/
+/-! ### The bridge to the four-law contraction (`sec:local-estimate`) -/
 
 /-- The abstract weighted zero integral of the process laws is the weighted zero integral
-against the singleton target (`sec:one-weight`). -/
+against the singleton target (`sec:weighted-zero`). -/
 lemma wZeroD_eq_wZero (α : ℝ) (s t t' : I) (h : ℕ) :
     wZeroD α (M.rho s h) (M.rho t h) (M.rho t' h) (M.sim h) = M.wZero α s {t} t' h := by
   rw [wZeroD, wZero]
   refine tsum_congr fun x => ?_
   simp [ZeroEv, deg, W]
 
-/-- Matching at height `h` is symmetric for a compatible model (`sec:statement`). -/
+/-- Matching at height `h` is symmetric for a compatible model (`sec:markov-proof`). -/
 lemma sim_symm (hc : M.IsCompat) (h : ℕ) : ∀ a b, M.sim h a b → M.sim h b a :=
   fullSim_symm M.srel (M.srel_symm hc) h
 
@@ -102,7 +102,7 @@ bound `E(M)`, every equal-phase restricted potential at every height is at most 
 theorem P_le_finite [Fintype I] (hc : M.IsCompat) (hb0 : rE M.μ M.R M.zero ≠ 0)
     (hFP : M.FreshPositive) {α : ℝ} (hα : 1 ≤ α) {g : ℕ} (Θ : Phase M g) {T : ℕ}
     (hT : ∀ i, Θ.count i ≤ T) {H : ℕ} (hCR : M.CommonReturns Θ H) (Sel : Selection M)
-    {B : ℝ≥0∞} (hB : ∀ t, Sel.budget α t ≤ B) (a b γ : ℝ≥0∞)
+    {B : ℝ≥0∞} (hB : ∀ t, Sel.inverseSum α t ≤ B) (a b γ : ℝ≥0∞)
     (hfour : ∀ h Mb Zm E, M.FourLawAt Θ α h a b γ Mb Zm E) {Z : ℝ≥0∞}
     (hZ : SHe H * (M.delta + (T : ℝ≥0∞) ^ 2 * Z ^ 2) ≤ Z) {Mb : ℝ≥0∞}
     (hbar : M.zeta α + M.DmuC α * Qfun α a b γ (Cmix α B) Z
@@ -131,7 +131,7 @@ theorem P_le_finite [Fintype I] (hc : M.IsCompat) (hb0 : rE M.μ M.R M.zero ≠ 
 theorem failProb_le_finite [Fintype I] (hc : M.IsCompat) (hb0 : rE M.μ M.R M.zero ≠ 0)
     (hFP : M.FreshPositive) {α : ℝ} (hα : 1 ≤ α) {g : ℕ} (Θ : Phase M g) {T : ℕ}
     (hT : ∀ i, Θ.count i ≤ T) {H : ℕ} (hCR : M.CommonReturns Θ H) (Sel : Selection M)
-    {B : ℝ≥0∞} (hB : ∀ t, Sel.budget α t ≤ B) (a b γ : ℝ≥0∞)
+    {B : ℝ≥0∞} (hB : ∀ t, Sel.inverseSum α t ≤ B) (a b γ : ℝ≥0∞)
     (hfour : ∀ h Mb Zm E, M.FourLawAt Θ α h a b γ Mb Zm E) {Z : ℝ≥0∞}
     (hZ : SHe H * (M.delta + (T : ℝ≥0∞) ^ 2 * Z ^ 2) ≤ Z) {Mb : ℝ≥0∞}
     (hbar : M.zeta α + M.DmuC α * Qfun α a b γ (Cmix α B) Z
@@ -149,7 +149,7 @@ probability is at most `M` (`sec:completion`). -/
 theorem failProb_le_finite_fresh [Fintype I] (hc : M.IsCompat) (hb0 : rE M.μ M.R M.zero ≠ 0)
     (hFP : M.FreshPositive) {α : ℝ} (hα : 1 ≤ α) {g : ℕ} (Θ : Phase M g) {T : ℕ}
     (hT : ∀ i, Θ.count i ≤ T) {H : ℕ} (hCR : M.CommonReturns Θ H) (Sel : Selection M)
-    {B : ℝ≥0∞} (hB : ∀ t, Sel.budget α t ≤ B) (a b γ : ℝ≥0∞)
+    {B : ℝ≥0∞} (hB : ∀ t, Sel.inverseSum α t ≤ B) (a b γ : ℝ≥0∞)
     (hfour : ∀ h Mb Zm E, M.FourLawAt Θ α h a b γ Mb Zm E) {Z : ℝ≥0∞}
     (hZ : SHe H * (M.delta + (T : ℝ≥0∞) ^ 2 * Z ^ 2) ≤ Z) {Mb : ℝ≥0∞}
     (hbar : M.zeta α + M.DmuC α * Qfun α a b γ (Cmix α B) Z

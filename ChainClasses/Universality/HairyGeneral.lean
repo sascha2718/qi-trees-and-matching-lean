@@ -62,7 +62,7 @@ lemma survivalMeasure_ambSub_null (θ : Offspring J) {S : Set (GWord N → ℕ)}
       _ = 0 := by rw [map_ambSub, hP]
   exact ProbabilityTheory.cond_absolutelyContinuous hP'
 
-/-- **A conditioned sample is hairy almost surely**: its offspring counts lie within the
+/-- **A conditioned sample is a bushy sample almost surely**: its offspring counts lie within the
 alphabet, it survives, and every neck ray below a surviving vertex meets a split. -/
 theorem ae_isGHairySample (θ : Offspring J) (hJN : J ≤ N) (hq : θ.extinction < 1)
     (hs1 : θ.skeletonWeight 1 < 1) :
@@ -452,7 +452,7 @@ theorem hairy_general_ae_at_parameters (θ : Offspring J) (hJN : J ≤ N)
 end Rate
 
 
-/-- **`thm:qi-transitive` at general arity**: almost sure quasi-isometry of independent
+/-- **transitivity of quasi-isometry (`thm:trichotomy`) at general arity**: almost sure quasi-isometry of independent
 samples composes through the triple product. -/
 theorem gSampleQI_trans {N₀ N₁ N₂ : ℕ} {μ₀ : Measure (GWord N₀ → ℕ)} {μ₁ : Measure (GWord N₁ → ℕ)}
     {μ₂ : Measure (GWord N₂ → ℕ)} [IsProbabilityMeasure μ₀] [IsProbabilityMeasure μ₁]

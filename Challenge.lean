@@ -225,14 +225,9 @@ def inGWSample {N : ℕ} (c : GWWord N → ℕ) (v : GWWord N) : Prop :=
 def gwSurvives {N : ℕ} (c : GWWord N → ℕ) : Prop :=
   {v | inGWSample c v}.Infinite
 
-/-- The i.i.d. offspring field and its law conditioned on an infinite sample. -/
+/-- The law of the i.i.d. offspring field. -/
 noncomputable def gwField {J N : ℕ} (theta : Offspring J) : Measure (GWWord N → ℕ) :=
   Measure.infinitePi (fun _ : GWWord N => theta.pmf.toMeasure)
-
-/-- The law of the i.i.d. offspring field conditioned on an infinite sample tree. -/
-noncomputable def conditionedGW {J N : ℕ} (theta : Offspring J) :
-    Measure (GWWord N → ℕ) :=
-  ProbabilityTheory.cond (gwField (N := N) theta) {c | gwSurvives c}
 
 /-- The common prefix of two addresses. -/
 def wedgeN {N : ℕ} : GWWord N → GWWord N → GWWord N
@@ -243,6 +238,10 @@ def wedgeN {N : ℕ} : GWWord N → GWWord N → GWWord N
 /-- The tree distance between two addresses: `|v| + |w| - 2|v ∧ w|`. -/
 def treeDistN {N : ℕ} (v w : GWWord N) : ℕ :=
   v.length + w.length - 2 * (wedgeN v w).length
+
+/-- The root of a sample, as a vertex of its tree. -/
+def gwRoot {N : ℕ} (c : GWWord N → ℕ) : {w : GWWord N // inGWSample c w} :=
+  ⟨[], fun _ h => absurd h (Nat.not_lt_zero _)⟩
 
 /-- The parent--child graph of a Galton--Watson sample. -/
 def gwTreeGraph {N : ℕ} (c : GWWord N → ℕ) :
@@ -261,9 +260,24 @@ structure GraphQIWith {V V' : Type*} (D : ℕ) (G : SimpleGraph V)
 def GraphQuasiIsometric {V V' : Type*} (G : SimpleGraph V) (G' : SimpleGraph V') : Prop :=
   ∃ (D : ℕ) (f : V → V'), GraphQIWith D G G' f
 
+/-- Two graphs are quasi-isometric by a map sending a chosen vertex to a chosen vertex. -/
+def GraphQuasiIsometricRooted {V V' : Type*} (G : SimpleGraph V) (G' : SimpleGraph V')
+    (r : V) (r' : V') : Prop :=
+  ∃ (D : ℕ) (f : V → V'), GraphQIWith D G G' f ∧ f r = r'
+
 /-- The shifted positive support generating the chain-regime invariant. -/
 noncomputable def shiftSupp {J : ℕ} (theta : Offspring J) : Finset ℕ :=
   ((Finset.range (J + 1)).filter fun k => 2 ≤ k ∧ theta k ≠ 0).image fun k => k - 1
+
+/-- Two laws lie in the same infinite class: both ray, both full tree, both chain with the
+same branching semigroup, or both bushy. -/
+def SameInfiniteClass {J J' : ℕ} (theta : Offspring J) (theta' : Offspring J') : Prop :=
+  (theta 1 = 1 ∧ theta' 1 = 1) ∨
+  (theta 0 = 0 ∧ theta 1 = 0 ∧ theta' 0 = 0 ∧ theta' 1 = 0) ∨
+  ((theta 0 = 0 ∧ 0 < theta 1 ∧ theta 1 < 1) ∧ (theta' 0 = 0 ∧ 0 < theta' 1 ∧ theta' 1 < 1) ∧
+    AddSubmonoid.closure (shiftSupp theta : Set ℕ) =
+      AddSubmonoid.closure (shiftSupp theta' : Set ℕ)) ∨
+  (0 < theta 0 ∧ 0 < theta' 0)
 
 end Classification
 
@@ -342,43 +356,51 @@ theorem audit_exists_infinite_tree_matching_graphAut {V : Type u} (μ : PMF V)
         ∀ s : List Bool, R₀ (coord (g s).length (X (g s).length ω) (g s))
           (coord s.length (Y s.length ω) s)} := sorry
 
-/-! ## Complete conditioned-infinite classification -/
+/-! ## The finite class and the complete classification -/
 
-/-- `thm:trichotomy`, on the part claimed as machine-checked: two conditioned
-infinite finite-support Galton--Watson trees are quasi-isometric almost surely
-exactly in classes (R), (F), the same `(C_Lambda)`, or (B). -/
-theorem audit_offspring_classification_ae_iff {J J' N N' : ℕ}
-    (theta : Offspring J) (hJN : J ≤ N)
-    (hvalid : theta.IsSupercritical ∨ theta 1 = 1)
-    (htop : theta 1 = 1 ∨ (2 ≤ J ∧ 0 < theta J))
-    (theta' : Offspring J') (hJN' : J' ≤ N')
-    (hvalid' : theta'.IsSupercritical ∨ theta' 1 = 1)
-    (htop' : theta' 1 = 1 ∨ (2 ≤ J' ∧ 0 < theta' J')) :
-    ∀ᵐ omega ∂((conditionedGW (N := N) theta).prod (conditionedGW (N := N') theta')),
-      GraphQuasiIsometric (gwTreeGraph omega.1) (gwTreeGraph omega.2) ↔
-        (theta 1 = 1 ∧ theta' 1 = 1) ∨
-        (theta 0 = 0 ∧ theta 1 = 0 ∧ theta' 0 = 0 ∧ theta' 1 = 0) ∨
-        ((theta 0 = 0 ∧ 0 < theta 1 ∧ theta 1 < 1) ∧
-          (theta' 0 = 0 ∧ 0 < theta' 1 ∧ theta' 1 < 1) ∧
-          AddSubmonoid.closure (shiftSupp theta : Set ℕ) =
-            AddSubmonoid.closure (shiftSupp theta' : Set ℕ)) ∨
-        (0 < theta 0 ∧ 0 < theta' 0) := sorry
+/-- Bounded connected graphs form one quasi-isometry class: each is quasi-isometric to a
+single vertex. -/
+theorem audit_bounded_graph_qi_point {V : Type u} (G : SimpleGraph V) (hconn : G.Connected)
+    (hbdd : ∃ D : ℕ, ∀ x y, G.dist x y ≤ D) :
+    GraphQuasiIsometric G (⊥ : SimpleGraph Unit) := sorry
+
+/-- A law with mean at most one dies out almost surely, unless it is the deterministic
+single child `θ_1 = 1`. -/
+theorem audit_extinction_of_not_supercritical {J N : ℕ} (theta : Offspring J) (hJN : J ≤ N)
+    (hmean : ¬ theta.IsSupercritical) (h1 : theta 1 ≠ 1) :
+    ∀ᵐ c ∂(gwField (N := N) theta), ¬ gwSurvives c := sorry
+
+/-- `thm:trichotomy` in full: for two independent Galton--Watson trees with finitely supported
+offspring laws, almost surely a root-preserving quasi-isometry exists exactly when both are
+finite, or both are infinite and the two laws lie in the same infinite class, and otherwise no
+quasi-isometry exists at all. -/
+theorem audit_full_classification_ae_iff {J J' N N' : ℕ}
+    (theta : Offspring J) (hJN : J ≤ N) (theta' : Offspring J') (hJN' : J' ≤ N') :
+    ∀ᵐ omega ∂((gwField (N := N) theta).prod (gwField (N := N') theta')),
+      (GraphQuasiIsometricRooted (gwTreeGraph omega.1) (gwTreeGraph omega.2)
+          (gwRoot omega.1) (gwRoot omega.2) ↔
+        (¬ gwSurvives omega.1 ∧ ¬ gwSurvives omega.2) ∨
+        (gwSurvives omega.1 ∧ gwSurvives omega.2 ∧ SameInfiniteClass theta theta')) ∧
+      (GraphQuasiIsometric (gwTreeGraph omega.1) (gwTreeGraph omega.2) →
+        (¬ gwSurvives omega.1 ∧ ¬ gwSurvives omega.2) ∨
+        (gwSurvives omega.1 ∧ gwSurvives omega.2 ∧ SameInfiniteClass theta theta')) := sorry
 
 /-! ## Universality in the two-value family -/
 
 /-- `thm:twovalue`: two independent Galton--Watson trees whose offspring law is
-supported on `{1,2}` are almost surely quasi-isometric. -/
+supported on `{1,2}` almost surely admit a root-preserving quasi-isometry. -/
 theorem audit_twovalue_ae_tree_family {t : ℝ} (ht0 : 0 ≤ t) (ht1 : t ≤ 1) :
     ((bernoulliField ht0 ht1).prod (bernoulliField ht0 ht1))
-      {ω | ¬ ∃ (K : ℕ) (f : Word → Word), IsQIWith K (InTree ω.1) (InTree ω.2) f} = 0 := sorry
+      {ω | ¬ ∃ (K : ℕ) (f : Word → Word),
+        IsQIWith K (InTree ω.1) (InTree ω.2) f ∧ f [] = []} = 0 := sorry
 
-/-- The quantitative half of `thm:twovalue`: above a threshold, failure of a
+/-- The quantitative half of `thm:twovalue`: above a threshold, failure of a root-preserving
 `(D²+3)`-quasi-isometry has probability at most the explicit rate. -/
 theorem audit_twovalue_rate_tree {t : ℝ} (ht0 : 0 < t) (ht1 : t < 1) :
     ∃ D₀ : ℕ, ∀ D : ℕ, D₀ ≤ D →
       ((bernoulliField ht0.le ht1.le).prod (bernoulliField ht0.le ht1.le))
           {ω | ¬ ∃ f : Word → Word,
-            IsQIWith (D ^ 2 + 3) (InTree ω.1) (InTree ω.2) f}
+            IsQIWith (D ^ 2 + 3) (InTree ω.1) (InTree ω.2) f ∧ f [] = []}
         ≤ ENNReal.ofReal (256 * qBound (1 - t) D) := sorry
 
 /-! ## The stopped Markov matching theorem: the model -/
@@ -398,17 +420,17 @@ end StoppedPotential
 
 namespace Stopped
 
-/-- A Markov label model (`sec:statement`): states with a compatibility relation and a
-distinguished state, a fresh state law, and types with a fresh subset and a child-type
+/-- A Markov label model (`sec:markov-proof`): states with a compatibility relation and a
+distinguished state `0`, the label law `μ`, the fresh types (the set `I_μ`) and a child-type
 kernel. -/
 structure Model (V I : Type) where
   /-- compatibility of states, `v ∼ w` -/
   R : V → V → Prop
   /-- the distinguished state `0` -/
   zero : V
-  /-- the fresh state law -/
+  /-- the label law `μ` of the fresh types -/
   μ : PMF V
-  /-- the fresh types -/
+  /-- the fresh types, the set `I_μ` whose labels are drawn from `μ` -/
   fresh : I → Prop
   /-- the kernel on ordered child-type pairs -/
   π : I → PMF (I × I)
@@ -482,8 +504,8 @@ noncomputable def zeta (α : ℝ) : ℝ≥0∞ := max (M.eta α) (M.e0 α)
 noncomputable def failProb (s t : I) (h : ℕ) : ℝ≥0∞ :=
   failureD (M.rho s h) (M.rho t h) (M.sim h)
 
-/-- A phase map (`sec:finite-hypotheses`): fresh types have phase zero and every child in
-a charged transition has phase one greater than its parent. -/
+/-- The class index (`sec:finite-hypotheses`), here called the phase: fresh types have phase
+zero and every child in a charged transition has phase one greater than its parent. -/
 structure Phase (M : Model V I) (g : ℕ) where
   θ : I → ZMod g
   fresh_zero : ∀ t, M.fresh t → θ t = 0
@@ -514,13 +536,13 @@ from `D` in `k` steps is fresh. -/
 def Stops (s : I) (D : Set I) (n : ℕ) : Prop :=
   ∀ p : ℕ → I, p 0 = s → M.IsPath p n → ∃ k ≤ n, M.fresh (p k) ∧ ∃ f ∈ M.reach D k, M.fresh f
 
-/-- Common returns (`sec:finite-hypotheses`): from any two equal-phase types, every
+/-- Common returns, condition `it:markov-returns`: from any two types of the same class, every
 possible source path reaches a fresh type at a depth at most `H` at which some possible
 target path is fresh as well. -/
 def CommonReturns {g : ℕ} (Θ : Phase M g) (H : ℕ) : Prop :=
   ∀ s t, Θ.θ s = Θ.θ t → M.Stops s {t} H
 
-/-- Fresh positivity (`sec:finite-hypotheses`): every charged realisation of a fresh type
+/-- Positivity, condition `it:markov-positivity`: every charged realisation of a fresh type
 has positive degree against every fresh type. -/
 def FreshPositive : Prop :=
   ∀ (h : ℕ) (f f' : I) (x : FullLab (I × V) h),
@@ -539,9 +561,9 @@ structure Selection (M : Model V I) where
     rE (M.childMix t h) (SquareRel (M.sim h)) p ≠ 0 →
     ∃ j ∈ J t, rE (prodPMF (M.rho j.1 h) (M.rho j.2 h)) (SquareRel (M.sim h)) p ≠ 0
 
-/-- The inverse-probability budget `∑_{j ∈ J_t} π_t(j)^{-α}` of a type
+/-- The inverse-probability sum `∑_{j ∈ J_t} π_t(j)^{-α}` of a type
 (`eq:transition-budget`). -/
-noncomputable def Selection.budget {M : Model V I} (Sel : Selection M) (α : ℝ) (t : I) :
+noncomputable def Selection.inverseSum {M : Model V I} (Sel : Selection M) (α : ℝ) (t : I) :
     ℝ≥0∞ :=
   ∑ j ∈ Sel.J t, (M.π t j) ^ (-α)
 
@@ -566,14 +588,14 @@ end Stopped
 
 /-- `thm:markov-matching`, finite alternative: under the exponent condition `λ_α < 1`,
 there are constants `K`, `ε > 0` depending only on `α, H, T, B` such that every finite
-model with a phase map of class size at most `T`, a transition selection of budget at most
+model with type classes of size at most `T`, transition selections with inverse sums at most
 `B`, fresh positivity and common returns within `H`, and one-site defect `ζ_α ≤ ε`, has
-every equal-phase pair failing to match at every height with probability at most `K ζ_α`. -/
+every same-class pair failing to match at every height with probability at most `K ζ_α`. -/
 theorem audit_markov_matching_finite {α : ℝ} (hα : 1 ≤ α) (hlam : Stopped.lambda α < 1)
     (H T : ℕ) (hT : 1 ≤ T) (B : ℝ) (hB : 1 ≤ B) :
     ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} [Fintype I] (M : Stopped.Model V I), M.IsCompat →
       ∀ {g : ℕ} (Θ : Stopped.Model.Phase M g), (∀ i, Θ.count i ≤ T) →
-      ∀ (Sel : Stopped.Model.Selection M), (∀ t, Sel.budget α t ≤ ENNReal.ofReal B) →
+      ∀ (Sel : Stopped.Model.Selection M), (∀ t, Sel.inverseSum α t ≤ ENNReal.ofReal B) →
       M.FreshPositive → M.CommonReturns Θ H → M.zeta α ≤ ENNReal.ofReal ε →
       ∀ s t, Θ.θ s = Θ.θ t → ∀ h, M.failProb s t h ≤ ENNReal.ofReal Kc * M.zeta α := sorry
 
@@ -587,7 +609,7 @@ theorem audit_markov_matching_zero {α : ℝ} (hα : 1 ≤ α) (hlam : Stopped.l
         M.failProb s t h ≤ ENNReal.ofReal Kc * M.zeta α := sorry
 
 /-- `thm:markov-matching`, finite alternative at infinite height: two independent
-consistent processes of equal-phase types admit one root-fixing infinite-tree
+consistent processes of same-class types admit one root-fixing infinite-tree
 automorphism matching their states at every vertex with probability at least
 `1 - K ζ_α`. -/
 theorem audit_markov_matching_finite_infinite {α : ℝ} (hα : 1 ≤ α)
@@ -596,7 +618,7 @@ theorem audit_markov_matching_finite_infinite {α : ℝ} (hα : 1 ≤ α)
       [MeasurableSingletonClass V] [MeasurableSpace I] [MeasurableSingletonClass I]
       (M : Stopped.Model V I), M.IsCompat →
       ∀ {g : ℕ} (Θ : Stopped.Model.Phase M g), (∀ i, Θ.count i ≤ T) →
-      ∀ (Sel : Stopped.Model.Selection M), (∀ t, Sel.budget α t ≤ ENNReal.ofReal B) →
+      ∀ (Sel : Stopped.Model.Selection M), (∀ t, Sel.inverseSum α t ≤ ENNReal.ofReal B) →
       M.FreshPositive → M.CommonReturns Θ H → M.zeta α ≤ ENNReal.ofReal ε →
       ∀ s t, Θ.θ s = Θ.θ t →
       ∃ (Omega : Type) (_ : MeasurableSpace Omega) (P : Measure Omega)

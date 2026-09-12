@@ -3,7 +3,7 @@ import ChainClasses.Chain.WordGraph
 import BranchingProcess.Word
 
 /-!
-`thm:merge` (`it:merge-split`) of `matching_classes_general.tex`: the cascade
+`thm:bushy` (the coding in its proof) of `matching_classes_general.tex`: the cascade
 encoding of a `J`-ary tree into the binary tree `𝔹`, and its quasi-isometry constant.
 
 A split of arity `k ≤ 2^L` is replaced by a cascade of binary splits whose `k` slots
@@ -26,7 +26,7 @@ in place of the paper's `1 + ⌈log₂ J⌉`.  The balanced variable-depth casca
   times the length of the word.
 * `wedge_cascWord_diverge`, `treeDist_cascWord_diverge`: the wedge identity of encoded
   words, `d' = L d - 2e` with `e ≤ L - 1` the agreement of the two differing codes.
-* `treeDist_cascWord_le`, `le_treeDist_cascWord`: **`thm:merge` (`it:merge-split`),
+* `treeDist_cascWord_le`, `le_treeDist_cascWord`: **`thm:bushy` (the coding in its proof),
   the metric bounds** `d ≤ d' ≤ L d` between copies.
 * `PrefixClosedN`, `cascSet`, `prefixClosed_cascSet`, `exists_copy_near`: the cascade of
   a prefix-closed set of words over `Fin N`, prefix-closed, with every vertex within
@@ -34,7 +34,7 @@ in place of the paper's `1 + ⌈log₂ J⌉`.  The balanced variable-depth casca
 * `wordGraphN`, `wordGraphN_dist`: the parent-child graph of a prefix-closed set of
   words over `Fin N`, with graph metric `BranchingProcess.treeDist`.
 * `cascMap`, `cascade_isQIWith`, `cascade_quasiIsometric`, `cascade_isQIWith_clog`:
-  **`thm:merge` (`it:merge-split`)**, the cascade encoding is an
+  **`thm:bushy` (the coding in its proof)**, the cascade encoding is an
   `L`-quasi-isometry of the parent-child graphs in the sense of `def:qi`, at
   `L = ⌈log₂ N⌉` in particular.
 -/
@@ -172,7 +172,7 @@ lemma wedgeN_diverge {p u v : BranchingProcess.Word N} {a b : Fin N} (hab : a �
   rw [BranchingProcess.wedge_append_append, BranchingProcess.wedge_cons_cons, if_neg hab]
   simp
 
-/-- **`thm:merge` (`it:merge-split`), the exact distance of diverging copies**:
+/-- **`thm:bushy` (the coding in its proof), the exact distance of diverging copies**:
 `d' + 2e = L d`, where `e < L` is the agreement of the codes of the first differing
 letters. -/
 theorem treeDist_cascWord_diverge (L : ℕ) (hN : N ≤ 2 ^ L) {p u v : BranchingProcess.Word N}
@@ -198,7 +198,7 @@ theorem treeDist_cascWord_diverge (L : ℕ) (hN : N ≤ 2 ^ L) {p u v : Branchin
 
 /-! ### The metric bounds -/
 
-/-- **`thm:merge` (`it:merge-split`), the upper bound**: copies are at most `L`
+/-- **`thm:bushy` (the coding in its proof), the upper bound**: copies are at most `L`
 times as far apart as the originals. -/
 theorem treeDist_cascWord_le (L : ℕ) (u v : BranchingProcess.Word N) :
     treeDist (cascWord L u) (cascWord L v) ≤ L * BranchingProcess.treeDist u v := by
@@ -218,7 +218,7 @@ theorem treeDist_cascWord_le (L : ℕ) (u v : BranchingProcess.Word N) :
       _ = L * u.length + L * v.length := by ring
   omega
 
-/-- **`thm:merge` (`it:merge-split`), the lower bound**: copies are at least as
+/-- **`thm:bushy` (the coding in its proof), the lower bound**: copies are at least as
 far apart as the originals. -/
 theorem le_treeDist_cascWord {L : ℕ} (hN : N ≤ 2 ^ L) (hL : 1 ≤ L)
     (u v : BranchingProcess.Word N) :
@@ -420,7 +420,7 @@ theorem wordGraphN_dist (hT : PrefixClosedN T) (u v : {w : BranchingProcess.Word
   have := treeDistN_le_walk_length r
   omega
 
-/-! ### `thm:merge`, the quasi-isometry -/
+/-! ### `thm:bushy`, the quasi-isometry -/
 
 /-- The cascade encoding as a map of vertex sets: every vertex goes to its copy. -/
 def cascMap (L : ℕ) (T : BranchingProcess.Word N → Prop) :
@@ -430,7 +430,7 @@ def cascMap (L : ℕ) (T : BranchingProcess.Word N → Prop) :
 @[simp] lemma cascMap_val (L : ℕ) (T : BranchingProcess.Word N → Prop)
     (w : {w : BranchingProcess.Word N // T w}) : (cascMap L T w).1 = cascWord L w.1 := rfl
 
-/-- **`thm:merge` (`it:merge-split`).** Replacing every split of a prefix-closed
+/-- **`thm:bushy` (the coding in its proof).** Replacing every split of a prefix-closed
 set of words over `Fin N` by its cascade of depth `L`, `N ≤ 2^L`, is an
 `L`-quasi-isometry of the parent-child graphs in the sense of `def:qi`: copies satisfy
 `d ≤ d' ≤ L d`, and every cascade vertex lies within `L - 1` of a copy. -/
@@ -452,12 +452,12 @@ theorem cascade_isQIWith {L : ℕ} (hN : N ≤ 2 ^ L) (hL : 1 ≤ L) (hT : Prefi
     simp only [cascMap_val]
     omega
 
-/-- **`thm:merge` (`it:merge-split`), as quasi-isometry of graphs.** -/
+/-- **`thm:bushy` (the coding in its proof), as quasi-isometry of graphs.** -/
 theorem cascade_quasiIsometric {L : ℕ} (hN : N ≤ 2 ^ L) (hL : 1 ≤ L) (hT : PrefixClosedN T) :
     BranchingProcess.QuasiIsometric (wordGraphN T) (wordGraph (cascSet L T)) :=
   ⟨L, cascMap L T, cascade_isQIWith hN hL hT⟩
 
-/-- **`thm:merge` (`it:merge-split`), at the depth `⌈log₂ N⌉`**: for `2 ≤ N`, the
+/-- **`thm:bushy` (the coding in its proof), at the depth `⌈log₂ N⌉`**: for `2 ≤ N`, the
 cascade of depth `Nat.clog 2 N` is a `Nat.clog 2 N`-quasi-isometry, the constant being
 at most the paper's `1 + ⌈log₂ J⌉`. -/
 theorem cascade_isQIWith_clog (hN : 2 ≤ N) (hT : PrefixClosedN T) :

@@ -543,4 +543,18 @@ theorem sampleMeasure_survives (θ : Offspring J) (hJN : J ≤ N) :
   rw [h, prob_compl_eq_one_sub hns, sampleMeasure_not_survives θ hJN,
     ENNReal.ofReal_sub 1 θ.extinction_nonneg, ENNReal.ofReal_one]
 
+/-- **A law with mean at most one dies out almost surely**, unless it is the deterministic
+single child: the survival event is null. -/
+theorem sampleMeasure_survives_eq_zero (θ : Offspring J) (hJN : J ≤ N) (h : θ.mean ≤ 1)
+    (h1 : θ 1 ≠ 1) : sampleMeasure (N := N) θ {c : Word N → ℕ | Survives c} = 0 := by
+  rw [sampleMeasure_survives θ hJN, θ.extinction_eq_one_of_mean_le_one h h1, sub_self,
+    ENNReal.ofReal_zero]
+
+/-- The almost-sure form: almost every sample of such a law is finite. -/
+theorem ae_not_survives_of_mean_le_one (θ : Offspring J) (hJN : J ≤ N) (h : θ.mean ≤ 1)
+    (h1 : θ 1 ≠ 1) : ∀ᵐ c ∂(sampleMeasure (N := N) θ), ¬ Survives c := by
+  rw [MeasureTheory.ae_iff]
+  simp only [not_not]
+  exact sampleMeasure_survives_eq_zero θ hJN h h1
+
 end BranchingProcess

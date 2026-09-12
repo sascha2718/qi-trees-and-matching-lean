@@ -1,16 +1,16 @@
 /-
 The application of `thm:markov-matching` to two product laws with a common core
-(`markov_matching_new_proof.tex`, `sec:types` (last paragraphs), `sec:common-generators`,
+(`markov_matching_new_proof.tex`, `sec:markov-hypotheses` (last paragraphs), `sec:common-generators`,
 and the "In particular" after `thm:markov-matching`).
 
-* `liveOf`, `TcountOf`, `coreDepthsOf`, `gPhaseOf`, `conductorOf`, `ellOf`, `HretOf`,
-  `budgetOf`: the constants `T`, `H`, `B` of the finite alternative as functions of the
+* `liveOf`, `TcountOf`, `coreDepthsOf`, `gPhaseOf`, `returnThresholdOf`, `ellOf`, `HretOf`,
+  `inverseSumOf`: the constants `T`, `H`, `B` of the finite alternative as functions of the
   profile data and the core floor alone, with `Presentation.Tcount`, `Presentation.Hret`,
-  `Presentation.coreBudget` their values at a presentation;
+  `Presentation.coreInverseSum` their values at a presentation;
 * `Presentation.commonReturns_Hret`, `Presentation.commonReturns_exists`: the return bound
-  `thm:bounded-return` at `H = c_Γ + 2ℓ` with the explicit conductor;
-* `Presentation.budget_le_of_floor`: the budget `B ≤ #S c^{-α}` from a floor `c` on the core
-  probabilities (`sec:positive-fresh`);
+  `thm:bounded-return` at `H = c_Γ + 2ℓ` with the explicit return threshold;
+* `Presentation.inverseSum_le_of_floor`: the bound `B ≤ #S c^{-α}` from a floor `c` on the core
+  probabilities (`sec:positive-matching`);
 * `Presentation.presentation_matching_explicit`, `presentation_matching`,
   `presentation_matching_infinite`, `presentation_matching_eta`,
   `presentation_matching_of_lambda`: `thm:markov-matching` for the Markov model of a
@@ -33,9 +33,9 @@ namespace GraphMarkovMatching.Stopped
 open GraphMarkovMatching GraphMarkovMatching.Support Model
 open scoped ENNReal Classical
 
-/-! ### The constants as functions of the profile data (`sec:types`) -/
+/-! ### The constants as functions of the profile data (`sec:markov-hypotheses`) -/
 
-/-- The live types of profile data (`sec:types`): the two fresh types and the forced types
+/-- The live types of profile data (`sec:markov-hypotheses`): the two fresh types and the forced types
 at the proper subtrees, other than leaves, of the supported profiles. This is the body of
 `Presentation.live`, as a function of the supports and profiles alone. -/
 noncomputable def liveOf (supp : Bool → Finset ℕ) (C : Bool → ℕ → MTree) : Finset PType :=
@@ -49,22 +49,22 @@ noncomputable def liveOf (supp : Bool → Finset ℕ) (C : Bool → ℕ → MTre
 noncomputable def TcountOf (supp : Bool → Finset ℕ) (C : Bool → ℕ → MTree) : ℕ :=
   (liveOf supp C).card
 
-/-- The core leaf depths `R_0` of profile data (`sec:types`). -/
+/-- The core leaf depths `R_0` of profile data (`sec:markov-hypotheses`). -/
 noncomputable def coreDepthsOf (S : Finset ℕ) (D : ℕ → MTree) : Finset ℕ :=
   S.biUnion fun a => (D a).leafDepths
 
-/-- `g = gcd R_0` of profile data (`sec:types`). -/
+/-- `g = gcd R_0` of profile data (`sec:markov-hypotheses`). -/
 noncomputable def gPhaseOf (S : Finset ℕ) (D : ℕ → MTree) : ℕ := (coreDepthsOf S D).gcd id
 
-/-- The explicit conductor `g (a_0 - 1)(b_0 - 1)` of `sec:types` (`thm:bounded-return`),
+/-- The explicit return threshold `g (a_0 - 1)(b_0 - 1)` of `sec:markov-hypotheses` (`thm:bounded-return`),
 zero when the core is empty. -/
-noncomputable def conductorOf (S : Finset ℕ) (D : ℕ → MTree) : ℕ :=
+noncomputable def returnThresholdOf (S : Finset ℕ) (D : ℕ → MTree) : ℕ :=
   if h : (coreDepthsOf S D).Nonempty then
     gPhaseOf S D * (((coreDepthsOf S D).min' h / gPhaseOf S D - 1)
       * ((coreDepthsOf S D).max' h / gPhaseOf S D - 1))
   else 0
 
-/-- The maximal profile height `ℓ` of profile data (`sec:types`). -/
+/-- The maximal profile height `ℓ` of profile data (`sec:markov-hypotheses`). -/
 noncomputable def ellOf (supp : Bool → Finset ℕ) (C : Bool → ℕ → MTree) : ℕ :=
   (Finset.univ (α := Bool)).sup fun σ => (supp σ).sup fun k => (C σ k).height
 
@@ -72,10 +72,10 @@ noncomputable def ellOf (supp : Bool → Finset ℕ) (C : Bool → ℕ → MTree
 (`thm:bounded-return`). -/
 noncomputable def HretOf (S : Finset ℕ) (D : ℕ → MTree) (supp : Bool → Finset ℕ)
     (C : Bool → ℕ → MTree) : ℕ :=
-  conductorOf S D + 2 * ellOf supp C
+  returnThresholdOf S D + 2 * ellOf supp C
 
-/-- The budget bound `#S c^{-α}` from the core floor `c` (`sec:positive-fresh`). -/
-noncomputable def budgetOf (S : Finset ℕ) (c α : ℝ) : ℝ := S.card * c ^ (-α)
+/-- The bound `B` `#S c^{-α}` from the core floor `c` (`sec:positive-matching`). -/
+noncomputable def inverseSumOf (S : Finset ℕ) (c α : ℝ) : ℝ := S.card * c ^ (-α)
 
 /-- The live types of profile data contain the left fresh type. -/
 lemma fresh_mem_liveOf (supp : Bool → Finset ℕ) (C : Bool → ℕ → MTree) (σ : Bool) :
@@ -87,10 +87,10 @@ lemma one_le_TcountOf (supp : Bool → Finset ℕ) (C : Bool → ℕ → MTree) 
     1 ≤ TcountOf supp C :=
   Finset.card_pos.mpr ⟨_, fresh_mem_liveOf supp C false⟩
 
-/-- `1 ≤ #S c^{-α}` for a nonempty core and a floor `0 < c ≤ 1` (`sec:positive-fresh`). -/
-lemma one_le_budgetOf {S : Finset ℕ} (hS : S.Nonempty) {c : ℝ} (hc0 : 0 < c) (hc1 : c ≤ 1)
-    {α : ℝ} (hα : 0 ≤ α) : 1 ≤ budgetOf S c α := by
-  unfold budgetOf
+/-- `1 ≤ #S c^{-α}` for a nonempty core and a floor `0 < c ≤ 1` (`sec:positive-matching`). -/
+lemma one_le_inverseSumOf {S : Finset ℕ} (hS : S.Nonempty) {c : ℝ} (hc0 : 0 < c) (hc1 : c ≤ 1)
+    {α : ℝ} (hα : 0 ≤ α) : 1 ≤ inverseSumOf S c α := by
+  unfold inverseSumOf
   have h1 : (1 : ℝ) ≤ S.card := by exact_mod_cast Finset.card_pos.mpr hS
   have h2 : (1 : ℝ) ≤ c ^ (-α) :=
     Real.one_le_rpow_of_pos_of_le_one_of_nonpos hc0 hc1 (by linarith)
@@ -104,7 +104,7 @@ variable (P : Presentation) {V : Type} (R : V → V → Prop) (zero : V) (μ : P
 /-- The live types are those of the profile data. -/
 lemma live_eq : P.live = liveOf P.supp P.C := rfl
 
-/-- `T = #live` (`eq:transition-budget`, `sec:types`). -/
+/-- `T = #live` (`eq:transition-budget`, `sec:markov-hypotheses`). -/
 noncomputable def Tcount : ℕ := TcountOf P.supp P.C
 
 /-- `T = #live`. -/
@@ -116,15 +116,15 @@ lemma one_le_Tcount : 1 ≤ P.Tcount := one_le_TcountOf P.supp P.C
 /-- The core leaf depths are those of the profile data. -/
 lemma coreDepths_eq : P.coreDepths = coreDepthsOf P.S P.D := rfl
 
-/-- The explicit conductor of a presentation (`thm:bounded-return`). -/
-noncomputable def conductor : ℕ := conductorOf P.S P.D
+/-- The explicit return threshold of a presentation (`thm:bounded-return`). -/
+noncomputable def returnThreshold : ℕ := returnThresholdOf P.S P.D
 
-/-- The conductor bound (`thm:bounded-return`, `sec:types`): every multiple of `g` at
-least the conductor lies in `Γ`. -/
-theorem conductor_spec : ∀ n, P.conductor ≤ n → P.gPhase ∣ n → n ∈ P.Gamma := by
-  have h := P.conductor_bound P.S_nonempty
+/-- The return-threshold bound (`thm:bounded-return`, `sec:markov-hypotheses`): every multiple of `g` at
+least the return threshold lies in `Γ`. -/
+theorem returnThreshold_spec : ∀ n, P.returnThreshold ≤ n → P.gPhase ∣ n → n ∈ P.Gamma := by
+  have h := P.returnThreshold_bound P.S_nonempty
   have hne : (coreDepthsOf P.S P.D).Nonempty := P.coreDepths_nonempty P.S_nonempty
-  unfold conductor conductorOf
+  unfold returnThreshold returnThresholdOf
   rw [dif_pos hne]
   exact h
 
@@ -133,12 +133,12 @@ the profile data alone. -/
 noncomputable def Hret : ℕ := HretOf P.S P.D P.supp P.C
 
 /-- `H = c_Γ + 2ℓ`. -/
-lemma Hret_eq : P.Hret = P.conductor + 2 * P.ell := rfl
+lemma Hret_eq : P.Hret = P.returnThreshold + 2 * P.ell := rfl
 
 /-- **`thm:bounded-return`** at `H = c_Γ + 2ℓ`: common returns for every state space. -/
 theorem commonReturns_Hret :
     (P.toModel R zero μ).CommonReturns (P.phase R zero μ) P.Hret :=
-  P.commonReturns_explicit R zero μ P.S_nonempty P.conductor_spec
+  P.commonReturns_explicit R zero μ P.S_nonempty P.returnThreshold_spec
 
 /-- **`thm:bounded-return`**, existential form: a return bound depending only on the
 profiles, valid for every state space. -/
@@ -147,37 +147,37 @@ theorem commonReturns_exists :
       (P.toModel R zero μ).CommonReturns (P.phase R zero μ) H :=
   ⟨P.Hret, fun R zero μ => P.commonReturns_Hret R zero μ⟩
 
-/-- The budget bound `#S c^{-α}` of a presentation from the core floor `c`
-(`sec:positive-fresh`). -/
-noncomputable def coreBudget (c α : ℝ) : ℝ := budgetOf P.S c α
+/-- The bound `B` `#S c^{-α}` of a presentation from the core floor `c`
+(`sec:positive-matching`). -/
+noncomputable def coreInverseSum (c α : ℝ) : ℝ := inverseSumOf P.S c α
 
 /-- `1 ≤ B` for a floor `0 < c ≤ 1`. -/
-lemma one_le_coreBudget {c : ℝ} (hc0 : 0 < c) (hc1 : c ≤ 1) {α : ℝ} (hα : 0 ≤ α) :
-    1 ≤ P.coreBudget c α :=
-  one_le_budgetOf P.S_nonempty hc0 hc1 hα
+lemma one_le_coreInverseSum {c : ℝ} (hc0 : 0 < c) (hc1 : c ≤ 1) {α : ℝ} (hα : 0 ≤ α) :
+    1 ≤ P.coreInverseSum c α :=
+  one_le_inverseSumOf P.S_nonempty hc0 hc1 hα
 
-/-- **The budget from a core floor** (`sec:positive-fresh`): if every core probability on
-either side is at least `c`, the budget of the core selection is at most `#S c^{-α}`. -/
-theorem budget_le_of_floor (hc : (P.toModel R zero μ).IsCompat) (hb0 : rE μ R zero ≠ 0)
+/-- **The bound `B` from a core floor** (`sec:positive-matching`): if every core probability on
+either side is at least `c`, the inverse-probability sum of the core selection is at most `#S c^{-α}`. -/
+theorem inverseSum_le_of_floor (hc : (P.toModel R zero μ).IsCompat) (hb0 : rE μ R zero ≠ 0)
     {α : ℝ} (hα : 0 ≤ α) {c : ℝ} (hc0 : 0 < c)
     (hfloor : ∀ σ a, a ∈ P.S → ENNReal.ofReal c ≤ P.ν σ a) (t : P.Live) :
-    (P.selection R zero μ hc hb0).budget α t ≤ ENNReal.ofReal (P.coreBudget c α) := by
-  refine (P.budget_le R zero μ hc hb0 hα t).trans ?_
-  have key : ∀ σ, ∑ a ∈ P.S, (P.ν σ a) ^ (-α) ≤ ENNReal.ofReal (P.coreBudget c α) := by
+    (P.selection R zero μ hc hb0).inverseSum α t ≤ ENNReal.ofReal (P.coreInverseSum c α) := by
+  refine (P.inverseSum_le R zero μ hc hb0 hα t).trans ?_
+  have key : ∀ σ, ∑ a ∈ P.S, (P.ν σ a) ^ (-α) ≤ ENNReal.ofReal (P.coreInverseSum c α) := by
     intro σ
     calc ∑ a ∈ P.S, (P.ν σ a) ^ (-α)
         ≤ ∑ _a ∈ P.S, (ENNReal.ofReal c) ^ (-α) :=
           Finset.sum_le_sum fun a ha => rpow_neg_antitone hα (hfloor σ a ha)
       _ = P.S.card * (ENNReal.ofReal c) ^ (-α) := by rw [Finset.sum_const, nsmul_eq_mul]
-      _ = ENNReal.ofReal (P.coreBudget c α) := by
-          rw [coreBudget, budgetOf, ENNReal.ofReal_mul (Nat.cast_nonneg _),
+      _ = ENNReal.ofReal (P.coreInverseSum c α) := by
+          rw [coreInverseSum, inverseSumOf, ENNReal.ofReal_mul (Nat.cast_nonneg _),
             ENNReal.ofReal_natCast, ENNReal.ofReal_rpow_of_pos hc0]
   exact max_le (key false) (key true)
 
 /-- The fresh live types are fresh in the model. -/
 lemma fresh_freshL (σ : Bool) : (P.toModel R zero μ).fresh (P.freshL σ) := rfl
 
-/-- The phase of a fresh live type is zero (`sec:types`). -/
+/-- The phase of a fresh live type is zero (`sec:markov-hypotheses`). -/
 lemma phase_freshL (σ : Bool) : (P.phase R zero μ).θ (P.freshL σ) = 0 :=
   (P.phase R zero μ).fresh_zero _ (P.fresh_freshL R zero μ σ)
 
@@ -189,17 +189,17 @@ lemma phase_freshL_eq (σ σ' : Bool) :
 /-! ### The matching theorem for a presentation (`thm:markov-matching`, "In particular") -/
 
 /-- **`thm:markov-matching` for the Markov model of a presentation, with the explicit
-constants** (`sec:types`, "The construction verifies every hypothesis"): with `T = #live`,
+constants** (`sec:markov-hypotheses`, "The construction verifies every hypothesis"): with `T = #live`,
 `H = c_Γ + 2ℓ` and `B = #S c^{-α}` from a floor `c` on the core probabilities, if
 `ζ_α ≤ ε_K` then every equal-phase pair fails at every height with probability at most
 `K_match ζ_α`, the fresh pairs with probability at most `K ζ_α`, and every equal-phase
 restricted potential is at most `K ζ_α`. -/
 theorem presentation_matching_explicit (p : Params) {c : ℝ} (hc0 : 0 < c) (hc1 : c ≤ 1)
     (hfloor : ∀ σ a, a ∈ P.S → ENNReal.ofReal c ≤ P.ν σ a) (Kc : ℝ)
-    (hK : finiteK0 p P.Hret (P.coreBudget c p.α) < Kc)
+    (hK : finiteK0 p P.Hret (P.coreInverseSum c p.α) < Kc)
     (hcompat : (P.toModel R zero μ).IsCompat)
     (hζ : (P.toModel R zero μ).zeta p.α
-      ≤ ENNReal.ofReal (finiteEps p P.Hret P.Tcount (P.coreBudget c p.α) Kc)) :
+      ≤ ENNReal.ofReal (finiteEps p P.Hret P.Tcount (P.coreInverseSum c p.α) Kc)) :
     (∀ s t, (P.phase R zero μ).θ s = (P.phase R zero μ).θ t → ∀ h,
         (P.toModel R zero μ).failProb s t h
           ≤ ENNReal.ofReal (finiteKmatch P.Hret Kc) * (P.toModel R zero μ).zeta p.α)
@@ -211,9 +211,9 @@ theorem presentation_matching_explicit (p : Params) {c : ℝ} (hc0 : 0 < c) (hc1
     ne_top_of_le_ne_top ENNReal.ofReal_ne_top hζ
   have hb0 : rE μ R zero ≠ 0 := (P.toModel R zero μ).rE_zero_ne_zero_of_zeta_ne_top hζtop
   obtain ⟨h1, h2, h3⟩ := markov_matching_finite p P.Hret P.Tcount P.one_le_Tcount
-    (P.coreBudget c p.α) (P.one_le_coreBudget hc0 hc1 p.α_nonneg) Kc hK (P.toModel R zero μ)
+    (P.coreInverseSum c p.α) (P.one_le_coreInverseSum hc0 hc1 p.α_nonneg) Kc hK (P.toModel R zero μ)
     hcompat (P.phase R zero μ) (P.count_le_card R zero μ) (P.selection R zero μ hcompat hb0)
-    (P.budget_le_of_floor R zero μ hcompat hb0 p.α_nonneg hc0 hfloor)
+    (P.inverseSum_le_of_floor R zero μ hcompat hb0 p.α_nonneg hc0 hfloor)
     (P.freshPositive R zero μ hcompat hb0) (P.commonReturns_Hret R zero μ) hζ
   exact ⟨h1, fun σ σ' h => h2 _ _ (P.fresh_freshL R zero μ σ) (P.fresh_freshL R zero μ σ') h,
     h3⟩
@@ -230,10 +230,10 @@ theorem presentation_matching (p : Params) {c : ℝ} (hc0 : 0 < c) (hc1 : c ≤ 
       (P.toModel R zero μ).zeta p.α ≤ ENNReal.ofReal ε →
         ∀ σ σ' h, (P.toModel R zero μ).failProb (P.freshL σ) (P.freshL σ') h
           ≤ ENNReal.ofReal Kc * (P.toModel R zero μ).zeta p.α := by
-  set K0 := finiteK0 p P.Hret (P.coreBudget c p.α) with hK0
+  set K0 := finiteK0 p P.Hret (P.coreInverseSum c p.α) with hK0
   have hK : K0 < K0 + 1 := by linarith
-  refine ⟨K0 + 1, finiteEps p P.Hret P.Tcount (P.coreBudget c p.α) (K0 + 1),
-    finiteEps_pos p P.Hret P.Tcount P.one_le_Tcount _ (P.one_le_coreBudget hc0 hc1 p.α_nonneg)
+  refine ⟨K0 + 1, finiteEps p P.Hret P.Tcount (P.coreInverseSum c p.α) (K0 + 1),
+    finiteEps_pos p P.Hret P.Tcount P.one_le_Tcount _ (P.one_le_coreInverseSum hc0 hc1 p.α_nonneg)
       _ hK, ?_⟩
   intro V R zero μ hcompat hζ
   exact (P.presentation_matching_explicit R zero μ p hc0 hc1 hfloor _ hK hcompat hζ).2.1
@@ -265,11 +265,11 @@ theorem presentation_matching_infinite (p : Params) {c : ℝ} (hc0 : 0 < c) (hc1
 pair fails with probability at most `(K_match/p₀) η_α`. -/
 theorem presentation_matching_eta (p : Params) {c : ℝ} (hc0 : 0 < c) (hc1 : c ≤ 1)
     (hfloor : ∀ σ a, a ∈ P.S → ENNReal.ofReal c ≤ P.ν σ a) (Kc : ℝ)
-    (hK : finiteK0 p P.Hret (P.coreBudget c p.α) < Kc)
+    (hK : finiteK0 p P.Hret (P.coreInverseSum c p.α) < Kc)
     (hcompat : (P.toModel R zero μ).IsCompat) {p0 : ℝ} (hp0 : 0 < p0) (hp1 : p0 ≤ 1)
     (hμ : ENNReal.ofReal p0 ≤ μ zero)
     (hη : (P.toModel R zero μ).eta p.α
-      ≤ ENNReal.ofReal (p0 * finiteEps p P.Hret P.Tcount (P.coreBudget c p.α) Kc)) :
+      ≤ ENNReal.ofReal (p0 * finiteEps p P.Hret P.Tcount (P.coreInverseSum c p.α) Kc)) :
     ∀ s t, (P.phase R zero μ).θ s = (P.phase R zero μ).θ t → ∀ h,
       (P.toModel R zero μ).failProb s t h
         ≤ ENNReal.ofReal (finiteKmatch P.Hret Kc / p0) * (P.toModel R zero μ).eta p.α := by
@@ -281,10 +281,10 @@ theorem presentation_matching_eta (p : Params) {c : ℝ} (hc0 : 0 < c) (hc1 : c 
     refine ne_top_of_le_ne_top ?_ hζη
     exact ENNReal.div_ne_top (ne_top_of_le_ne_top ENNReal.ofReal_ne_top hη) hp
   have hb0 : rE μ R zero ≠ 0 := (P.toModel R zero μ).rE_zero_ne_zero_of_zeta_ne_top hζtop
-  exact markov_matching_finite_eta p P.Hret P.Tcount P.one_le_Tcount (P.coreBudget c p.α)
-    (P.one_le_coreBudget hc0 hc1 p.α_nonneg) Kc hK (P.toModel R zero μ) hcompat
+  exact markov_matching_finite_eta p P.Hret P.Tcount P.one_le_Tcount (P.coreInverseSum c p.α)
+    (P.one_le_coreInverseSum hc0 hc1 p.α_nonneg) Kc hK (P.toModel R zero μ) hcompat
     (P.phase R zero μ) (P.count_le_card R zero μ) (P.selection R zero μ hcompat hb0)
-    (P.budget_le_of_floor R zero μ hcompat hb0 p.α_nonneg hc0 hfloor)
+    (P.inverseSum_le_of_floor R zero μ hcompat hb0 p.α_nonneg hc0 hfloor)
     (P.freshPositive R zero μ hcompat hb0) (P.commonReturns_Hret R zero μ) hp0 hp1 hμ hη
 
 /-- **The `η` form for a presentation, existential**: with `μ(0) ≥ p₀ > 0`, constants
@@ -298,12 +298,12 @@ theorem presentation_matching_eta_exists (p : Params) {c : ℝ} (hc0 : 0 < c) (h
       (P.toModel R zero μ).eta p.α ≤ ENNReal.ofReal ε →
         ∀ σ σ' h, (P.toModel R zero μ).failProb (P.freshL σ) (P.freshL σ') h
           ≤ ENNReal.ofReal Kc * (P.toModel R zero μ).eta p.α := by
-  set K0 := finiteK0 p P.Hret (P.coreBudget c p.α) with hK0
+  set K0 := finiteK0 p P.Hret (P.coreInverseSum c p.α) with hK0
   have hK : K0 < K0 + 1 := by linarith
   have hεpos := finiteEps_pos p P.Hret P.Tcount P.one_le_Tcount _
-    (P.one_le_coreBudget hc0 hc1 p.α_nonneg) _ hK
+    (P.one_le_coreInverseSum hc0 hc1 p.α_nonneg) _ hK
   refine ⟨finiteKmatch P.Hret (K0 + 1) / p0,
-    p0 * finiteEps p P.Hret P.Tcount (P.coreBudget c p.α) (K0 + 1), by positivity, ?_⟩
+    p0 * finiteEps p P.Hret P.Tcount (P.coreInverseSum c p.α) (K0 + 1), by positivity, ?_⟩
   intro V R zero μ hcompat hμ hη σ σ' h
   exact P.presentation_matching_eta R zero μ p hc0 hc1 hfloor _ hK hcompat hp0 hp1 hμ hη _ _
     (P.phase_freshL_eq R zero μ σ σ') h
@@ -319,9 +319,9 @@ theorem presentation_matching_of_lambda {α : ℝ} (hα : 1 ≤ α) (hlam : lamb
           ≤ ENNReal.ofReal Kc * (P.toModel R zero μ).zeta α :=
   P.presentation_matching (Params.ofLambda hα hlam) hc0 hc1 hfloor
 
-/-! ### Uniformity over the arity masses (`sec:types`, last paragraph) -/
+/-! ### Uniformity over the arity masses (`sec:markov-hypotheses`, last paragraph) -/
 
-/-- **Uniformity** (`sec:types`: "The constants depend only on the finite supports, the
+/-- **Uniformity** (`sec:markov-hypotheses`: "The constants depend only on the finite supports, the
 atomic floor and the exponent"): for fixed supports, profiles and a floor `c`, constants
 uniform over all presentations with these data and all core probabilities at least `c`. -/
 theorem presentation_matching_uniform (p : Params) (S : Finset ℕ) (D : ℕ → MTree)
@@ -334,11 +334,11 @@ theorem presentation_matching_uniform (p : Params) (S : Finset ℕ) (D : ℕ →
           ∀ σ σ' h, (P.toModel R zero μ).failProb (P.freshL σ) (P.freshL σ') h
             ≤ ENNReal.ofReal Kc * (P.toModel R zero μ).zeta p.α := by
   by_cases hS : S.Nonempty
-  · set K0 := finiteK0 p (HretOf S D supp C) (budgetOf S c p.α) with hK0
+  · set K0 := finiteK0 p (HretOf S D supp C) (inverseSumOf S c p.α) with hK0
     have hK : K0 < K0 + 1 := by linarith
     refine ⟨finiteKmatch (HretOf S D supp C) (K0 + 1),
-      finiteEps p (HretOf S D supp C) (TcountOf supp C) (budgetOf S c p.α) (K0 + 1),
-      finiteEps_pos p _ _ (one_le_TcountOf supp C) _ (one_le_budgetOf hS hc0 hc1 p.α_nonneg)
+      finiteEps p (HretOf S D supp C) (TcountOf supp C) (inverseSumOf S c p.α) (K0 + 1),
+      finiteEps_pos p _ _ (one_le_TcountOf supp C) _ (one_le_inverseSumOf hS hc0 hc1 p.α_nonneg)
         _ hK, ?_⟩
     intro P hPS hPD hPsupp hPC hfloor V R zero μ hcompat hζ σ σ' h
     subst hPS hPD hPsupp hPC
@@ -348,7 +348,7 @@ theorem presentation_matching_uniform (p : Params) (S : Finset ℕ) (D : ℕ →
     intro P hPS
     exact absurd (hPS ▸ P.S_nonempty) hS
 
-/-- **Uniformity on the infinite tree** (`sec:types`, last paragraph). -/
+/-- **Uniformity on the infinite tree** (`sec:markov-hypotheses`, last paragraph). -/
 theorem presentation_matching_uniform_infinite (p : Params) (S : Finset ℕ) (D : ℕ → MTree)
     (supp : Bool → Finset ℕ) (C : Bool → ℕ → MTree) {c : ℝ} (hc0 : 0 < c) (hc1 : c ≤ 1) :
     ∃ Kc ε : ℝ, 0 < ε ∧ ∀ P : Presentation, P.S = S → P.D = D → P.supp = supp → P.C = C →
@@ -640,13 +640,13 @@ theorem exists_presentation (νL νR : PMF ℕ) (suppL suppR : Finset ℕ)
       ∧ (↑P.S : Set ℕ) = (fun a => a + 1) '' atoms (shiftSemigroup ↑suppL) :=
   ⟨atomicPresentation νL νR suppL suppR hL hR h2L h2R hne hsem, rfl, rfl, coe_atomCore suppL⟩
 
-/-! ### The floor of a fixed pair of laws (`sec:types`, last paragraph) -/
+/-! ### The floor of a fixed pair of laws (`sec:markov-hypotheses`, last paragraph) -/
 
 namespace Presentation
 
 variable (P : Presentation)
 
-/-- **The core floor is automatically positive** (`sec:types`: "For each fixed pair of
+/-- **The core floor is automatically positive** (`sec:markov-hypotheses`: "For each fixed pair of
 arity laws this floor is automatically positive, since the finite atomic core belongs to
 both supports"): some `0 < c ≤ 1` is a lower bound for every core probability on either
 side. -/

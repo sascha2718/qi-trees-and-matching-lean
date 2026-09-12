@@ -715,7 +715,7 @@ lemma gArityAt_of_not_mem_sample {c : GWord N → ℕ} {u : GWord N}
 lemma gArityAt_le_alphabet (c : GWord N → ℕ) (u : GWord N) : gArityAt c u ≤ N :=
   skeletonDegree_le_alphabet _
 
-/-- The skeleton arities of a hairy sample bounded by `L` give a bounded arity field. -/
+/-- The skeleton arities of a bushy sample bounded by `L` give a bounded arity field. -/
 lemma arityBounded_gArityAt {L : ℕ} {c : GWord N → ℕ} (hs : SkelBounded L (gArityAt c)) :
     ArityBounded L (gArityAt c) :=
   arityBounded_of_skelBounded hs fun _ hu => gArityAt_of_not_mem_sample hu
@@ -768,7 +768,7 @@ lemma exists_partner_bFamily {L : ℕ} (exc : Family)
         (gArityAt_le_alphabet c) 0 h]
 
 /-- **The deterministic core of `thm:hairy-general`**: an alignment of the encoded label
-fields of two hairy samples to within one class of `G_D`, the labels being the classes
+fields of two bushy samples to within one class of `G_D`, the labels being the classes
 of partners `9D³`-comparable to the shapes, gives a quasi-isometry of the two samples at
 the constant `⌈216 L L'² (3·(3¹⁵D¹⁶)²)²⌉`. -/
 theorem sample_qi_of_profile_match {L L' : ℕ} (exc exc' : Family) {c : GWord N → ℕ} {c' : GWord N' → ℕ}

@@ -1,7 +1,7 @@
 /-
 The branching semigroup of a set of arities and its atoms (`markov_matching_new_proof.tex`,
-`sec:common-presentations`, "The common generators", and `sec:unbounded-supports`, "The
-common generators remain finite"): pure additive combinatorics of `AddSubmonoid ℕ`.
+`sec:common-presentations`, "The common generators"): pure additive combinatorics of
+`AddSubmonoid ℕ`.
 
 * `shiftSemigroup S`: the nonnegative sums of the shifted arities `k - 1`, `k ∈ S`;
 * `IsAtom Λ a`, `atoms Λ`: a positive element which is not the sum of two positive elements;
@@ -11,7 +11,7 @@ common generators remain finite"): pure additive combinatorics of `AddSubmonoid 
 * `mem_closure_atoms`: the atoms generate, and `length_le_of_sum_atoms`: an expression as a
   sum of atoms has at most `⌊n / s₀⌋` summands (`thm:common-atoms`);
 * `atoms_finite`, `atoms_ncard_le`: at most one atom in each residue class modulo a positive
-  element, hence at most `s₀` atoms (`sec:unbounded-supports`);
+  element, hence at most `s₀` atoms;
 * `exists_atoms_finset`: the finite atomic core of a finitely generated submonoid;
 * `example_atoms`: the example of `sec:common-presentations` with the nonnested supports
   `{4, 6, 7}` and `{4, 6, 9}`.
@@ -129,11 +129,10 @@ theorem length_le_of_sum_atoms (Λ : AddSubmonoid ℕ) (s₀ : ℕ) (hs₀ : ∀
   have := List.card_nsmul_le_sum l s₀ (fun a ha => hs₀ a (hl a ha))
   simpa [smul_eq_mul] using this
 
-/-! ### Finiteness of the atoms (`sec:unbounded-supports`) -/
+/-! ### Finiteness of the atoms -/
 
 /-- Two atoms in the same residue class modulo a positive element of the submonoid coincide:
-the larger one would differ from the smaller by a positive multiple of that element
-(`sec:unbounded-supports`, "The common generators remain finite"). -/
+the larger one would differ from the smaller by a positive multiple of that element. -/
 private lemma eq_of_mod_eq_of_isAtom {Λ : AddSubmonoid ℕ} {s₀ : ℕ} (hs₀ : s₀ ∈ Λ) {a b : ℕ}
     (ha : IsAtom Λ a) (hb : IsAtom Λ b) (hab : a % s₀ = b % s₀) : a = b := by
   -- the ordered claim: no atom lies strictly above another one of the same residue class
@@ -150,8 +149,7 @@ private lemma eq_of_mod_eq_of_isAtom {Λ : AddSubmonoid ℕ} {s₀ : ℕ} (hs₀
   · exact heq
   · exact (key b a hb ha hab.symm hgt).elim
 
-/-- The residue map modulo an element of the submonoid is injective on the atoms
-(`sec:unbounded-supports`). -/
+/-- The residue map modulo an element of the submonoid is injective on the atoms. -/
 lemma injOn_mod_atoms {Λ : AddSubmonoid ℕ} {s₀ : ℕ} (hs₀ : s₀ ∈ Λ) :
     Set.InjOn (fun a => a % s₀) (atoms Λ) :=
   fun _ ha _ hb hab => eq_of_mod_eq_of_isAtom hs₀ ha hb hab
@@ -161,15 +159,15 @@ private lemma mapsTo_mod_atoms (Λ : AddSubmonoid ℕ) {s₀ : ℕ} (hpos : 0 < 
     Set.MapsTo (fun a => a % s₀) (atoms Λ) (↑(Finset.range s₀) : Set ℕ) :=
   fun _ _ => by simpa using Nat.mod_lt _ hpos
 
-/-- **Finiteness** (`sec:unbounded-supports`): a submonoid of `ℕ` with a positive element has
-at most one atom in each residue class modulo that element, hence finitely many atoms. -/
+/-- **Finiteness**: a submonoid of `ℕ` with a positive element has at most one atom in each
+residue class modulo that element, hence finitely many atoms. -/
 theorem atoms_finite (Λ : AddSubmonoid ℕ) (h : ∃ n ∈ Λ, 0 < n) : (atoms Λ).Finite := by
   obtain ⟨n, hn, hnpos⟩ := h
   exact Set.Finite.of_injOn (mapsTo_mod_atoms Λ hnpos) (injOn_mod_atoms hn)
     (Finset.finite_toSet _)
 
 /-- At most one atom in each residue class modulo the least positive element `s₀`, hence at
-most `s₀` atoms (`sec:unbounded-supports`). -/
+most `s₀` atoms. -/
 theorem atoms_ncard_le (Λ : AddSubmonoid ℕ) {s₀ : ℕ} (hs₀ : s₀ ∈ Λ) (hpos : 0 < s₀)
     (hmin : ∀ n ∈ Λ, 0 < n → s₀ ≤ n) : (atoms Λ).ncard ≤ s₀ := by
   -- minimality of `s₀` is not needed: any positive element of `Λ` gives the bound

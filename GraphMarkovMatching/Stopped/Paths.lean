@@ -9,8 +9,8 @@ transition selections of `markov_matching_new_proof.tex` (`sec:restricted-potent
   a set of types and their plain and weighted masses;
 * `Phase`, `child`, `children`, `reach`, `IsPath`, `Stops`, `CommonReturns`,
   `FreshPositive`: the phase maps, possible paths, and the two finite-type hypotheses;
-* `Selection`, `Selection.budget`, `Selection.full`: the transition selections and the
-  budget `B` of `eq:transition-budget`;
+* `Selection`, `Selection.inverseSum`, `Selection.full`: the transition selections and the
+  bound `B` of `eq:transition-budget`;
 * `SHe`, `GHe`, `Ufun`, `Efun`, `Qfun`, `Cmix`: the explicit scalar functions of
   `eq:explicit-zero-bound`, `eq:explicit-weighted-error` and `sec:averaging`, in `ℝ≥0∞`.
 -/
@@ -368,15 +368,15 @@ structure Selection (M : Model V I) where
     rE (M.childMix t h) (SquareRel (M.sim h)) p ≠ 0 →
     ∃ j ∈ J t, rE (prodPMF (M.rho j.1 h) (M.rho j.2 h)) (SquareRel (M.sim h)) p ≠ 0
 
-/-- The inverse-probability budget `∑_{j ∈ J_t} π_t(j)^{-α}` of a type. -/
-noncomputable def Selection.budget {M : Model V I} (Sel : Selection M) (α : ℝ) (t : I) :
+/-- The inverse-probability sum `∑_{j ∈ J_t} π_t(j)^{-α}` of a type. -/
+noncomputable def Selection.inverseSum {M : Model V I} (Sel : Selection M) (α : ℝ) (t : I) :
     ℝ≥0∞ :=
   ∑ j ∈ Sel.J t, (M.π t j) ^ (-α)
 
-/-- The budget is at least one. -/
-lemma Selection.one_le_budget {M : Model V I} (Sel : Selection M) {α : ℝ} (hα : 0 ≤ α)
+/-- The inverse-probability sum is at least one. -/
+lemma Selection.one_le_inverseSum {M : Model V I} (Sel : Selection M) {α : ℝ} (hα : 0 ≤ α)
     (t : I) :
-    1 ≤ Sel.budget α t := by
+    1 ≤ Sel.inverseSum α t := by
   obtain ⟨j, hj⟩ := Sel.nonempty t
   refine le_trans ?_ (Finset.single_le_sum (fun i _ => zero_le) hj)
   calc (1 : ℝ≥0∞) = (M.π t j) ^ (0 : ℝ) := ENNReal.rpow_zero.symm

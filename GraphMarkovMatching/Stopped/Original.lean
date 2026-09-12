@@ -13,17 +13,17 @@ The original Markov statements (`markov_matching_new_proof.tex`, `sec:original-s
   the law of the state labelling of a fresh type of the balanced presentation of `ν̄`;
 * `fullSim_labRel_iff`, `failProb_Tlaw_eq`: matching depends only on
   the states, hence the failure probabilities agree;
-* `budget_nuBar_le`: the budget comparison `∑ ν̄(k)^{-α} ≤ ∑ ν(k)^{-5/2}` for `α ≤ 5/2`;
+* `inverseSum_nuBar_le`: the inverse-sum comparison `∑ ν̄(k)^{-α} ≤ ∑ ν(k)^{-5/2}` for `α ≤ 5/2`;
 * `original_one_law_matching`, `original_one_law_matching_two`,
   `original_one_law_matching_fiveHalf`: the one-law statement recovered for the original
   process;
 * `graftPort`, `compProfile`, `CompositeData`, `CompositeData.toPresentation`: the composite
   profiles of the declared pairs and the presentation of the prescribed composite two-law
-  process (`sec:composite-process`, `def:composite-kernel`);
+  process (`sec:composite-process`);
 * `cT_states_eq`, `cFailProb_eq`: the law identification for the composite kernel `compK` of
   `Models/Composite.lean` and the agreement of the two-law failure probabilities;
 * `composite_two_law_matching`: the two-law statement recovered for the composite
-  processes, with the budget `B = max_σ ∑_{k ∈ S} ν_σ(k)^{-α}` of `sec:composite-process`.
+  processes, with the bound `B = max_σ ∑_{k ∈ S} ν_σ(k)^{-α}` of `sec:composite-process`.
 -/
 import GraphMarkovMatching.Stopped.Exponent
 import GraphMarkovMatching.Stopped.PresentationLaws
@@ -415,12 +415,12 @@ theorem failProb_Tlaw_eq (h : ℕ) (σ σ' : Bool) :
 
 end Identification
 
-/-! ### The budget and potential comparisons (`sec:single-counter-law`) -/
+/-! ### The inverse-sum and potential comparisons (`sec:single-counter-law`) -/
 
-/-- **The budget comparison** (`sec:single-counter-law`): combining components only reduces
+/-- **The inverse-sum comparison** (`sec:single-counter-law`): combining components only reduces
 the required sum, and `p^{-α} ≤ p^{-5/2}` for `0 < p ≤ 1` and `α ≤ 5/2`, so
 `∑_{k ∈ supp ν̄} ν̄(k)^{-α} ≤ ∑_{k ∈ supp ν} ν(k)^{-5/2}`. -/
-theorem budget_nuBar_le (ν : PMF ℕ) (supp : Finset ℕ) {α : ℝ} (hα0 : 0 ≤ α)
+theorem inverseSum_nuBar_le (ν : PMF ℕ) (supp : Finset ℕ) {α : ℝ} (hα0 : 0 ≤ α)
     (hα : α ≤ 5 / 2) :
     ∑ k ∈ suppBar supp, (nuBar ν k) ^ (-α) ≤ ∑ k ∈ supp, (ν k) ^ (-(5 / 2 : ℝ)) := by
   rw [suppBar]
@@ -430,10 +430,10 @@ theorem budget_nuBar_le (ν : PMF ℕ) (supp : Finset ℕ) {α : ℝ} (hα0 : 0 
     _ ≤ (ν k) ^ (-(5 / 2 : ℝ)) :=
         ENNReal.rpow_le_rpow_of_exponent_ge (PMF.coe_le_one _ _) (by linarith)
 
-/-- The budget comparison at exponent `2` (`sec:single-counter-law`). -/
-theorem budget_nuBar_le_two (ν : PMF ℕ) (supp : Finset ℕ) :
+/-- The inverse-sum comparison at exponent `2` (`sec:single-counter-law`). -/
+theorem inverseSum_nuBar_le_two (ν : PMF ℕ) (supp : Finset ℕ) :
     ∑ k ∈ suppBar supp, (nuBar ν k) ^ (-(2 : ℝ)) ≤ ∑ k ∈ supp, (ν k) ^ (-(5 / 2 : ℝ)) :=
-  budget_nuBar_le ν supp (by norm_num) (by norm_num)
+  inverseSum_nuBar_le ν supp (by norm_num) (by norm_num)
 
 /-! ### The one-law statement recovered (`sec:single-counter-law`) -/
 
@@ -461,7 +461,7 @@ lemma one_le_TcountBal (supp : Finset ℕ) : 1 ≤ TcountBal supp := one_le_Tcou
 
 /-- **The one-law statement recovered, with explicit constants**
 (`sec:single-counter-law`): for an exponent parameter set with `α ≤ 5/2`, a finite counter
-support, and a budget `T₀ ≥ ∑_{k ∈ supp ν} ν(k)^{-5/2}`, with `H = HretBal supp`,
+support, and a bound `T₀ ≥ ∑_{k ∈ supp ν} ν(k)^{-5/2}`, with `H = HretBal supp`,
 `T = TcountBal supp`, `B = max T₀ 1` and any `K > K₀(H, B)`: for every counter law with
 that support, every state space with a reflexive symmetric compatibility, a distinguished
 state of mass at least `1/2` and `η_α(μ) ≤ ε_K / 2`, the varying-offspring process fails
@@ -490,11 +490,11 @@ theorem original_one_law_matching_explicit (p : Params) (hα : p.α ≤ 5 / 2) (
     exact ENNReal.div_ne_top (ne_top_of_le_ne_top ENNReal.ofReal_ne_top hη) hp
   have hb0 : rE μ Rv v0 ≠ 0 := M.rE_zero_ne_zero_of_zeta_ne_top hζtop
   have hB : 1 ≤ max T0 1 := le_max_right _ _
-  have hBs : ∀ t, (P.selection Rv v0 μ hcompat hb0).budget p.α t ≤ ENNReal.ofReal (max T0 1) := by
+  have hBs : ∀ t, (P.selection Rv v0 μ hcompat hb0).inverseSum p.α t ≤ ENNReal.ofReal (max T0 1) := by
     intro t
-    refine (P.budget_le Rv v0 μ hcompat hb0 p.α_nonneg t).trans ?_
+    refine (P.inverseSum_le Rv v0 μ hcompat hb0 p.α_nonneg t).trans ?_
     have key : ∑ a ∈ suppBar supp, (nuBar ν a) ^ (-p.α) ≤ ENNReal.ofReal (max T0 1) :=
-      (budget_nuBar_le ν supp p.α_nonneg hα).trans
+      (inverseSum_nuBar_le ν supp p.α_nonneg hα).trans
         (hbud.trans (ENNReal.ofReal_le_ofReal (le_max_left _ _)))
     exact max_le key key
   exact markov_matching_finite_eta p (HretBal supp) (TcountBal supp) (one_le_TcountBal supp)
@@ -504,7 +504,7 @@ theorem original_one_law_matching_explicit (p : Params) (hα : p.α ≤ 5 / 2) (
     (P.freshL false) (P.phase_freshL_eq Rv v0 μ false false) h
 
 /-- **The one-law statement recovered** (`sec:single-counter-law`): for an exponent
-parameter set with `α ≤ 5/2`, a finite counter support and a budget `T₀`, there are
+parameter set with `α ≤ 5/2`, a finite counter support and a bound `T₀`, there are
 constants `K, ε` depending only on these data such that, for every counter law `ν` with that
 support and `∑_{k ∈ supp ν} ν(k)^{-5/2} ≤ T₀`, every state space with a reflexive symmetric
 compatibility, a distinguished state `0` of mass at least `1/2` and `η_α(μ) ≤ ε`, the
@@ -599,7 +599,7 @@ theorem original_one_law_matching_prob (p : Params) (hα : p.α ≤ 5 / 2) (supp
 /-! ### The composite profiles (`sec:composite-process`) -/
 
 /-- The balanced profile of the counter `v` with the designated leaf, the leftmost of the
-next fresh vertices of minimal depth (`eq:port-depth`), replaced by the tree `g`
+next fresh vertices of minimal depth (`sec:composite-process`), replaced by the tree `g`
 (`sec:composite-process`: "inserting one core descent into a specified leaf of another"). -/
 def graftPort (g : MTree) (v : ℕ) : MTree :=
   if h4 : 4 ≤ v then MTree.node (graftPort g (v / 2)) (rem (v - v / 2))
@@ -704,7 +704,7 @@ lemma allComp_markRoot_rem {S : Finset ℕ} {b : ℕ} (hb : max b 2 ∈ S) :
   rw [MTree.flatten_eq_self_of_noGraft hng.1, MTree.flatten_eq_self_of_noGraft hng.2, rem_max, h]
 
 /-- The composite profile of a counter under the exceptional data `exc`
-(`def:composite-kernel`, `sec:composite-process`): the balanced profile of `a` with the
+(`sec:composite-process`): the balanced profile of `a` with the
 marked balanced profile of `b` at the designated leaf for a declared pair `(a, b)`, the
 marked balanced profile otherwise. -/
 def compProfile (exc : ℕ → Option (ℕ × ℕ)) (k : ℕ) : MTree :=
@@ -726,12 +726,12 @@ lemma compProfile_of_none {exc : ℕ → Option (ℕ × ℕ)} {k : ℕ} (h : exc
 lemma rootPair_markRoot_node (σ : Bool) (l r : MTree) :
     rootPair σ (MTree.markRoot (MTree.node l r)) = rootPair σ (MTree.node l r) := rfl
 
-/-- The data of the prescribed composite two-law process (`def:composite-kernel`,
+/-- The data of the prescribed composite two-law process (`sec:composite-process`,
 `sec:composite-process`): on each side `σ`, a counter law `ν σ` with finite support `K σ`
 and exceptional data `exc σ`; a common core `S` of counters at least `2` and at most `N`;
 no counter at most `N` is exceptional; every charged ordinary counter merges into the core;
 every declared pair merges into the core and its counter is the arity `a + b - 1`
-(`eq:composite-pair`) of the composite profile. -/
+(`sec:composite-process`) of the composite profile. -/
 structure CompositeData where
   /-- the exceptional data of each side -/
   exc : Bool → ℕ → Option (ℕ × ℕ)
@@ -741,7 +741,7 @@ structure CompositeData where
   K : Bool → Finset ℕ
   /-- the common core -/
   S : Finset ℕ
-  /-- the bound above which the exceptional counters lie (`eq:above-core`) -/
+  /-- the bound above which the exceptional counters lie (`sec:composite-process`) -/
   N : ℕ
   mem_K : ∀ σ k, ν σ k ≠ 0 ↔ k ∈ K σ
   exc_none : ∀ σ j, j ≤ N → exc σ j = none
@@ -962,7 +962,7 @@ lemma cFreshClaim_zero : CFreshClaim C μ v0 Rv σ 0 := by
   exact PMF.bind_const (C.ν σ) _
 
 /-- The pair identity for ordinary counters at height `h` from the forced and fresh
-identities at height `h` (`def:composite-kernel`, rule (i)). -/
+identities at height `h` (`sec:composite-process`, rule (i)). -/
 lemma cPairOrd_of (h : ℕ) (hZ : CForcedClaim C μ v0 Rv σ h) (hF : CFreshClaim C μ v0 Rv σ h) :
     CPairOrd C μ v0 Rv σ h := by
   intro j hjN h1 h2
@@ -987,7 +987,7 @@ lemma cPairOrd_of (h : ℕ) (hZ : CForcedClaim C μ v0 Rv σ h) (hF : CFreshClai
         prodPMF_map_prod, (cP).toLive_fresh, cT_map_eq_of_fresh C μ v0 Rv σ h hF]
 
 /-- The pair identity for marked counters at height `h` from the forced, marked and fresh
-identities at height `h` (`def:composite-kernel`, rules (ii) and (iii)). -/
+identities at height `h` (`sec:composite-process`, rules (ii) and (iii)). -/
 lemma cPairMark_of (h : ℕ) (hZ : CForcedClaim C μ v0 Rv σ h) (hMk : CMarkClaim C μ v0 Rv σ h)
     (hF : CFreshClaim C μ v0 Rv σ h) : CPairMark C μ v0 Rv σ h := by
   intro a b i haN hbN h1 h2
@@ -1158,9 +1158,9 @@ lemma Hret_eq : C.toPresentation.Hret = HretComp C.exc C.K C.S := rfl
 /-- The type count of the composite presentation is `TcountComp`. -/
 lemma Tcount_eq : C.toPresentation.Tcount = TcountComp C.exc C.K := rfl
 
-/-- The core budget of the merged law is at most that of the original law
+/-- The core bound of the merged law is at most that of the original law
 (`sec:composite-process`: `B = max_σ ∑_{k ∈ S} ν_σ(k)^{-α}`). -/
-lemma budget_nuBar_le {α : ℝ} (hα : 0 ≤ α) (σ : Bool) :
+lemma inverseSum_nuBar_le {α : ℝ} (hα : 0 ≤ α) (σ : Bool) :
     ∑ a ∈ C.S, (nuBar (C.ν σ) a) ^ (-α) ≤ ∑ a ∈ C.S, (C.ν σ a) ^ (-α) := by
   refine Finset.sum_le_sum fun a ha => ?_
   refine rpow_neg_antitone hα ?_
@@ -1174,7 +1174,7 @@ lemma one_le_TcountComp (exc : Bool → ℕ → Option (ℕ × ℕ)) (K : Bool �
     1 ≤ TcountComp exc K := one_le_TcountOf _ _
 
 /-- **The two-law statement recovered, with explicit constants** (`sec:composite-process`):
-for composite data with budget `B ≥ max_σ ∑_{k ∈ S} ν_σ(k)^{-α}`, with `H = HretComp`,
+for composite data with bound `B ≥ max_σ ∑_{k ∈ S} ν_σ(k)^{-α}`, with `H = HretComp`,
 `T = TcountComp` and any `K > K₀(H, B)`, every state space with a reflexive symmetric
 compatibility, a distinguished state of mass at least `1/2` and `η_α(μ) ≤ ε_K / 2` has the
 two composite processes failing to match at height `h` with probability at most
@@ -1202,11 +1202,11 @@ theorem composite_two_law_matching_explicit (p : Params) (C : CompositeData) (B 
     refine ne_top_of_le_ne_top ?_ hζη
     exact ENNReal.div_ne_top (ne_top_of_le_ne_top ENNReal.ofReal_ne_top hη) hp
   have hb0 : rE μ Rv v0 ≠ 0 := M.rE_zero_ne_zero_of_zeta_ne_top hζtop
-  have hBs : ∀ t, (P.selection Rv v0 μ hcompat hb0).budget p.α t ≤ ENNReal.ofReal B := by
+  have hBs : ∀ t, (P.selection Rv v0 μ hcompat hb0).inverseSum p.α t ≤ ENNReal.ofReal B := by
     intro t
-    refine (P.budget_le Rv v0 μ hcompat hb0 p.α_nonneg t).trans ?_
+    refine (P.inverseSum_le Rv v0 μ hcompat hb0 p.α_nonneg t).trans ?_
     have key : ∀ σ, ∑ a ∈ C.S, (nuBar (C.ν σ) a) ^ (-p.α) ≤ ENNReal.ofReal B :=
-      fun σ => (C.budget_nuBar_le p.α_nonneg σ).trans (hbud σ)
+      fun σ => (C.inverseSum_nuBar_le p.α_nonneg σ).trans (hbud σ)
     exact max_le (key false) (key true)
   exact markov_matching_finite_eta p (HretComp C.exc C.K C.S) (TcountComp C.exc C.K)
     (one_le_TcountComp _ _) B hB Kc hK M hcompat (P.phase Rv v0 μ) (P.count_le_card Rv v0 μ)
@@ -1214,9 +1214,9 @@ theorem composite_two_law_matching_explicit (p : Params) (C : CompositeData) (B 
     (P.commonReturns_Hret Rv v0 μ) (by norm_num) (by norm_num) hμ hη (P.freshL false)
     (P.freshL true) (P.phase_freshL_eq Rv v0 μ false true) h
 
-/-- **The two-law statement recovered** (`sec:composite-process`, `thm:composite-matching`
+/-- **The two-law statement recovered** (`sec:composite-process`
 of the manuscript): for an exponent parameter set, exceptional data, supports, a common
-core and a budget `B`, there are constants `K, ε` such that, for every pair of counter laws
+core and a bound `B`, there are constants `K, ε` such that, for every pair of counter laws
 forming composite data with these parameters and `max_σ ∑_{k ∈ S} ν_σ(k)^{-α} ≤ B`, every
 state space with a reflexive symmetric compatibility, a distinguished state of mass at least
 `1/2` and `η_α(μ) ≤ ε` has the two composite processes failing to match at every height with

@@ -4,7 +4,7 @@ import ChainClasses.Shape.AddrMetric
 
 /-!
 `thm:shape-shrink` of `gw_classes_simple.tex` at general arity, the moves after the
-contraction: the shrinking pipeline `sec:general-transfer` of
+contraction: the shrinking pipeline `sec:general-relabel` of
 `matching_classes_general.tex` needs in the proof of `thm:relabel`, as a function of an
 arbitrary marked rose tree.
 

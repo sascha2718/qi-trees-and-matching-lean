@@ -279,6 +279,81 @@ theorem extinction_lt_one_of_supercritical (h : θ.IsSupercritical) :
     θ.extinction_le_of_fixed ⟨hc_mem.1, le_trans hc_mem.2 hs_lt.le⟩ hcfix
   linarith [hc_mem.2]
 
+/-! ### The subcritical and critical criterion -/
+
+/-- The difference quotient `g` is monotone on `[0,∞)`: each geometric sum is. -/
+lemma genSlope_mono {s t : ℝ} (hs : 0 ≤ s) (hst : s ≤ t) :
+    genSlope θ s ≤ genSlope θ t := by
+  unfold genSlope
+  refine Finset.sum_le_sum fun j _ => ?_
+  refine mul_le_mul_of_nonneg_left ?_ (θ.nonneg j)
+  exact Finset.sum_le_sum fun i _ => pow_le_pow_left₀ hs hst i
+
+/-- With positive mass at some `j ≥ 2`, `g` is strictly increasing on `[0,∞)`. -/
+lemma genSlope_lt_of_lt {j : ℕ} (hj : 2 ≤ j) (hθ : 0 < θ j) {s t : ℝ} (hs : 0 ≤ s)
+    (hst : s < t) : genSlope θ s < genSlope θ t := by
+  have hjJ : j ∈ Finset.range (J + 1) := by
+    rw [Finset.mem_range]
+    by_contra hc
+    exact hθ.ne' (θ.vanishing j (by omega))
+  unfold genSlope
+  refine Finset.sum_lt_sum (fun i _ => ?_) ⟨j, hjJ, ?_⟩
+  · exact mul_le_mul_of_nonneg_left
+      (Finset.sum_le_sum fun i _ => pow_le_pow_left₀ hs hst.le i) (θ.nonneg i)
+  · refine mul_lt_mul_of_pos_left ?_ hθ
+    refine Finset.sum_lt_sum (fun i _ => pow_le_pow_left₀ hs hst.le i) ⟨1, ?_, ?_⟩
+    · rw [Finset.mem_range]
+      omega
+    · simpa using hst
+
+/-- Without mass above one, `g` is the constant `θ_1`. -/
+lemma genSlope_eq_of_forall_zero (h : ∀ j, 2 ≤ j → θ j = 0) (s : ℝ) :
+    genSlope θ s = θ 1 := by
+  unfold genSlope
+  rw [Finset.sum_eq_single 1]
+  · simp
+  · intro j _ hj1
+    rcases Nat.lt_or_ge j 2 with hj | hj
+    · interval_cases j
+      · simp
+      · exact absurd rfl hj1
+    · rw [h j hj, zero_mul]
+  · intro h1
+    rw [Finset.mem_range] at h1
+    rw [θ.vanishing 1 (by omega), zero_mul]
+
+/-- **The classical criterion, second half**: a law with mean at most one dies out, `q = 1`,
+unless it is the deterministic single child `θ_1 = 1`.  At a fixed point `s < 1` the
+difference quotient equals one; it is below the mean when some `θ_j > 0` with `j ≥ 2`, and
+equals `θ_1` otherwise. -/
+theorem extinction_eq_one_of_mean_le_one (h : mean θ ≤ 1) (h1 : θ 1 ≠ 1) :
+    θ.extinction = 1 := by
+  refine le_antisymm θ.extinction_le_one ?_
+  by_contra hlt
+  push Not at hlt
+  have hq0 : 0 ≤ θ.extinction := θ.extinction_nonneg
+  have hfix : gen θ θ.extinction = θ.extinction := θ.gen_extinction
+  -- At the fixed point `q < 1` the difference quotient equals one.
+  have hslope : genSlope θ θ.extinction = 1 := by
+    have hquot := θ.one_sub_gen θ.extinction
+    rw [hfix] at hquot
+    have hne : (1 - θ.extinction) ≠ 0 := sub_ne_zero.mpr hlt.ne'
+    have hmul : (1 - θ.extinction) * genSlope θ θ.extinction = (1 - θ.extinction) * 1 := by
+      rw [mul_one, ← hquot]
+    exact mul_left_cancel₀ hne hmul
+  by_cases hex : ∃ j, 2 ≤ j ∧ θ j ≠ 0
+  · -- Some mass above one: `g` is strictly increasing, so `g(q) < g(1) = m ≤ 1`.
+    obtain ⟨j, hj, hjne⟩ := hex
+    have hpos : 0 < θ j := lt_of_le_of_ne (θ.nonneg j) (Ne.symm hjne)
+    have hlt' : genSlope θ θ.extinction < genSlope θ 1 := θ.genSlope_lt_of_lt hj hpos hq0 hlt
+    rw [θ.genSlope_one, hslope] at hlt'
+    linarith
+  · -- No mass above one: `g` is the constant `θ_1`, which would have to be one.
+    push Not at hex
+    have hconst := θ.genSlope_eq_of_forall_zero hex θ.extinction
+    rw [hslope] at hconst
+    exact h1 hconst.symm
+
 end Offspring
 
 end BranchingProcess

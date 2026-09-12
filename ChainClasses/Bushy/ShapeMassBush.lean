@@ -14,7 +14,7 @@ on the tree cuts out the same tree, so the point mass of a bush is the mass of a
 event.  Reading a bush off a field asks for the offspring bound at every vertex, which
 holds almost surely, so the mass is unchanged by intersecting with that event.  The bush of
 a field is its sample, so the size of a bush is the number of vertices of the sample, and
-the conjugate law of a hairy law is subcritical, which is what the exponential moment of
+the conjugate law of a bushy law is subcritical, which is what the exponential moment of
 the total progeny asks for.
 
 * `Tri.ext_isAddr`: **extensionality by addresses**, two finite trees with the same
@@ -346,7 +346,7 @@ lemma total_of_two (θ : Offspring 2) : θ 0 + θ 1 + θ 2 = 1 := by
     Finset.sum_range_zero] at h
   linarith
 
-/-- **The extinction probability of a hairy law is `θ₀/θ₂`**, in the form
+/-- **The extinction probability of a bushy law is `θ₀/θ₂`**, in the form
 `θ₂q = θ₀`: the fixed-point equation factors as `(s-1)(θ₂s-θ₀)`, and `q < 1`. -/
 lemma mul_extinction_eq (θ : Offspring 2) (hq : θ.extinction < 1) :
     θ 2 * θ.extinction = θ 0 := by
@@ -375,7 +375,7 @@ lemma pos_two_of_extinction_pos (θ : Offspring 2) (hq : θ.extinction < 1)
     exact absurd (θ.extinction_eq_zero_iff.mpr h0) hq0.ne'
 
 /-- **`thm:harris` (`it:harris-bushes`), the arithmetic**: the conjugate law of a
-hairy offspring law is subcritical.  Its mean is `f'(q) = θ₁ + 2θ₂q = θ₁ + 2θ₀`, which is
+bushy offspring law is subcritical.  Its mean is `f'(q) = θ₁ + 2θ₂q = θ₁ + 2θ₀`, which is
 the skeleton weight `θ̃₁`, and `θ₀ < θ₂` because `q < 1`. -/
 theorem conjugate_isSubcritical (θ : Offspring 2) (hq : θ.extinction < 1)
     (hq0 : 0 < θ.extinction) : (θ.conjugate hq0).IsSubcritical := by

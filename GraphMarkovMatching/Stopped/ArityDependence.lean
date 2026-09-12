@@ -1,14 +1,14 @@
 /-
 Polynomial dependence on the largest arity (`markov_matching_new_proof.tex`,
 `sec:arity-dependence`): for a fixed atom set `𝒜` and a probability floor `c` on the core
-arities, the canonical presentations (`sec:profile-depth`: one root child a leaf, the other
+arities, the canonical presentations (`sec:profile-depths`: one root child a leaf, the other
 a balanced tree) with largest arity `N` satisfy `thm:markov-matching` at exponent `2` with
 the threshold `c₁ N^{-2p}` and the failure coefficient `C₁ N^p`, where
 `p = 2 log₂(16 B₀)` and `B₀ = max{1, #𝒜 c^{-2}}`.
 
 * `balanced`, `canonicalProfile`: the balanced tree with `n` leaves and the canonical
   atomic profile `D_a = node leaf (balanced a)`, with its depth-one leaf and height at
-  most `1 + ⌈log₂ a⌉` (`sec:profile-depth`);
+  most `1 + ⌈log₂ a⌉` (`sec:profile-depths`);
 * `IsCanonical`: the canonical presentations of `𝒜` with largest arity at most `N`;
 * `Lfix`, `B0`, `pExp`, `arityC2`, `arityC1`, `arityc1`: the constants of
   `sec:arity-dependence`;
@@ -35,10 +35,10 @@ namespace GraphMarkovMatching.Stopped
 open GraphMarkovMatching GraphMarkovMatching.Support Model
 open scoped ENNReal Classical
 
-/-! ### The canonical atomic profiles (`sec:profile-depth`) -/
+/-! ### The canonical atomic profiles (`sec:profile-depths`) -/
 
 /-- The balanced full binary tree with `n` leaves, a leaf for `n ≤ 1`: the root subtrees
-carry `⌈n/2⌉` and `⌊n/2⌋` leaves (`sec:profile-depth`). -/
+carry `⌈n/2⌉` and `⌊n/2⌋` leaves (`sec:profile-depths`). -/
 def balanced (n : ℕ) : MTree :=
   if _ : n ≤ 1 then MTree.leaf
   else MTree.node (balanced ((n + 1) / 2)) (balanced (n / 2))
@@ -54,7 +54,7 @@ lemma balanced_of_lt {n : ℕ} (hn : 1 < n) :
     balanced n = MTree.node (balanced ((n + 1) / 2)) (balanced (n / 2)) := by
   rw [balanced, dif_neg (by omega)]
 
-/-- The balanced tree with `n ≥ 1` leaves has `n` leaves (`sec:profile-depth`). -/
+/-- The balanced tree with `n ≥ 1` leaves has `n` leaves (`sec:profile-depths`). -/
 lemma leaves_balanced (n : ℕ) : 1 ≤ n → (balanced n).leaves = n := by
   refine Nat.strong_induction_on n ?_
   intro n ih hn
@@ -78,7 +78,7 @@ lemma noGraft_balanced (n : ℕ) : (balanced n).NoGraft := by
     exact ⟨ih _ (by omega), ih _ (by omega)⟩
 
 /-- The balanced tree with `n` leaves has height at most `⌈log₂ n⌉`
-(`sec:profile-depth`). -/
+(`sec:profile-depths`). -/
 lemma height_balanced (n : ℕ) : (balanced n).height ≤ Nat.clog 2 n := by
   refine Nat.strong_induction_on n ?_
   intro n ih
@@ -96,7 +96,7 @@ lemma height_balanced (n : ℕ) : (balanced n).height ≤ Nat.clog 2 n := by
     rw [h5]
     omega
 
-/-- The canonical atomic profile `D_a = node leaf (balanced a)` (`sec:profile-depth`): one
+/-- The canonical atomic profile `D_a = node leaf (balanced a)` (`sec:profile-depths`): one
 root child a leaf, the other a balanced tree with `a` leaves. -/
 def canonicalProfile (a : ℕ) : MTree := MTree.node MTree.leaf (balanced a)
 
@@ -106,7 +106,7 @@ lemma leaves_canonicalProfile {a : ℕ} (ha : 1 ≤ a) : (canonicalProfile a).le
   rw [leaves_balanced a ha]
   omega
 
-/-- `D_a` has height at most `1 + ⌈log₂ a⌉` (`sec:profile-depth`). -/
+/-- `D_a` has height at most `1 + ⌈log₂ a⌉` (`sec:profile-depths`). -/
 lemma height_canonicalProfile (a : ℕ) : (canonicalProfile a).height ≤ Nat.clog 2 a + 1 := by
   show max MTree.leaf.height (balanced a).height + 1 ≤ _
   have := height_balanced a
@@ -128,7 +128,7 @@ lemma one_mem_leafDepths_canonicalProfile (a : ℕ) : 1 ∈ (canonicalProfile a)
 /-! ### The constants (`sec:arity-dependence`) -/
 
 /-- `L = 1 + ⌈log₂ max 𝒜⌉`, the common height bound of the canonical profiles
-(`sec:profile-depth`). -/
+(`sec:profile-depths`). -/
 def Lfix (A : Finset ℕ) : ℕ := Nat.clog 2 (A.sup id) + 1
 
 /-- `B₀ = max{1, #𝒜 c^{-2}}` (`sec:arity-dependence`). -/
@@ -314,15 +314,15 @@ lemma card_live_le : P.live.card ≤ N ^ 2 := by
         gcongr
     _ ≤ (m + 2) ^ 2 := by nlinarith
 
-/-- The budget of the core selection is at most `B₀` (`sec:positive-fresh`,
+/-- The inverse-probability sum of the core selection is at most `B₀` (`sec:positive-matching`,
 `sec:arity-dependence`). -/
-lemma budget_le {V : Type} (R : V → V → Prop) (zero : V) (μ : PMF V)
+lemma inverseSum_le {V : Type} (R : V → V → Prop) (zero : V) (μ : PMF V)
     (hc : (P.toModel R zero μ).IsCompat) (hb0 : rE μ R zero ≠ 0) (hc0 : 0 < c)
     (t : P.Live) :
-    (P.selection R zero μ hc hb0).budget 2 t ≤ ENNReal.ofReal (B0 A c) := by
-  refine (P.budget_le_of_floor R zero μ hc hb0 (by norm_num) hc0 hP.floor t).trans ?_
+    (P.selection R zero μ hc hb0).inverseSum 2 t ≤ ENNReal.ofReal (B0 A c) := by
+  refine (P.inverseSum_le_of_floor R zero μ hc hb0 (by norm_num) hc0 hP.floor t).trans ?_
   refine ENNReal.ofReal_le_ofReal ?_
-  unfold Presentation.coreBudget budgetOf
+  unfold Presentation.coreInverseSum inverseSumOf
   rw [hP.card_S]
   exact card_mul_le_B0 A c
 
@@ -685,8 +685,8 @@ theorem arity_dependence_explicit (A : Finset ℕ) (hA : A.Nonempty) (hA1 : ∀ 
   have hTc : ∀ i, (P.phase R zero μ).count i ≤ P.live.card := P.count_le_card R zero μ
   have hCR : (P.toModel R zero μ).CommonReturns (P.phase R zero μ) (2 * P.ell) :=
     (P.commonReturns_depthOne R zero μ P.S_nonempty (hP.depthOne hA)).2
-  have hBs : ∀ u, (P.selection R zero μ hcompat hb0).budget 2 u ≤ ENNReal.ofReal (B0 A c) :=
-    hP.budget_le R zero μ hcompat hb0 hc
+  have hBs : ∀ u, (P.selection R zero μ hcompat hb0).inverseSum 2 u ≤ ENNReal.ofReal (B0 A c) :=
+    hP.inverseSum_le R zero μ hcompat hb0 hc
   have hFP : (P.toModel R zero μ).FreshPositive := P.freshPositive R zero μ hcompat hb0
   have hfour : ∀ h Mb Zm E, (P.toModel R zero μ).FourLawAt (P.phase R zero μ) 2 h
       (ENNReal.ofReal (381 / 512)) (ENNReal.ofReal 38) (ENNReal.ofReal (17 / 8)) Mb Zm E :=
@@ -884,7 +884,7 @@ theorem arity_dependence_eta (A : Finset ℕ) (hA : A.Nonempty) (hA1 : ∀ a ∈
         rw [div_mul_eq_mul_div, ENNReal.ofReal_div_of_pos hp0, div_eq_mul_inv, div_eq_mul_inv]
         ring
 
-/-! ### Existence of canonical presentations (`sec:common-generators`, `sec:profile-depth`) -/
+/-! ### Existence of canonical presentations (`sec:common-generators`, `sec:profile-depths`) -/
 
 /-- The expression of `n` in the atoms `𝒜`: the one-term expression `[n]` when `n` is an
 atom, otherwise a chosen list of atoms summing to `n` (the empty list outside the generated
@@ -925,7 +925,7 @@ private lemma canonical_supp_facts {A : Finset ℕ} {suppL suppR : Finset ℕ}
 
 /-- **The canonical presentation** of two arity laws with finite supports in `{2, 3, …}`
 containing the core `{a + 1 : a ∈ 𝒜}` and every shifted arity in the semigroup generated by
-`𝒜` (`sec:common-generators`, `sec:profile-depth`): the canonical core profiles and the
+`𝒜` (`sec:common-generators`, `sec:profile-depths`): the canonical core profiles and the
 composites of the chosen atomic expressions. -/
 noncomputable def canonicalPresentation (A : Finset ℕ) (hA : A.Nonempty)
     (hA1 : ∀ a ∈ A, 1 ≤ a) (νL νR : PMF ℕ) (suppL suppR : Finset ℕ)

@@ -1,6 +1,6 @@
 /-
 The weighted stopped expansion of `markov_matching_new_proof.tex`
-(`sec:one-weight`, `thm:explicit-weighted-bound`): one inverse-degree weight `W_{u,h}` is
+(`sec:weighted-zero`, `thm:explicit-weighted-bound`): one inverse-degree weight `W_{u,h}` is
 carried through the stopped expansion of an impossible comparison.
 
 * `wZero_succ_le`: the expansion step; the incompatible root contributes
@@ -24,10 +24,10 @@ namespace Model
 
 variable {V I : Type} (M : Model V I)
 
-/-! ### Fubini identities for the child pair (`sec:one-weight`) -/
+/-! ### Fubini identities for the child pair (`sec:weighted-zero`) -/
 
 /-- A separated integrand against a product law integrates to the product of the two
-marginal integrals (`sec:one-weight`, conditional independence of the children). -/
+marginal integrals (`sec:weighted-zero`, conditional independence of the children). -/
 private lemma tsum_prodPMF_mul {X Y : Type} (ρ₁ : PMF X) (ρ₂ : PMF Y) (f : X → ℝ≥0∞)
     (g : Y → ℝ≥0∞) :
     ∑' p : X × Y, prodPMF ρ₁ ρ₂ p * (f p.1 * g p.2)
@@ -49,20 +49,20 @@ private lemma tsum_mul_finset_sum {X ι : Type} (ρ : X → ℝ≥0∞) (s : Fin
     _ = ∑ i ∈ s, c i * ∑' p, ρ p * f i p :=
         Finset.sum_congr rfl fun i _ => ENNReal.tsum_mul_left
 
-/-- Two constants pulled out of an integral (`sec:one-weight`). -/
+/-- Two constants pulled out of an integral (`sec:weighted-zero`). -/
 private lemma tsum_mul_const_add {X : Type} (ρ f g : X → ℝ≥0∞) (x y : ℝ≥0∞) :
     ∑' p, ρ p * (x * f p + y * g p) = x * ∑' p, ρ p * f p + y * ∑' p, ρ p * g p := by
   rw [← ENNReal.tsum_mul_left, ← ENNReal.tsum_mul_left, ← ENNReal.tsum_add]
   exact tsum_congr fun p => by ring
 
-/-- Two integrals pulled out of a root-state average (`sec:one-weight`). -/
+/-- Two integrals pulled out of a root-state average (`sec:weighted-zero`). -/
 private lemma tsum_mul_add_mul {X : Type} (ρ a c : X → ℝ≥0∞) (x y : ℝ≥0∞) :
     ∑' v, ρ v * (a v * x + c v * y) = (∑' v, ρ v * a v) * x + (∑' v, ρ v * c v) * y := by
   rw [← ENNReal.tsum_mul_right, ← ENNReal.tsum_mul_right, ← ENNReal.tsum_add]
   exact tsum_congr fun v => by ring
 
 /-- A constant and a scaled integrand averaged against a probability law
-(`sec:one-weight`, the source transition is averaged with its original law). -/
+(`sec:weighted-zero`, the source transition is averaged with its original law). -/
 private lemma tsum_pmf_mul_const_add {X : Type} (ρ : PMF X) (f : X → ℝ≥0∞) (x y : ℝ≥0∞) :
     ∑' p, ρ p * (x + y * f p) = x + y * ∑' p, ρ p * f p := by
   calc ∑' p, ρ p * (x + y * f p)
@@ -74,7 +74,7 @@ private lemma tsum_pmf_mul_const_add {X : Type} (ρ : PMF X) (f : X → ℝ≥0�
 /-! ### The pointwise ingredients of the expansion step -/
 
 /-- The two-pairing product of child weights against a target pair `j'`
-(`sec:one-weight`): the restricted inverse pair degree is at most this sum. -/
+(`sec:weighted-zero`): the restricted inverse pair degree is at most this sum. -/
 private noncomputable def pairW (α : ℝ) (h : ℕ) (j' : I × I)
     (p : FullLab (I × V) h × FullLab (I × V) h) : ℝ≥0∞ :=
   M.W α j'.1 h p.1 * M.W α j'.2 h p.2 + M.W α j'.2 h p.1 * M.W α j'.1 h p.2
@@ -92,7 +92,7 @@ private noncomputable def indW (D' : Set I) (h : ℕ)
   (if M.ZeroEv D' h p.1 then 1 else 0) + (if M.ZeroEv D' h p.2 then 1 else 0)
     + (if M.UnionEv D' h p.1 then 1 else 0) * (if M.UnionEv D' h p.2 then 1 else 0)
 
-/-- **The pointwise bound of the weighted expansion step** (`sec:one-weight`): at a
+/-- **The pointwise bound of the weighted expansion step** (`sec:weighted-zero`): at a
 realised root state and a realised child pair, the zero-restricted weight of the branch is
 at most the incompatible-root weight times the selected pair weight, plus the
 compatible-root weight times the selected pair weight times the split indicator. -/
@@ -157,7 +157,7 @@ private lemma wUnion_le_Zt [Fintype I] {α : ℝ} (hα : 1 ≤ α) {g : ℕ} (Θ
     exact_mod_cast hT _
 
 /-- **The unrestricted pair moment**: against an independent source child pair, the
-two-pairing weight integrates to at most `2 U(M)²` (`sec:one-weight`). -/
+two-pairing weight integrates to at most `2 U(M)²` (`sec:weighted-zero`). -/
 private lemma pair_unres_le {α : ℝ} {h : ℕ} {Mb : ℝ≥0∞} {j j' : I × I}
     (hm11 : ∑' x, M.rho j.1 h x * M.W α j'.1 h x ≤ Ufun α Mb)
     (hm12 : ∑' x, M.rho j.1 h x * M.W α j'.2 h x ≤ Ufun α Mb)
@@ -182,7 +182,7 @@ private lemma pair_unres_le {α : ℝ} {h : ℕ} {Mb : ℝ≥0∞} {j j' : I × 
 
 /-- **One pairing against the split indicator**: the continuing terms carry one weighted
 zero integral times an unrestricted moment, the split term the product of two weighted
-union integrals (`sec:one-weight`). -/
+union integrals (`sec:weighted-zero`). -/
 private lemma pair_zero_le {α : ℝ} {h : ℕ} {Mb Zt : ℝ≥0∞} {a b c d : I} {D' : Set I}
     (hm1 : ∑' x, M.rho a h x * M.W α c h x ≤ Ufun α Mb)
     (hm2 : ∑' x, M.rho b h x * M.W α d h x ≤ Ufun α Mb)
@@ -235,7 +235,7 @@ private lemma pair_zero_le {α : ℝ} {h : ℕ} {Mb Zt : ℝ≥0∞} {a b c d : 
           (mul_le_mul' hu1 hu2)
     _ = Ufun α Mb * (M.wZero α a D' c h + M.wZero α b D' d h) + Zt ^ 2 := by ring
 
-/-- **Both pairings against the split indicator** (`sec:one-weight`): the four continuing
+/-- **Both pairings against the split indicator** (`sec:weighted-zero`): the four continuing
 weighted zero integrals times `U(M)`, plus twice the split term. -/
 private lemma pair_total_le {α : ℝ} {h : ℕ} {Mb Zt : ℝ≥0∞} {j j' : I × I} {D' : Set I}
     (hm11 : ∑' x, M.rho j.1 h x * M.W α j'.1 h x ≤ Ufun α Mb)
@@ -272,7 +272,7 @@ mixture (coefficients `π_u(j')^{-α}`, total at most `B`) of the four continuin
 integrals against the children at height `h`, averaged over the source transition. -/
 theorem wZero_succ_le [Fintype I] (hc : M.IsCompat) (hb0 : rE M.μ M.R M.zero ≠ 0)
     {α : ℝ} (hα : 1 ≤ α) {g : ℕ} (Θ : Phase M g) {T : ℕ} (hT : ∀ i, Θ.count i ≤ T)
-    (Sel : Selection M) {B : ℝ≥0∞} (hB : ∀ t, Sel.budget α t ≤ B)
+    (Sel : Selection M) {B : ℝ≥0∞} (hB : ∀ t, Sel.inverseSum α t ≤ B)
     {h : ℕ} {Mb Zm : ℝ≥0∞} (hM : ∀ s u, Θ.θ s = Θ.θ u → M.P α s u h ≤ Mb)
     (hz : ∀ s t, Θ.θ s = Θ.θ t → M.z s t h ≤ Zm)
     (s : I) {D : Set I} (hD : ∀ t ∈ D, Θ.θ t = Θ.θ s) (u : I) (hu : Θ.θ u = Θ.θ s) :
@@ -363,8 +363,8 @@ theorem wZero_succ_le [Fintype I] (hc : M.IsCompat) (hb0 : rE M.μ M.R M.zero �
                   (M.moment_le_Ufun hα (hM _ _ (by rw [hjp.1, h2])))
                   (M.moment_le_Ufun hα (hM _ _ (by rw [hjp.2, h1])))
                   (M.moment_le_Ufun hα (hM _ _ (by rw [hjp.2, h2])))
-            _ = Sel.budget α u * (2 * Ufun α Mb ^ 2) := by
-                rw [Selection.budget, Finset.sum_mul]
+            _ = Sel.inverseSum α u * (2 * Ufun α Mb ^ 2) := by
+                rw [Selection.inverseSum, Finset.sum_mul]
             _ ≤ B * (2 * Ufun α Mb ^ 2) := mul_le_mul_left (hB u) _
             _ = 2 * B * Ufun α Mb ^ 2 := by ring
       _ = 2 * B * Ufun α Mb ^ 2 := by rw [ENNReal.tsum_mul_right, PMF.tsum_coe, one_mul]
@@ -427,8 +427,8 @@ theorem wZero_succ_le [Fintype I] (hc : M.IsCompat) (hb0 : rE M.μ M.R M.zero �
                   (M.wZero α j.1 (M.children D) j'.1 h + M.wZero α j.1 (M.children D) j'.2 h
                     + M.wZero α j.2 (M.children D) j'.1 h
                     + M.wZero α j.2 (M.children D) j'.2 h)
-                + Sel.budget α u * (2 * ((T : ℝ≥0∞) * Zm + ENNReal.ofReal α * Mb) ^ 2) := by
-                rw [Selection.budget, Finset.sum_mul, Finset.mul_sum, ← Finset.sum_add_distrib]
+                + Sel.inverseSum α u * (2 * ((T : ℝ≥0∞) * Zm + ENNReal.ofReal α * Mb) ^ 2) := by
+                rw [Selection.inverseSum, Finset.sum_mul, Finset.mul_sum, ← Finset.sum_add_distrib]
                 exact Finset.sum_congr rfl fun _ _ => by ring
             _ ≤ Ufun α Mb * ∑ j' ∈ Sel.J u, (M.π u j') ^ (-α) *
                   (M.wZero α j.1 (M.children D) j'.1 h + M.wZero α j.1 (M.children D) j'.2 h
@@ -492,7 +492,7 @@ heights below `h` at most `Mb` and `Zm`, every stopping equal-phase triple has w
 zero integral at most `G_n(4 B R_μ U(M)) · (2 B U(M)² f + 2 B R_μ (T Z + α M)²)`. -/
 theorem wZero_le_of_stops [Fintype I] (hc : M.IsCompat) (hb0 : rE M.μ M.R M.zero ≠ 0)
     (hFP : M.FreshPositive) {α : ℝ} (hα : 1 ≤ α) {g : ℕ} (Θ : Phase M g) {T : ℕ}
-    (hT : ∀ i, Θ.count i ≤ T) (Sel : Selection M) {B : ℝ≥0∞} (hB : ∀ t, Sel.budget α t ≤ B)
+    (hT : ∀ i, Θ.count i ≤ T) (Sel : Selection M) {B : ℝ≥0∞} (hB : ∀ t, Sel.inverseSum α t ≤ B)
     {h : ℕ} {Mb Zm : ℝ≥0∞} (hM : ∀ j < h, ∀ s u, Θ.θ s = Θ.θ u → M.P α s u j ≤ Mb)
     (hz : ∀ j < h, ∀ s t, Θ.θ s = Θ.θ t → M.z s t j ≤ Zm) :
     ∀ (n : ℕ) (s : I) (D : Set I) (u : I), D.Nonempty → (∀ t ∈ D, Θ.θ t = Θ.θ s) →
@@ -514,7 +514,7 @@ theorem wZero_le_of_stops [Fintype I] (hc : M.IsCompat) (hb0 : rE M.μ M.R M.zer
     cases h with
     | zero =>
       -- the truncation: `f ≤ 2 B U(M)² f ≤ E`
-      have hB1 : 1 ≤ B := (Sel.one_le_budget (by linarith) s).trans (hB s)
+      have hB1 : 1 ≤ B := (Sel.one_le_inverseSum (by linarith) s).trans (hB s)
       have hU1 : 1 ≤ Ufun α Mb := le_self_add
       have h2BU : 1 ≤ 2 * B * Ufun α Mb ^ 2 := by
         calc (1 : ℝ≥0∞) = 1 * 1 * (1 * 1) := by norm_num
@@ -590,8 +590,8 @@ theorem wZero_le_of_stops [Fintype I] (hc : M.IsCompat) (hb0 : rE M.μ M.R M.zer
                   ≤ ∑ j' ∈ Sel.J u, (M.π u j') ^ (-α)
                       * (4 * Efun α n T B (M.fRoot α) (M.RmuC α) Zm Mb) :=
                     Finset.sum_le_sum fun j' hj' => mul_le_mul_right (hS4 j hj j' hj') _
-                _ = Sel.budget α u * (4 * Efun α n T B (M.fRoot α) (M.RmuC α) Zm Mb) := by
-                    rw [Selection.budget, Finset.sum_mul]
+                _ = Sel.inverseSum α u * (4 * Efun α n T B (M.fRoot α) (M.RmuC α) Zm Mb) := by
+                    rw [Selection.inverseSum, Finset.sum_mul]
                 _ ≤ B * (4 * Efun α n T B (M.fRoot α) (M.RmuC α) Zm Mb) :=
                     mul_le_mul_left (hB u) _
                 _ = 4 * B * Efun α n T B (M.fRoot α) (M.RmuC α) Zm Mb := by ring
@@ -614,7 +614,7 @@ most `E(M)` of `eq:explicit-weighted-error`. -/
 theorem wZero_le_Efun [Fintype I] (hc : M.IsCompat) (hb0 : rE M.μ M.R M.zero ≠ 0)
     (hFP : M.FreshPositive) {α : ℝ} (hα : 1 ≤ α) {g : ℕ} (Θ : Phase M g) {T : ℕ}
     (hT : ∀ i, Θ.count i ≤ T) {H : ℕ} (hCR : M.CommonReturns Θ H) (Sel : Selection M)
-    {B : ℝ≥0∞} (hB : ∀ t, Sel.budget α t ≤ B) {h : ℕ} {Mb Zm : ℝ≥0∞}
+    {B : ℝ≥0∞} (hB : ∀ t, Sel.inverseSum α t ≤ B) {h : ℕ} {Mb Zm : ℝ≥0∞}
     (hM : ∀ j < h, ∀ s u, Θ.θ s = Θ.θ u → M.P α s u j ≤ Mb)
     (hz : ∀ j < h, ∀ s t, Θ.θ s = Θ.θ t → M.z s t j ≤ Zm) :
     ∀ (s : I) (D : Set I) (u : I), D.Nonempty → (∀ t ∈ D, Θ.θ t = Θ.θ s) →

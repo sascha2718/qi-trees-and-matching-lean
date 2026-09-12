@@ -4,7 +4,7 @@ import ChainClasses.Scalar.Hairy
 import ChainClasses.Bushy.ShapeIID
 
 /-!
-`sec:hairy-universality` of `gw_classes_simple.tex`: **`thm:hairy`**, assembled
+`sec:hairy` of `gw_classes_simple.tex`: **`thm:hairy`**, assembled
 on the space of two independent samples conditioned on survival, each carrying
 the independent uniform field of `thm:shape-coupling`.
 
@@ -48,26 +48,26 @@ open MeasureTheory ProbabilityTheory GraphMatching
 open BranchingProcess (sample survivalMeasure Offspring)
 open scoped ENNReal
 
-/-! ### The hairy sample space -/
+/-! ### The bushy sample space -/
 
-/-- **One hairy sample**: an offspring field on the ambient binary tree
+/-- **One bushy sample**: an offspring field on the ambient binary tree
 together with the uniform field that randomises the label map of
 `thm:shape-coupling`. -/
 abbrev HairySample : Type := (Amb → ℕ) × (Word → ℝ)
 
-/-- **The law of one hairy sample**: a sample conditioned on survival together
+/-- **The law of one bushy sample**: a sample conditioned on survival together
 with the independent uniform field that randomises the label map of
 `thm:shape-coupling`. -/
 noncomputable def hairyMeasure (θ : Offspring 2) : Measure HairySample :=
   (survivalMeasure (N := 2) θ).prod uniField
 
-/-- The law of one hairy sample is a probability measure. -/
+/-- The law of one bushy sample is a probability measure. -/
 lemma isProbabilityMeasure_hairyMeasure (θ : Offspring 2) (hq : θ.extinction < 1) :
     IsProbabilityMeasure (hairyMeasure θ) := by
   have _ := BranchingProcess.isProbabilityMeasure_survivalMeasure θ le_rfl hq
   exact inferInstanceAs (IsProbabilityMeasure ((survivalMeasure (N := 2) θ).prod uniField))
 
-/-- **The two-sample space of `thm:hairy`**: two independent hairy samples,
+/-- **The two-sample space of `thm:hairy`**: two independent bushy samples,
 drawn from the two offspring laws. -/
 noncomputable def twoHairyMeasure (θ θ' : Offspring 2) :
     Measure (HairySample × HairySample) :=

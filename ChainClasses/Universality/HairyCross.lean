@@ -2,13 +2,13 @@ import ChainClasses.Bushy.Trichotomy
 import ChainClasses.General.GeneralHarris
 
 /-!
-`thm:hairy-cross` and `thm:qi-transitive` of `trichotomy.tex`, the law level:
+`thm:cross-relabel` and transitivity of quasi-isometry (`thm:trichotomy`) of `trichotomy.tex`, the law level:
 the bushy-regime pair of reduced laws sits inside the hypotheses of
-`thm:composite-matching` at `J' ≤ 2J - 1`, and almost sure quasi-isometry
+the two-law application of `thm:markov-matching` in `sec:common-presentations` at `J' ≤ 2J - 1`, and almost sure quasi-isometry
 composes across independent samples.
 
 * `hairyCross_chart`: **the chart of
-  `thm:hairy-cross` (`it:hairy-cross-core`)**: the exceptional arities
+  `thm:cross-relabel`**: the exceptional arities
   are `{J+1, …, J'}`, each carrying the composite pair `(z + 1 - J, J)` in the
   core `{2, …, J}`, with no chart below `J + 1`.
 * `hairyCross_core_charged`, `hairyCross_pair_floor`: **the full-support
@@ -17,7 +17,7 @@ composes across independent samples.
   laws alone.
 * the composition `QuasiIsometric.trans` lives in `Trichotomy.lean` with the
   reflexivity and the quasi-inverse.
-* `pairQI_trans`: **`thm:qi-transitive`**, the composition step: if two
+* `pairQI_trans`: **transitivity of quasi-isometry (`thm:trichotomy`)**, the composition step: if two
   independent samples of `P₀, P₁` are almost surely quasi-isometric and
   likewise for `P₁, P₂`, then so are two independent samples of `P₀, P₂`,
   realised through the triple product and one Fubini slice.
@@ -31,7 +31,7 @@ namespace ChainClasses
 
 /-! ### The chart of the bushy cross-law -/
 
-/-- **The chart of `thm:hairy-cross`**: at `J' ≤ 2J - 1` the exceptional
+/-- **The chart of `thm:cross-relabel`**: at `J' ≤ 2J - 1` the exceptional
 arities `{J+1, …, J'}` carry the composite pairs `(z + 1 - J, J)`, both
 components in the core `{2, …, J}`, and nothing else is charted. -/
 theorem hairyCross_chart {J J' : ℕ} (hJ2 : 2 ≤ J)
@@ -88,7 +88,7 @@ theorem hairyCross_core_charged {J J' : ℕ} (θ θ' : ℕ → ℝ) {q q' : ℝ}
   ⟨reducedLaw_pos J θ hnn hJ hq0 hq1 hsub (by omega) hkJ,
     reducedLaw_pos J' θ' hnn' hJ' hq'0 hq'1 hsub' (by omega) (by omega)⟩
 
-/-- **The floor of a composite pair of `thm:hairy-cross`**: the tilt floor
+/-- **The floor of a composite pair of `thm:cross-relabel`**: the tilt floor
 `(1/2) ν̃'_{z+1-J} ν̃'_J` is positive and depends on the two laws alone. -/
 theorem hairyCross_pair_floor {J J' : ℕ} (θ' : ℕ → ℝ) {q' : ℝ}
     (hnn' : ∀ j, 0 ≤ θ' j) (hJ' : 0 < θ' J')
@@ -107,7 +107,7 @@ theorem hairyCross_pair_floor {J J' : ℕ} (θ' : ℕ → ℝ) {q' : ℝ}
 open MeasureTheory
 open BranchingProcess (QuasiIsometric IsQIWith)
 
-/-- **`thm:qi-transitive`**, the composition step: almost sure quasi-isometry
+/-- **transitivity of quasi-isometry (`thm:trichotomy`)**, the composition step: almost sure quasi-isometry
 of independent samples composes through the triple product. -/
 theorem pairQI_trans (L0 L1 L2 : SampleLaw)
     (h01 : ∀ᵐ ω ∂(L0.law.prod L1.law), PairQI L0 L1 ω)

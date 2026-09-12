@@ -1,5 +1,6 @@
 import ChainClasses.Classification.Simple
 import ChainClasses.Classification.Complete
+import ChainClasses.Classification.Finite
 
 /-!
 # Public quasi-isometry classification API
@@ -13,6 +14,8 @@ modules.
 * `offspring_classification_ae_iff` is the complete conditioned-infinite theorem written directly
   for offspring laws.
 * `same_class_ae` and `different_class_ae` expose its two conclusions separately.
+* `full_classification_ae_iff` is the complete theorem over the unconditioned laws, with the
+  finite class included.
 
 The implementation remains in `ChainClasses.Bushy.Trichotomy`, `ChainClasses.Universality.GeneralTrichotomy`, and
 `ChainClasses.Universality.ChainSeparationProof`.

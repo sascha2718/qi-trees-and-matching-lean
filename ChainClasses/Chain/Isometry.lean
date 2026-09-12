@@ -155,16 +155,15 @@ lemma relabelMap_apply (σ : Word → Bool ≃ Bool) {lam : Word → ℕ} (lam' 
 /-! ### `thm:isometry` -/
 
 /-- `thm:isometry`: relabelling along an automorphism of the index tree gives
-an isometric associated tree. The relabelled labelling is written as
-`lam = lam' ∘ autOf σ`, the tex's `λ'(w) = λ(π⁻¹ w)` with `π = autOf σ`. -/
-theorem isometry_of_relabel (σ : Word → Bool ≃ Bool) {lam lam' : Word → ℕ}
-    (hlam : ∀ w, 1 ≤ lam w) (_hlam' : ∀ w, 1 ≤ lam' w)
-    (hcomp : ∀ w, lam' (autOf σ w) = lam w) :
-    ∃ f : Word → Word,
-      (∀ x, InAssoc lam x → InAssoc lam' (f x)) ∧
-      (∀ y, InAssoc lam' y → ∃ x, InAssoc lam x ∧ f x = y) ∧
-      (∀ x y, InAssoc lam x → InAssoc lam y → treeDist (f x) (f y) = treeDist x y) := by
-  refine ⟨relabelMap σ lam lam', ?_, ?_, ?_⟩
+an isometric associated tree, and `relabelMap` is the isometry. The relabelled labelling is
+written as `lam = lam' ∘ autOf σ`, the tex's `λ'(w) = λ(π⁻¹ w)` with `π = autOf σ`. -/
+theorem relabelMap_isometry (σ : Word → Bool ≃ Bool) {lam lam' : Word → ℕ}
+    (hlam : ∀ w, 1 ≤ lam w) (hcomp : ∀ w, lam' (autOf σ w) = lam w) :
+    (∀ x, InAssoc lam x → InAssoc lam' (relabelMap σ lam lam' x)) ∧
+      (∀ y, InAssoc lam' y → ∃ x, InAssoc lam x ∧ relabelMap σ lam lam' x = y) ∧
+      (∀ x y, InAssoc lam x → InAssoc lam y →
+        treeDist (relabelMap σ lam lam' x) (relabelMap σ lam lam' y) = treeDist x y) := by
+  refine ⟨?_, ?_, ?_⟩
   · -- the associated tree of `lam` lands in the associated tree of `lam'`
     rintro x ⟨w, l, hl, rfl⟩
     rw [relabelMap_apply σ lam' hlam hl]
@@ -208,5 +207,15 @@ theorem isometry_of_relabel (σ : Word → Bool ≃ Bool) {lam lam' : Word → �
             assoc_wedge_diverge lam' hfab hfa hfb]
           simp only [List.length_append, List.length_replicate,
             iotaL_autOf_length σ hcomp, hcomp]
+
+/-- `thm:isometry` with the isometry exposed existentially. -/
+theorem isometry_of_relabel (σ : Word → Bool ≃ Bool) {lam lam' : Word → ℕ}
+    (hlam : ∀ w, 1 ≤ lam w) (_hlam' : ∀ w, 1 ≤ lam' w)
+    (hcomp : ∀ w, lam' (autOf σ w) = lam w) :
+    ∃ f : Word → Word,
+      (∀ x, InAssoc lam x → InAssoc lam' (f x)) ∧
+      (∀ y, InAssoc lam' y → ∃ x, InAssoc lam x ∧ f x = y) ∧
+      (∀ x y, InAssoc lam x → InAssoc lam y → treeDist (f x) (f y) = treeDist x y) :=
+  ⟨relabelMap σ lam lam', relabelMap_isometry σ hlam hcomp⟩
 
 end ChainClasses

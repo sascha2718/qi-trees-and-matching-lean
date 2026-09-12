@@ -1063,7 +1063,7 @@ lemma exists_code_transSample (hc : IsHairySample c) : ∀ v : Amb, v ∈ sample
       obtain ⟨y, hy⟩ := (Assembly.exists_code_concat_iff x b).mpr (hspec.mpr hchild)
       exact ⟨y, by rw [hy, transSample_concat, hx, hb]⟩
 
-/-- **`thm:shape-iid`, the last clause**: a hairy sample is isometric to the assembly
+/-- **`thm:shape-iid`, the last clause**: a bushy sample is isometric to the assembly
 of its own shapes.  The isometry is the address translation: it reads the letters of the
 assembly one for one, sending the neck of a copy to the chain of its entry vertex and
 the decorations to the bushes hanging off that chain, so it preserves lengths and the

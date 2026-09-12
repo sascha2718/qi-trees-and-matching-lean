@@ -2,7 +2,7 @@ import ChainClasses.Bushy.ShapeLabelLaw
 import ChainClasses.Shape.ShapeShrink
 
 /-!
-`sec:shape-coupling` and `sec:hairy-universality` of `gw_classes_simple.tex`: the label
+`sec:shape-coupling` and `sec:hairy` of `gw_classes_simple.tex`: the label
 graph of `thm:shape-coupling` for one law, and `thm:hairy` over it.
 
 The labels are the shapes themselves, as `thm:shape-coupling` builds them: the label of a
