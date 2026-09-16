@@ -96,7 +96,7 @@ theorem chainMeasure_label_iIndepFun {t : ℝ} (ht : 0 < t) (ht1 : t ≤ 1) :
     measurable_chainMeasure_coord (chainMeasure_iIndepFun ht ht1)
     (chainMeasure_coord_true ht ht1) ht ht1
 
-/-- **The independence clause of `thm:chain-classes`**: the quantised labels
+/-- **The independence clause of `thm:quantised-law`**: the quantised labels
 `ℓ_D(λ(w))`, `w ∈ 𝔹`, of the offspring field form an independent family. -/
 theorem chainMeasure_quantised_label_iIndepFun {t : ℝ} (ht : 0 < t) (ht1 : t ≤ 1) (D : ℕ) :
     iIndepFun (fun (w : Word) (ω : Word → Bool) ↦ levelMap D (labAux ω w))

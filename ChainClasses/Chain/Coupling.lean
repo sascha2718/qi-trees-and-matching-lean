@@ -675,7 +675,7 @@ lemma ellQ_section_volume (ha : 0 < a) (ha1 : a < 1) (hb : 0 < b) (hb1 : b < 1)
 
 /-- Clause (ii) of **`thm:chain-coupling`**: under the product of the second
 law and the uniform variable `U` on `[0,1)`, the coupled class has the law `p^{(D)}`
-of `thm:chain-classes`, `ℙ(ℓ'(λ', U) = k) = p^{(D)}_k`. -/
+of `thm:quantised-law`, `ℙ(ℓ'(λ', U) = k) = p^{(D)}_k`. -/
 theorem coupling_law (ha : 0 < a) (ha1 : a < 1) (hb : 0 < b) (hb1 : b < 1) (hD : 2 ≤ D)
     (hgD : 1 ≤ cgamma a b * ((D : ℝ) - 1)) (k : ℕ) :
     ((geomPMF hb hb1).toMeasure.prod (volume.restrict (Set.Ico (0 : ℝ) 1)))

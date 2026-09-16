@@ -102,7 +102,7 @@ noncomputable def chainQPMF (ht : 0 < t) (ht1 : t ≤ 1) {D : ℕ} (hD : 2 ≤ D
 lemma chainQPMF_apply (ht : 0 < t) (ht1 : t ≤ 1) {D : ℕ} (hD : 2 ≤ D) (k : ℕ) :
     chainQPMF ht ht1 hD k = ENNReal.ofReal (qF (1 - t) D k) := rfl
 
-/-- **The marginal clause of `thm:chain-classes`**: the quantised label of a
+/-- **The marginal clause of `thm:quantised-law`**: the quantised label of a
 vertex has the quantised geometric law, `ℙ(ℓ_D(λ(w)) = k) = p^{(D)}_k`. -/
 theorem chainMeasure_level_marginal (ht : 0 < t) (ht1 : t ≤ 1) {D : ℕ} (hD : 2 ≤ D)
     (w : Word) (k : ℕ) :
@@ -158,7 +158,7 @@ theorem chainMeasure_level_marginal (ht : 0 < t) (ht1 : t ≤ 1) {D : ℕ} (hD :
     _ = ENNReal.ofReal (qF (1 - t) D k) := by
         rw [hNval, hP, chainMeasure_labAux_zero ht ht1 w, add_zero]
 
-/-- **The independence clause of `thm:chain-classes`, in product form**: the
+/-- **The independence clause of `thm:quantised-law`, in product form**: the
 joint law of the quantised labels over a finite set of vertices factorises into
 the masses of `p^{(D)}`. -/
 theorem chainMeasure_level_prod (ht : 0 < t) (ht1 : t ≤ 1) {D : ℕ} (hD : 2 ≤ D)

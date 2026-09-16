@@ -21,6 +21,8 @@
 * `Kolmogorov`   the i.i.d. product measure on the infinite tree
 * `AutBridge`    the swap group as the automorphism group of the tree, and the
                  matching relations over graph automorphisms
+* `Probability`  the exact full-labelling probability recursion, moment bounds and
+                 scalar failure criterion in `prelims.tex`
 -/
 import GraphMatching.Phi
 import GraphMatching.Maxima
@@ -40,3 +42,4 @@ import GraphMatching.DoubleExp
 import GraphMatching.Measure
 import GraphMatching.Kolmogorov
 import GraphMatching.AutBridge
+import GraphMatching.Probability

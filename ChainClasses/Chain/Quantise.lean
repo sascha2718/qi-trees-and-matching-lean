@@ -11,11 +11,10 @@ comparison, and the quantised geometric law.
 * `thm:level`: `level_comparable` and the two-sided `level_close_comparable`.
 * The quantised law: `qF a D k = a^{D^k-1} - a^{D^{k+1}-1}`, the closed form
   `eq:qk`; `class_sum` identifies it with the geometric mass of the class
-  (the summation in `thm:chain-classes`); `qF_zero` and `qF_le` give the
-  zero-class mass and tail bound in the same lemma, also labelled
-  `thm:quantised-law`; `qPMF` packages the law as a `PMF ℕ`.
+  (the summation in `thm:quantised-law`); `qF_zero` and `qF_le` give the
+  zero-class mass and tail bound in the same lemma; `qPMF` packages the law as a `PMF ℕ`.
 
-The probabilistic clauses of `thm:chain-classes` (independence of the
+The probabilistic clauses of `thm:quantised-law` (independence of the
 quantised labels) sit with `thm:geometric` and are not treated here.
 -/
 
@@ -109,7 +108,7 @@ lemma qF_le (ha : 0 ≤ a) (_ha1 : a ≤ 1) {D : ℕ} (_hD : 2 ≤ D) (k : ℕ) 
     qF a D k ≤ tailB a D k :=
   sub_le_self _ (tailB_nonneg ha D (k + 1))
 
-/-- The class summation of **`thm:chain-classes`** (`eq:qk`): the geometric
+/-- The class summation of **`thm:quantised-law`** (`eq:qk`): the geometric
 mass of the class `𝒞_k = [D^k, D^{k+1})` is `a^{D^k-1} - a^{D^{k+1}-1}`. Here
 the geometric law is written with its natural index, `ℙ(λ = n) = a^{n-1}(1-a)`
 summed over `n ∈ 𝒞_k`. -/

@@ -23,7 +23,7 @@ with `P {X v = true} = θ₂ = t`.
 * `label_iIndepFun`: the labels form an independent family; together with
   `label_marginal` this is `thm:geometric`.
 * `quantised_label_iIndepFun`: the quantised labels `ℓ_D(λ(w))` inherit the
-  independence, the independence clause of `thm:chain-classes`.
+  independence, the independence clause of `thm:quantised-law`.
 -/
 
 namespace ChainClasses
@@ -785,7 +785,7 @@ private lemma labelPi_iIndepSets (hmeas : ∀ v, Measurable (X v)) (hindep : iIn
 /-- **`thm:geometric`, independence**: the chain labels of an i.i.d. offspring
 field form an independent family. Together with `label_marginal` this is the
 statement of the lemma, and it certifies the independence clause of
-`thm:chain-classes` at its root. -/
+`thm:quantised-law` at its root. -/
 theorem label_iIndepFun (hmeas : ∀ v, Measurable (X v)) (hindep : iIndepFun X P)
     (htrue : ∀ v, P {ω | X v ω = true} = ENNReal.ofReal t) (ht : 0 < t) (ht1 : t ≤ 1) :
     iIndepFun (fun w ω => labAux (fun v => X v ω) w) P := by
@@ -795,7 +795,7 @@ theorem label_iIndepFun (hmeas : ∀ v, Measurable (X v)) (hindep : iIndepFun X 
     (fun w => labelPi_isPiSystem X w) (fun w => comap_label_eq X w)
     (labelPi_iIndepSets P X t hmeas hindep htrue ht ht1)
 
-/-- **The independence clause of `thm:chain-classes`**: the quantised labels
+/-- **The independence clause of `thm:quantised-law`**: the quantised labels
 `ℓ_D(λ(w))`, `w ∈ 𝔹`, form an independent family. -/
 theorem quantised_label_iIndepFun (D : ℕ) (hmeas : ∀ v, Measurable (X v))
     (hindep : iIndepFun X P) (htrue : ∀ v, P {ω | X v ω = true} = ENNReal.ofReal t)
