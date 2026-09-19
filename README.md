@@ -21,6 +21,9 @@ The project has four default library targets.
 The toolchain is pinned to Lean `v4.32.2`, with Mathlib pinned to the matching release in
 `lakefile.toml`.
 
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the module map, representation choices and
+proof-maintenance notes. [CHALLENGE_REVIEW.md](CHALLENGE_REVIEW.md) records dated audit evidence.
+
 ## Public classification API
 
 Import the public façade with:
@@ -97,8 +100,17 @@ lake build
 ```
 
 `Challenge.lean` states the audited results using Mathlib alone. `Solution.lean` proves them
-from the four libraries, with its definitions and proof transports in `Solution/`. For trusted
-local development, run
+from the four libraries, with its definitions and proof transports in `Solution/`.
+
+The [local audit runner](comparator-audit.sh) requires separately built Comparator and
+lean4export tools. The exporter must match the project's `lean-toolchain`. Set
+`COMPARATOR_TOOLS` to a directory containing the `comparator/` and `lean4export/` checkouts
+and their built executables; the runner defaults to `~/Documents/lean`. On Linux, `landrun`
+must be on `PATH` or selected through `COMPARATOR_LANDRUN`. `COMPARATOR_LEAN4EXPORT` can
+override the exporter path. The [CI workflow](.github/workflows/build.yml), in its
+“Build pinned verification tools” step, records the exact tool revisions and build commands.
+
+With these prerequisites installed, for trusted local development run
 
 ```bash
 ./comparator-audit.sh
@@ -135,6 +147,19 @@ This is a dependency-free static source check. It does not invoke Lean or LaTeX 
 does not replace `lake build` or the comparator audit. In particular, dependency-minimality
 of the definitions in `Challenge.lean` still requires semantic review in Lean's elaborated
 environment.
+
+This check also needs the manuscript sources: it reads the files listed in
+`paper-correspondence.yaml`, together with `appendices.tex`, from the **parent directory of
+the Lean checkout**. The author's layout is a manuscript repository containing this checkout
+as `lean/`. A standalone clone supplies the Lean source but not those parent-directory files.
+Reproducing the correspondence check requires the matching manuscript version in that layout;
+the Lean library build and comparator audit do not require the manuscript sources.
+
+On the author's workstation, `.lake/packages` is an untracked symlink to the package directory
+of `~/Documents/lean/mathematics_in_lean`. Dependency resolution can therefore modify another
+project's checkouts. Do not run `lake update` or edit the toolchain/dependency configuration as
+routine maintenance in that layout. A fresh clone uses the tracked dependency configuration
+without this machine-specific symlink.
 
 The challenge uses one unrestricted automorphism family for both matching theorems, states
 the Markov laws directly on state labels, and uses the full transition-support bound from the
