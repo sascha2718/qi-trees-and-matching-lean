@@ -8,6 +8,7 @@
         "Challenge.audit_bounded_graph_qi_point",
         "Challenge.audit_extinction_of_not_supercritical",
         "Challenge.audit_full_classification_ae_iff",
+        "Challenge.audit_mutual_embeddability",
         "Challenge.audit_twovalue_ae_tree_family",
         "Challenge.audit_twovalue_rate_tree",
         "Challenge.audit_markov_matching_finite",

@@ -83,3 +83,32 @@ real Landrun on Linux. The inspected CI workflow uses a fresh checkout, avoids c
 code before Comparator, pins the verifier tools, and adds systemd restrictions. This audit ran
 locally on macOS; it did not execute a fresh CI run or an additional independently implemented
 kernel. Only `propext`, `Quot.sound` and `Classical.choice` are permitted, unchanged from before.
+
+## Addendum: the thirteenth endpoint, 19 September 2026
+
+The mutual embeddability theorem `thm:embedding-hierarchy` is the thirteenth endpoint,
+`audit_mutual_embeddability`. Its vocabulary adds the structure `GraphQIEmbWith`, the two
+metric inequalities of `GraphQIWith` without the density condition, and the predicate
+`GraphQIEmbeddable`; both are used by the statement and nothing else was added. The binary
+tree is `wordGraph (fun _ : GWWord 2 => True)`, the existing parent–child graph over the
+existing word type, and the conditioning on infinite diameter is expressed, as in the
+classification endpoint, by quantifying over the surviving samples of the unconditioned law.
+`Solution/Definitions.lean` repeats the two definitions verbatim. The proof in `Solution.lean`
+transports `ChainClasses.embedding_hierarchy_ae` through the existing graph identifications.
+
+`lake build`, `lake build Challenge Solution`, `scripts/check_paper_correspondence.py` and
+`./comparator-audit.sh` pass with the thirteen endpoints; the comparator accepts the statements
+and the kernel replay under `propext`, `Quot.sound` and `Classical.choice` alone. The
+correspondence checker now expects thirteen headline names.
+
+| Endpoint | Paper counterpart |
+|---|---|
+| `audit_mutual_embeddability` | `thm:embedding-hierarchy`: on survival, the sample almost surely embeds quasi-isometrically into `𝒩(2)` and receives an embedding of it. |
+
+The library proof deviates from the printed one in the recorded ways: the binomial lower tail
+of the pruning is bounded by a union bound at the level `4/5` rather than Chebyshev at `3/4`;
+the retained vertex is found along the skeleton descent under the conditioned law rather than
+along the first-child ray; and one concentrated representative, the mixture
+`(7/8) δ_{J₁} + (1/8) θ` with `J₁ - 1 = 24 (J - 1)`, serves all three supercritical classes, so
+the bushy case does not pass through the survival skeleton. These are listed in the deviations
+of the paper's Lean appendix.

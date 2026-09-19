@@ -37,7 +37,13 @@ it; nothing here consumes `ChainClasses`, `GraphMatching` or
   `Measure.infinitePi`, with the Bernoulli specialisation in the shape the
   chain half of the paper consumes.
 * `Geometry`: the coarse geometry of trees on `SimpleGraph`, with the two
-  separations `thm:bush-separation` and `thm:three-rays`.
+  separations `thm:bush-separation` and `thm:three-rays`, the latter for
+  quasi-isometric embeddings.
+* `Embedding`: the calculus of quasi-isometric embeddings, composition, isometric
+  maps, bounded graphs and the ray, behind `sec:embedding-hierarchy`.
+* `Pruning`: `thm:concentrated-regular-subtree`, the pruning of a concentrated
+  law, the lower bound on the probability that the root is retained, and the
+  isometric copy of the binary tree below a retained vertex.
 -/
 import BranchingProcess.Word
 import BranchingProcess.Offspring
@@ -50,3 +56,5 @@ import BranchingProcess.Harris
 import BranchingProcess.Progeny
 import BranchingProcess.Field
 import BranchingProcess.Geometry
+import BranchingProcess.Embedding
+import BranchingProcess.Pruning

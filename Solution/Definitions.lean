@@ -192,6 +192,18 @@ def GraphQuasiIsometricRooted {V V' : Type*} (G : SimpleGraph V) (G' : SimpleGra
     (r : V) (r' : V') : Prop :=
   ∃ (D : ℕ) (f : V → V'), GraphQIWith D G G' f ∧ f r = r'
 
+/-- `GraphQIEmbWith D G G' f`: `f` is a `D`-quasi-isometric embedding of `G` into `G'`, the
+two metric inequalities of a `D`-quasi-isometry without coarse density. -/
+structure GraphQIEmbWith {V V' : Type*} (D : ℕ) (G : SimpleGraph V)
+    (G' : SimpleGraph V') (f : V → V') : Prop where
+  upper : ∀ x y, G'.dist (f x) (f y) ≤ D * G.dist x y + D
+  lower : ∀ x y, G.dist x y ≤ D * G'.dist (f x) (f y) + D * D
+
+/-- `G` embeds quasi-isometrically into `G'`: some map is a `D`-quasi-isometric embedding
+for some `D`. -/
+def GraphQIEmbeddable {V V' : Type*} (G : SimpleGraph V) (G' : SimpleGraph V') : Prop :=
+  ∃ (D : ℕ) (f : V → V'), GraphQIEmbWith D G G' f
+
 /-- The shifted positive support generating the chain-regime invariant. -/
 noncomputable def shiftSupp {J : ℕ} (theta : Offspring J) : Finset ℕ :=
   ((Finset.range (J + 1)).filter fun k => 2 ≤ k ∧ theta k ≠ 0).image fun k => k - 1

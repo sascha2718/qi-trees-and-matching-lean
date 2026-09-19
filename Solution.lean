@@ -1,4 +1,4 @@
-/- The twelve challenge theorems, proved using the internal transports.
+/- The thirteen challenge theorems, proved using the internal transports.
 Solution.Definitions repeats the independent challenge vocabulary. -/
 import Solution.Transport
 
@@ -76,6 +76,21 @@ theorem audit_full_classification_ae_iff {J J' N N' : ℕ}
         (gwSurvives omega.1 ∧ gwSurvives omega.2 ∧ SameInfiniteClass theta theta')) := by
   simpa only [Solution.Transport.sampleGraph_eq] using
     Solution.Infrastructure.audit_full_classification_ae_iff theta hJN theta' hJN'
+
+/-! ## Mutual embeddability -/
+
+/-- `thm:embedding-hierarchy`: a Galton--Watson tree with a finitely supported supercritical
+offspring law, conditioned on infinite diameter, almost surely admits quasi-isometric
+embeddings into the binary tree and from it. The binary tree is the parent--child graph of
+all words over a two-letter alphabet, and the conditioning is expressed by quantifying over
+the surviving samples of the unconditioned law. -/
+theorem audit_mutual_embeddability {J N : ℕ} (theta : Offspring J) (hJN : J ≤ N)
+    (hsup : theta.IsSupercritical) :
+    ∀ᵐ c ∂(gwField (N := N) theta), gwSurvives c →
+      GraphQIEmbeddable (wordGraph (inGWSample c)) (wordGraph (fun _ : GWWord 2 => True)) ∧
+      GraphQIEmbeddable (wordGraph (fun _ : GWWord 2 => True)) (wordGraph (inGWSample c)) := by
+  simpa only [Solution.Transport.sampleGraph_eq] using
+    Solution.Infrastructure.audit_mutual_embeddability theta hJN hsup
 
 /-! ## Universality in the two-value family -/
 

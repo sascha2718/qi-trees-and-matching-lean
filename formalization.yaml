@@ -24,7 +24,10 @@ project:
     class, with two independent conditioned trees almost surely quasi-isometric exactly when
     their laws share a class, together with the finite class, so that over the unconditioned
     laws two trees are almost surely quasi-isometric exactly when both are finite or both are
-    infinite with laws in the same class; and, for offspring supported on {1,2}, almost sure quasi-isometry
+    infinite with laws in the same class; the mutual embeddability theorem, that a
+    Galton--Watson tree with finitely supported supercritical offspring law, conditioned on
+    infinite diameter, almost surely admits quasi-isometric embeddings into the binary tree and
+    from it; and, for offspring supported on {1,2}, almost sure quasi-isometry
     together with an explicit exponential bound on the failure probability of a
     (D^2+3)-quasi-isometry. The statements are made in Challenge.lean over Mathlib alone and
     discharged by Solution.lean from four library targets.
@@ -69,7 +72,7 @@ related_formalizations: []
 
 status:
   scope: >-
-    Formalised and audited: the twelve theorems listed in comparator.json, namely the i.i.d.
+    Formalised and audited: the thirteen theorems listed in comparator.json, namely the i.i.d.
     matching theorem (Theorem 5.1 of the manuscript: leaf bound, full bound and the infinite
     tree), the Markov matching theorem (Theorem 6.1, in four forms: finite-type and
     zero-compatible alternatives, each at finite height and at infinite height), the complete
@@ -77,12 +80,15 @@ status:
     quasi-isometric to a point, laws with mean at most one and theta_1 different from 1 die
     out almost surely, and the classification itself over the unconditioned product law, in
     which two trees are almost surely quasi-isometric exactly when both are finite or both are
-    infinite with laws in the same infinite class), and the two-value universality theorem
-    with its quantitative rate (Theorem 1.3). Beyond these endpoints the four libraries
-    machine-check the numbered statements of the matching parts, the Galton--Watson
-    foundations and the geometric obstructions, as recorded in the paper's appendix.
+    infinite with laws in the same infinite class), the mutual embeddability theorem
+    (Theorem 1.3: a survival-conditioned supercritical tree almost surely admits
+    quasi-isometric embeddings into the binary tree and from it), and the two-value
+    universality theorem with its quantitative rate (Theorem 1.4). Beyond these endpoints the
+    four libraries machine-check the numbered statements of the matching parts, the
+    Galton--Watson foundations, the geometric obstructions, the pruning lemma behind the
+    embedding theorem and the strict embedding hierarchy, as recorded in the paper's appendix.
     Not formalised: the quasisymmetry corollary for the boundaries
-    (Corollary 1.4) and the fractal percolation application (Corollary 3.1); and the two families
+    (Corollary 1.5) and the fractal percolation application (Corollary 3.1); and the two families
     of binary trees with continuous random branching times (Section 7). The analytic constants
     of the i.i.d. theorem are machine-checked through rational upper bounds for the closed-form
     maxima.
@@ -217,12 +223,21 @@ alignment:
         root-preserving quasi-isometry exactly when both are finite, or both are infinite and
         the laws lie in the same infinite class, and admit no quasi-isometry otherwise. Proved
         in Solution from ChainClasses.Classification.Finite.
-    - source: "Theorem 1.3 (Universality in the two-value family), almost sure statement"
+    - source: "Theorem 1.3 (Mutual embeddability)"
+      lean: "Challenge.audit_mutual_embeddability"
+      module: "Challenge"
+      status: "proved"
+      note: >-
+        On survival, the sample almost surely embeds quasi-isometrically into the binary tree
+        and receives a quasi-isometric embedding of it. Proved in Solution from
+        ChainClasses.Classification.Embedding, through the pruning lemma of
+        BranchingProcess.Pruning and the classification.
+    - source: "Theorem 1.4 (Universality in the two-value family), almost sure statement"
       lean: "Challenge.audit_twovalue_ae_tree_family"
       module: "Challenge"
       status: "proved"
       note: "Proved in Solution from ChainClasses.TwoValue."
-    - source: "Theorem 1.3 (Universality in the two-value family), the rate (1.1)"
+    - source: "Theorem 1.4 (Universality in the two-value family), the rate (1.1)"
       lean: "Challenge.audit_twovalue_rate_tree"
       module: "Challenge"
       status: "proved"

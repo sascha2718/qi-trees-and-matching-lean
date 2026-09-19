@@ -6,13 +6,17 @@ about arbitrary infinite trees, and both are proved here over Mathlib's
 
 * `IsQIWith`, `QuasiIsometric`: `def:qi` of `prelims.tex` with the three
   constants equal, read between two graphs in their graph metrics.
+* `IsQIEmbWith`, `QIEmbeddable`: the quasi-isometric embeddings of
+  `sec:embedding-hierarchy`, the two metric inequalities without coarse
+  density; `IsQIWith.toEmb` forgets the density.
 * `Between`: `m` lies on every walk from `u` to `v`.  The three tree facts the
   arguments run on are `between_of_mem_support`, `between_iff_dist_add` and
   `between_or`.
-* `exists_between_dist_le`: the stability step.  In a tree every vertex
-  separating the images of the endpoints is within `D` of the image of the
-  source walk, so the stability constant of quasi-geodesics is `D` itself and
-  no hyperbolicity enters.
+* `exists_between_dist_le_emb`, `exists_between_dist_le`: the stability step.
+  In a tree every vertex separating the images of the endpoints is within `D`
+  of the image of the source walk, so the stability constant of
+  quasi-geodesics is `D` itself and no hyperbolicity enters.  Only the upper
+  bound is used, so the step holds for quasi-isometric embeddings.
 * `IsRay`, `IsLine`: rays and lines as maps `ℕ → V` and `ℤ → V` that are
   isometric onto their images.  `IsLine.exists_far` is the form the separation
   consumes: one of the two half-rays runs away from any given vertex through
@@ -25,7 +29,9 @@ about arbitrary infinite trees, and both are proved here over Mathlib's
 * `IsRay.eq_of_between` and `dist_ray_branch`: a geodesic out of the initial
   vertex of a ray runs along the ray, and two rays meeting only at that vertex
   are at distance the sum of the parameters.
-* `not_quasiIsometric_rayGraph`: `thm:three-rays`.
+* `not_qiEmbeddable_rayGraph`, `not_quasiIsometric_rayGraph`: `thm:three-rays`,
+  for quasi-isometric embeddings and hence for quasi-isometries; the argument
+  uses only the two metric inequalities.
 -/
 import Mathlib.Combinatorics.SimpleGraph.Acyclic
 import Mathlib.Combinatorics.SimpleGraph.Metric
@@ -53,6 +59,30 @@ structure IsQIWith (D : ℕ) (G : SimpleGraph V) (G' : SimpleGraph V') (f : V �
 some `D`. -/
 def QuasiIsometric (G : SimpleGraph V) (G' : SimpleGraph V') : Prop :=
   ∃ (D : ℕ) (f : V → V'), IsQIWith D G G' f
+
+/-! ### Quasi-isometric embeddings -/
+
+/-- `f` is a `D`-quasi-isometric embedding of `G` into `G'`: the two metric
+inequalities of a `D`-quasi-isometry, without coarse density. -/
+structure IsQIEmbWith (D : ℕ) (G : SimpleGraph V) (G' : SimpleGraph V') (f : V → V') :
+    Prop where
+  upper : ∀ x y, G'.dist (f x) (f y) ≤ D * G.dist x y + D
+  lower : ∀ x y, G.dist x y ≤ D * G'.dist (f x) (f y) + D * D
+
+/-- `G` embeds quasi-isometrically into `G'`, written `G ≼ G'` in the paper: some map
+is a `D`-quasi-isometric embedding for some `D`. -/
+def QIEmbeddable (G : SimpleGraph V) (G' : SimpleGraph V') : Prop :=
+  ∃ (D : ℕ) (f : V → V'), IsQIEmbWith D G G' f
+
+/-- A quasi-isometry is a quasi-isometric embedding. -/
+lemma IsQIWith.toEmb {D : ℕ} {f : V → V'} (h : IsQIWith D G G' f) :
+    IsQIEmbWith D G G' f :=
+  ⟨h.upper, h.lower⟩
+
+/-- Quasi-isometric graphs embed into each other; here the forward direction. -/
+lemma QuasiIsometric.qiEmbeddable (h : QuasiIsometric G G') : QIEmbeddable G G' := by
+  obtain ⟨D, f, hf⟩ := h
+  exact ⟨D, f, hf.toEmb⟩
 
 /-! ### Betweenness -/
 
@@ -122,8 +152,8 @@ separate `f x` from `f y`.  Then some vertex of any walk from `x` to `y` has
 its image within `D` of `m`.  Consecutive vertices of the walk have images at
 distance at most `2D`, and a consecutive pair straddling `m` would be at
 distance more than `2D` if both were more than `D` from `m`. -/
-theorem exists_between_dist_le (hG' : G'.IsTree) {D : ℕ} {f : V → V'}
-    (hf : IsQIWith D G G' f) {x y : V} (p : G.Walk x y) {m : V'}
+theorem exists_between_dist_le_emb (hG' : G'.IsTree) {D : ℕ} {f : V → V'}
+    (hf : IsQIEmbWith D G G' f) {x y : V} (p : G.Walk x y) {m : V'}
     (hm : Between G' (f x) m (f y)) :
     ∃ i ≤ p.length, G'.dist (f (p.getVert i)) m ≤ D := by
   by_contra hcon
@@ -156,6 +186,13 @@ theorem exists_between_dist_le (hG' : G'.IsTree) {D : ℕ} {f : V → V'}
         rw [SimpleGraph.dist_comm (u := m) (v := f (p.getVert (k + 1)))] at hd
         omega
   exact key p.length le_rfl (by rw [p.getVert_length]; exact hm)
+
+/-- The stability step for a quasi-isometry, `thm:tree-stability`. -/
+theorem exists_between_dist_le (hG' : G'.IsTree) {D : ℕ} {f : V → V'}
+    (hf : IsQIWith D G G' f) {x y : V} (p : G.Walk x y) {m : V'}
+    (hm : Between G' (f x) m (f y)) :
+    ∃ i ≤ p.length, G'.dist (f (p.getVert i)) m ≤ D :=
+  exists_between_dist_le_emb hG' hf.toEmb p hm
 
 /-! ### Rays and lines -/
 
@@ -437,12 +474,13 @@ lemma dist_ray_branch (hG : G.IsTree) {r s : ℕ → V} (hr : IsRay G r) (hs : I
       unfold Nat.dist at h3
       omega
 
-/-- **`thm:three-rays`.**  A tree carrying three rays that pairwise meet only
-in their common initial vertex is not quasi-isometric to the ray. -/
-theorem not_quasiIsometric_rayGraph (hG : G.IsTree) {v : V} {ray : Fin 3 → ℕ → V}
+/-- **`thm:three-rays`, for embeddings.**  A tree carrying three rays that pairwise
+meet only in their common initial vertex does not embed quasi-isometrically into the
+ray: the argument uses only the two metric inequalities, never coarse density. -/
+theorem not_qiEmbeddable_rayGraph (hG : G.IsTree) {v : V} {ray : Fin 3 → ℕ → V}
     (hray : ∀ i, IsRay G (ray i)) (hbase : ∀ i, ray i 0 = v)
     (hmeet : ∀ i j, i ≠ j → ∀ m n, ray i m = ray j n → ray i m = v) :
-    ¬ QuasiIsometric G rayGraph := by
+    ¬ QIEmbeddable G rayGraph := by
   rintro ⟨D, f, hf⟩
   obtain ⟨ρ, hρ⟩ : ∃ ρ : ℕ, ρ = D * D + D * D + 1 := ⟨_, rfl⟩
   have key : ∀ i j : Fin 3, i ≠ j →
@@ -453,7 +491,7 @@ theorem not_quasiIsometric_rayGraph (hG : G.IsTree) {v : V} {ray : Fin 3 → ℕ
       rw [between_iff_dist_add rayGraph_isTree, rayGraph_dist, rayGraph_dist, rayGraph_dist]
       exact hd
     obtain ⟨W, hW, -⟩ := hG.connected.exists_path_of_dist v (ray j ρ)
-    obtain ⟨t, -, htd⟩ := exists_between_dist_le rayGraph_isTree hf W hb
+    obtain ⟨t, -, htd⟩ := exists_between_dist_le_emb rayGraph_isTree hf W hb
     have hqb : Between G v (W.getVert t) (ray j ρ) :=
       between_of_mem_support hG hW (W.getVert_mem_support t)
     have hqray : W.getVert t = ray j (G.dist v (W.getVert t)) := by
@@ -493,6 +531,14 @@ theorem not_quasiIsometric_rayGraph (hG : G.IsTree) {v : V} {ray : Fin 3 → ℕ
   · exact key 2 0 (by decide) h
   · exact key 1 2 (by decide) h
   · exact key 2 1 (by decide) h
+
+/-- **`thm:three-rays`.**  A tree carrying three rays that pairwise meet only
+in their common initial vertex is not quasi-isometric to the ray. -/
+theorem not_quasiIsometric_rayGraph (hG : G.IsTree) {v : V} {ray : Fin 3 → ℕ → V}
+    (hray : ∀ i, IsRay G (ray i)) (hbase : ∀ i, ray i 0 = v)
+    (hmeet : ∀ i j, i ≠ j → ∀ m n, ray i m = ray j n → ray i m = v) :
+    ¬ QuasiIsometric G rayGraph :=
+  fun h => not_qiEmbeddable_rayGraph hG hray hbase hmeet h.qiEmbeddable
 
 /-! ### Bounded graphs -/
 

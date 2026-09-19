@@ -192,6 +192,18 @@ def GraphQuasiIsometricRooted {V V' : Type*} (G : SimpleGraph V) (G' : SimpleGra
     (r : V) (r' : V') : Prop :=
   ∃ (D : ℕ) (f : V → V'), GraphQIWith D G G' f ∧ f r = r'
 
+/-- `GraphQIEmbWith D G G' f`: `f` is a `D`-quasi-isometric embedding of `G` into `G'`, the
+two metric inequalities of a `D`-quasi-isometry without coarse density. -/
+structure GraphQIEmbWith {V V' : Type*} (D : ℕ) (G : SimpleGraph V)
+    (G' : SimpleGraph V') (f : V → V') : Prop where
+  upper : ∀ x y, G'.dist (f x) (f y) ≤ D * G.dist x y + D
+  lower : ∀ x y, G.dist x y ≤ D * G'.dist (f x) (f y) + D * D
+
+/-- `G` embeds quasi-isometrically into `G'`: some map is a `D`-quasi-isometric embedding
+for some `D`. -/
+def GraphQIEmbeddable {V V' : Type*} (G : SimpleGraph V) (G' : SimpleGraph V') : Prop :=
+  ∃ (D : ℕ) (f : V → V'), GraphQIEmbWith D G G' f
+
 /-- The shifted positive support generating the chain-regime invariant. -/
 noncomputable def shiftSupp {J : ℕ} (theta : Offspring J) : Finset ℕ :=
   ((Finset.range (J + 1)).filter fun k => 2 ≤ k ∧ theta k ≠ 0).image fun k => k - 1
@@ -376,6 +388,19 @@ theorem audit_full_classification_ae_iff {J J' N N' : ℕ}
       (GraphQuasiIsometric (wordGraph (inGWSample omega.1)) (wordGraph (inGWSample omega.2)) →
         (¬ gwSurvives omega.1 ∧ ¬ gwSurvives omega.2) ∨
         (gwSurvives omega.1 ∧ gwSurvives omega.2 ∧ SameInfiniteClass theta theta')) := sorry
+
+/-! ## Mutual embeddability -/
+
+/-- `thm:embedding-hierarchy`: a Galton--Watson tree with a finitely supported supercritical
+offspring law, conditioned on infinite diameter, almost surely admits quasi-isometric
+embeddings into the binary tree and from it. The binary tree is the parent--child graph of
+all words over a two-letter alphabet, and the conditioning is expressed by quantifying over
+the surviving samples of the unconditioned law. -/
+theorem audit_mutual_embeddability {J N : ℕ} (theta : Offspring J) (hJN : J ≤ N)
+    (hsup : theta.IsSupercritical) :
+    ∀ᵐ c ∂(gwField (N := N) theta), gwSurvives c →
+      GraphQIEmbeddable (wordGraph (inGWSample c)) (wordGraph (fun _ : GWWord 2 => True)) ∧
+      GraphQIEmbeddable (wordGraph (fun _ : GWWord 2 => True)) (wordGraph (inGWSample c)) := sorry
 
 /-! ## Universality in the two-value family -/
 

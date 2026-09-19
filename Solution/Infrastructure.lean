@@ -188,6 +188,34 @@ lemma graphQuasiIsometric_iff {V V' : Type*} (G : SimpleGraph V) (G' : SimpleGra
 lemma shiftSupp_eq {J : ℕ} (theta : Offspring J) :
     shiftSupp theta = ChainClasses.shiftSupp (offspringToLib theta) := rfl
 
+lemma graphQIEmbWith_iff {V V' : Type*} (D : ℕ) (G : SimpleGraph V)
+    (G' : SimpleGraph V') (f : V → V') :
+    GraphQIEmbWith D G G' f ↔ BranchingProcess.IsQIEmbWith D G G' f := by
+  constructor <;> rintro ⟨hup, hlo⟩ <;> exact ⟨hup, hlo⟩
+
+lemma graphQIEmbeddable_iff {V V' : Type*} (G : SimpleGraph V) (G' : SimpleGraph V') :
+    GraphQIEmbeddable G G' ↔ BranchingProcess.QIEmbeddable G G' := by
+  constructor
+  · rintro ⟨D, f, hf⟩
+    exact ⟨D, f, (graphQIEmbWith_iff D G G' f).1 hf⟩
+  · rintro ⟨D, f, hf⟩
+    exact ⟨D, f, (graphQIEmbWith_iff D G G' f).2 hf⟩
+
+/-- The challenge's parent--child graph of a set of words over `Fin N` is the library's. -/
+lemma wordGraph_eq_wordGraphN {N : ℕ} (T : GWWord N → Prop) :
+    wordGraph T = ChainClasses.wordGraphN T := by
+  ext u v
+  change (u ≠ v ∧ ((∃ a, v.1 = u.1 ++ [a]) ∨ (∃ a, u.1 = v.1 ++ [a]))) ↔
+    BranchingProcess.treeDist u.1 v.1 = 1
+  rw [ChainClasses.treeDistN_eq_one_iff]
+  constructor
+  · exact And.right
+  · intro h
+    refine ⟨?_, h⟩
+    rintro rfl
+    rcases h with ⟨a, ha⟩ | ⟨a, ha⟩ <;>
+      have := congrArg List.length ha <;> simp at this
+
 /-! ## The two-value family -/
 
 section TwoValue
@@ -714,6 +742,21 @@ theorem audit_full_classification_ae_iff {J J' N N' : ℕ}
   simp only [gwTreeGraph_eq, graphQuasiIsometric_iff, gwSurvives_iff, sameInfiniteClass_iff,
     GraphQuasiIsometricRooted, graphQIWith_iff]
   exact homega
+
+/-! ## Mutual embeddability -/
+
+/-- `thm:embedding-hierarchy`: on survival, the sample almost surely embeds
+quasi-isometrically into the binary tree and receives an embedding of it. -/
+theorem audit_mutual_embeddability {J N : ℕ} (theta : Offspring J) (hJN : J ≤ N)
+    (hsup : theta.IsSupercritical) :
+    ∀ᵐ c ∂(gwField (N := N) theta), gwSurvives c →
+      GraphQIEmbeddable (gwTreeGraph c) (wordGraph (fun _ : GWWord 2 => True)) ∧
+      GraphQIEmbeddable (wordGraph (fun _ : GWWord 2 => True)) (gwTreeGraph c) := by
+  rw [gwField_eq]
+  filter_upwards [ChainClasses.embedding_hierarchy_ae (offspringToLib theta) hJN
+    ((offspringSupercritical_iff theta).1 hsup)] with c hc
+  simp only [gwTreeGraph_eq, wordGraph_eq_wordGraphN, graphQIEmbeddable_iff, gwSurvives_iff]
+  exact hc
 
 /-! ## Bridge for the two-value block -/
 

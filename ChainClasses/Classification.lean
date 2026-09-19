@@ -1,6 +1,7 @@
 import ChainClasses.Classification.Simple
 import ChainClasses.Classification.Complete
 import ChainClasses.Classification.Finite
+import ChainClasses.Classification.Embedding
 
 /-!
 # Public quasi-isometry classification API
@@ -16,7 +17,12 @@ modules.
 * `same_class_ae` and `different_class_ae` expose its two conclusions separately.
 * `full_classification_ae_iff` is the complete theorem over the unconditioned laws, with the
   finite class included.
+* `embedding_hierarchy_ae` is the mutual embeddability theorem `thm:embedding-hierarchy`, with
+  `mutual_embeddability_ae` for two laws and the strict hierarchy `Fin ≺ Ray ≺ Supercritical`
+  in `qiEmbeddable_rayGraph_of_not_survives`, `not_qiEmbeddable_rayGraph_of_not_survives`,
+  `qiEmbeddable_rayGraph_of_survives` and `ae_not_qiEmbeddable_rayGraph`.
 
-The implementation remains in `ChainClasses.Bushy.Trichotomy`, `ChainClasses.Universality.GeneralTrichotomy`, and
-`ChainClasses.Universality.ChainSeparationProof`.
+The implementation remains in `ChainClasses.Bushy.Trichotomy`, `ChainClasses.Universality.GeneralTrichotomy`,
+`ChainClasses.Universality.ChainSeparationProof` and, for the embeddings,
+`ChainClasses.Universality.ConcentratedPruning`.
 -/

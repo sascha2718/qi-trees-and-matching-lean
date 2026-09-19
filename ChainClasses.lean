@@ -133,6 +133,7 @@ import ChainClasses.Universality.StarGeometry
 import ChainClasses.Universality.StarSeparation
 import ChainClasses.Universality.ChainSeparationProof
 import ChainClasses.Universality.GeneralTrichotomy
+import ChainClasses.Universality.ConcentratedPruning
 import ChainClasses.Classification
 import ChainClasses.Engine.ChainWitnesses
 import ChainClasses.Engine.ProfileWeightObstruction

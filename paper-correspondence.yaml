@@ -8,6 +8,7 @@ manuscript_files:
   - matching_classes_general.tex
   - arbitrary_offspring_matching.tex
   - trichotomy.tex
+  - quasi_isometric_embeddings.tex
 
 # This manifest records statement-level correspondences only. It deliberately
 # omits source-file locations and proof-helper inventories, which are not part
@@ -45,10 +46,26 @@ entries:
   - source: "def:qi"
     kind: definition
     status: formalized
-    lean: ["BranchingProcess.IsQIWith"]
+    lean: ["BranchingProcess.IsQIWith", "BranchingProcess.IsQIEmbWith"]
     relation: specialization
     headline: false
-    note: "The paper gives the metric-space definition; the Lean declaration is its graph-metric form."
+    note: "The paper gives the metric-space definition; the Lean declarations are its graph-metric form, for quasi-isometries and for the quasi-isometric embeddings defined after it."
+
+  - source: "thm:embedding-hierarchy"
+    kind: theorem
+    status: formalized
+    lean: ["Challenge.audit_mutual_embeddability"]
+    relation: exact
+    headline: true
+    note: "The conditioning on infinite diameter is expressed by quantifying over the surviving samples of the unconditioned law, as in the classification endpoint."
+
+  - source: "thm:concentrated-regular-subtree"
+    kind: lemma
+    status: formalized
+    lean: ["BranchingProcess.retainedInf_iff", "BranchingProcess.ofReal_le_sampleMeasure_retainedInf", "BranchingProcess.exists_binary_embedding_of_retainedInf", "ChainClasses.ae_exists_retained_vertex", "ChainClasses.ae_qiEmbeddable_binary_of_concentrated"]
+    relation: split
+    headline: false
+    note: "The retained-root probability is bounded below by 4/5 through a union bound in place of Chebyshev's inequality, and the retained vertex is found along the skeleton descent under the conditioned law rather than along the first-child ray."
 
   - source: "def:qs"
     kind: definition

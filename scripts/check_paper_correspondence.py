@@ -496,8 +496,8 @@ def main() -> int:
     ):
         errors.append("comparator theorem_names must be a list of strings")
         comparator_names = []
-    if len(comparator_names) != 12:
-        errors.append(f"comparator must list exactly 12 headline theorems, found {len(comparator_names)}")
+    if len(comparator_names) != 13:
+        errors.append(f"comparator must list exactly 13 headline theorems, found {len(comparator_names)}")
     if len(set(comparator_names)) != len(comparator_names):
         errors.append("comparator theorem_names contains duplicates")
     if comparator.get("definition_names") != []:
@@ -539,7 +539,7 @@ def main() -> int:
     }
     if challenge_propositions != comparator_set:
         errors.append(
-            "every theorem or lemma in Challenge.lean must be one of the 12 audited endpoints; "
+            "every theorem or lemma in Challenge.lean must be one of the 13 audited endpoints; "
             f"extra={sorted(challenge_propositions - comparator_set)}, "
             f"missing={sorted(comparator_set - challenge_propositions)}"
         )
@@ -601,7 +601,7 @@ def main() -> int:
         return 1
     print(
         f"OK: all {len(paper_declarations)} labelled declarations have exactly one manifest "
-        "entry, all mapped Lean names were found, and the 12 audit endpoints agree."
+        "entry, all mapped Lean names were found, and the 13 audit endpoints agree."
     )
     return 0
 
