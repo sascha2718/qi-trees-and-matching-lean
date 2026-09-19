@@ -62,10 +62,10 @@ entries:
   - source: "thm:concentrated-regular-subtree"
     kind: lemma
     status: formalized
-    lean: ["BranchingProcess.retainedInf_iff", "BranchingProcess.ofReal_le_sampleMeasure_retainedInf", "BranchingProcess.exists_binary_embedding_of_retainedInf", "ChainClasses.ae_exists_retained_vertex", "ChainClasses.ae_qiEmbeddable_binary_of_concentrated"]
+    lean: ["BranchingProcess.retainedInf_iff", "BranchingProcess.retainedProb_succ", "BranchingProcess.ofReal_le_retainedProb", "BranchingProcess.ofReal_le_sampleMeasure_retainedInf", "BranchingProcess.retainedTreeLaw_eq_treeLaw", "BranchingProcess.exists_regular_embedding_of_retainedInf", "BranchingProcess.exists_binary_embedding_of_retainedInf", "ChainClasses.sampleMeasure_spine_fail", "ChainClasses.sampleMeasure_spine_fail_le", "ChainClasses.ae_exists_spine_retained", "ChainClasses.ae_exists_retained_vertex", "ChainClasses.ae_qiEmbeddable_binary_of_concentrated"]
     relation: split
     headline: false
-    note: "The retained-root probability is bounded below by 4/5 through a union bound in place of Chebyshev's inequality, and the retained vertex is found along the skeleton descent under the conditioned law rather than along the first-child ray."
+    note: "The retained-root probability is bounded below by 4/5 through a union bound in place of Chebyshev's inequality; the exact recursion and its fixed point are separate identities. The Galton-Watson law is identified for the retained descendant tree re-addressed by rank, under the law conditioned on a retained root. The first-child-ray trials give the exact failure probability and the bound (11/32)^N; the embedding theorem instead locates a retained vertex along the skeleton descent under the conditioned law."
 
   - source: "def:qs"
     kind: definition

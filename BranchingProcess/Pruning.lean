@@ -29,9 +29,13 @@ binomial lower tail is bounded by the union bound over the patterns of at most
   of the field at the root.
 * `ofReal_le_retainedProb`, `ofReal_le_sampleMeasure_retainedInf`: the induction
   `p_n ≥ 4/5` and its limit, the root is retained with probability at least `4/5`.
-* `HasTwoChildren`, `ChildChoice`, `exists_binary_embedding`,
-  `exists_binary_embedding_of_retainedInf`, `survives_of_retainedInf`: the isometric
-  copy of `𝔹 = 𝒩(2)` below a retained vertex of the sample.
+* `HasChildren`, `ChildChoice`, `exists_regular_embedding`,
+  `exists_regular_embedding_of_retainedInf`: the isometric copy of the regular `k`-ary
+  tree `𝒩(k)` in a set with `k` children below every vertex, and the regular `m`-ary
+  subtree rooted at a retained vertex of the sample, every vertex of which has `J`
+  children in the sample.
+* `exists_binary_embedding_of_retainedInf`, `survives_of_retainedInf`: the case `k = 2`,
+  the isometric copy of `𝔹 = 𝒩(2)` below a retained vertex of the sample.
 -/
 import BranchingProcess.Conditioned
 
@@ -458,56 +462,51 @@ theorem ofReal_le_sampleMeasure_retainedInf (hJN : J ≤ N) (hJ : 24 ≤ J) (hθ
 
 end Probability
 
-/-! ### The binary subtree below a retained vertex -/
+/-! ### The regular subtree below a retained vertex -/
 
-section BinaryEmbedding
+section RegularEmbedding
 
-/-- Every vertex of `R` has two distinct children in `R`. -/
-def HasTwoChildren (R : Word N → Prop) : Prop :=
-  ∀ v, R v → ∃ j₀ j₁ : Fin N, j₀ ≠ j₁ ∧ R (v ++ [j₀]) ∧ R (v ++ [j₁])
+/-- Every vertex of `R` has `k` distinct children in `R`. -/
+def HasChildren (k : ℕ) (R : Word N → Prop) : Prop :=
+  ∀ v, R v → ∃ f : Fin k → Fin N, Function.Injective f ∧ ∀ i, R (v ++ [f i])
 
-variable {R : Word N → Prop}
+variable {R : Word N → Prop} {k : ℕ}
 
-/-- A choice of two distinct children in `R` at each vertex of `R`, indexed by the two
-letters of `𝔹`. -/
-structure ChildChoice (R : Word N → Prop) where
-  child : {v : Word N // R v} → Fin 2 → Fin N
-  mem : ∀ x b, R (x.1 ++ [child x b])
-  ne : ∀ x, child x 0 ≠ child x 1
+/-- A choice of `k` distinct children in `R` at each vertex of `R`, indexed by the letters
+of `𝒩(k)`. -/
+structure ChildChoice (k : ℕ) (R : Word N → Prop) where
+  child : {v : Word N // R v} → Fin k → Fin N
+  mem : ∀ x i, R (x.1 ++ [child x i])
+  inj : ∀ x, Function.Injective (child x)
 
-/-- The choice supplied by `HasTwoChildren`. -/
-noncomputable def HasTwoChildren.choice (h : HasTwoChildren R) : ChildChoice R := by
-  choose j₀ j₁ hne h₀ h₁ using h
-  exact ⟨fun x b ↦ if b = 0 then j₀ x.1 x.2 else j₁ x.1 x.2,
-    fun x b ↦ by
-      split_ifs
-      · exact h₀ _ _
-      · exact h₁ _ _,
-    fun x ↦ by simp [hne]⟩
+/-- The choice supplied by `HasChildren`. -/
+noncomputable def HasChildren.choice (h : HasChildren k R) : ChildChoice k R := by
+  choose f hinj hmem using h
+  exact ⟨fun x ↦ f x.1 x.2, fun x ↦ hmem x.1 x.2, fun x ↦ hinj x.1 x.2⟩
 
 namespace ChildChoice
 
-variable (f : ChildChoice R)
+variable (f : ChildChoice k R)
 
 /-- One step of the embedding: the child chosen for the letter `b`. -/
-def step (x : {v : Word N // R v}) (b : Fin 2) : {v : Word N // R v} :=
+def step (x : {v : Word N // R v}) (b : Fin k) : {v : Word N // R v} :=
   ⟨x.1 ++ [f.child x b], f.mem x b⟩
 
-/-- The embedding of `𝔹` from a base vertex, following the chosen children letter by
+/-- The embedding of `𝒩(k)` from a base vertex, following the chosen children letter by
 letter. -/
-def embedFrom (x : {v : Word N // R v}) (w : Word 2) : {v : Word N // R v} :=
+def embedFrom (x : {v : Word N // R v}) (w : Word k) : {v : Word N // R v} :=
   w.foldl f.step x
 
 @[simp] lemma embedFrom_nil (x : {v : Word N // R v}) : f.embedFrom x [] = x := rfl
 
-lemma embedFrom_cons (x : {v : Word N // R v}) (b : Fin 2) (w : Word 2) :
+lemma embedFrom_cons (x : {v : Word N // R v}) (b : Fin k) (w : Word k) :
     f.embedFrom x (b :: w) = f.embedFrom (f.step x b) w := rfl
 
-lemma embedFrom_append (x : {v : Word N // R v}) (u w : Word 2) :
+lemma embedFrom_append (x : {v : Word N // R v}) (u w : Word k) :
     f.embedFrom x (u ++ w) = f.embedFrom (f.embedFrom x u) w :=
   List.foldl_append
 
-lemma embedFrom_length : ∀ (w : Word 2) (x : {v : Word N // R v}),
+lemma embedFrom_length : ∀ (w : Word k) (x : {v : Word N // R v}),
     (f.embedFrom x w).1.length = x.1.length + w.length
   | [], _ => by simp
   | b :: w, x => by
@@ -515,25 +514,20 @@ lemma embedFrom_length : ∀ (w : Word 2) (x : {v : Word N // R v}),
       simp [step]
       omega
 
-lemma prefix_embedFrom : ∀ (w : Word 2) (x : {v : Word N // R v}),
+lemma prefix_embedFrom : ∀ (w : Word k) (x : {v : Word N // R v}),
     x.1 <+: (f.embedFrom x w).1
   | [], _ => List.prefix_refl _
   | b :: w, x => by
       rw [embedFrom_cons]
       exact (List.prefix_append x.1 [f.child x b]).trans (prefix_embedFrom w (f.step x b))
 
-/-- The embedding sends the letters of `𝔹` to distinct children: `a ≠ b` in `Fin 2` is
-`{a, b} = {0, 1}`. -/
-lemma child_ne (x : {v : Word N // R v}) {a b : Fin 2} (hab : a ≠ b) :
-    f.child x a ≠ f.child x b := by
-  fin_cases a <;> fin_cases b
-  · exact absurd rfl hab
-  · exact f.ne x
-  · exact (f.ne x).symm
-  · exact absurd rfl hab
+/-- The embedding sends distinct letters of `𝒩(k)` to distinct children. -/
+lemma child_ne (x : {v : Word N // R v}) {a b : Fin k} (hab : a ≠ b) :
+    f.child x a ≠ f.child x b :=
+  fun h ↦ hab (f.inj x h)
 
 /-- **The embedding preserves wedges.** -/
-theorem wedge_embedFrom : ∀ (u w : Word 2) (x : {v : Word N // R v}),
+theorem wedge_embedFrom : ∀ (u w : Word k) (x : {v : Word N // R v}),
     wedge (f.embedFrom x u).1 (f.embedFrom x w).1 = (f.embedFrom x (wedge u w)).1
   | [], w, x => by
       rw [embedFrom_nil, wedge_nil_left, embedFrom_nil]
@@ -555,7 +549,7 @@ theorem wedge_embedFrom : ∀ (u w : Word 2) (x : {v : Word N // R v}),
         rw [wedge_append_append, wedge_cons_cons, if_neg (f.child_ne x hab), List.append_nil]
 
 /-- **The embedding is isometric.** -/
-theorem treeDist_embedFrom (u w : Word 2) (x : {v : Word N // R v}) :
+theorem treeDist_embedFrom (u w : Word k) (x : {v : Word N // R v}) :
     treeDist (f.embedFrom x u).1 (f.embedFrom x w).1 = treeDist u w := by
   have h1 := treeDist_add (f.embedFrom x u).1 (f.embedFrom x w).1
   have h2 := treeDist_add u w
@@ -564,24 +558,42 @@ theorem treeDist_embedFrom (u w : Word 2) (x : {v : Word N // R v}) :
 
 end ChildChoice
 
-/-- **An isometric copy of `𝔹` in a set with two children below every vertex**, rooted
-at any of its vertices. -/
-theorem exists_binary_embedding (h : HasTwoChildren R) {v₀ : Word N} (hv₀ : R v₀) :
-    ∃ e : Word 2 → Word N, (∀ w, R (e w)) ∧ ∀ u w, treeDist (e u) (e w) = treeDist u w :=
-  ⟨fun w ↦ (h.choice.embedFrom ⟨v₀, hv₀⟩ w).1, fun w ↦ (h.choice.embedFrom ⟨v₀, hv₀⟩ w).2,
-    fun u w ↦ h.choice.treeDist_embedFrom u w _⟩
+/-- **An isometric copy of the regular tree `𝒩(k)` in a set with `k` children below every
+vertex**, rooted at any of its vertices. -/
+theorem exists_regular_embedding (h : HasChildren k R) {v₀ : Word N} (hv₀ : R v₀) :
+    ∃ e : Word k → Word N, e [] = v₀ ∧ (∀ w, R (e w)) ∧
+      ∀ u w, treeDist (e u) (e w) = treeDist u w :=
+  ⟨fun w ↦ (h.choice.embedFrom ⟨v₀, hv₀⟩ w).1, rfl,
+    fun w ↦ (h.choice.embedFrom ⟨v₀, hv₀⟩ w).2, fun u w ↦ h.choice.treeDist_embedFrom u w _⟩
 
-/-- **The retained vertices of the sample have two retained children in the sample**, once
-`m ≥ 2`: a retained vertex has `J` children in the sample and at least `m` retained
-ones among them. -/
-theorem hasTwoChildren_retainedInf {c : Word N → ℕ} (hm : 2 ≤ m) :
-    HasTwoChildren fun v : Word N ↦ RetainedInf J m c v ∧ v ∈ sample c := by
+/-- **The retained vertices of the sample have `k` retained children in the sample**, for
+every `k ≤ m`: a retained vertex has `J` children in the sample and at least `m` retained
+ones among them, and the first `k` of these in letter order are distinct. -/
+theorem hasChildren_retainedInf {c : Word N → ℕ} (hk : k ≤ m) :
+    HasChildren k fun v : Word N ↦ RetainedInf J m c v ∧ v ∈ sample c := by
   rintro v ⟨hr, hv⟩
   obtain ⟨hc, hcard⟩ := retainedInf_iff.1 hr
-  obtain ⟨j₀, hj₀, j₁, hj₁, hne⟩ := Finset.one_lt_card.1 (lt_of_lt_of_le one_lt_two (hm.trans hcard))
-  rw [mem_retainedInfChildren] at hj₀ hj₁
-  exact ⟨j₀, j₁, hne, ⟨hj₀.2, mem_sample_append_singleton.2 ⟨hv, hc ▸ hj₀.1⟩⟩,
-    ⟨hj₁.2, mem_sample_append_singleton.2 ⟨hv, hc ▸ hj₁.1⟩⟩⟩
+  set S := retainedInfChildren J m c v with hS
+  have hkS : k ≤ S.card := hk.trans hcard
+  refine ⟨fun i ↦ S.orderEmbOfFin rfl (Fin.castLE hkS i),
+    (S.orderEmbOfFin rfl).injective.comp (Fin.castLE_injective hkS), fun i ↦ ?_⟩
+  have hmem : S.orderEmbOfFin rfl (Fin.castLE hkS i) ∈ retainedInfChildren J m c v :=
+    Finset.orderEmbOfFin_mem _ _ _
+  rw [mem_retainedInfChildren] at hmem
+  exact ⟨hmem.2, mem_sample_append_singleton.2 ⟨hv, hc ▸ hmem.1⟩⟩
+
+/-- **`thm:concentrated-regular-subtree`, the regular subtree**: below a retained vertex of
+the sample there is an isometric copy of the regular `m`-ary tree `𝒩(m)` rooted at that
+vertex, with the original unit edges, all of whose vertices are retained and have `J`
+children in the sample. -/
+theorem exists_regular_embedding_of_retainedInf {c : Word N → ℕ} {v₀ : Word N}
+    (hr : RetainedInf J m c v₀) (hv₀ : v₀ ∈ sample c) :
+    ∃ e : Word m → Word N, e [] = v₀ ∧
+      (∀ w, e w ∈ sample c ∧ RetainedInf J m c (e w) ∧ c (e w) = J) ∧
+      ∀ u w, treeDist (e u) (e w) = treeDist u w := by
+  obtain ⟨e, he0, he, hd⟩ :=
+    exists_regular_embedding (hasChildren_retainedInf (k := m) le_rfl) ⟨hr, hv₀⟩
+  exact ⟨e, he0, fun w ↦ ⟨(he w).2, (he w).1, (retainedInf_iff.1 (he w).1).1⟩, hd⟩
 
 /-- **`thm:concentrated-regular-subtree`, the deterministic conclusion**: below a
 retained vertex of the sample there is an isometric copy of the binary tree `𝒩(2)`,
@@ -589,7 +601,8 @@ with the original unit edges. -/
 theorem exists_binary_embedding_of_retainedInf {c : Word N → ℕ} (hm : 2 ≤ m) {v₀ : Word N}
     (hr : RetainedInf J m c v₀) (hv₀ : v₀ ∈ sample c) :
     ∃ e : Word 2 → Word N, (∀ w, e w ∈ sample c) ∧ ∀ u w, treeDist (e u) (e w) = treeDist u w := by
-  obtain ⟨e, he, hd⟩ := exists_binary_embedding (hasTwoChildren_retainedInf hm) ⟨hr, hv₀⟩
+  obtain ⟨e, -, he, hd⟩ :=
+    exists_regular_embedding (hasChildren_retainedInf (k := 2) hm) ⟨hr, hv₀⟩
   exact ⟨e, fun w ↦ (he w).2, hd⟩
 
 /-- A sample whose root is retained is infinite. -/
@@ -603,6 +616,6 @@ theorem survives_of_retainedInf {c : Word N → ℕ} (hm : 2 ≤ m) (hr : Retain
     exact (treeDist_eq_zero_iff.1 h.symm)
   exact Set.infinite_of_injective_forall_mem hinj he
 
-end BinaryEmbedding
+end RegularEmbedding
 
 end BranchingProcess

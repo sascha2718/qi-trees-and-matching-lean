@@ -86,7 +86,9 @@ status:
     universality theorem with its quantitative rate (Theorem 1.4). Beyond these endpoints the
     four libraries machine-check the numbered statements of the matching parts, the
     Galton--Watson foundations, the geometric obstructions, the pruning lemma behind the
-    embedding theorem and the strict embedding hierarchy, as recorded in the paper's appendix.
+    embedding theorem (the exact binomial recursion, the conditional Galton--Watson law of the
+    retained descendant tree, the regular m-ary subtree and the first-child-ray bound) and the
+    strict embedding hierarchy, as recorded in the paper's appendix.
     Not formalised: the quasisymmetry corollary for the boundaries
     (Corollary 1.5) and the fractal percolation application (Corollary 3.1); and the two families
     of binary trees with continuous random branching times (Section 7). The analytic constants

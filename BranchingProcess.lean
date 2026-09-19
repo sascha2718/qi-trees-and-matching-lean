@@ -43,7 +43,11 @@ it; nothing here consumes `ChainClasses`, `GraphMatching` or
   maps, bounded graphs and the ray, behind `sec:embedding-hierarchy`.
 * `Pruning`: `thm:concentrated-regular-subtree`, the pruning of a concentrated
   law, the lower bound on the probability that the root is retained, and the
-  isometric copy of the binary tree below a retained vertex.
+  regular `m`-ary subtree below a retained vertex.
+* `PrunedTree`: the exact binomial recursion of the pruning, its fixed point,
+  and the retained descendant tree as a Galton-Watson tree with the binomial
+  law conditioned to be at least `m`, under the law conditioned on a retained
+  root.
 -/
 import BranchingProcess.Word
 import BranchingProcess.Offspring
@@ -58,3 +62,4 @@ import BranchingProcess.Field
 import BranchingProcess.Geometry
 import BranchingProcess.Embedding
 import BranchingProcess.Pruning
+import BranchingProcess.PrunedTree
