@@ -207,7 +207,7 @@ theorem boundaryFailure_ge_one {Ω : Type*} [MeasurableSpace Ω]
 bounded profiles, regardless of the branching semigroups of their arity laws. -/
 theorem sample_qi_of_pure_chain_match {N N' L L' D : ℕ} [NeZero N] [NeZero N']
     (C C' : Family) {c : GWord N → ℕ} {c' : GWord N' → ℕ}
-    (hc : IsGHairySample c) (hc' : IsGHairySample c')
+    (hc : IsGBushySample c) (hc' : IsGBushySample c')
     (h1 : ∀ v, 1 ≤ c v) (h1' : ∀ v, 1 ≤ c' v)
     (hs : SkelBounded L (gArityAt c)) (hs' : SkelBounded L' (gArityAt c'))
     (hL : 1 ≤ L) (hL' : 1 ≤ L') (hD : 2 ≤ D)

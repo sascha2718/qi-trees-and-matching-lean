@@ -1,7 +1,7 @@
 import ChainClasses.General.GeneralDecomposition
 import ChainClasses.Shape.ContractAddr
 import ChainClasses.Shape.ShapeMetric
-import ChainClasses.Scalar.Hairy
+import ChainClasses.Scalar.Bushy
 import ChainClasses.General.GeneralConstants
 
 /-!

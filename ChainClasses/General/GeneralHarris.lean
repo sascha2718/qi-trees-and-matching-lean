@@ -32,7 +32,7 @@ law as a finite real sequence.
 * `extinction_ge` (`q ≥ θ₀ > 0`) and `genDeriv_pos` (`f'(q) > 0`); the
   subcriticality `f'(q) < 1`
   is the structural input and enters the lemmas as a hypothesis.
-* `tilde_hairy`, `reduced_hairy`: the specialisation to `J = 2` at
+* `tilde_bushy`, `reduced_bushy`: the specialisation to `J = 2` at
   `q = θ₀/θ₂`, recovering the two-value skeleton law `θ̃₁ = θ₁ + 2θ₀`,
   `θ̃₂ = θ₂ - θ₀` of `thm:harris` and the point mass of the reduced law at
   arity `2`.
@@ -160,7 +160,7 @@ lemma tilde_one (J : ℕ) (θ : ℕ → ℝ) {q : ℝ} (hq1 : q < 1) :
   rw [tilde, if_neg one_ne_zero, surviveCoeff_one]
   field_simp
 
-/-- Every skeleton arity `1 ≤ k ≤ J` has positive probability in the hairy
+/-- Every skeleton arity `1 ≤ k ≤ J` has positive probability in the bushy
 regime. -/
 lemma tilde_pos (J : ℕ) (θ : ℕ → ℝ) {q : ℝ} (hnn : ∀ j, 0 ≤ θ j) (hJ : 0 < θ J)
     (hq0 : 0 < q) (hq1 : q < 1) {k : ℕ} (hk1 : 1 ≤ k) (hkb : k ≤ J) :
@@ -300,8 +300,8 @@ lemma genDeriv_pos (J : ℕ) (θ : ℕ → ℝ) {q : ℝ} (hnn : ∀ j, 0 ≤ θ
 
 /-! ### The specialisation to `J = 2` -/
 
-/-- The three-point law of `IsHairy` as a sequence. -/
-def hairyLaw (θ₀ θ₁ θ₂ : ℝ) : ℕ → ℝ
+/-- The three-point law of `IsBushy` as a sequence. -/
+def bushyLaw (θ₀ θ₁ θ₂ : ℝ) : ℕ → ℝ
   | 0 => θ₀
   | 1 => θ₁
   | 2 => θ₂
@@ -309,30 +309,30 @@ def hairyLaw (θ₀ θ₁ θ₂ : ℝ) : ℕ → ℝ
 
 variable {θ₀ θ₁ θ₂ : ℝ}
 
-lemma genDeriv_hairy (θ₀ θ₁ θ₂ s : ℝ) :
-    genDeriv 2 (hairyLaw θ₀ θ₁ θ₂) s = θ₁ + 2 * θ₂ * s := by
+lemma genDeriv_bushy (θ₀ θ₁ θ₂ s : ℝ) :
+    genDeriv 2 (bushyLaw θ₀ θ₁ θ₂) s = θ₁ + 2 * θ₂ * s := by
   unfold genDeriv
   rw [Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_one]
-  simp only [hairyLaw]
+  simp only [bushyLaw]
   push_cast
   ring
 
 /-- **The specialisation of `thm:harris-general` to `J = 2`**: at
 `q = θ₀/θ₂` the transform is the two-value skeleton law of `thm:harris`,
 `θ̃₁ = θ₁ + 2θ₀` and `θ̃₂ = θ₂ - θ₀`. -/
-theorem tilde_hairy (h : IsHairy θ₀ θ₁ θ₂) :
-    tilde 2 (hairyLaw θ₀ θ₁ θ₂) (θ₀ / θ₂) 1 = θ₁ + 2 * θ₀ ∧
-    tilde 2 (hairyLaw θ₀ θ₁ θ₂) (θ₀ / θ₂) 2 = θ₂ - θ₀ := by
+theorem tilde_bushy (h : IsBushy θ₀ θ₁ θ₂) :
+    tilde 2 (bushyLaw θ₀ θ₁ θ₂) (θ₀ / θ₂) 1 = θ₁ + 2 * θ₀ ∧
+    tilde 2 (bushyLaw θ₀ θ₁ θ₂) (θ₀ / θ₂) 2 = θ₂ - θ₀ := by
   obtain ⟨hq0, hq1⟩ := h.extinction_mem
   have h2 : θ₂ ≠ 0 := ne_of_gt h.pos₂
   constructor
-  · rw [tilde_one _ _ hq1, genDeriv_hairy]
+  · rw [tilde_one _ _ hq1, genDeriv_bushy]
     exact h.neck_prob
-  · have hs2 : surviveCoeff 2 (hairyLaw θ₀ θ₁ θ₂) (θ₀ / θ₂) 2
+  · have hs2 : surviveCoeff 2 (bushyLaw θ₀ θ₁ θ₂) (θ₀ / θ₂) 2
         = θ₂ * (1 - θ₀ / θ₂) ^ 2 := by
       unfold surviveCoeff
       rw [Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_one]
-      simp only [hairyLaw]
+      simp only [bushyLaw]
       norm_num
     rw [tilde, if_neg (by norm_num : (2 : ℕ) ≠ 0), hs2]
     have hne : (1 : ℝ) - θ₀ / θ₂ ≠ 0 := by linarith
@@ -344,9 +344,9 @@ theorem tilde_hairy (h : IsHairy θ₀ θ₁ θ₂) :
 
 /-- The reduced law of the `J = 2` case is the point mass at arity `2`: the
 tree of splits is the binary tree. -/
-theorem reduced_hairy (h : IsHairy θ₀ θ₁ θ₂) :
-    reducedLaw 2 (hairyLaw θ₀ θ₁ θ₂) (θ₀ / θ₂) 2 = 1 := by
-  obtain ⟨ht1, ht2⟩ := tilde_hairy h
+theorem reduced_bushy (h : IsBushy θ₀ θ₁ θ₂) :
+    reducedLaw 2 (bushyLaw θ₀ θ₁ θ₂) (θ₀ / θ₂) 2 = 1 := by
+  obtain ⟨ht1, ht2⟩ := tilde_bushy h
   rw [reducedLaw, ht2, ht1]
   have hone : (1 : ℝ) - (θ₁ + 2 * θ₀) = θ₂ - θ₀ := by
     have := h.sum; linarith

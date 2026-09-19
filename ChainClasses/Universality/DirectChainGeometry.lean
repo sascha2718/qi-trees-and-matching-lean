@@ -17,7 +17,7 @@ variable {N N' : ℕ}
 reduced necks; its local comparison constant is `2 chainRatio D² + 1`. -/
 theorem sample_qi_of_direct_chain_match [NeZero N] [NeZero N'] {L L' : ℕ}
     (C C' : Profile.Family) {c : GWord N → ℕ} {c' : GWord N' → ℕ}
-    (hc : IsGHairySample c) (hc' : IsGHairySample c')
+    (hc : IsGBushySample c) (hc' : IsGBushySample c')
     (h1 : ∀ v, 1 ≤ c v) (h1' : ∀ v, 1 ≤ c' v)
     (hs : Profile.SkelBounded L (gArityAt c)) (hs' : Profile.SkelBounded L' (gArityAt c'))
     (hL : 1 ≤ L) (hL' : 1 ≤ L') {a b : ℝ}

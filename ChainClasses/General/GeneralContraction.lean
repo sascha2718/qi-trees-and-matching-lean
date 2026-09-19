@@ -4,7 +4,7 @@ import ChainClasses.General.GeneralDilution
 import ChainClasses.Shape.AddrMetric
 
 /-!
-`it:general-dilution` of `matching_classes_general.tex`: `thm:dilution` at general
+`thm:general-dilution` of `matching_classes_general.tex`: `thm:dilution` at general
 arity, the greedy contraction of a rose tree and the count it gives.
 
 The cut of `GeneralDilution.lean` is read at the level of addresses, as
@@ -34,7 +34,7 @@ with offspring numbers in `{0,…,J}` has offspring numbers in `{0,…,J(1+J(s-1
   `part_append_singleton`.
 * `GPartVert`, `gPartGraph`, `gPartSpace`: the contracted tree and its marked metric
   space.
-* `markedQI_gContract`: **`it:general-dilution`, the contraction** is a `2s`-marked
+* `markedQI_gContract`: **`thm:general-dilution`, the contraction** is a `2s`-marked
   quasi-isometry, the constant free of the arity.
 * `RTree.cutForest`, `RTree.gContractTree`, `size_gContractTree_le_div`: the
   contraction as a rose tree with at most `|t|/s + 1` vertices.
@@ -44,7 +44,7 @@ with offspring numbers in `{0,…,J}` has offspring numbers in `{0,…,J(1+J(s-1
   marked contraction, the datum `RTree.dilution_count` counts.
 * `gToVert`, `dist_gToVert`, `isMarkedIsom_gToVert`, `markedQI_gContractTree`: the
   contracted tree is the rose tree as a marked metric space.
-* `degLe_gContractTree`: **`it:general-dilution`, the degree**: the contraction of a
+* `degLe_gContractTree`: **`thm:general-dilution`, the degree**: the contraction of a
   tree with offspring numbers in `{0,…,J}` has offspring numbers in
   `{0,…,J(1+J(s-1))}`.
 * `markedQI_of_gContractPair_eq`, `markedQI_of_gShapeContractPair_eq`: marked rose
@@ -622,7 +622,7 @@ noncomputable def gPartSpace (s : ℕ) (t : RTree) (e : List ℕ) : MarkedSpace 
 lemma exit_gPartSpace_of_mem {e : List ℕ} (he : e ∈ addrList t) :
     (gPartSpace s t e).exit = gContract (s := s) he := dif_pos he
 
-/-- **`it:general-dilution`, the contraction.**  Contracting every part of the greedy
+/-- **`thm:general-dilution`, the contraction.**  Contracting every part of the greedy
 cut to a point is a `2s`-marked quasi-isometry of a rose tree with a marked address
 onto a rooted tree with a marked vertex; the constant does not see the arity. -/
 theorem markedQI_gContract (hs : 1 ≤ s) {e : List ℕ} (he : e ∈ addrList t) :
@@ -705,7 +705,7 @@ def rootForest (s : ℕ) : RTree → List RTree
 
 @[simp] lemma rootForest_node (cs : List RTree) : rootForest s (.node cs) = cutForestF s cs := rfl
 
-/-- **`it:general-dilution`**, the contracted tree: the part roots of `t` at scale `s`,
+/-- **`thm:general-dilution`**, the contracted tree: the part roots of `t` at scale `s`,
 each part root carrying as children the part roots immediately below it. -/
 def gContractTree (s : ℕ) (t : RTree) : RTree := .node (rootForest s t)
 
@@ -756,7 +756,7 @@ lemma sizeF_cutForest (t : RTree) : sizeF (cutForest s t) = cutCount s t := by
 lemma sizeF_cutForestF (cs : List RTree) : sizeF (cutForestF s cs) = cutCountF s cs :=
   sizeF_cutForestF_of cs fun c _ => sizeF_cutForest c
 
-/-- **`it:general-dilution`, the parts**: the contraction carries one vertex more than
+/-- **`thm:general-dilution`, the parts**: the contraction carries one vertex more than
 the greedy cut has parts, the extra one being the root part. -/
 theorem size_gContractTree_le (t : RTree) : (gContractTree s t).size ≤ cutCount s t + 1 := by
   cases t with
@@ -764,7 +764,7 @@ theorem size_gContractTree_le (t : RTree) : (gContractTree s t).size ≤ cutCoun
       rw [gContractTree_eq, rootForest_node, size_node, sizeF_cutForestF, cutCount]
       split <;> omega
 
-/-- **`it:general-dilution`, the parts**: at scale `s` the contraction of a tree of `n`
+/-- **`thm:general-dilution`, the parts**: at scale `s` the contraction of a tree of `n`
 vertices has at most `n/s + 1` vertices. -/
 theorem size_gContractTree_le_div (hs : 1 ≤ s) (t : RTree) :
     (gContractTree s t).size ≤ t.size / s + 1 := by
@@ -933,7 +933,7 @@ lemma part_eq_nil_or_mem_cutAddrs : ∀ (t : RTree) (w : List ℕ), IsAddr t w �
             · exact absurd h hp
             · exact Or.inr (hmem _ h)
 
-/-- **`it:general-dilution`**, the vertices of the contraction listed by address: the
+/-- **`thm:general-dilution`**, the vertices of the contraction listed by address: the
 root part first, then the part roots below it in the order the tree is read. -/
 def partList (s : ℕ) (T : RTree) : List (List ℕ) := [] :: rootAddrs s T
 
@@ -1067,7 +1067,7 @@ lemma length_partList (T : RTree) : (partList s T).length = (gContractTree s T).
 
 /-! ### The mark -/
 
-/-- **`it:general-dilution`**, the mark: the part of a vertex, read as an index into
+/-- **`thm:general-dilution`**, the mark: the part of a vertex, read as an index into
 the vertices of the contraction. -/
 def markOf (s : ℕ) (T : RTree) (w : List ℕ) : ℕ := (partList s T).idxOf (part s T w)
 
@@ -1087,11 +1087,11 @@ theorem markOf_eq_iff (T : RTree) {v w : List ℕ} (hv : v ∈ addrList T) :
   rw [markOf, part_nil, partList_eq]
   simp [List.idxOf_cons_self]
 
-/-- **`it:general-dilution`**, the datum counted: the contraction of `T` at scale `s`
+/-- **`thm:general-dilution`**, the datum counted: the contraction of `T` at scale `s`
 together with the part of the vertex `e`. -/
 def gContractPair (s : ℕ) (T : RTree) (e : List ℕ) : RTree × ℕ := (gContractTree s T, markOf s T e)
 
-/-- **`it:general-dilution`**, the hypothesis of the count: the marked contraction of
+/-- **`thm:general-dilution`**, the hypothesis of the count: the marked contraction of
 a tree of at most `n` vertices is a rooted tree of at most `n/s + 1` vertices with one
 of them marked. -/
 theorem gContractPair_spec (hs : 1 ≤ s) {T : RTree} {n : ℕ} (hn : T.size ≤ n) {e : List ℕ}
@@ -1110,7 +1110,7 @@ end RTree
 
 variable {s : ℕ}
 
-/-- **`it:general-dilution`**, the pairing: the part roots of `T`, as `RTree.partList`
+/-- **`thm:general-dilution`**, the pairing: the part roots of `T`, as `RTree.partList`
 lists them, against the addresses of `RTree.gContractTree s T`, as `RTree.addrList`
 lists them.  Both recursions read the tree in the same order, so the pairing is the
 graph of a bijection. -/
@@ -1318,7 +1318,7 @@ lemma part_dropLast_mem_gCutPairsF (s : ℕ) : ∀ cs : List RTree,
           · exact List.mem_cons_of_mem _ (List.mem_append_right _
               (List.mem_map.mpr ⟨_, hmem', rfl⟩))
 
-/-- **`it:general-dilution`, the pairing is a map of part trees.**  The part-parent of
+/-- **`thm:general-dilution`, the pairing is a map of part trees.**  The part-parent of
 a part root is paired with the parent of its address in the contraction. -/
 theorem part_dropLast_mem_gPairList (s : ℕ) : ∀ (t : RTree) (x y : List ℕ),
     (x, y) ∈ gPairList s t → (part s t x.dropLast, y.dropLast) ∈ gPairList s t := by
@@ -1338,7 +1338,7 @@ theorem part_dropLast_mem_gPairList (s : ℕ) : ∀ (t : RTree) (x y : List ℕ)
 
 variable (s : ℕ) (T : RTree)
 
-/-- **`it:general-dilution`**: the address, in the contraction, of the part topped by a
+/-- **`thm:general-dilution`**: the address, in the contraction, of the part topped by a
 given address. -/
 def gPartAddr (x : List ℕ) : List ℕ :=
   (addrList (gContractTree s T)).getD ((partList s T).idxOf x) []
@@ -1397,7 +1397,7 @@ lemma gPartAddr_injOn (hx : x ∈ partList s T) (hx' : x' ∈ partList s T)
     rw [gPairList_eq]; exact List.mem_cons_self
   exact (((mem_gPairList_iff s T).mp this).2).symm
 
-/-- **`it:general-dilution`, the naming is a map of part trees.**  The part-parent of
+/-- **`thm:general-dilution`, the naming is a map of part trees.**  The part-parent of
 a part root is named by the parent of its name. -/
 lemma gPartAddr_part_dropLast (hx : x ∈ partList s T) :
     gPartAddr s T (part s T x.dropLast) = (gPartAddr s T x).dropLast :=
@@ -1451,7 +1451,7 @@ lemma gPartGraph_adj_iff {p q : GPartVert s T} :
     · exact Or.inl ⟨h1, h2⟩
     · exact Or.inr ⟨h1.symm, h2⟩
 
-/-- **`it:general-dilution`**: a part root read as an address of the contraction. -/
+/-- **`thm:general-dilution`**: a part root read as an address of the contraction. -/
 def gToVert (p : GPartVert s T) : Vert (gContractTree s T) :=
   ⟨gPartAddr s T p.1, gPartAddr_mem ((mem_partList_iff T).mpr p.2)⟩
 
@@ -1502,7 +1502,7 @@ def gOfVertHom (s : ℕ) (T : RTree) : rtreeGraph (gContractTree s T) →g gPart
     rw [gToVert_gOfVert, gToVert_gOfVert] at hxy
     exact hxy.mp h⟩
 
-/-- **`it:general-dilution`, the contraction is the rose tree**: the contracted tree
+/-- **`thm:general-dilution`, the contraction is the rose tree**: the contracted tree
 `gPartGraph s T` and the rose tree `gContractTree s T` carry the same metric. -/
 theorem dist_gToVert (p q : GPartVert s T) :
     (rtreeGraph (gContractTree s T)).dist (gToVert p) (gToVert q) = (gPartGraph s T).dist p q := by
@@ -1514,7 +1514,7 @@ theorem dist_gToVert (p q : GPartVert s T) :
 
 /-! ### The marked contraction -/
 
-/-- **`it:general-dilution`**, the mark as an address: the address in the contraction
+/-- **`thm:general-dilution`**, the mark as an address: the address in the contraction
 of the part root of `e`. -/
 def gContractMark (s : ℕ) (T : RTree) (e : List ℕ) : List ℕ := gPartAddr s T (part s T e)
 
@@ -1527,7 +1527,7 @@ lemma gContractMark_mem {e : List ℕ} (he : e ∈ addrList T) :
     gContractMark s T e ∈ addrList (gContractTree s T) :=
   gPartAddr_mem (part_mem_partList T he)
 
-/-- **`it:general-dilution`, the contraction as the counted datum**: the contracted
+/-- **`thm:general-dilution`, the contraction as the counted datum**: the contracted
 tree of a marked rose tree, with the part of the marked vertex, is the rose tree the
 count of `dilution_count` sees, marks and metric included. -/
 theorem isMarkedIsom_gToVert (s : ℕ) {T : RTree} {e : List ℕ} (he : e ∈ addrList T) :
@@ -1542,7 +1542,7 @@ theorem isMarkedIsom_gToVert (s : ℕ) {T : RTree} {e : List ℕ} (he : e ∈ ad
     rw [exit_gPartSpace_of_mem he, exit_gSpace_of_mem (gContractMark_mem he)]
     exact Subtype.ext rfl
 
-/-- **`it:general-dilution`, the contraction as a rose tree**: a rose tree with a
+/-- **`thm:general-dilution`, the contraction as a rose tree**: a rose tree with a
 marked address is `2s`-comparable to its contraction, a rose tree with the part of the
 mark marked. -/
 theorem markedQI_gContractTree (hs : 1 ≤ s) {e : List ℕ} (he : e ∈ addrList T) :
@@ -1622,7 +1622,7 @@ lemma degLe_of_mem_cutForest (hs : 1 ≤ s) {J : ℕ} : ∀ t : RTree, DegLe J t
         exact degLe_node_cutForestF hs hdeg hmem
       · exact hmem x hx
 
-/-- **`it:general-dilution`, the degree of the contraction.**  A part has at most
+/-- **`thm:general-dilution`, the degree of the contraction.**  A part has at most
 `1 + J(s-1)` vertices, each with at most `J` children, and the parts immediately below
 a part root are the children of that root in the contraction, so the contraction of a
 tree with offspring numbers in `{0,…,J}` has offspring numbers in
@@ -1647,7 +1647,7 @@ theorem degLe_gContractTree_mul (hs : 1 ≤ s) {J : ℕ} {t : RTree} (hdeg : Deg
 
 /-! ### Marked rose trees with the same contraction are comparable -/
 
-/-- **`it:general-dilution`, the step that makes the count bite.**  Two marked rose
+/-- **`thm:general-dilution`, the step that makes the count bite.**  Two marked rose
 trees whose contractions at scale `s` agree, the mark included, are
 `72s³`-comparable: the projection of the first, the identification of the two
 contractions, and a quasi-inverse of the projection of the second compose to
@@ -1671,25 +1671,25 @@ theorem markedQI_of_gContractPair_eq (hs : 1 ≤ s) {T T' : RTree} {e e' : List 
   have e : 3 * (2 * (s : ℝ)) * (3 * (2 * (s : ℝ)) ^ 2) = 72 * (s : ℝ) ^ 3 := by ring
   rwa [e] at h5
 
-/-- **`it:general-dilution`**: the contraction of the realisation of a shape, marked
+/-- **`thm:general-dilution`**: the contraction of the realisation of a shape, marked
 at the part of the exit. -/
 def gShapeContractPair (s : ℕ) (σ : GShape) : RTree × ℕ :=
   gContractPair s σ.realise σ.exitAddr
 
-/-- **`it:general-dilution`**, the hypothesis of the count at a shape. -/
+/-- **`thm:general-dilution`**, the hypothesis of the count at a shape. -/
 theorem gShapeContractPair_spec (hs : 1 ≤ s) {σ : GShape} {n : ℕ} (hn : σ.size ≤ n) :
     (gShapeContractPair s σ).1.size ≤ n / s + 1 ∧
       (gShapeContractPair s σ).2 < (gShapeContractPair s σ).1.size :=
   gContractPair_spec hs hn σ.exitAddr_mem_addrList
 
-/-- **`it:general-dilution`**: two shapes with the same marked contraction at scale
+/-- **`thm:general-dilution`**: two shapes with the same marked contraction at scale
 `s` are `72s³`-comparable. -/
 theorem markedQI_of_gShapeContractPair_eq (hs : 1 ≤ s) {σ τ : GShape}
     (h : gShapeContractPair s σ = gShapeContractPair s τ) :
     MarkedQI (72 * (s : ℝ) ^ 3) (gShapeSpace σ) (gShapeSpace τ) :=
   markedQI_of_gContractPair_eq hs σ.exitAddr_mem_addrList τ.exitAddr_mem_addrList h
 
-/-- **`it:general-dilution`**: a family of marked contractions of shapes of at most
+/-- **`thm:general-dilution`**: a family of marked contractions of shapes of at most
 `n` vertices, taken at scale `s`, has at most `e^{3(n/s+1)}` members. -/
 theorem gDilution_count_shape (hs : 1 ≤ s) (n : ℕ) (F : Finset (RTree × ℕ))
     (hF : ∀ p ∈ F, ∃ σ : GShape, σ.size ≤ n ∧ p = gShapeContractPair s σ) :

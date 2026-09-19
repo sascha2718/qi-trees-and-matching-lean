@@ -16,7 +16,7 @@ split weight `θ̃₂` at the end.
 
 The events of the recursion are the ones of `ShapeDecomposition`, so they carry the junk
 of an offspring count above the support bound; every step is therefore taken modulo the
-event `IsHairySample`, which `ae_isHairySample_of_pos` gives full measure.
+event `IsBushySample`, which `ae_isBushySample_of_pos` gives full measure.
 
 * `measure_eq_of_inter_ae`: two events agreeing on an event of full measure have the same
   mass, the form every step below is transported in.
@@ -119,23 +119,23 @@ theorem survivalMeasure_neck_step (θ : Offspring 2) (hq : θ.extinction < 1)
         (({c : Amb → ℕ | skeletonDegree c = 1} ∩ {c : Amb → ℕ | decAt c [] = o})
           ∩ {c : Amb → ℕ | bushAt c 0 ∈ A})
       = decMass θ o * survivalMeasure (N := 2) θ A := by
-  have hnull : survivalMeasure (N := 2) θ {c : Amb → ℕ | IsHairySample c}ᶜ = 0 := by
-    have hae := ae_isHairySample_of_pos θ hq h2
+  have hnull : survivalMeasure (N := 2) θ {c : Amb → ℕ | IsBushySample c}ᶜ = 0 := by
+    have hae := ae_isBushySample_of_pos θ hq h2
     rw [ae_iff] at hae
     exact hae
   cases o with
   | none =>
       have hset : (({c : Amb → ℕ | skeletonDegree c = 1} ∩ {c : Amb → ℕ | decAt c [] = none})
-            ∩ {c : Amb → ℕ | bushAt c 0 ∈ A}) ∩ {c : Amb → ℕ | IsHairySample c}
+            ∩ {c : Amb → ℕ | bushAt c 0 ∈ A}) ∩ {c : Amb → ℕ | IsBushySample c}
           = ((({c : Amb → ℕ | c [] = 1} ∩ {c : Amb → ℕ | skeletonDegree c = 1})
                 ∩ {c : Amb → ℕ | bushAt c 0 ∈ A})
               ∩ {c : Amb → ℕ | ∀ i : Fin 2, i ∉ survivors c → (i : ℕ) < 1 →
                   (fun w : Amb ↦ c (i :: w)) ∈ (Set.univ : Set (Amb → ℕ))})
-            ∩ {c : Amb → ℕ | IsHairySample c} := by
+            ∩ {c : Amb → ℕ | IsBushySample c} := by
         ext c
         simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_univ, implies_true, and_true]
         constructor
-        · rintro ⟨⟨⟨hdeg, hdec⟩, hbush⟩, hhairy⟩
+        · rintro ⟨⟨⟨hdeg, hdec⟩, hbush⟩, hbushy⟩
           have hne : c [] ≠ 2 := by
             by_contra hc
             rw [decAt, if_pos hc] at hdec
@@ -144,12 +144,12 @@ theorem survivalMeasure_neck_step (θ : Offspring 2) (hq : θ.extinction < 1)
             simpa using BranchingProcess.survives_iff_skeletonDegree_ne_zero.mpr
               (by omega : skeletonDegree c ≠ 0)
           have hone : c [] = 1 := by
-            rcases eq_one_or_two_of_survives hhairy hsurv with h | h
+            rcases eq_one_or_two_of_survives hbushy hsurv with h | h
             · simpa using h
             · exact absurd (by simpa using h) hne
-          exact ⟨⟨⟨hone, hdeg⟩, hbush⟩, hhairy⟩
-        · rintro ⟨⟨⟨hone, hdeg⟩, hbush⟩, hhairy⟩
-          refine ⟨⟨⟨hdeg, ?_⟩, hbush⟩, hhairy⟩
+          exact ⟨⟨⟨hone, hdeg⟩, hbush⟩, hbushy⟩
+        · rintro ⟨⟨⟨hone, hdeg⟩, hbush⟩, hbushy⟩
+          refine ⟨⟨⟨hdeg, ?_⟩, hbush⟩, hbushy⟩
           rw [decAt, if_neg (by rw [hone]; omega)]
       rw [measure_eq_of_inter_ae hnull hset,
         BranchingProcess.survivalMeasure_root_one_survivor θ le_rfl hq hq0 (by norm_num) hA
@@ -157,16 +157,16 @@ theorem survivalMeasure_neck_step (θ : Offspring 2) (hq : θ.extinction < 1)
       simp [decMass]
   | some t =>
       have hset : (({c : Amb → ℕ | skeletonDegree c = 1} ∩ {c : Amb → ℕ | decAt c [] = some t})
-            ∩ {c : Amb → ℕ | bushAt c 0 ∈ A}) ∩ {c : Amb → ℕ | IsHairySample c}
+            ∩ {c : Amb → ℕ | bushAt c 0 ∈ A}) ∩ {c : Amb → ℕ | IsBushySample c}
           = ((({c : Amb → ℕ | c [] = 2} ∩ {c : Amb → ℕ | skeletonDegree c = 1})
                 ∩ {c : Amb → ℕ | bushAt c 0 ∈ A})
               ∩ {c : Amb → ℕ | ∀ i : Fin 2, i ∉ survivors c → (i : ℕ) < 2 →
                   (fun w : Amb ↦ c (i :: w)) ∈ {d : Amb → ℕ | bushTri d = t}})
-            ∩ {c : Amb → ℕ | IsHairySample c} := by
+            ∩ {c : Amb → ℕ | IsBushySample c} := by
         ext c
         simp only [Set.mem_inter_iff, Set.mem_setOf_eq]
         constructor
-        · rintro ⟨⟨⟨hdeg, hdec⟩, hbush⟩, hhairy⟩
+        · rintro ⟨⟨⟨hdeg, hdec⟩, hbush⟩, hbushy⟩
           have hc2 : c [] = 2 := by
             by_contra hc
             rw [decAt, if_neg hc] at hdec
@@ -174,7 +174,7 @@ theorem survivalMeasure_neck_step (θ : Offspring 2) (hq : θ.extinction < 1)
           rw [decAt, if_pos hc2] at hdec
           have htri : bushTri (shift c ([] ++ [bushLetter c []])) = t := by
             simpa using hdec
-          refine ⟨⟨⟨⟨hc2, hdeg⟩, hbush⟩, fun i hi _ ↦ ?_⟩, hhairy⟩
+          refine ⟨⟨⟨⟨hc2, hdeg⟩, hbush⟩, fun i hi _ ↦ ?_⟩, hbushy⟩
           have hib : i = bushLetter c [] := eq_bushLetter_of_notMem hdeg hi
           have hshift : (fun w : Amb ↦ c (i :: w)) = shift c ([] ++ [bushLetter c []]) := by
             funext w
@@ -182,8 +182,8 @@ theorem survivalMeasure_neck_step (θ : Offspring 2) (hq : θ.extinction < 1)
             rfl
           rw [hshift]
           exact htri
-        · rintro ⟨⟨⟨⟨hc2, hdeg⟩, hbush⟩, hdying⟩, hhairy⟩
-          refine ⟨⟨⟨hdeg, ?_⟩, hbush⟩, hhairy⟩
+        · rintro ⟨⟨⟨⟨hc2, hdeg⟩, hbush⟩, hdying⟩, hbushy⟩
+          refine ⟨⟨⟨hdeg, ?_⟩, hbush⟩, hbushy⟩
           have hnot := bushLetter_notMem_survivors hdeg hc2
           have hlt : (bushLetter c [] : ℕ) < 2 := (bushLetter c []).isLt
           have hval := hdying (bushLetter c []) hnot hlt
@@ -216,7 +216,7 @@ lemma neckRay_shift_base (c : Amb → ℕ) (u v : Amb) :
 
 /-- **The chain of the root, one step down**: at a neck vertex the chain of the root is
 one longer than the chain of the surviving subtree. -/
-lemma splitDepth_bushAt {c : Amb → ℕ} (hc : IsHairySample c) (hdeg : skeletonDegree c = 1) :
+lemma splitDepth_bushAt {c : Amb → ℕ} (hc : IsBushySample c) (hdeg : skeletonDegree c = 1) :
     splitDepth c [] = splitDepth (bushAt c 0) [] + 1 := by
   have hroot : Survives (shift c []) := by simpa using hc.survives
   have hne : ∃ k, 2 ≤ skeletonDegree (shift c (neckRay c [] k)) := hc.splits [] hroot
@@ -275,7 +275,7 @@ lemma decs_shapeAt_nil (c : Amb → ℕ) :
 
 /-- **The recursion of the shape at the root**: the shape of a bushy sample is its first
 decoration followed by the shape of the surviving subtree. -/
-lemma decs_shapeAt_nil_cons {c : Amb → ℕ} (hc : IsHairySample c) (o : Option Tri)
+lemma decs_shapeAt_nil_cons {c : Amb → ℕ} (hc : IsBushySample c) (o : Option Tri)
     (l : List (Option Tri)) :
     (shapeAt c []).decs = o :: l
       ↔ (skeletonDegree c = 1 ∧ decAt c [] = o ∧ (shapeAt (bushAt c 0) []).decs = l) := by
@@ -334,8 +334,8 @@ theorem survivalMeasure_decs_shapeAt_nil (θ : Offspring 2) (hq : θ.extinction 
     (hq0 : 0 < θ.extinction) (h2 : 0 < θ 2) (l : List (Option Tri)) :
     survivalMeasure (N := 2) θ {c : Amb → ℕ | (shapeAt c []).decs = l}
       = (l.map (decMass θ)).prod * ENNReal.ofReal (θ.skeletonWeight 2) := by
-  have hnull : survivalMeasure (N := 2) θ {c : Amb → ℕ | IsHairySample c}ᶜ = 0 := by
-    have hae := ae_isHairySample_of_pos θ hq h2
+  have hnull : survivalMeasure (N := 2) θ {c : Amb → ℕ | IsBushySample c}ᶜ = 0 := by
+    have hae := ae_isBushySample_of_pos θ hq h2
     rw [ae_iff] at hae
     exact hae
   induction l with
@@ -361,10 +361,10 @@ theorem survivalMeasure_decs_shapeAt_nil (θ : Offspring 2) (hq : θ.extinction 
       simp
   | cons o l ih =>
       have hset : {c : Amb → ℕ | (shapeAt c []).decs = o :: l}
-            ∩ {c : Amb → ℕ | IsHairySample c}
+            ∩ {c : Amb → ℕ | IsBushySample c}
           = (({c : Amb → ℕ | skeletonDegree c = 1} ∩ {c : Amb → ℕ | decAt c [] = o})
               ∩ {c : Amb → ℕ | bushAt c 0 ∈ {d : Amb → ℕ | (shapeAt d []).decs = l}})
-            ∩ {c : Amb → ℕ | IsHairySample c} := by
+            ∩ {c : Amb → ℕ | IsBushySample c} := by
         ext c
         simp only [Set.mem_inter_iff, Set.mem_setOf_eq]
         constructor

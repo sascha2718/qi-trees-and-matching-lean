@@ -1,19 +1,22 @@
 import ChainClasses.Bushy.ShapeEtaSelf
 
 /-!
-`sec:shape-coupling` and `sec:hairy` of `gw_classes_simple.tex`: the label
-graph of `thm:shape-coupling` across two laws, and `thm:hairy` over it.
+`sec:shape-coupling` and the bushy-universality proposition labelled
+`thm:hairy` in `gw_classes_simple.tex`: the label graph of
+`thm:shape-coupling` across two laws, and bushy universality over it.
 
 The labels are the pairs of a coupling `π` of the two shape laws, as `thm:shape-coupling`
 builds them: a shape of the first law is labelled by the pair consisting of its support fix
 and a partner drawn from the conditional law of `π` given that fix, a shape of the second
-law by the mirror pair, and the label graph joins two pairs the coupling charges when all
-four cross comparisons hold.  Both label fields then carry the law `π`.
+law by the mirror pair, and the label graph joins two positive-mass pairs when all four
+cross comparisons hold.  Both label fields then have law `π`.  In declaration names,
+`charged` abbreviates "has nonzero mass under `π`".
 
 The coupling itself enters as the hypothesis `IsShapeCoupling`: its two marginals are the
-two shape laws and it charges only `9D³`-comparable pairs.  Everything `thm:hairy` asks for
-is read off it here.  The potential is not estimated again: a pair the coupling charges
-sees, in the label graph, every charged pair whose first component is a neighbour of its
+two shape laws and it gives positive mass only to `9D³`-comparable pairs.  Everything the
+bushy-universality proposition `thm:hairy` asks for is read off it here.  The potential is
+not estimated again: a positive-mass pair sees, in the label graph, every positive-mass
+pair whose first component is a neighbour of its
 own in `def:shape-net`, so the ball of a pair is at least as heavy as the ball of its first
 component and `eq:shape-eta` for the first law alone bounds the potential of `π`.  The
 scale of the label graph pays for that comparison: the cross comparison of two charged
@@ -31,7 +34,7 @@ quasi-isometry of the two shapes, and the gluing is an `8·19683²D¹⁴`-quasi-
   charge, which no label ever takes.
 * `pairLab`, `pairLab'`: **the two label maps**, with `labMass_pairLab` and
   `labMass_pairLab'` **`thm:shape-coupling` (`it:shape-coupling-law`)**, their
-  common law `π`, and `hairyMeasure_pairLab_prod`, `hairyMeasure_pairLab'_prod` its product
+  common law `π`, and `bushyMeasure_pairLab_prod`, `bushyMeasure_pairLab'_prod` its product
   form.
 * `markedQI_of_compat_pairLab`: **`thm:shape-coupling` (`it:shape-coupling-qi`)**,
   matched labels give comparable shapes at the scale `19683D⁷`.
@@ -40,7 +43,7 @@ quasi-isometry of the two shapes, and the gluing is an `8·19683²D¹⁴`-quasi-
   ball of its first component and the fibres of the first projection carry the first
   marginal, so the potential of `π` is at most the potential of the first shape law over
   `def:shape-net`.
-* `hairy_rate_shape_tree_cross`: **`thm:hairy` across two laws**, `eq:hairy-rate` at the
+* `bushy_rate_shape_tree_cross`: **`thm:hairy` across two laws**, `eq:hairy-rate` at the
   scale `8·19683²D¹⁴`.
 -/
 
@@ -657,23 +660,23 @@ theorem markedQI_of_compat_pairLab {Dq : ℝ} (hD : 1 ≤ Dq) (θ θ' : Offsprin
 
 /-- The labels of the copies of a prefix-closed finite set are independent with the law of
 the coupling. -/
-lemma hairyMeasure_pairLab_prod (θ : Offspring 2) (hq : θ.extinction < 1)
+lemma bushyMeasure_pairLab_prod (θ : Offspring 2) (hq : θ.extinction < 1)
     (hq0 : 0 < θ.extinction) (h2 : 0 < θ 2) (π : PMF (Shape × Shape))
     (hm : ∀ a : Shape, margFst π a = shapePMF θ hq hq0 h2 a) (S : Finset Word)
     (hS : ∀ w ∈ S, ∀ p, p <+: w → p ∈ S) (v : Word → Shape × Shape) :
-    hairyMeasure θ (⋂ w ∈ S, {ω : HairySample | shapeLab (pairLab π) ω w = v w})
+    bushyMeasure θ (⋂ w ∈ S, {ω : BushySample | shapeLab (pairLab π) ω w = v w})
       = ∏ w ∈ S, π (v w) := by
-  rw [hairyMeasure_shapeLab_prod θ hq hq0 h2 (measurableSet_pairLab_fibre π) S hS v]
+  rw [bushyMeasure_shapeLab_prod θ hq hq0 h2 (measurableSet_pairLab_fibre π) S hS v]
   exact Finset.prod_congr rfl fun w _ => labMass_pairLab θ hq hq0 h2 π hm (v w)
 
 /-- The same for the second law. -/
-lemma hairyMeasure_pairLab'_prod (θ' : Offspring 2) (hq' : θ'.extinction < 1)
+lemma bushyMeasure_pairLab'_prod (θ' : Offspring 2) (hq' : θ'.extinction < 1)
     (hq0' : 0 < θ'.extinction) (h2' : 0 < θ' 2) (π : PMF (Shape × Shape))
     (hm' : ∀ b : Shape, margSnd π b = shapePMF θ' hq' hq0' h2' b) (S : Finset Word)
     (hS : ∀ w ∈ S, ∀ p, p <+: w → p ∈ S) (v : Word → Shape × Shape) :
-    hairyMeasure θ' (⋂ w ∈ S, {ω : HairySample | shapeLab (pairLab' π) ω w = v w})
+    bushyMeasure θ' (⋂ w ∈ S, {ω : BushySample | shapeLab (pairLab' π) ω w = v w})
       = ∏ w ∈ S, π (v w) := by
-  rw [hairyMeasure_shapeLab_prod θ' hq' hq0' h2' (measurableSet_pairLab'_fibre π) S hS v]
+  rw [bushyMeasure_shapeLab_prod θ' hq' hq0' h2' (measurableSet_pairLab'_fibre π) S hS v]
   exact Finset.prod_congr rfl fun w _ => labMass_pairLab' θ' hq' hq0' h2' π hm' (v w)
 
 /-! ### The potential of the law on pairs -/
@@ -792,13 +795,13 @@ theorem etaG_pairNet_le (θ : Offspring 2) (hq : θ.extinction < 1) (hq0 : 0 < �
 probability of the quasi-isometry between the two sampled trees at the scale
 `8·19683²D¹⁴` is bounded by the potential of the shape law of the first law over
 `def:shape-net`. -/
-theorem hairy_rate_shape_tree_cross (θ θ' : Offspring 2) (hq : θ.extinction < 1)
+theorem bushy_rate_shape_tree_cross (θ θ' : Offspring 2) (hq : θ.extinction < 1)
     (hq0 : 0 < θ.extinction) (h2 : 0 < θ 2) (hq' : θ'.extinction < 1)
     (hq0' : 0 < θ'.extinction) (h2' : 0 < θ' 2) {D : ℕ} (hD : 30 ≤ D)
     {π : PMF (Shape × Shape)}
     (hπ : IsShapeCoupling (D : ℝ) (shapePMF θ hq hq0 h2) (shapePMF θ' hq' hq0' h2') π)
     (hη : etaG (shapePMF θ hq hq0 h2) (shapeNet (D : ℝ)) ≤ 1 / 10000) :
-    twoHairyMeasure θ θ'
+    twoBushyMeasure θ θ'
         {ω | ¬ ∃ F : {v : Amb // v ∈ sample ω.1.1} → {v : Amb // v ∈ sample ω.2.1},
           IsSampleQI (8 * 19683 ^ 2 * (D : ℝ) ^ 14) F}
       ≤ 16 * etaG (shapePMF θ hq hq0 h2) (shapeNet (D : ℝ)) := by
@@ -806,10 +809,10 @@ theorem hairy_rate_shape_tree_cross (θ θ' : Offspring 2) (hq : θ.extinction <
   have h7 : (1 : ℝ) ≤ (D : ℝ) ^ 7 := one_le_pow₀ hDR
   have hK : (1 : ℝ) ≤ 19683 * (D : ℝ) ^ 7 := by nlinarith
   have hle := etaG_pairNet_le θ hq hq0 h2 hD hπ
-  have hmain := hairy_rate_tree θ θ' hq hq' h2 h2' π (pairNet π (D : ℝ)) hK
+  have hmain := bushy_rate_tree θ θ' hq hq' h2 h2' π (pairNet π (D : ℝ)) hK
     (measurableSet_pairLab_fibre π) (measurableSet_pairLab'_fibre π)
-    (hairyMeasure_pairLab_prod θ hq hq0 h2 π hπ.marg₁)
-    (hairyMeasure_pairLab'_prod θ' hq' hq0' h2' π hπ.marg₂)
+    (bushyMeasure_pairLab_prod θ hq hq0 h2 π hπ.marg₁)
+    (bushyMeasure_pairLab'_prod θ' hq' hq0' h2' π hπ.marg₂)
     (markedQI_of_compat_pairLab hDR θ θ' hq hq0 h2 hq' hq0' h2' hπ hπ.marg₁ hπ.marg₂)
     (le_trans hle hη)
   have hconst : 8 * (19683 * (D : ℝ) ^ 7) ^ 2 = 8 * 19683 ^ 2 * (D : ℝ) ^ 14 := by ring

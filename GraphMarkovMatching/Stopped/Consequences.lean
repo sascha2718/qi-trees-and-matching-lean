@@ -1,5 +1,5 @@
 /-
-The explicit consequences of `thm:markov-matching` in `markov_matching_new_proof.tex` at the
+The explicit consequences of `thm:markov-matching` in `arbitrary_offspring_matching.tex` at the
 rational parameters of `sec:two-exponent-values` and `sec:exponent-four-thirds`.
 
 * `paramsTwo`: the parameters `α = 2`, `β = 1/16`, `u = 1/2`, `L = 1/4`, `K = 125/1024`,

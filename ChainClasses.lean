@@ -24,7 +24,7 @@ import ChainClasses.Scalar.ShapeMass
 import ChainClasses.Scalar.ShapeEta
 import ChainClasses.Scalar.ShapeCoupling
 import ChainClasses.Scalar.Harris
-import ChainClasses.Scalar.Hairy
+import ChainClasses.Scalar.Bushy
 import ChainClasses.Scalar.Relabel
 
 -- ## Shapes, their metric and their contractions
@@ -42,6 +42,13 @@ import ChainClasses.Shape.AddrMetric
 
 -- ## The bushy regime of the simple case (`gw_classes_simple.tex`)
 
+/-
+Nomenclature follows the paper: "bushy" names regime (B), while a "bush" is
+a finite component used as a geometric obstruction.  The strings `thm:hairy`
+and `eq:hairy-rate` below are retained only because they are the existing
+LaTeX labels in the paper.
+-/
+
 import ChainClasses.Bushy.ShapeDecomposition
 import ChainClasses.Bushy.ShapeLaw
 import ChainClasses.Bushy.ShapeRootLaw
@@ -49,7 +56,7 @@ import ChainClasses.Bushy.ShapeSplitLaw
 import ChainClasses.Bushy.ShapeIID
 import ChainClasses.Bushy.SplitJoint
 import ChainClasses.Bushy.AssemblyRelabel
-import ChainClasses.Bushy.HairyUniversality
+import ChainClasses.Bushy.Universality
 import ChainClasses.Bushy.ShapeLabelLaw
 import ChainClasses.Bushy.ShapeCouplingSelf
 import ChainClasses.Bushy.ShapeMassPoint
@@ -60,7 +67,7 @@ import ChainClasses.Bushy.ShapeEtaSelf
 import ChainClasses.Bushy.ShapeCouplingCross
 import ChainClasses.Bushy.ShapeCouplingBuild
 import ChainClasses.Bushy.ShapePairEta
-import ChainClasses.Bushy.Hairs
+import ChainClasses.Bushy.Bushes
 import ChainClasses.Bushy.Trichotomy
 
 -- ## General bounded support (`matching_classes_general.tex`)
@@ -112,13 +119,13 @@ import ChainClasses.Engine.ChainEngineBridge
 -- ## Universality and the classification (`trichotomy.tex`)
 
 import ChainClasses.Universality.GeneralObstructions
-import ChainClasses.Universality.HairyCross
+import ChainClasses.Universality.BushyCross
 import ChainClasses.Universality.CascadeEncoding
 import ChainClasses.Universality.AssemblyAut
 import ChainClasses.Universality.SampleAssembly
 import ChainClasses.Universality.BAssembly
 import ChainClasses.Universality.FullTree
-import ChainClasses.Universality.HairyGeneral
+import ChainClasses.Universality.BushyGeneral
 import ChainClasses.Universality.ChainPieces
 import ChainClasses.Universality.DirectChainGeometry
 import ChainClasses.Universality.ChainGeneral

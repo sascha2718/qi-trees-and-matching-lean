@@ -1,8 +1,13 @@
 import ChainClasses.Engine.BushyProfileBridge
 import ChainClasses.Engine.ProfileGeometry
 
-/-! Direct universality for arbitrary bounded bushy offspring laws. The common binary
-profiles and the stopped Markov theorem apply to the original reduced arity laws. -/
+/-!
+Direct universality for arbitrary bounded bushy offspring laws: the
+proposition labelled `thm:hairy-general` in `trichotomy.tex`.  Its printed
+terminology is **bushy universality**; the historical word "hairy" remains
+only in that LaTeX label.  Common binary profiles and the stopped Markov
+matching theorem are applied to the original reduced arity laws.
+-/
 
 namespace ChainClasses
 open MeasureTheory
@@ -64,9 +69,9 @@ lemma survivalMeasure_ambSub_null (θ : Offspring J) {S : Set (GWord N → ℕ)}
 
 /-- **A conditioned sample is a bushy sample almost surely**: its offspring counts lie within the
 alphabet, it survives, and every neck ray below a surviving vertex meets a split. -/
-theorem ae_isGHairySample (θ : Offspring J) (hJN : J ≤ N) (hq : θ.extinction < 1)
+theorem ae_isGBushySample (θ : Offspring J) (hJN : J ≤ N) (hq : θ.extinction < 1)
     (hs1 : θ.skeletonWeight 1 < 1) :
-    ∀ᵐ c ∂survivalMeasure (N := N) θ, IsGHairySample c := by
+    ∀ᵐ c ∂survivalMeasure (N := N) θ, IsGBushySample c := by
   have h1 : ∀ᵐ c ∂survivalMeasure (N := N) θ, ∀ v, c v ≤ N := by
     refine ae_all_iff.mpr fun v => ?_
     rw [ae_iff]
@@ -293,10 +298,11 @@ lemma exists_gCouplings_all (θ : Offspring J) (hJN : J ≤ N)
   choose π hπ using fun κ hκ hν => hthr κ hκ hν D (hD' κ hκ hν)
   exact ⟨π, hπ⟩
 
-/-- **`thm:hairy-general` for arbitrary bounded supports, the rate**: past a threshold depending on the
-two laws alone, two independent labelled samples fail to be
+/-- **The rate in bushy universality for arbitrary bounded supports**
+(`thm:hairy-general`): past a threshold depending on the two laws alone, two
+independent labelled samples fail to be
 `⌈216 J J'² (3·(3¹⁵D¹⁶)²)²⌉`-quasi-isometric with probability at most `Ke^{-cD²}`. -/
-theorem hairy_general_rate (θ : Offspring J) (hJN : J ≤ N)
+theorem bushy_general_rate (θ : Offspring J) (hJN : J ≤ N)
     (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction) (hs1 : θ.skeletonWeight 1 < 1)
     (h0 : 0 < θ 0) (hθJ : 0 < θ J) (hJ2 : 2 ≤ J)
     (θ' : Offspring J') (hJN' : J' ≤ N') (hq' : θ'.extinction < 1)
@@ -339,26 +345,26 @@ theorem hairy_general_rate (θ : Offspring J) (hJN : J ≤ N)
     rw [add_comm] at h1
     exact tsub_le_iff_right.mpr h1
   -- the good event
-  have hgood₁ : ∀ᵐ ω ∂labelMeasure (N' := N) θ, IsGHairySample ω.1 ∧
+  have hgood₁ : ∀ᵐ ω ∂labelMeasure (N' := N) θ, IsGBushySample ω.1 ∧
       SkelBounded J (gArityAt ω.1) ∧ ∀ u, u ∈ sample (gArityAt ω.1) →
         MarkedQI (9 * (D : ℝ) ^ 3) (gShapeSpace (gShapeAt ω.1 u))
           (gShapeSpace (gPartner π₁ ω u)) := by
-    filter_upwards [ae_of_fst (ν := uniformField (GWord N)) (ae_isGHairySample θ hJN hq hs1),
+    filter_upwards [ae_of_fst (ν := uniformField (GWord N)) (ae_isGBushySample θ hJN hq hs1),
       ae_of_fst (ν := uniformField (GWord N)) (ae_skeleton_good θ hJN hq hq0 hJ2 hθJ),
       ae_partner_comparable θ hJN hq hq0 hs1 θ hJN hq hq0 hs1 hJ2 hθJ π₁ hπ₁] with ω h1 h2 h3
     exact ⟨h1, fun u hu => (h2 u hu).1, h3⟩
-  have hgood₂ : ∀ᵐ ω ∂labelMeasure (N' := N') θ', IsGHairySample ω.1 ∧
+  have hgood₂ : ∀ᵐ ω ∂labelMeasure (N' := N') θ', IsGBushySample ω.1 ∧
       SkelBounded J' (gArityAt ω.1) ∧ ∀ u, u ∈ sample (gArityAt ω.1) →
         MarkedQI (9 * (D : ℝ) ^ 3) (gShapeSpace (gShapeAt ω.1 u))
           (gShapeSpace (gPartner π₂ ω u)) := by
-    filter_upwards [ae_of_fst (ν := uniformField (GWord N')) (ae_isGHairySample θ' hJN' hq' hs1'),
+    filter_upwards [ae_of_fst (ν := uniformField (GWord N')) (ae_isGBushySample θ' hJN' hq' hs1'),
       ae_of_fst (ν := uniformField (GWord N')) (ae_skeleton_good θ' hJN' hq' hq0' hJ2' hθJ'),
       ae_partner_comparable θ hJN hq hq0 hs1 θ' hJN' hq' hq0' hs1' hJ2' hθJ' π₂ hπ₂] with ω h1 h2 h3
     exact ⟨h1, fun u hu => (h2 u hu).1, h3⟩
-  have hgood : ∀ᵐ ω ∂twoLabelMeasure (N := N) (N' := N') θ θ', (IsGHairySample ω.1.1 ∧
+  have hgood : ∀ᵐ ω ∂twoLabelMeasure (N := N) (N' := N') θ θ', (IsGBushySample ω.1.1 ∧
       SkelBounded J (gArityAt ω.1.1) ∧ ∀ u, u ∈ sample (gArityAt ω.1.1) →
         MarkedQI (9 * (D : ℝ) ^ 3) (gShapeSpace (gShapeAt ω.1.1 u))
-          (gShapeSpace (gPartner π₁ ω.1 u))) ∧ (IsGHairySample ω.2.1 ∧
+          (gShapeSpace (gPartner π₁ ω.1 u))) ∧ (IsGBushySample ω.2.1 ∧
       SkelBounded J' (gArityAt ω.2.1) ∧ ∀ u, u ∈ sample (gArityAt ω.2.1) →
         MarkedQI (9 * (D : ℝ) ^ 3) (gShapeSpace (gShapeAt ω.2.1 u))
           (gShapeSpace (gPartner π₂ ω.2 u))) := by
@@ -370,10 +376,10 @@ theorem hairy_general_rate (θ : Offspring J) (hJN : J ≤ N)
         ¬ ∃ F : {v : GWord N // v ∈ sample ω.1.1} → {v : GWord N' // v ∈ sample ω.2.1},
           BranchingProcess.IsQIWith ⌈216 * J * J' ^ 2 * (3 * (14348907 * (D : ℝ) ^ 16) ^ 2) ^ 2⌉₊
             (wordGraphN (· ∈ sample ω.1.1)) (wordGraphN (· ∈ sample ω.2.1)) F}
-      ⊆ Mᶜ ∪ {ω | ¬ ((IsGHairySample ω.1.1 ∧
+      ⊆ Mᶜ ∪ {ω | ¬ ((IsGBushySample ω.1.1 ∧
       SkelBounded J (gArityAt ω.1.1) ∧ ∀ u, u ∈ sample (gArityAt ω.1.1) →
         MarkedQI (9 * (D : ℝ) ^ 3) (gShapeSpace (gShapeAt ω.1.1 u))
-          (gShapeSpace (gPartner π₁ ω.1 u))) ∧ (IsGHairySample ω.2.1 ∧
+          (gShapeSpace (gPartner π₁ ω.1 u))) ∧ (IsGBushySample ω.2.1 ∧
       SkelBounded J' (gArityAt ω.2.1) ∧ ∀ u, u ∈ sample (gArityAt ω.2.1) →
         MarkedQI (9 * (D : ℝ) ^ 3) (gShapeSpace (gShapeAt ω.2.1 u))
           (gShapeSpace (gPartner π₂ ω.2 u))))} := by
@@ -391,10 +397,10 @@ theorem hairy_general_rate (θ : Offspring J) (hJN : J ≤ N)
     _ = twoLabelMeasure (N := N) (N' := N') θ θ' Mᶜ + 0 := by rw [ae_iff.mp hgood]
     _ ≤ ENNReal.ofReal (K * Real.exp (-(c * (D : ℝ) ^ 2))) := by rw [add_zero]; exact hfail
 
-/-- **`thm:hairy-general` for arbitrary bounded supports, the almost sure statement on the labelled
-space**: the failure rates `Ke^{-cD²}` fall below every threshold, so almost surely some
-scale succeeds. -/
-theorem hairy_general_labelled_ae (θ : Offspring J) (hJN : J ≤ N)
+/-- **The labelled almost-sure statement in bushy universality for arbitrary
+bounded supports** (`thm:hairy-general`): the failure rates `Ke^{-cD²}` fall
+below every threshold, so almost surely some scale succeeds. -/
+theorem bushy_general_labelled_ae (θ : Offspring J) (hJN : J ≤ N)
     (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction) (hs1 : θ.skeletonWeight 1 < 1)
     (h0 : 0 < θ 0) (hθJ : 0 < θ J) (hJ2 : 2 ≤ J)
     (θ' : Offspring J') (hJN' : J' ≤ N') (hq' : θ'.extinction < 1)
@@ -403,13 +409,13 @@ theorem hairy_general_labelled_ae (θ : Offspring J) (hJN : J ≤ N)
     ∀ᵐ ω ∂twoLabelMeasure (N := N) (N' := N') θ θ',
       BranchingProcess.QuasiIsometric (wordGraphN (· ∈ sample ω.1.1))
         (wordGraphN (· ∈ sample ω.2.1)) := by
-  obtain ⟨D₆, K, c, hc, hrate⟩ := hairy_general_rate θ hJN hq hq0 hs1 h0 hθJ hJ2 θ' hJN' hq'
+  obtain ⟨D₆, K, c, hc, hrate⟩ := bushy_general_rate θ hJN hq hq0 hs1 h0 hθJ hJ2 θ' hJN' hq'
     hq0' hs1' h0' hθJ' hJ2'
   rw [ae_iff]
   refine le_antisymm (ENNReal.le_of_forall_pos_le_add fun ε hε _ => ?_) bot_le
   have hεpos : (0 : ℝ) < ε := hε
   have hKpos : 0 < max K 1 := lt_of_lt_of_le one_pos (le_max_right _ _)
-  obtain ⟨D₀, hD₀⟩ := hairy_rate_to_one hc (ε := 16 * ε / max K 1) (by positivity)
+  obtain ⟨D₀, hD₀⟩ := bushy_rate_to_one hc (ε := 16 * ε / max K 1) (by positivity)
   set D := max D₀ D₆ with hD
   have hsmall : K * Real.exp (-(c * (D : ℝ) ^ 2)) ≤ ε := by
     have h1 := hD₀ D (le_max_left _ _)
@@ -431,9 +437,11 @@ theorem hairy_general_labelled_ae (θ : Offspring J) (hJN : J ≤ N)
     _ ≤ (ε : ℝ≥0∞) := ENNReal.ofReal_le_of_le_toReal (by simpa using hsmall)
     _ = 0 + (ε : ℝ≥0∞) := (zero_add _).symm
 
-/-- **`thm:hairy-general` for arbitrary bounded supports**: two independent samples conditioned on
-survival are almost surely quasi-isometric, the uniform fields integrated out. -/
-theorem hairy_general_ae_at_parameters (θ : Offspring J) (hJN : J ≤ N)
+/-- **Bushy universality for arbitrary bounded supports**
+(`thm:hairy-general`): two independent samples conditioned on survival are
+almost surely quasi-isometric, after integrating out the auxiliary uniform
+fields. -/
+theorem bushy_general_ae_at_parameters (θ : Offspring J) (hJN : J ≤ N)
     (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction) (hs1 : θ.skeletonWeight 1 < 1)
     (h0 : 0 < θ 0) (hθJ : 0 < θ J) (hJ2 : 2 ≤ J)
     (θ' : Offspring J') (hJN' : J' ≤ N') (hq' : θ'.extinction < 1)
@@ -444,7 +452,7 @@ theorem hairy_general_ae_at_parameters (θ : Offspring J) (hJN : J ≤ N)
         (wordGraphN (· ∈ sample cc.2)) := by
   have _ := BranchingProcess.isProbabilityMeasure_survivalMeasure (N := N) θ hJN hq
   have _ := BranchingProcess.isProbabilityMeasure_survivalMeasure (N := N') θ' hJN' hq'
-  have h := hairy_general_labelled_ae θ hJN hq hq0 hs1 h0 hθJ hJ2 θ' hJN' hq' hq0' hs1' h0' hθJ'
+  have h := bushy_general_labelled_ae θ hJN hq hq0 hs1 h0 hθJ hJ2 θ' hJN' hq' hq0' hs1' h0' hθJ'
     hJ2'
   exact ae_prod_fst_fst (μ := survivalMeasure (N := N) θ) (ν := uniformField (GWord N))
     (μ' := survivalMeasure (N := N') θ') (ν' := uniformField (GWord N')) h
@@ -501,14 +509,14 @@ theorem gSampleQI_symm {N₀ N₁ : ℕ} {μ₀ : Measure (GWord N₀ → ℕ)} 
 
 /-- Two bounded supercritical bushy laws give almost surely quasi-isometric independent
 samples, conditioned on survival. -/
-theorem hairy_general_ae {J J' : ℕ} (θ : Offspring J) (hJN : J ≤ N)
+theorem bushy_general_ae {J J' : ℕ} (θ : Offspring J) (hJN : J ≤ N)
     (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction) (h0 : 0 < θ 0) (hθJ : 0 < θ J)
     (hJ2 : 2 ≤ J) (θ' : Offspring J') (hJN' : J' ≤ N') (hq' : θ'.extinction < 1)
     (hq0' : 0 < θ'.extinction) (h0' : 0 < θ' 0) (hθJ' : 0 < θ' J') (hJ2' : 2 ≤ J') :
     ∀ᵐ cc ∂((survivalMeasure (N := N) θ).prod (survivalMeasure (N := N') θ')),
       BranchingProcess.QuasiIsometric (wordGraphN (· ∈ sample cc.1))
         (wordGraphN (· ∈ sample cc.2)) := by
-  exact hairy_general_ae_at_parameters θ hJN hq hq0
+  exact bushy_general_ae_at_parameters θ hJN hq hq0
     (skeletonWeight_one_lt_one_of θ hq hq0 hJ2 hθJ) h0 hθJ hJ2 θ' hJN' hq' hq0'
     (skeletonWeight_one_lt_one_of θ' hq' hq0' hJ2' hθJ') h0' hθJ' hJ2'
 

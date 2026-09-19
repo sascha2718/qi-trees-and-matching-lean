@@ -1,5 +1,5 @@
 /-
-The branching semigroup of a set of arities and its atoms (`markov_matching_new_proof.tex`,
+The branching semigroup of a set of arities and its atoms (`arbitrary_offspring_matching.tex`,
 `sec:common-presentations`, "The common generators"): pure additive combinatorics of
 `AddSubmonoid ℕ`.
 

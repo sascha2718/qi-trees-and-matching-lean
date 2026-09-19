@@ -6,7 +6,7 @@ The geometry is built in four modules: `CascadeEncoding`, `AssemblyAut`, `Sample
 and this one, which states the deterministic core; the account below covers all four.
 
 two label fields lives on `𝔹`, not on the reduced skeletons, and the assembly that the
-glued transfer of `it:general-glued` runs over is the `𝔹`-assembly, the shape of a
+glued transfer of `thm:general-glued` runs over is the `𝔹`-assembly, the shape of a
 skeleton vertex placed at its cascade root and a one-vertex shape at every forced slot.
 Four deterministic facts carry the proof from there to a quasi-isometry of the samples.
 
@@ -58,7 +58,7 @@ quasi-isometry of the sample graphs at the constant `216 L L'² K²`.
 * `neckAddr`, `isAddr_realiseAux_neck_concat`, `isAddr_realiseAux_bush`,
   `isAddr_realiseAux_cases`: **the addresses of a realisation** at general arity, the
   neck vertices, their children, and the bushes.
-* `IsGHairySample`: the deterministic hypotheses of **`thm:hairy-general`**, offspring
+* `IsGBushySample`: the deterministic hypotheses of **`thm:hairy-general`**, offspring
   within the alphabet, survival, and every neck ray meeting a split.
 * `neckPath`, `neckIter_eq_ambSub_neckPath`, `gEntryV`, `redSub_eq_ambSub_gEntryV`: the
   descent of `GeneralDecomposition` located in the ambient tree, the copies being the
@@ -67,7 +67,7 @@ quasi-isometry of the sample graphs at the constant `216 L L'² K²`.
   `transSampleN_gCopyAddr`, `transSampleN_bush`, `transSampleN_code_spec`: **the
   dictionary**, the children of a vertex of the skeleton assembly and of its translate.
 * `gAssembly_isometric_sample`: **`thm:shape-iid` at general arity, the isometry**, the
-  premise of **`it:general-glued`**: a bushy sample is isometric to the assembly of its
+  premise of **`thm:general-glued`**: a bushy sample is isometric to the assembly of its
   shapes over its reduced skeleton.
 * `sample_qi_of_bShape_matching`: **`thm:hairy-general`, the deterministic core**: two
   bushy samples with encoded skeletons matched by an automorphism of `𝔹` at
@@ -91,7 +91,7 @@ assembly is `L`-quasi-isometric to the `𝔹`-assembly placing the shapes at the
 roots and one-vertex shapes at the forced slots, and the glued transfer over `𝔹` at `K`
 assembles the matched shapes into an `8K²`-quasi-isometry of the `𝔹`-assemblies. -/
 theorem sample_qi_of_bShape_matching {N' L L' : ℕ} {c : GWord N → ℕ} {c' : GWord N' → ℕ}
-    (hc : IsGHairySample c) (hc' : IsGHairySample c') (E : CascadeEnc N L) (E' : CascadeEnc N' L')
+    (hc : IsGBushySample c) (hc' : IsGBushySample c') (E : CascadeEnc N L) (E' : CascadeEnc N' L')
     (hk : E.k = gArityAt c) (hk' : E'.k = gArityAt c') (hL : 1 ≤ L) (hL' : 1 ≤ L') {K : ℝ}
     (hK : 1 ≤ K) (π : Word → Bool ≃ Bool)
     (hπ : ∀ w : Word, E.InClosure (bnat w) ↔ E'.InClosure (bnat (autOf π w)))
@@ -109,4 +109,3 @@ theorem sample_qi_of_bShape_matching {N' L L' : ℕ} {c : GWord N → ℕ} {c' :
   exact CascadeEnc.sample_qi_of_bShape_matching_of_isometric hL hL' hK π hπ hcomp hΦ hΦd hΦ' hΦd'
 
 end ChainClasses
-

@@ -2,7 +2,7 @@ import ChainClasses.Shape.Assembly
 import ChainClasses.Chain.Isometry
 
 /-!
-`sec:hairy` of `gw_classes_simple.tex`: the deterministic core of
+`thm:hairy` of `gw_classes_simple.tex`: the deterministic core of
 **`thm:hairy`**.  A portrait matching the shape labels of two samples supplies
 a marked quasi-isometry between the shape at every copy of the first sample and
 the shape at the image copy of the second, and `thm:glued-transfer` glues these

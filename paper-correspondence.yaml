@@ -305,7 +305,7 @@ entries:
   - source: "thm:hairy"
     kind: proposition
     status: formalized
-    lean: ["ChainClasses.hairy_ae_tree", "ChainClasses.hairy_rate_two_law"]
+    lean: ["ChainClasses.bushy_ae_tree", "ChainClasses.bushy_rate_two_law"]
     relation: split
     headline: false
 
@@ -326,7 +326,7 @@ entries:
   - source: "thm:bush-separation"
     kind: proposition
     status: formalized
-    lean: ["BranchingProcess.not_quasiIsometric_of_hair_of_line"]
+    lean: ["BranchingProcess.not_quasiIsometric_of_bush_of_line"]
     relation: exact
     headline: false
 
@@ -340,7 +340,7 @@ entries:
   - source: "thm:regime-obstructions"
     kind: lemma
     status: formalized
-    lean: ["ChainClasses.hasThreeRays_sampleWord", "ChainClasses.nearLine_inTree", "ChainClasses.unbounded_hairs_ae"]
+    lean: ["ChainClasses.hasThreeRays_sampleWord", "ChainClasses.nearLine_inTree", "ChainClasses.unbounded_bushes_ae"]
     relation: split
     headline: false
 
@@ -579,7 +579,7 @@ entries:
   - source: "thm:regime-obstructions-general"
     kind: lemma
     status: formalized
-    lean: ["ChainClasses.threeRays_ae", "ChainClasses.nearLine_gSample_ae", "ChainClasses.unbounded_hairs_gSample_ae", "ChainClasses.thinBalls_gSample_ae"]
+    lean: ["ChainClasses.threeRays_ae", "ChainClasses.nearLine_gSample_ae", "ChainClasses.unbounded_bushes_gSample_ae", "ChainClasses.thinBalls_gSample_ae"]
     relation: split
     headline: false
 
@@ -600,7 +600,7 @@ entries:
   - source: "thm:hairy-general"
     kind: proposition
     status: formalized
-    lean: ["ChainClasses.hairy_general_ae"]
+    lean: ["ChainClasses.bushy_general_ae"]
     relation: exact
     headline: false
 

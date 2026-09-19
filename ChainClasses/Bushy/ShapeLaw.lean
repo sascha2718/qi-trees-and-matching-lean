@@ -4,7 +4,7 @@ import ChainClasses.Bushy.ShapeDecomposition
 `sec:shape-harris` of `matching_classes_simple.tex`: the law of `thm:shape-iid` on the
 constructed space, over the sample of `BranchingProcess`.
 
-`ShapeDecomposition` carries the deterministic half over the hypotheses `IsHairySample`.
+`ShapeDecomposition` carries the deterministic half over the hypotheses `IsBushySample`.
 Two of the three are almost sure for elementary reasons; the third, that every ray of the
 skeleton meets a split, is the event `Ω₀` of `thm:chains` read for the skeleton, and it is
 proved here.  The argument stays in the coordinates of the sample.  The neck ray of a
@@ -35,7 +35,7 @@ for.
 * `survivalMeasure_iInter_noSplit`, `neverSplits`, `sampleMeasure_neverSplits` and
   `ae_splits`: **`Ω₀` for the skeleton**, almost surely every skeleton vertex has a split
   on its neck ray.
-* `ae_isHairySample_of_pos` and `ae_assembly_isometric_sample`: **`thm:shape-iid`, the
+* `ae_isBushySample_of_pos` and `ae_assembly_isometric_sample`: **`thm:shape-iid`, the
   last clause, almost surely**.  Almost every sample conditioned on survival meets the
   hypotheses of `sec:shapes` and is isometric to the assembly of its own shapes.
 * `splitDepth_nil_ge_iff`, `survivalMeasure_splitDepth_ge` and `survivalMeasure_neckLen`:
@@ -331,9 +331,9 @@ theorem ae_splits (θ : Offspring 2) (hq : θ.extinction < 1) (hs : θ.skeletonW
 /-- **`thm:shape-iid`, the standing hypotheses, almost surely**: for a supercritical
 offspring law on `{0,1,2}` charging two children, almost every sample conditioned on
 survival meets the hypotheses of `sec:shapes`. -/
-theorem ae_isHairySample_of_pos (θ : Offspring 2) (hq : θ.extinction < 1) (h2 : 0 < θ 2) :
-    ∀ᵐ c ∂(survivalMeasure (N := 2) θ), IsHairySample c :=
-  ae_isHairySample θ hq (ae_splits θ hq (skeletonWeight_one_lt_one θ hq h2))
+theorem ae_isBushySample_of_pos (θ : Offspring 2) (hq : θ.extinction < 1) (h2 : 0 < θ 2) :
+    ∀ᵐ c ∂(survivalMeasure (N := 2) θ), IsBushySample c :=
+  ae_isBushySample θ hq (ae_splits θ hq (skeletonWeight_one_lt_one θ hq h2))
 
 /-- **`thm:shape-iid`, the last clause, almost surely**: almost every bushy sample
 conditioned on survival is isometric to the assembly of its own shapes. -/
@@ -343,7 +343,7 @@ theorem ae_assembly_isometric_sample (θ : Offspring 2) (hq : θ.extinction < 1)
       ∃ Φ : Assembly (shapeAt c) → {v : Amb // v ∈ sample c}, Function.Bijective Φ ∧
         ∀ x y : Assembly (shapeAt c),
           (BranchingProcess.treeDist (Φ x).1 (Φ y).1 : ℝ) = dist x y := by
-  filter_upwards [ae_isHairySample_of_pos θ hq h2] with c hc
+  filter_upwards [ae_isBushySample_of_pos θ hq h2] with c hc
   exact assembly_isometric_sample hc
 
 /-! ### The neck length of the shape at the root -/
@@ -359,7 +359,7 @@ lemma skeletonWeight_sum_two (θ : Offspring 2) (hq : θ.extinction < 1) :
 
 /-- **`thm:geometric` for the skeleton**: on the hypotheses of `sec:shapes` the chain of
 the root runs at least `n` steps exactly when it has no split in its first `n`. -/
-lemma splitDepth_nil_ge_iff {c : Amb → ℕ} (hc : IsHairySample c) (n : ℕ) :
+lemma splitDepth_nil_ge_iff {c : Amb → ℕ} (hc : IsBushySample c) (n : ℕ) :
     n ≤ splitDepth c [] ↔ c ∈ noSplit n := by
   have hsurv : Survives (shift c []) := by simpa using hc.survives
   constructor
@@ -395,7 +395,7 @@ theorem survivalMeasure_splitDepth_ge (θ : Offspring 2) (hq : θ.extinction < 1
       = ENNReal.ofReal (θ.skeletonWeight 1) ^ n := by
   have hae : {c : Amb → ℕ | n ≤ splitDepth c []} =ᵐ[survivalMeasure (N := 2) θ] noSplit n := by
     refine Filter.eventuallyEq_set.mpr ?_
-    filter_upwards [ae_isHairySample_of_pos θ hq h2] with c hc
+    filter_upwards [ae_isBushySample_of_pos θ hq h2] with c hc
     exact splitDepth_nil_ge_iff hc n
   rw [measure_congr hae, survivalMeasure_noSplit θ hq n]
 

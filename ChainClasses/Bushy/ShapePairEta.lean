@@ -1,7 +1,7 @@
 import ChainClasses.Bushy.ShapeCouplingBuild
 
 /-!
-`sec:shape-coupling` and `sec:hairy` of `gw_classes_simple.tex` at the
+`sec:shape-coupling` and `thm:hairy` of `gw_classes_simple.tex` at the
 constants of the paper.  The label graph of `thm:shape-coupling` joins two charged pairs
 when all four cross comparisons hold at the edge scale `27D⁴` of `def:shape-net`, matched
 labels give a `972D⁴`-marked quasi-isometry, and `eq:hairy-rate` across two laws holds at
@@ -31,7 +31,7 @@ tail sums geometrically.
 * `exists_isShapeCoupling_etaS`:
   **`thm:shape-coupling` (`it:shape-coupling-eta`)**, the coupling with
   `η_{𝖰,5/2}(q) ≤ e^{-c₃D²}` over the edge scale `27D⁴`.
-* `hairy_rate_two_law`: **`eq:hairy-rate` across two laws**, the failure probability of the
+* `bushy_rate_two_law`: **`eq:hairy-rate` across two laws**, the failure probability of the
   `8·972²D⁸`-quasi-isometry bounded by `16η_{𝖰,5/2}(q) ≤ 16e^{-c₃D²}`.
 -/
 
@@ -827,12 +827,12 @@ theorem exists_isShapeCoupling_etaS (θ θ' : Offspring 2) (hq : θ.extinction <
 trees admit an `8·972²D⁸`-quasi-isometry outside an event of probability at most
 `16η_{𝖰,5/2}(q) ≤ 16e^{-c₃D²}`, over the coupling of `thm:shape-coupling` and the label
 graph at the edge scale `27D⁴`. -/
-theorem hairy_rate_two_law (θ θ' : Offspring 2) (hq : θ.extinction < 1)
+theorem bushy_rate_two_law (θ θ' : Offspring 2) (hq : θ.extinction < 1)
     (hq0 : 0 < θ.extinction) (h2 : 0 < θ 2) (hq' : θ'.extinction < 1)
     (hq0' : 0 < θ'.extinction) (h2' : 0 < θ' 2) :
     ∃ c₃ : ℝ, 0 < c₃ ∧ ∃ D₁ : ℕ, ∀ D : ℕ, D₁ ≤ D → ∃ π : PMF (Shape × Shape),
       IsShapeCoupling (D : ℝ) (shapePMF θ hq hq0 h2) (shapePMF θ' hq' hq0' h2') π ∧
-      twoHairyMeasure θ θ'
+      twoBushyMeasure θ θ'
           {ω | ¬ ∃ F : {v : Amb // v ∈ sample ω.1.1} → {v : Amb // v ∈ sample ω.2.1},
             IsSampleQI (8 * 972 ^ 2 * (D : ℝ) ^ 8) F}
         ≤ 16 * etaG π (pairNetS π (D : ℝ)) ∧
@@ -847,10 +847,10 @@ theorem hairy_rate_two_law (θ θ' : Offspring 2) (hq : θ.extinction < 1)
     refine hη.trans ((ENNReal.ofReal_le_ofReal hexp).trans (le_of_eq ?_))
     rw [ENNReal.ofReal_div_of_pos (by norm_num), ENNReal.ofReal_one]
     norm_num
-  have hmain := hairy_rate_tree_scale θ θ' hq hq' h2 h2' π (pairNetS π (D : ℝ)) hD1
+  have hmain := bushy_rate_tree_scale θ θ' hq hq' h2 h2' π (pairNetS π (D : ℝ)) hD1
     (measurableSet_pairLab_fibre π) (measurableSet_pairLab'_fibre π)
-    (hairyMeasure_pairLab_prod θ hq hq0 h2 π hπ.marg₁)
-    (hairyMeasure_pairLab'_prod θ' hq' hq0' h2' π hπ.marg₂)
+    (bushyMeasure_pairLab_prod θ hq hq0 h2 π hπ.marg₁)
+    (bushyMeasure_pairLab'_prod θ' hq' hq0' h2' π hπ.marg₂)
     (markedQI_of_compat_pairLabS hDR θ θ' hq hq0 h2 hq' hq0' h2' hπ hπ.marg₁ hπ.marg₂)
     hη4
   exact ⟨π, hπ, hmain, hη⟩

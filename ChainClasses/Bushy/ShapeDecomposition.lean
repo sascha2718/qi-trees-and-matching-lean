@@ -36,7 +36,7 @@ here as a measurable field, which is the form that clause is stated over.
   surviving children and the depth of the split ending it.  `neckLetter_mem_survivors` is
   that the skeleton has no leaves and `not_survives_bush` that a neck vertex with two
   children has a dying one.
-* `IsHairySample`: the deterministic hypotheses of `sec:shapes`, offspring in `{0,1,2}`,
+* `IsBushySample`: the deterministic hypotheses of `sec:shapes`, offspring in `{0,1,2}`,
   survival, and every neck ray meeting a split, which is `Ω₀` read for the skeleton;
   `splitDepth_spec` and `splitDepth_min` are `thm:chains` for it.
 * `entryV`, `decAt`, `shapeAt`: **`thm:shape-iid`**, the entry vertex of a copy and the
@@ -61,9 +61,9 @@ here as a measurable field, which is the form that clause is stated over.
   since words, trees and shapes carry no measurable structure.
 * `fibreMeasurable_shapeAt` and `measurableSet_shapeAt_eq`: **the shape field is
   measurable**, the event that a copy carries a given shape.
-* `sampleMeasure_offspring_le` and `ae_isHairySample`: the standing hypotheses under the
+* `sampleMeasure_offspring_le` and `ae_isBushySample`: the standing hypotheses under the
   conditioned law.  The support bound and survival hold almost surely, so what
-  `IsHairySample` asks beyond them is the event that every ray of the skeleton meets a
+  `IsBushySample` asks beyond them is the event that every ray of the skeleton meets a
   split, which enters as a hypothesis.
 -/
 
@@ -487,7 +487,7 @@ noncomputable def splitDepth (c : Amb → ℕ) (v : Amb) : ℕ :=
 /-- **The deterministic hypotheses of `sec:shapes`**: the offspring counts lie in
 `{0,1,2}`, the sample survives, and every ray of the skeleton meets a split, which is
 the event `Ω₀` of `thm:chains` read for the skeleton. -/
-structure IsHairySample (c : Amb → ℕ) : Prop where
+structure IsBushySample (c : Amb → ℕ) : Prop where
   /-- The offspring counts lie in `{0,1,2}`. -/
   offspring : ∀ v, c v ≤ 2
   /-- The sample is infinite. -/
@@ -496,7 +496,7 @@ structure IsHairySample (c : Amb → ℕ) : Prop where
   splits : ∀ v : Amb, Survives (shift c v) → ∃ k, 2 ≤ skeletonDegree (shift c (neckRay c v k))
 
 /-- **`thm:chains`**: the neck ray of a skeleton vertex ends at a split. -/
-lemma splitDepth_spec (hc : IsHairySample c) {v : Amb} (h : Survives (shift c v)) :
+lemma splitDepth_spec (hc : IsBushySample c) {v : Amb} (h : Survives (shift c v)) :
     skeletonDegree (shift c (neckRay c v (splitDepth c v))) = 2 := by
   have hmem := Nat.sInf_mem (hc.splits v h)
   exact le_antisymm (skeletonDegree_le_two _) hmem
@@ -511,7 +511,7 @@ lemma splitDepth_min {v : Amb} (h : Survives (shift c v)) {k : ℕ} (hk : k < sp
   omega
 
 /-- A split has two children. -/
-lemma eq_two_of_skeletonDegree_two {v : Amb} (hc : IsHairySample c)
+lemma eq_two_of_skeletonDegree_two {v : Amb} (hc : IsBushySample c)
     (h : skeletonDegree (shift c v) = 2) : c v = 2 := by
   have huniv := survivors_eq_univ h
   have h1 : (1 : Fin 2) ∈ survivors (shift c v) := by rw [huniv]; exact Finset.mem_univ _
@@ -521,7 +521,7 @@ lemma eq_two_of_skeletonDegree_two {v : Amb} (hc : IsHairySample c)
   omega
 
 /-- A neck vertex with two children has one child dying. -/
-lemma eq_one_or_two_of_survives {v : Amb} (hc : IsHairySample c) (h : Survives (shift c v)) :
+lemma eq_one_or_two_of_survives {v : Amb} (hc : IsBushySample c) (h : Survives (shift c v)) :
     c v = 1 ∨ c v = 2 := by
   have hlt := (mem_survivors_shift.mp (neckLetter_mem_survivors h)).1
   have := hc.offspring v
@@ -544,7 +544,7 @@ lemma entryV_concat (c : Amb → ℕ) (w : Word) (j : Bool) :
   simp [entryV, List.foldl_append]
 
 /-- Every entry vertex is a skeleton vertex. -/
-lemma entryV_mem_skeleton (hc : IsHairySample c) (w : Word) :
+lemma entryV_mem_skeleton (hc : IsBushySample c) (w : Word) :
     entryV c w ∈ sample c ∧ Survives (shift c (entryV c w)) := by
   induction w using List.reverseRecOn with
   | nil => exact ⟨BranchingProcess.nil_mem_sample c, by simpa using hc.survives⟩
@@ -776,7 +776,7 @@ lemma Shape.neckAddr_take_succ {l : List (Option Tri)} {i : ℕ} {o : Option Tri
 
 /-- **The neck of a copy is the chain of its entry**: the translation carries the neck
 address of the shape at `w` to the neck ray of the entry vertex. -/
-lemma transSample_neck (hc : IsHairySample c) (w : Word)
+lemma transSample_neck (hc : IsBushySample c) (w : Word)
     (hbase : transSample c (copyAddr (shapeAt c) w) = entryV c w) :
     ∀ i, i ≤ splitDepth c (entryV c w) →
       transSample c (copyAddr (shapeAt c) w ++ Shape.neckAddr ((shapeAt c w).decs.take i))
@@ -808,7 +808,7 @@ lemma transSample_neck (hc : IsHairySample c) (w : Word)
 
 /-- **The entry of a copy**: the translation carries the planting of the copy `w` to the
 entry vertex of its chain. -/
-lemma transSample_copyAddr (hc : IsHairySample c) (w : Word) :
+lemma transSample_copyAddr (hc : IsBushySample c) (w : Word) :
     transSample c (copyAddr (shapeAt c) w) = entryV c w := by
   induction w using List.reverseRecOn with
   | nil => simp [transSample]
@@ -827,7 +827,7 @@ lemma transSample_copyAddr (hc : IsHairySample c) (w : Word) :
 
 /-- **The bush of a neck vertex**: the translation carries the bush address of the
 `i`-th neck vertex of the copy `w` to the dying subtree there. -/
-lemma transSample_bush (hc : IsHairySample c) (w : Word) {i : ℕ}
+lemma transSample_bush (hc : IsBushySample c) (w : Word) {i : ℕ}
     (hi : i < splitDepth c (entryV c w)) (h2 : c (neckRay c (entryV c w) i) = 2)
     {z : Word}
     (hz : letters z ∈ sample (shift c (neckRay c (entryV c w) i ++
@@ -907,7 +907,7 @@ lemma Assembly.exists_code_concat_iff {σ : Word → Shape} (x : Assembly σ) (b
 
 /-- **`thm:shape-iid`**, the dictionary: the translation carries a vertex of the
 assembly of the shapes to a vertex of the sample, and the children of the two agree. -/
-lemma transSample_code_spec (hc : IsHairySample c) (x : Assembly (shapeAt c)) :
+lemma transSample_code_spec (hc : IsBushySample c) (x : Assembly (shapeAt c)) :
     transSample c (Assembly.code x) ∈ sample c ∧
       ∀ b : Bool, ((x.vert.1 = Shape.neckAddr (shapeAt c x.copy).decs
           ∨ (Shape.realiseAux (shapeAt c x.copy).decs).IsAddr (x.vert.1 ++ [b]))
@@ -1042,7 +1042,7 @@ lemma transSample_code_spec (hc : IsHairySample c) (x : Assembly (shapeAt c)) :
 
 /-- Every vertex of the sample is the translation of a vertex of the assembly: the
 chains of the skeleton and their bushes exhaust the sample. -/
-lemma exists_code_transSample (hc : IsHairySample c) : ∀ v : Amb, v ∈ sample c →
+lemma exists_code_transSample (hc : IsBushySample c) : ∀ v : Amb, v ∈ sample c →
     ∃ x : Assembly (shapeAt c), transSample c (Assembly.code x) = v := by
   intro v
   induction v using List.reverseRecOn with
@@ -1068,7 +1068,7 @@ of its own shapes.  The isometry is the address translation: it reads the letter
 assembly one for one, sending the neck of a copy to the chain of its entry vertex and
 the decorations to the bushes hanging off that chain, so it preserves lengths and the
 prefix order, and with them every distance. -/
-theorem assembly_isometric_sample (hc : IsHairySample c) :
+theorem assembly_isometric_sample (hc : IsBushySample c) :
     ∃ Φ : Assembly (shapeAt c) → {v : Amb // v ∈ sample c}, Function.Bijective Φ ∧
       ∀ x y : Assembly (shapeAt c),
         (BranchingProcess.treeDist (Φ x).1 (Φ y).1 : ℝ) = dist x y := by
@@ -1405,12 +1405,12 @@ lemma survivalMeasure_absolutelyContinuous (θ : Offspring 2) :
   cond_absolutelyContinuous
 
 /-- **`thm:shape-iid`, the standing hypotheses**: conditioned on survival, almost every
-field is supported on `{0,1,2}` and survives, so `IsHairySample` reduces to the event
+field is supported on `{0,1,2}` and survives, so `IsBushySample` reduces to the event
 that every ray of the skeleton meets a split, which is `Ω₀` read for the skeleton. -/
-theorem ae_isHairySample (θ : Offspring 2) (hq : θ.extinction < 1)
+theorem ae_isBushySample (θ : Offspring 2) (hq : θ.extinction < 1)
     (hsplits : ∀ᵐ c ∂(survivalMeasure (N := 2) θ), ∀ v : Amb, Survives (shift c v) →
       ∃ k, 2 ≤ skeletonDegree (shift c (neckRay c v k))) :
-    ∀ᵐ c ∂(survivalMeasure (N := 2) θ), IsHairySample c := by
+    ∀ᵐ c ∂(survivalMeasure (N := 2) θ), IsBushySample c := by
   have _ := BranchingProcess.isProbabilityMeasure_survivalMeasure θ le_rfl hq
   have hoff : ∀ᵐ c ∂(survivalMeasure (N := 2) θ), ∀ v : Amb, c v ≤ 2 :=
     (survivalMeasure_absolutelyContinuous θ).ae_le

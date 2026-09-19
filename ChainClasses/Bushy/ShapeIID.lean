@@ -10,8 +10,8 @@ is left is the induction over the copies, and it is the one of `eq:exploration`:
 prefix-closed finite set of copies, which contains the root and cuts into the copies
 below each of the two letters, the mass factorises into the mass of the root shape and
 the masses of the two subtrees, and the subtrees are independent copies of the
-conditioned law.  Every step is taken modulo the event `IsHairySample`, of full measure
-by `ae_isHairySample_of_pos`.
+conditioned law.  Every step is taken modulo the event `IsBushySample`, of full measure
+by `ae_isBushySample_of_pos`.
 
 Independence is stated as the product formula over prefix-closed finite sets, as
 `eq:exploration` is for the chain labels, rather than through `iIndepFun`: the shapes
@@ -130,8 +130,8 @@ theorem survivalMeasure_shapes_aux (θ : Offspring 2) (hq : θ.extinction < 1)
     survivalMeasure (N := 2) θ (⋂ w ∈ s, {c : Amb → ℕ | shapeAt c w = f w})
       = ∏ w ∈ s, shapeMass θ (f w) := by
   have _ := BranchingProcess.isProbabilityMeasure_survivalMeasure θ le_rfl hq
-  have hnull : survivalMeasure (N := 2) θ {c : Amb → ℕ | IsHairySample c}ᶜ = 0 := by
-    have hae := ae_isHairySample_of_pos θ hq h2
+  have hnull : survivalMeasure (N := 2) θ {c : Amb → ℕ | IsBushySample c}ᶜ = 0 := by
+    have hae := ae_isBushySample_of_pos θ hq h2
     rw [ae_iff] at hae
     exact hae
   have hempty : ∀ f : Word → Shape,
@@ -174,10 +174,10 @@ theorem survivalMeasure_shapes_aux (θ : Offspring 2) (hq : θ.extinction < 1)
       have hmeas₀ : MeasurableSet E₀ := measurableSet_shapes _ _
       have hmeas₁ : MeasurableSet E₁ := measurableSet_shapes _ _
       have hinter : (⋂ w ∈ s, {c : Amb → ℕ | shapeAt c w = f w})
-            ∩ {c : Amb → ℕ | IsHairySample c}
+            ∩ {c : Amb → ℕ | IsBushySample c}
           = ({c : Amb → ℕ | shapeAt c [] = f []}
               ∩ ({c : Amb → ℕ | splitBush c 0 ∈ E₀} ∩ {c : Amb → ℕ | splitBush c 1 ∈ E₁}))
-            ∩ {c : Amb → ℕ | IsHairySample c} := by
+            ∩ {c : Amb → ℕ | IsBushySample c} := by
         ext c
         simp only [Set.mem_inter_iff, Set.mem_iInter, Set.mem_setOf_eq, hE₀, hE₁]
         constructor

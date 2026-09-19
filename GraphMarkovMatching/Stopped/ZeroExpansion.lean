@@ -1,5 +1,5 @@
 /-
-The unweighted stopped expansion of `markov_matching_new_proof.tex`
+The unweighted stopped expansion of `arbitrary_offspring_matching.tex`
 (`sec:unweighted`, `thm:explicit-zero-bound`).
 
 * `zeroEv_succ_imp`: the dichotomy of an impossible comparison at a compatible source

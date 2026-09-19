@@ -1,5 +1,5 @@
 import ChainClasses.Engine.ChainEngineBridge
-import ChainClasses.Universality.HairyGeneral
+import ChainClasses.Universality.BushyGeneral
 import ChainClasses.Universality.DirectChainGeometry
 
 /-! Chain universality from common atomic profiles for the original reduced laws.
@@ -26,11 +26,11 @@ theorem ae_reduced_skelBounded (θ : Offspring J) (hJN : J ≤ N)
 /-- The original chain sample has finite bare-neck pieces and bounded reduced arities. -/
 theorem ae_direct_chain_good (θ : Offspring J) (hJN : J ≤ N) (hθ0 : θ 0 = 0)
     (hθ1 : θ 1 < 1) (hJ2 : 2 ≤ J) :
-    ∀ᵐ c ∂survivalMeasure (N := N) θ, IsGHairySample c ∧ (∀ v, 1 ≤ c v) ∧
+    ∀ᵐ c ∂survivalMeasure (N := N) θ, IsGBushySample c ∧ (∀ v, 1 ≤ c v) ∧
       Profile.SkelBounded J (gArityAt c) := by
   have hq := extinction_lt_one_of_chain θ hθ0
   have hs1 := chain_hs1 θ hθ0 hθ1
-  filter_upwards [ae_isGHairySample θ hJN hq hs1, ae_forall_pos_of_zero θ hθ0,
+  filter_upwards [ae_isGBushySample θ hJN hq hs1, ae_forall_pos_of_zero θ hθ0,
     ae_reduced_skelBounded θ hJN hq hs1 hJ2] with c hc hpos hbound
   exact ⟨hc, hpos, hbound⟩
 
@@ -58,8 +58,8 @@ theorem chain_general_ae (θ : Offspring J) (hJN : J ≤ N) (hθ0 : θ 0 = 0)
   obtain ⟨C, C', hmatch⟩ := exists_direct_chain_match θ hJN hθ0 hθ1 hθ1' hJ2 hθJ θ'
     hJN' hθ0' hθ1'₀ hθ1'' hJ2' hsem
   have hgood : ∀ᵐ ω ∂directChainMeasure (N := N) (N' := N') θ θ',
-      (IsGHairySample ω.1 ∧ (∀ v, 1 ≤ ω.1 v) ∧ Profile.SkelBounded J (gArityAt ω.1)) ∧
-      (IsGHairySample ω.2.1 ∧ (∀ v, 1 ≤ ω.2.1 v) ∧ Profile.SkelBounded J' (gArityAt ω.2.1)) := by
+      (IsGBushySample ω.1 ∧ (∀ v, 1 ≤ ω.1 v) ∧ Profile.SkelBounded J (gArityAt ω.1)) ∧
+      (IsGBushySample ω.2.1 ∧ (∀ v, 1 ≤ ω.2.1 v) ∧ Profile.SkelBounded J' (gArityAt ω.2.1)) := by
     filter_upwards [ae_of_fst (ν := labelMeasure (N' := N') θ')
       (ae_direct_chain_good θ hJN hθ0 hθ1' hJ2),
       ae_of_snd (μ := survivalMeasure (N := N) θ)
@@ -92,8 +92,8 @@ theorem chain_general_ae (θ : Offspring J) (hJN : J ≤ N) (hθ0 : θ 0 = 0)
     have hsub : {ω : (GWord N → ℕ) × ((GWord N' → ℕ) × (GWord N' → ℝ)) |
         ¬ BranchingProcess.QuasiIsometric (wordGraphN (· ∈ sample ω.1))
           (wordGraphN (· ∈ sample ω.2.1))} ⊆ Eᶜ ∪
-        {ω | ¬ ((IsGHairySample ω.1 ∧ (∀ v, 1 ≤ ω.1 v) ∧ Profile.SkelBounded J (gArityAt ω.1)) ∧
-          (IsGHairySample ω.2.1 ∧ (∀ v, 1 ≤ ω.2.1 v) ∧ Profile.SkelBounded J' (gArityAt ω.2.1)))} := by
+        {ω | ¬ ((IsGBushySample ω.1 ∧ (∀ v, 1 ≤ ω.1 v) ∧ Profile.SkelBounded J (gArityAt ω.1)) ∧
+          (IsGBushySample ω.2.1 ∧ (∀ v, 1 ≤ ω.2.1 v) ∧ Profile.SkelBounded J' (gArityAt ω.2.1)))} := by
       intro ω hω
       by_contra hcon
       simp only [Set.mem_union, Set.mem_compl_iff, Set.mem_setOf_eq, not_or, not_not] at hcon

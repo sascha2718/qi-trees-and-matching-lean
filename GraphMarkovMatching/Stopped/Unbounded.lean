@@ -445,7 +445,7 @@ namespace Presentation
 
 variable (P : Presentation)
 
-/-- The raw kernel preserves the side (`sec:markov-hypotheses`). -/
+/-- The raw kernel preserves the side (`sec:types-degrees`). -/
 lemma rawKernel_side (t : PType) (p : PType × PType) (hp : P.rawKernel t p ≠ 0) :
     p.1.1 = t.1 ∧ p.2.1 = t.1 := by
   obtain ⟨σ, oτ⟩ := t
@@ -457,7 +457,7 @@ lemma rawKernel_side (t : PType) (p : PType × PType) (hp : P.rawKernel t p ≠ 
     obtain rfl := (P.rawKernel_forced_ne_zero_iff σ τ p).mp hp
     exact rootPair_fst σ τ
 
-/-- The live kernel preserves the side (`sec:markov-hypotheses`). -/
+/-- The live kernel preserves the side (`sec:types-degrees`). -/
 lemma kernelL_side (t : P.Live) (j : P.Live × P.Live) (hj : P.kernelL t j ≠ 0) :
     j.1.1.1 = t.1.1 ∧ j.2.1.1 = t.1.1 :=
   P.rawKernel_side t.1 (j.1.1, j.2.1) ((P.kernelL_ne_zero_iff t j).mp hj)

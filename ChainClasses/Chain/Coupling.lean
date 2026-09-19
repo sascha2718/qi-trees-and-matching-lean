@@ -7,7 +7,7 @@ import Mathlib.MeasureTheory.Integral.Lebesgue.Countable
 import Mathlib.MeasureTheory.Constructions.BorelSpace.Order
 
 /-!
-`sec:chain-coupling` of `matching_classes_simple.tex`: `thm:chain-coupling`,
+`thm:chain-coupling` of `matching_classes_simple.tex`: `thm:chain-coupling`,
 the chain classes coupled across two laws.
 
 * `cgamma`: the exponent ratio `γ = log θ₁ / log θ₁'`, with `cgamma_pos` and

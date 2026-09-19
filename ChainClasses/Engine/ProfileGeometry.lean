@@ -772,7 +772,7 @@ fields of two bushy samples to within one class of `G_D`, the labels being the c
 of partners `9D³`-comparable to the shapes, gives a quasi-isometry of the two samples at
 the constant `⌈216 L L'² (3·(3¹⁵D¹⁶)²)²⌉`. -/
 theorem sample_qi_of_profile_match {L L' : ℕ} (exc exc' : Family) {c : GWord N → ℕ} {c' : GWord N' → ℕ}
-    (hc : IsGHairySample c) (hc' : IsGHairySample c')
+    (hc : IsGBushySample c) (hc' : IsGBushySample c')
     (hs : SkelBounded L (gArityAt c)) (hs' : SkelBounded L' (gArityAt c'))
     (hL : 1 ≤ L) (hL' : 1 ≤ L') {D : ℝ} (hD : 1 ≤ D)
     {lab : GWord N → ℕ} {lab' : GWord N' → ℕ} {τ : GWord N → GShape} {τ' : GWord N' → GShape}

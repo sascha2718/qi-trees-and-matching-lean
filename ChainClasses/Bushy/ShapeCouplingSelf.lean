@@ -2,7 +2,7 @@ import ChainClasses.Bushy.ShapeLabelLaw
 import ChainClasses.Shape.ShapeShrink
 
 /-!
-`sec:shape-coupling` and `sec:hairy` of `gw_classes_simple.tex`: the label
+`sec:shape-coupling` and `thm:hairy` of `gw_classes_simple.tex`: the label
 graph of `thm:shape-coupling` for one law, and `thm:hairy` over it.
 
 The labels are the shapes themselves, as `thm:shape-coupling` builds them: the label of a
@@ -27,9 +27,9 @@ countable label type in `thm:matching` asks for and which the label field of
 * `markedQI_of_compat_shapeLabel`: **`thm:shape-coupling` (`it:shape-coupling-qi`)**,
   matched labels give comparable shapes, at the scale `729D⁴` that the composition and
   inversion bounds of `thm:shape-net` yield from the three legs `1`, `27D⁴`, `3`.
-* `shapePMF`, `hairyMeasure_shapeLabel_prod`: **the label law `q`**, the shape law pushed
+* `shapePMF`, `bushyMeasure_shapeLabel_prod`: **the label law `q`**, the shape law pushed
   forward along the fix, and its product form.
-* `hairy_rate_shape_tree_self`, `hairy_ae_shape_tree_self`: **`thm:hairy` for one law**,
+* `bushy_rate_shape_tree_self`, `bushy_ae_shape_tree_self`: **`thm:hairy` for one law**,
   `eq:hairy-rate` for the samples at the scale `8·729²D⁸`, and the almost sure statement,
   over the potential bound of
   `thm:shape-coupling` (`it:shape-coupling-eta`).
@@ -115,28 +115,28 @@ noncomputable def shapePMF (θ : Offspring 2) (hq : θ.extinction < 1) (hq0 : 0 
 
 /-- The labels of the copies of a prefix-closed finite set are independent with the law
 `q`. -/
-lemma hairyMeasure_shapeLabel_prod (θ : Offspring 2) (hq : θ.extinction < 1)
+lemma bushyMeasure_shapeLabel_prod (θ : Offspring 2) (hq : θ.extinction < 1)
     (hq0 : 0 < θ.extinction) (h2 : 0 < θ 2) (S : Finset Word)
     (hS : ∀ w ∈ S, ∀ p, p <+: w → p ∈ S) (v : Word → Shape) :
-    hairyMeasure θ (⋂ w ∈ S, {ω : HairySample | shapeLab shapeLabel ω w = v w})
+    bushyMeasure θ (⋂ w ∈ S, {ω : BushySample | shapeLab shapeLabel ω w = v w})
       = ∏ w ∈ S, shapePMF θ hq hq0 h2 (v w) :=
-  hairyMeasure_shapeLab_prod θ hq hq0 h2 measurableSet_shapeLabel_fibre S hS v
+  bushyMeasure_shapeLab_prod θ hq hq0 h2 measurableSet_shapeLabel_fibre S hS v
 
 /-- **`eq:hairy-rate`, one law**: the same bound for the two sampled trees, at the scale
 `8·729²D⁸`. -/
-theorem hairy_rate_shape_tree_self (θ : Offspring 2) (hq : θ.extinction < 1)
+theorem bushy_rate_shape_tree_self (θ : Offspring 2) (hq : θ.extinction < 1)
     (hq0 : 0 < θ.extinction) (h2 : 0 < θ 2) {Dq : ℝ} (hD : 1 ≤ Dq)
     (hη : etaG (shapePMF θ hq hq0 h2) (shapeNet Dq) ≤ 1 / 10000) :
-    twoHairyMeasure θ θ
+    twoBushyMeasure θ θ
         {ω | ¬ ∃ F : {v : Amb // v ∈ sample ω.1.1} → {v : Amb // v ∈ sample ω.2.1},
           IsSampleQI (8 * 729 ^ 2 * Dq ^ 8) F}
       ≤ 16 * etaG (shapePMF θ hq hq0 h2) (shapeNet Dq) := by
   have hD0 : (0 : ℝ) ≤ Dq := le_trans zero_le_one hD
   have h4 : (1 : ℝ) ≤ Dq ^ 4 := one_le_pow₀ hD
-  have hmain := hairy_rate_tree θ θ hq hq h2 h2 (shapePMF θ hq hq0 h2) (shapeNet Dq)
+  have hmain := bushy_rate_tree θ θ hq hq h2 h2 (shapePMF θ hq hq0 h2) (shapeNet Dq)
     (K := 729 * Dq ^ 4) (by nlinarith)
     measurableSet_shapeLabel_fibre measurableSet_shapeLabel_fibre
-    (hairyMeasure_shapeLabel_prod θ hq hq0 h2) (hairyMeasure_shapeLabel_prod θ hq hq0 h2)
+    (bushyMeasure_shapeLabel_prod θ hq hq0 h2) (bushyMeasure_shapeLabel_prod θ hq hq0 h2)
     (markedQI_of_compat_shapeLabel hD) hη
   have hconst : 8 * (729 * Dq ^ 4) ^ 2 = 8 * 729 ^ 2 * Dq ^ 8 := by ring
   rwa [hconst] at hmain
@@ -144,17 +144,17 @@ theorem hairy_rate_shape_tree_self (θ : Offspring 2) (hq : θ.extinction < 1)
 /-- **The almost sure statement of `thm:hairy`, one law**: if the net can be taken at
 scales whose potential is arbitrarily small, then almost surely the two sampled trees are
 quasi-isometric. -/
-theorem hairy_ae_shape_tree_self (θ : Offspring 2) (hq : θ.extinction < 1)
+theorem bushy_ae_shape_tree_self (θ : Offspring 2) (hq : θ.extinction < 1)
     (hq0 : 0 < θ.extinction) (h2 : 0 < θ 2)
     (hscale : ∀ ε : ℝ≥0∞, 0 < ε → ∃ Dq : ℝ, ∃ _ : 1 ≤ Dq,
       etaG (shapePMF θ hq hq0 h2) (shapeNet Dq) ≤ 1 / 10000 ∧
         16 * etaG (shapePMF θ hq hq0 h2) (shapeNet Dq) ≤ ε) :
-    twoHairyMeasure θ θ
+    twoBushyMeasure θ θ
       {ω | ¬ ∃ (L : ℝ) (F : {v : Amb // v ∈ sample ω.1.1} → {v : Amb // v ∈ sample ω.2.1}),
         IsSampleQI L F} = 0 := by
-  refine hairy_ae_tree θ θ fun ε hε ↦ ?_
+  refine bushy_ae_tree θ θ fun ε hε ↦ ?_
   obtain ⟨Dq, hD, hη, hsmall⟩ := hscale ε hε
   exact ⟨8 * 729 ^ 2 * Dq ^ 8,
-    le_trans (hairy_rate_shape_tree_self θ hq hq0 h2 hD hη) hsmall⟩
+    le_trans (bushy_rate_shape_tree_self θ hq hq0 h2 hD hη) hsmall⟩
 
 end ChainClasses

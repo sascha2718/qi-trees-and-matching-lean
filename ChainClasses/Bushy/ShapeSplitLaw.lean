@@ -75,12 +75,12 @@ lemma measurable_splitBush (m : ℕ) : Measurable (fun c : Amb → ℕ ↦ split
 
 /-- At a neck vertex the split ending the chain is the split ending the chain of the
 surviving subtree. -/
-lemma splitField_bushAt {c : Amb → ℕ} (hc : IsHairySample c) (hdeg : skeletonDegree c = 1) :
+lemma splitField_bushAt {c : Amb → ℕ} (hc : IsBushySample c) (hdeg : skeletonDegree c = 1) :
     splitField c = splitField (bushAt c 0) := by
   rw [splitField, splitField, splitVert, splitVert, splitDepth_bushAt hc hdeg,
     shift_neckRay_succ hdeg]
 
-lemma splitBush_bushAt {c : Amb → ℕ} (hc : IsHairySample c) (hdeg : skeletonDegree c = 1)
+lemma splitBush_bushAt {c : Amb → ℕ} (hc : IsBushySample c) (hdeg : skeletonDegree c = 1)
     (m : ℕ) : splitBush c m = splitBush (bushAt c 0) m := by
   rw [splitBush, splitBush, splitField_bushAt hc hdeg]
 
@@ -90,7 +90,7 @@ lemma splitField_of_splitDepth_zero {c : Amb → ℕ} (h : splitDepth c [] = 0) 
   rw [splitField, splitVert, h, neckRay_zero, shift_nil]
 
 /-- On the hypotheses of `sec:shapes` a chain of one vertex is a split. -/
-lemma splitDepth_eq_zero_iff {c : Amb → ℕ} (hc : IsHairySample c) :
+lemma splitDepth_eq_zero_iff {c : Amb → ℕ} (hc : IsBushySample c) :
     splitDepth c [] = 0 ↔ skeletonDegree c = 2 := by
   have hroot : Survives (shift c []) := by simpa using hc.survives
   constructor
@@ -130,8 +130,8 @@ theorem survivalMeasure_shapeSplitEvent (θ : Offspring 2) (hq : θ.extinction <
     survivalMeasure (N := 2) θ (shapeSplitEvent A₀ A₁ l)
       = (l.map (decMass θ)).prod * ENNReal.ofReal (θ.skeletonWeight 2)
           * survivalMeasure (N := 2) θ A₀ * survivalMeasure (N := 2) θ A₁ := by
-  have hnull : survivalMeasure (N := 2) θ {c : Amb → ℕ | IsHairySample c}ᶜ = 0 := by
-    have hae := ae_isHairySample_of_pos θ hq h2
+  have hnull : survivalMeasure (N := 2) θ {c : Amb → ℕ | IsBushySample c}ᶜ = 0 := by
+    have hae := ae_isBushySample_of_pos θ hq h2
     rw [ae_iff] at hae
     exact hae
   induction l with
@@ -149,10 +149,10 @@ theorem survivalMeasure_shapeSplitEvent (θ : Offspring 2) (hq : θ.extinction <
             exact hA₁
           · simp only [if_neg h0, if_neg h1]
             exact MeasurableSet.univ
-      have hset : shapeSplitEvent A₀ A₁ [] ∩ {c : Amb → ℕ | IsHairySample c}
+      have hset : shapeSplitEvent A₀ A₁ [] ∩ {c : Amb → ℕ | IsBushySample c}
           = ({c : Amb → ℕ | skeletonDegree c = 2}
               ∩ {c : Amb → ℕ | ∀ m : ℕ, m < 2 → bushAt c m ∈ A m})
-            ∩ {c : Amb → ℕ | IsHairySample c} := by
+            ∩ {c : Amb → ℕ | IsBushySample c} := by
         ext c
         simp only [shapeSplitEvent, Set.mem_inter_iff, Set.mem_setOf_eq]
         constructor
@@ -194,10 +194,10 @@ theorem survivalMeasure_shapeSplitEvent (θ : Offspring 2) (hq : θ.extinction <
       simp only [List.map_nil, List.prod_nil, one_mul]
       ring
   | cons o l ih =>
-      have hset : shapeSplitEvent A₀ A₁ (o :: l) ∩ {c : Amb → ℕ | IsHairySample c}
+      have hset : shapeSplitEvent A₀ A₁ (o :: l) ∩ {c : Amb → ℕ | IsBushySample c}
           = (({c : Amb → ℕ | skeletonDegree c = 1} ∩ {c : Amb → ℕ | decAt c [] = o})
               ∩ {c : Amb → ℕ | bushAt c 0 ∈ shapeSplitEvent A₀ A₁ l})
-            ∩ {c : Amb → ℕ | IsHairySample c} := by
+            ∩ {c : Amb → ℕ | IsBushySample c} := by
         ext c
         simp only [shapeSplitEvent, Set.mem_inter_iff, Set.mem_setOf_eq]
         constructor
@@ -301,7 +301,7 @@ lemma bushAt_of_deg_two {d : Amb → ℕ} (h : skeletonDegree d = 2) (i : Fin 2)
 
 /-- **The shape field below the split**: the shapes of the copies under the first letter
 are the shapes of the subtree the split hands them. -/
-theorem shapeAt_cons {c : Amb → ℕ} (hc : IsHairySample c) (j : Bool) (w : Word) :
+theorem shapeAt_cons {c : Amb → ℕ} (hc : IsBushySample c) (j : Bool) (w : Word) :
     shapeAt c (j :: w) = shapeAt (splitBush c (letterOf j : ℕ)) w := by
   have hroot : Survives (shift c []) := by simpa using hc.survives
   have hdeg : skeletonDegree (splitField c) = 2 := splitDepth_spec hc hroot

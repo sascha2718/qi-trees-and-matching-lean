@@ -1,4 +1,4 @@
-import ChainClasses.Bushy.Hairs
+import ChainClasses.Bushy.Bushes
 import ChainClasses.Bushy.ShapeCouplingBuild
 
 /-!
@@ -19,13 +19,14 @@ supply four such sets:
   translation `letters` of `ShapeDecomposition`.
 
 The law of a pair is the product of the two laws, so the four classes also sit
-on one probabilistic footing; the auxiliary uniform fields the proofs of
-`thm:cross-law` and `thm:hairy` run over are carried along, and where they are
-not part of the sample space they are dropped by `null_of_prod_assoc`.
+on one probabilistic footing.  The auxiliary uniform fields used in
+`thm:cross-law` and in the bushy-universality proposition labelled
+`thm:hairy` are carried along; where they are not part of the sample space,
+`null_of_prod_assoc` removes them.
 
 * `isQIWith_of_isSampleQI`, `quasiIsometric_sampleWord`: over the alphabet
-  translation of `Hairs.lean`, `IsSampleQI` read as `IsQIWith`, which carries
-  `thm:hairy` to the graph footing.
+  translation of `Bushes.lean`, `IsSampleQI` read as `IsQIWith`, which carries
+  bushy universality (`thm:hairy`) to the graph footing.
 * `isLine_of`, `downWord`, `upWord`, `exists_isLine_through`, `NearLine`,
   `nearLine_of_split`, `nearLine_true`, `nearLine_inTree`:
   **`thm:regime-obstructions` (`it:obstr-lines`)**.  A tree in which
@@ -34,41 +35,41 @@ not part of the sample space they are dropped by `null_of_prod_assoc`.
   the chain of the root: the binary tree and, on `Ω₀`, the sample tree of the
   chain regime.
 * `HasThreeRays`, `not_quasiIsometric_rayGraph_of_threeRays`,
-  `not_quasiIsometric_of_hairs_of_nearLine`: the two obstructions of
-  `thm:hair-separation` and `thm:three-rays` for sets of words, the hairs
-  supplied by `Hairs.lean`.
+  `not_quasiIsometric_of_bushes_of_nearLine`: the two obstructions of
+  `thm:bush-separation` and `thm:three-rays` for sets of words, the bushes
+  supplied by `Bushes.lean`.
 * `hasThreeRays_of`, `childRay`, `upRay`, `hasThreeRays_sampleWord`,
-  `raysInHairyRegime`: **`thm:regime-obstructions` (`it:obstr-rays`) in
+  `raysInBushyRegime`: **`thm:regime-obstructions` (`it:obstr-rays`) in
   class (B)**, the three rays out of the split below the second child of the
   first split.
 * `quasiIsometric_refl`, `QuasiIsometric.symm`, `QuasiIsometric.trans`:
   reflexivity, the quasi-inverse coarse density supplies, and composition.
 * `RayWord`, `treeDist_rayWord`, `quasiIsometric_rayWord_rayGraph`: the ray as
   a set of binary words, isometric to `rayGraph`.
-* `SampleLaw`, `rayLaw`, `binaryLaw`, `chainLaw`, `hairySampleLaw`, `PairQI`:
+* `SampleLaw`, `rayLaw`, `binaryLaw`, `chainLaw`, `bushySampleLaw`, `PairQI`:
   **the four simple-support classes as laws of a random tree**.
-* `ray_ray_ae`, `binary_binary_ae`, `chain_chain_ae`, `hairy_hairy_ae`: **the
+* `ray_ray_ae`, `binary_binary_ae`, `chain_chain_ae`, `bushy_bushy_ae`: **the
   four positive statements**, and `chain_binary_ae`, `binary_chain_ae`,
-  `hairy_chain_ae`, `chain_hairy_ae`, `hairy_binary_ae`, `binary_hairy_ae`,
+  `bushy_chain_ae`, `chain_bushy_ae`, `bushy_binary_ae`, `binary_bushy_ae`,
   `binary_ray_ae`, `ray_binary_ae`, `chain_ray_ae`, `ray_chain_ae`,
-  `hairy_ray_ae`, `ray_hairy_ae`, `not_ray_binary`, `not_ray_chain`,
-  `not_ray_hairy` the separations.
+  `bushy_ray_ae`, `ray_bushy_ae`, `not_ray_binary`, `not_ray_chain`,
+  `not_ray_bushy` the separations.
 * `Regime`, `Regime.Valid`, `Regime.sampleLaw`, `Regime.kind`,
   `same_regime_ae`, `diff_regime_ae`, `not_ray_ae`, `trichotomy_simple`:
   **`thm:trichotomy-simple`**.
 
-`thm:regime-obstructions` (`it:obstr-hair`) is `unbounded_hairs_ae` of
-`Hairs.lean`; it enters the two separations of (B) from (F) and from `(C_ℕ₀)`, and
+`thm:regime-obstructions` (`it:obstr-bushes`) is `unbounded_bushes_ae` of
+`Bushes.lean`; it enters the two separations of (B) from (F) and from `(C_ℕ₀)`, and
 through them the different-class clause of the classification.
 -/
 
 namespace ChainClasses
 
 open MeasureTheory ProbabilityTheory
-open BranchingProcess (Offspring QuasiIsometric IsRay IsLine IsHair rayGraph sample
+open BranchingProcess (Offspring QuasiIsometric IsRay IsLine IsBush rayGraph sample
   survivalMeasure Survives survivors skeletonDegree)
 
-/-! ### `thm:hairy` on the word footing -/
+/-! ### Bushy universality (`thm:hairy`) on the word footing -/
 
 open Classical in
 /-- **A quasi-isometry of two samples is one of the two word sets.** The map is
@@ -153,7 +154,7 @@ theorem isQIWith_of_isSampleQI {c c' : Amb → ℕ} {L : ℝ}
         le_trans hx hLK
       exact_mod_cast this
 
-/-- **`thm:hairy` on the word footing**: a quasi-isometry of two samples is a
+/-- **Bushy universality (`thm:hairy`) on the word footing**: a quasi-isometry of two samples is a
 quasi-isometry of the graphs of the two word sets. -/
 theorem quasiIsometric_sampleWord {c c' : Amb → ℕ} {L : ℝ}
     {F : {v : Amb // v ∈ sample c} → {v : Amb // v ∈ sample c'}} (hF : IsSampleQI L F) :
@@ -404,7 +405,7 @@ theorem exists_near_isLine (hT : PrefixClosed T) (hchain : ∀ u, T u → T (u +
   · exact hB u hub
 
 /-- **`thm:regime-obstructions` (`it:obstr-lines`)**, in the form
-`thm:hair-separation` consumes: every vertex lies within a bounded distance of
+`thm:bush-separation` consumes: every vertex lies within a bounded distance of
 a line. -/
 def NearLine (T : Word → Prop) : Prop :=
   ∃ R : ℕ, ∀ u : {w : Word // T w}, ∃ (l : ℤ → {w : Word // T w}) (k : ℤ),
@@ -503,16 +504,16 @@ theorem not_quasiIsometric_rayGraph_true :
   not_quasiIsometric_rayGraph_of_splits (T := fun _ : Word ↦ True) (u := []) (k := 0)
     prefixClosed_true (fun _ ↦ trivial) (fun _ ↦ trivial) (fun _ ↦ trivial)
 
-/-! ### Hairs -/
+/-! ### Bushes -/
 
-/-- **`thm:hair-separation` for two sets of words.** -/
-theorem not_quasiIsometric_of_hairs_of_nearLine {T T' : Word → Prop} (hT : PrefixClosed T)
+/-- **`thm:bush-separation` for two sets of words.** -/
+theorem not_quasiIsometric_of_bushes_of_nearLine {T T' : Word → Prop} (hT : PrefixClosed T)
     (hT' : PrefixClosed T') (hne : T []) (hne' : T' [])
-    (hhair : UnboundedHairs T) (hline : NearLine T') :
+    (hbush : UnboundedBushes T) (hline : NearLine T') :
     ¬ QuasiIsometric (wordGraph T) (wordGraph T') := by
   obtain ⟨R, hR⟩ := hline
-  exact BranchingProcess.not_quasiIsometric_of_hair_of_line (R := R)
-    (wordGraph_isTree hT ⟨⟨[], hne⟩⟩) (wordGraph_isTree hT' ⟨⟨[], hne'⟩⟩) hhair hR
+  exact BranchingProcess.not_quasiIsometric_of_bush_of_line (R := R)
+    (wordGraph_isTree hT ⟨⟨[], hne⟩⟩) (wordGraph_isTree hT' ⟨⟨[], hne'⟩⟩) hbush hR
 
 /-! ### Quasi-isometry is reflexive, symmetric and transitive -/
 
@@ -842,11 +843,11 @@ noncomputable def chainLaw {t : ℝ} (ht : 0 < t) (ht1 : t < 1) : SampleLaw wher
 
 /-- **Class (B)**: an offspring law on `{0,1,2}` with `θ₀ > 0`, conditioned on
 survival, carrying the uniform field of `thm:shape-coupling`. -/
-noncomputable def hairySampleLaw (θ : Offspring 2) (hq : θ.extinction < 1) : SampleLaw where
-  Ω := HairySample
+noncomputable def bushySampleLaw (θ : Offspring 2) (hq : θ.extinction < 1) : SampleLaw where
+  Ω := BushySample
   meas := inferInstance
-  law := hairyMeasure θ
-  isProb := isProbabilityMeasure_hairyMeasure θ hq
+  law := bushyMeasure θ
+  isProb := isProbabilityMeasure_bushyMeasure θ hq
   tree := fun ω ↦ sampleWord ω.1
   prefixClosed := fun ω ↦ prefixClosed_sampleWord ω.1
   root := fun ω ↦ sampleWord_nil ω.1
@@ -878,13 +879,13 @@ theorem chain_chain_ae {t t' : ℝ} (ht : 0 < t) (ht1 : t < 1) (ht' : 0 < t') (h
   exact hω (quasiIsometric_wordGraph (prefixClosed_inTree _) (prefixClosed_inTree _) hf)
 
 /-- **Universality in class (B)**, `thm:hairy` on the graph footing. -/
-theorem hairy_hairy_ae (θ θ' : Offspring 2) (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction)
+theorem bushy_bushy_ae (θ θ' : Offspring 2) (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction)
     (h2 : 0 < θ 2) (hq' : θ'.extinction < 1) (hq0' : 0 < θ'.extinction) (h2' : 0 < θ' 2) :
-    ∀ᵐ ω ∂((hairySampleLaw θ hq).law.prod (hairySampleLaw θ' hq').law),
-      PairQI (hairySampleLaw θ hq) (hairySampleLaw θ' hq') ω := by
+    ∀ᵐ ω ∂((bushySampleLaw θ hq).law.prod (bushySampleLaw θ' hq').law),
+      PairQI (bushySampleLaw θ hq) (bushySampleLaw θ' hq') ω := by
   rw [ae_iff]
   refine measure_mono_null ?_
-    (hairy_ae_shape_tree_two_law θ θ' hq hq0 h2 hq' hq0' h2')
+    (bushy_ae_shape_tree_two_law θ θ' hq hq0 h2 hq' hq0' h2')
   rintro ω hω ⟨L, F, hF⟩
   exact hω (quasiIsometric_sampleWord hF)
 
@@ -900,8 +901,8 @@ lemma ae_chains {t : ℝ} (ht : 0 < t) (ht1 : t < 1) :
     (chainMeasure_coord_true ht ht1.le) ht
 
 /-- **`thm:regime-obstructions` (`it:obstr-rays`) in class (B)**, the
-form the separation from the ray consumes; `raysInHairyRegime` proves it. -/
-def RaysInHairyRegime : Prop :=
+form the separation from the ray consumes; `raysInBushyRegime` proves it. -/
+def RaysInBushyRegime : Prop :=
   ∀ θ : Offspring 2, θ.extinction < 1 → 0 < θ.extinction → 0 < θ 2 →
     ∀ᵐ c ∂(survivalMeasure (N := 2) θ), HasThreeRays (sampleWord c)
 
@@ -922,49 +923,49 @@ theorem binary_chain_ae {t : ℝ} (ht : 0 < t) (ht1 : t < 1) :
   exact hω.1 (QuasiIsometric.symm
     (wordGraph_connected (prefixClosed_inTree _) ⟨⟨[], InTree.root⟩⟩) hqi)
 
-/-- **Class (B) against class `(C_ℕ₀)`**: the bushy sample has hairs of unbounded
+/-- **Class (B) against class `(C_ℕ₀)`**: the bushy sample has bushes of unbounded
 depth and the chain sample is a union of lines. -/
-theorem hairy_chain_ae (θ : Offspring 2) (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction)
+theorem bushy_chain_ae (θ : Offspring 2) (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction)
     (h2 : 0 < θ 2) {t : ℝ} (ht : 0 < t) (ht1 : t < 1) :
-    ∀ᵐ ω ∂((hairySampleLaw θ hq).law.prod (chainLaw ht ht1).law),
-      ¬ PairQI (hairySampleLaw θ hq) (chainLaw ht ht1) ω := by
+    ∀ᵐ ω ∂((bushySampleLaw θ hq).law.prod (chainLaw ht ht1).law),
+      ¬ PairQI (bushySampleLaw θ hq) (chainLaw ht ht1) ω := by
   filter_upwards [ae_of_fst (ν := (chainLaw ht ht1).law)
-      (ae_of_fst (unbounded_hairs_ae θ hq hq0 h2)),
-    ae_of_snd (μ := (hairySampleLaw θ hq).law) (ae_chains ht ht1)] with ω hh hc
-  exact not_quasiIsometric_of_hairs_of_nearLine (prefixClosed_sampleWord _)
+      (ae_of_fst (unbounded_bushes_ae θ hq hq0 h2)),
+    ae_of_snd (μ := (bushySampleLaw θ hq).law) (ae_chains ht ht1)] with ω hh hc
+  exact not_quasiIsometric_of_bushes_of_nearLine (prefixClosed_sampleWord _)
     (prefixClosed_inTree _) (sampleWord_nil _) InTree.root hh (nearLine_inTree hc)
 
 /-- **Class `(C_ℕ₀)` against class (B)**. -/
-theorem chain_hairy_ae (θ : Offspring 2) (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction)
+theorem chain_bushy_ae (θ : Offspring 2) (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction)
     (h2 : 0 < θ 2) {t : ℝ} (ht : 0 < t) (ht1 : t < 1) :
-    ∀ᵐ ω ∂((chainLaw ht ht1).law.prod (hairySampleLaw θ hq).law),
-      ¬ PairQI (chainLaw ht ht1) (hairySampleLaw θ hq) ω := by
+    ∀ᵐ ω ∂((chainLaw ht ht1).law.prod (bushySampleLaw θ hq).law),
+      ¬ PairQI (chainLaw ht ht1) (bushySampleLaw θ hq) ω := by
   filter_upwards [ae_of_snd (μ := (chainLaw ht ht1).law)
-      (ae_of_fst (unbounded_hairs_ae θ hq hq0 h2)),
-    ae_of_fst (ν := (hairySampleLaw θ hq).law) (ae_chains ht ht1)] with ω hh hc hqi
-  exact not_quasiIsometric_of_hairs_of_nearLine (prefixClosed_sampleWord _)
+      (ae_of_fst (unbounded_bushes_ae θ hq hq0 h2)),
+    ae_of_fst (ν := (bushySampleLaw θ hq).law) (ae_chains ht ht1)] with ω hh hc hqi
+  exact not_quasiIsometric_of_bushes_of_nearLine (prefixClosed_sampleWord _)
     (prefixClosed_inTree _) (sampleWord_nil _) InTree.root hh (nearLine_inTree hc)
     (QuasiIsometric.symm (wordGraph_connected (prefixClosed_sampleWord _)
       ⟨⟨[], sampleWord_nil _⟩⟩) hqi)
 
 /-- **Class (B) against class (F)**. -/
-theorem hairy_binary_ae (θ : Offspring 2) (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction)
+theorem bushy_binary_ae (θ : Offspring 2) (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction)
     (h2 : 0 < θ 2) :
-    ∀ᵐ ω ∂((hairySampleLaw θ hq).law.prod binaryLaw.law),
-      ¬ PairQI (hairySampleLaw θ hq) binaryLaw ω := by
+    ∀ᵐ ω ∂((bushySampleLaw θ hq).law.prod binaryLaw.law),
+      ¬ PairQI (bushySampleLaw θ hq) binaryLaw ω := by
   filter_upwards [ae_of_fst (ν := binaryLaw.law)
-    (ae_of_fst (unbounded_hairs_ae θ hq hq0 h2))] with ω hh
-  exact not_quasiIsometric_of_hairs_of_nearLine (prefixClosed_sampleWord _)
+    (ae_of_fst (unbounded_bushes_ae θ hq hq0 h2))] with ω hh
+  exact not_quasiIsometric_of_bushes_of_nearLine (prefixClosed_sampleWord _)
     prefixClosed_true (sampleWord_nil _) trivial hh nearLine_true
 
 /-- **Class (F) against class (B)**. -/
-theorem binary_hairy_ae (θ : Offspring 2) (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction)
+theorem binary_bushy_ae (θ : Offspring 2) (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction)
     (h2 : 0 < θ 2) :
-    ∀ᵐ ω ∂(binaryLaw.law.prod (hairySampleLaw θ hq).law),
-      ¬ PairQI binaryLaw (hairySampleLaw θ hq) ω := by
+    ∀ᵐ ω ∂(binaryLaw.law.prod (bushySampleLaw θ hq).law),
+      ¬ PairQI binaryLaw (bushySampleLaw θ hq) ω := by
   filter_upwards [ae_of_snd (μ := binaryLaw.law)
-    (ae_of_fst (unbounded_hairs_ae θ hq hq0 h2))] with ω hh hqi
-  exact not_quasiIsometric_of_hairs_of_nearLine (prefixClosed_sampleWord _)
+    (ae_of_fst (unbounded_bushes_ae θ hq hq0 h2))] with ω hh hqi
+  exact not_quasiIsometric_of_bushes_of_nearLine (prefixClosed_sampleWord _)
     prefixClosed_true (sampleWord_nil _) trivial hh nearLine_true
     (QuasiIsometric.symm (wordGraph_connected (prefixClosed_sampleWord _)
       ⟨⟨[], sampleWord_nil _⟩⟩) hqi)
@@ -984,9 +985,9 @@ theorem not_ray_chain {t : ℝ} (ht : 0 < t) (ht1 : t < 1) :
 
 /-- **`thm:three-rays` in class (B)**, over the three rays of
 `thm:regime-obstructions` (`it:obstr-rays`). -/
-theorem not_ray_hairy (θ : Offspring 2) (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction)
-    (h2 : 0 < θ 2) (hrays : RaysInHairyRegime) :
-    ∀ᵐ ω ∂(hairySampleLaw θ hq).law, ¬ QuasiIsometric ((hairySampleLaw θ hq).graph ω) rayGraph := by
+theorem not_ray_bushy (θ : Offspring 2) (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction)
+    (h2 : 0 < θ 2) (hrays : RaysInBushyRegime) :
+    ∀ᵐ ω ∂(bushySampleLaw θ hq).law, ¬ QuasiIsometric ((bushySampleLaw θ hq).graph ω) rayGraph := by
   filter_upwards [ae_of_fst (hrays θ hq hq0 h2)] with ω hω
   exact not_quasiIsometric_rayGraph_of_threeRays (prefixClosed_sampleWord _) hω
 
@@ -1030,7 +1031,7 @@ theorem ray_chain_ae {t : ℝ} (ht : 0 < t) (ht1 : t < 1) :
 /-! ### Three rays in the bushy sample
 
 `thm:regime-obstructions` (`it:obstr-rays`) in class (B). On the event
-`IsHairySample` the chain of the root ends at a split `u`, and the chain of the
+`IsBushySample` the chain of the root ends at a split `u`, and the chain of the
 second child of `u` ends at a further split `v`.  Two rays descend the children
 of `v` along their necks, and the third climbs from `v` to `u` and descends the
 first child of `u`. -/
@@ -1120,7 +1121,7 @@ noncomputable def upRay (c : Amb → ℕ) (u v : Amb) (k n : ℕ) : Amb :=
   rw [upRay, if_pos (Nat.zero_le _)]
   simp
 
-section HairyRays
+section BushyRays
 
 variable {u v : Amb} {k : ℕ}
 
@@ -1195,13 +1196,13 @@ lemma upRay_cases {n : ℕ} (hn : n ≠ 0) :
     omega
   · exact Or.inr (by rw [upRay_gt hnk]; exact prefix_neckRay c (u ++ [0]) _)
 
-end HairyRays
+end BushyRays
 
 /-! ### The rays in the sample tree read as a set of words -/
 
 /-- **`thm:regime-obstructions` (`it:obstr-rays`) in class (B)**, the
 deterministic form. -/
-theorem hasThreeRays_sampleWord (hc : IsHairySample c) : HasThreeRays (sampleWord c) := by
+theorem hasThreeRays_sampleWord (hc : IsBushySample c) : HasThreeRays (sampleWord c) := by
   classical
   -- the split ending the chain of the root
   have hsurv0 : Survives (shift c []) := by simpa using hc.survives
@@ -1299,28 +1300,28 @@ theorem hasThreeRays_sampleWord (hc : IsHairySample c) : HasThreeRays (sampleWor
     (fun m n hm hn h ↦ hsepU 1 m n hm hn (unletters_injective (congrArg Subtype.val h)))
 
 /-- **`thm:regime-obstructions` (`it:obstr-rays`) in class (B)**: the
-three rays are there almost surely, since `IsHairySample` is. -/
-theorem raysInHairyRegime : RaysInHairyRegime := by
+three rays are there almost surely, since `IsBushySample` is. -/
+theorem raysInBushyRegime : RaysInBushyRegime := by
   intro θ hq _ h2
-  filter_upwards [ae_isHairySample_of_pos θ hq h2] with c hc
+  filter_upwards [ae_isBushySample_of_pos θ hq h2] with c hc
   exact hasThreeRays_sampleWord hc
 
 /-- **Separation (B)-(R)**. -/
-theorem hairy_ray_ae (θ : Offspring 2) (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction)
+theorem bushy_ray_ae (θ : Offspring 2) (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction)
     (h2 : 0 < θ 2) :
-    ∀ᵐ ω ∂((hairySampleLaw θ hq).law.prod rayLaw.law),
-      ¬ PairQI (hairySampleLaw θ hq) rayLaw ω := by
+    ∀ᵐ ω ∂((bushySampleLaw θ hq).law.prod rayLaw.law),
+      ¬ PairQI (bushySampleLaw θ hq) rayLaw ω := by
   filter_upwards [ae_of_fst (ν := rayLaw.law)
-    (not_ray_hairy θ hq hq0 h2 raysInHairyRegime)] with ω hω h
+    (not_ray_bushy θ hq hq0 h2 raysInBushyRegime)] with ω hω h
   exact hω (quasiIsometric_rayGraph_of_pairQI h)
 
 /-- **Separation (R)-(B)**. -/
-theorem ray_hairy_ae (θ : Offspring 2) (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction)
+theorem ray_bushy_ae (θ : Offspring 2) (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction)
     (h2 : 0 < θ 2) :
-    ∀ᵐ ω ∂(rayLaw.law.prod (hairySampleLaw θ hq).law),
-      ¬ PairQI rayLaw (hairySampleLaw θ hq) ω := by
+    ∀ᵐ ω ∂(rayLaw.law.prod (bushySampleLaw θ hq).law),
+      ¬ PairQI rayLaw (bushySampleLaw θ hq) ω := by
   filter_upwards [ae_of_snd (μ := rayLaw.law)
-    (not_ray_hairy θ hq hq0 h2 raysInHairyRegime)] with ω hω h
+    (not_ray_bushy θ hq hq0 h2 raysInBushyRegime)] with ω hω h
   exact hω (quasiIsometric_rayGraph_of_pairQI' h)
 
 /-! ### The classification -/
@@ -1332,7 +1333,7 @@ inductive Regime : Type
   /-- Class `(C_ℕ₀)`, `θ₀ = 0 < θ₁`: the two-value family, with `θ₂ = t`. -/
   | chain (t : ℝ) : Regime
   /-- Class (B), `θ₀ > 0`. -/
-  | hairy (θ : Offspring 2) : Regime
+  | bushy (θ : Offspring 2) : Regime
   /-- Class (R), `θ₁ = 1`: the ray. -/
   | ray : Regime
 
@@ -1341,21 +1342,21 @@ the extinction probability is positive exactly when `θ₀ > 0`. -/
 def Regime.Valid : Regime → Prop
   | .binary => True
   | .chain t => 0 < t ∧ t < 1
-  | .hairy θ => θ.extinction < 1 ∧ 0 < θ.extinction ∧ 0 < θ 2
+  | .bushy θ => θ.extinction < 1 ∧ 0 < θ.extinction ∧ 0 < θ 2
   | .ray => True
 
 /-- The law of the sample in a regime. -/
 noncomputable def Regime.sampleLaw : (r : Regime) → r.Valid → SampleLaw
   | .binary, _ => binaryLaw
   | .chain _, h => chainLaw h.1 h.2
-  | .hairy θ, h => hairySampleLaw θ h.1
+  | .bushy θ, h => bushySampleLaw θ h.1
   | .ray, _ => rayLaw
 
 /-- The name of the class: the invariant used by the classification. -/
 def Regime.kind : Regime → ℕ
   | .binary => 0
   | .chain _ => 1
-  | .hairy _ => 2
+  | .bushy _ => 2
   | .ray => 3
 
 /-- **The same-class clause of `thm:trichotomy-simple`**: two laws in the same class give
@@ -1369,26 +1370,26 @@ theorem same_regime_ae (r r' : Regime) (hr : r.Valid) (hr' : r'.Valid)
       cases r' with
       | binary => exact binary_binary_ae
       | chain t => simp [Regime.kind] at hk
-      | hairy θ => simp [Regime.kind] at hk
+      | bushy θ => simp [Regime.kind] at hk
       | ray => simp [Regime.kind] at hk
   | chain t =>
       cases r' with
       | binary => simp [Regime.kind] at hk
       | chain t' =>
           exact chain_chain_ae hr.1 hr.2 hr'.1 hr'.2
-      | hairy θ => simp [Regime.kind] at hk
+      | bushy θ => simp [Regime.kind] at hk
       | ray => simp [Regime.kind] at hk
-  | hairy θ =>
+  | bushy θ =>
       cases r' with
       | binary => simp [Regime.kind] at hk
       | chain t => simp [Regime.kind] at hk
-      | hairy θ' => exact hairy_hairy_ae θ θ' hr.1 hr.2.1 hr.2.2 hr'.1 hr'.2.1 hr'.2.2
+      | bushy θ' => exact bushy_bushy_ae θ θ' hr.1 hr.2.1 hr.2.2 hr'.1 hr'.2.1 hr'.2.2
       | ray => simp [Regime.kind] at hk
   | ray =>
       cases r' with
       | binary => simp [Regime.kind] at hk
       | chain t => simp [Regime.kind] at hk
-      | hairy θ => simp [Regime.kind] at hk
+      | bushy θ => simp [Regime.kind] at hk
       | ray => exact ray_ray_ae
 
 /-- **The different-class clause of `thm:trichotomy-simple`**: two laws in different classes give
@@ -1402,25 +1403,25 @@ theorem diff_regime_ae (r r' : Regime) (hr : r.Valid)
       cases r' with
       | binary => simp [Regime.kind] at hk
       | chain t => exact binary_chain_ae hr'.1 hr'.2
-      | hairy θ => exact binary_hairy_ae θ hr'.1 hr'.2.1 hr'.2.2
+      | bushy θ => exact binary_bushy_ae θ hr'.1 hr'.2.1 hr'.2.2
       | ray => exact binary_ray_ae
   | chain t =>
       cases r' with
       | binary => exact chain_binary_ae hr.1 hr.2
       | chain t' => simp [Regime.kind] at hk
-      | hairy θ => exact chain_hairy_ae θ hr'.1 hr'.2.1 hr'.2.2 hr.1 hr.2
+      | bushy θ => exact chain_bushy_ae θ hr'.1 hr'.2.1 hr'.2.2 hr.1 hr.2
       | ray => exact chain_ray_ae hr.1 hr.2
-  | hairy θ =>
+  | bushy θ =>
       cases r' with
-      | binary => exact hairy_binary_ae θ hr.1 hr.2.1 hr.2.2
-      | chain t => exact hairy_chain_ae θ hr.1 hr.2.1 hr.2.2 hr'.1 hr'.2
-      | hairy θ' => simp [Regime.kind] at hk
-      | ray => exact hairy_ray_ae θ hr.1 hr.2.1 hr.2.2
+      | binary => exact bushy_binary_ae θ hr.1 hr.2.1 hr.2.2
+      | chain t => exact bushy_chain_ae θ hr.1 hr.2.1 hr.2.2 hr'.1 hr'.2
+      | bushy θ' => simp [Regime.kind] at hk
+      | ray => exact bushy_ray_ae θ hr.1 hr.2.1 hr.2.2
   | ray =>
       cases r' with
       | binary => exact ray_binary_ae
       | chain t => exact ray_chain_ae hr'.1 hr'.2
-      | hairy θ => exact ray_hairy_ae θ hr'.1 hr'.2.1 hr'.2.2
+      | bushy θ => exact ray_bushy_ae θ hr'.1 hr'.2.1 hr'.2.2
       | ray => simp [Regime.kind] at hk
 
 /-- **The ray is separated from the other three classes**: no sample outside the ray class is
@@ -1430,7 +1431,7 @@ theorem not_ray_ae (r : Regime) (hr : r.Valid) (hray : r ≠ Regime.ray) :
   cases r with
   | binary => exact not_ray_binary
   | chain t => exact not_ray_chain hr.1 hr.2
-  | hairy θ => exact not_ray_hairy θ hr.1 hr.2.1 hr.2.2 raysInHairyRegime
+  | bushy θ => exact not_ray_bushy θ hr.1 hr.2.1 hr.2.2 raysInBushyRegime
   | ray => exact absurd rfl hray
 
 /-- **The offspring-`{0,1,2}` classification of `thm:trichotomy-simple`.** Two independent

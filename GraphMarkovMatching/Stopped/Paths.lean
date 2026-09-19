@@ -1,6 +1,6 @@
 /-
 The restricted potentials, zero events, phases, possible paths, stopping predicate and
-transition selections of `markov_matching_new_proof.tex` (`sec:restricted-potential`,
+transition selections of `arbitrary_offspring_matching.tex` (`sec:restricted-potential`,
 `sec:finite-hypotheses`, `sec:unweighted`):
 
 * `P`, `z`, `failProb`, `W`: the restricted potential `P_h(s,t)`, the zero mass
@@ -13,6 +13,10 @@ transition selections of `markov_matching_new_proof.tex` (`sec:restricted-potent
   bound `B` of `eq:transition-budget`;
 * `SHe`, `GHe`, `Ufun`, `Efun`, `Qfun`, `Cmix`: the explicit scalar functions of
   `eq:explicit-zero-bound`, `eq:explicit-weighted-error` and `sec:averaging`, in `ℝ≥0∞`.
+
+In formal field and lemma names, `charged` means simply "has nonzero mass
+under the relevant PMF".  The prose below usually says "positive-mass" to
+make that meaning explicit.
 -/
 import GraphMarkovMatching.Stopped.Constants
 
@@ -356,8 +360,8 @@ lemma Phase.child_eq {M : Model V I} {g : ℕ} (Θ : Phase M g) {t t' : I} (h : 
 
 /-! ### Transition selections (`eq:transition-budget`) -/
 
-/-- A transition selection: for every target type a nonempty finite set of charged child
-pairs such that, for every source child pair with states in `V_μ`, positive degree against
+/-- A transition selection: for every target type a nonempty finite set of positive-mass
+child pairs such that, for every source child pair with states in `V_μ`, positive degree against
 the full child-pair mixture implies positive degree against some selected component. -/
 structure Selection (M : Model V I) where
   J : I → Finset (I × I)

@@ -444,7 +444,7 @@ lemma isAddr_realiseAux_cases : ∀ (L : List (List RTree)), L ≠ [] → ∀ {p
 /-- **The deterministic hypotheses of `thm:hairy-general`** at general arity: the
 offspring counts lie within the alphabet, the sample survives, and every neck ray of the
 skeleton meets a split, which is the event `Ω₀` of `thm:chains` read for the skeleton. -/
-structure IsGHairySample (c : GWord N → ℕ) : Prop where
+structure IsGBushySample (c : GWord N → ℕ) : Prop where
   /-- The offspring counts lie within the alphabet. -/
   offspring : ∀ v, c v ≤ N
   /-- The sample is infinite. -/
@@ -597,7 +597,7 @@ lemma mem_sample_gArityAt_cons {d : GWord N → ℕ} {i : Fin N} {u : GWord N} :
 
 /-- **The copies are the subtrees at the entry vertices**: along the reduced skeleton
 the subfield of a copy is the ambient subfield at its entry vertex, and it survives. -/
-lemma redSub_eq_ambSub_gEntryV {c : GWord N → ℕ} (hc : IsGHairySample c) :
+lemma redSub_eq_ambSub_gEntryV {c : GWord N → ℕ} (hc : IsGBushySample c) :
     ∀ (u y : GWord N), Survives (ambSub c y) → u ∈ sample (gArityAt (ambSub c y)) →
       redSub (ambSub c y) u = ambSub c (y ++ gEntryV (ambSub c y) u)
         ∧ Survives (redSub (ambSub c y) u)
@@ -619,14 +619,14 @@ lemma redSub_eq_ambSub_gEntryV {c : GWord N → ℕ} (hc : IsGHairySample c) :
       exact ih2
 
 /-- The subfield of a copy, at the root. -/
-lemma redSub_eq_ambSub_gEntryV' {c : GWord N → ℕ} (hc : IsGHairySample c) {u : GWord N}
+lemma redSub_eq_ambSub_gEntryV' {c : GWord N → ℕ} (hc : IsGBushySample c) {u : GWord N}
     (hu : u ∈ sample (gArityAt c)) :
     redSub c u = ambSub c (gEntryV c u) ∧ Survives (redSub c u) := by
   have h := redSub_eq_ambSub_gEntryV hc u [] (by simpa using hc.survives) (by simpa using hu)
   simpa using h
 
 /-- The entry vertices lie in the sample. -/
-lemma gEntryV_mem_sample {c : GWord N → ℕ} (hc : IsGHairySample c) :
+lemma gEntryV_mem_sample {c : GWord N → ℕ} (hc : IsGBushySample c) :
     ∀ (u y : GWord N), y ∈ sample c → Survives (ambSub c y) → u ∈ sample (gArityAt (ambSub c y)) →
       y ++ gEntryV (ambSub c y) u ∈ sample c
   | [], y, hy, _, _ => by simpa using hy
@@ -818,7 +818,7 @@ lemma neckIter_root {c : GWord N → ℕ} {y : GWord N} (hs : Survives (ambSub c
 
 /-- **The neck of a copy is the chain of its entry**: the translation carries the neck
 addresses of the shape at a vertex to its neck ray. -/
-lemma transSampleN_neck {c : GWord N → ℕ} (hc : IsGHairySample c) {a : List ℕ} {y : GWord N}
+lemma transSampleN_neck {c : GWord N → ℕ} (hc : IsGBushySample c) {a : List ℕ} {y : GWord N}
     (ha : transSampleN c a = vals y) (hs : Survives (ambSub c y)) :
     ∀ i, i ≤ gSplitDepth (ambSub c y) →
       transSampleN c (a ++ neckAddr (gShapeRoot (ambSub c y)).decs i)
@@ -837,7 +837,7 @@ lemma transSampleN_neck {c : GWord N → ℕ} (hc : IsGHairySample c) {a : List 
         ← List.append_assoc, letterMap, if_neg (lt_irrefl _), Nat.sub_self]
 
 /-- The entry vertices lie in the sample, at the root. -/
-lemma gEntryV_mem_sample' {c : GWord N → ℕ} (hc : IsGHairySample c) {u : GWord N}
+lemma gEntryV_mem_sample' {c : GWord N → ℕ} (hc : IsGBushySample c) {u : GWord N}
     (hu : u ∈ sample (gArityAt c)) : gEntryV c u ∈ sample c := by
   have h := gEntryV_mem_sample hc u [] (BranchingProcess.nil_mem_sample c)
     (by simpa using hc.survives) (by simpa using hu)
@@ -845,7 +845,7 @@ lemma gEntryV_mem_sample' {c : GWord N → ℕ} (hc : IsGHairySample c) {u : GWo
 
 /-- **The entry of a copy**: the translation carries the planting of the copy at `u` to
 its entry vertex. -/
-lemma transSampleN_gCopyAddr {c : GWord N → ℕ} (hc : IsGHairySample c) :
+lemma transSampleN_gCopyAddr {c : GWord N → ℕ} (hc : IsGBushySample c) :
     ∀ {u : GWord N}, u ∈ sample (gArityAt c) →
       transSampleN c (gCopyAddr (liftN N (gShapeAt c)) (vals u)) = vals (gEntryV c u) := by
   intro u
@@ -890,7 +890,7 @@ lemma not_survives_ambSub_of_mem {e : GWord N → ℕ} (hfin : ¬ Survives e) {v
 
 /-- **The translation inside a bush**: below a dying vertex the translation reads the
 letters one for one. -/
-lemma transSampleN_bush {c : GWord N → ℕ} (hc : IsGHairySample c) {a : List ℕ} {y : GWord N}
+lemma transSampleN_bush {c : GWord N → ℕ} (hc : IsGBushySample c) {a : List ℕ} {y : GWord N}
     (ha : transSampleN c a = vals y) (hfin : ¬ Survives (ambSub c y)) :
     ∀ v : GWord N, v ∈ sample (ambSub c y) → transSampleN c (a ++ vals v) = vals (y ++ v) := by
   intro v
@@ -925,7 +925,7 @@ lemma isAddr_bushRTree_iff {e : GWord N → ℕ} (he : ∀ v, e v ≤ N) (hfin :
 /-- The neck-vertex case of the dictionary: a neck address of the shape at a vertex
 translates to a vertex of its neck ray, whose children are counted by its bushes and its
 surviving children. -/
-lemma transSampleN_spec_neck {c : GWord N → ℕ} (hc : IsGHairySample c) {a : List ℕ}
+lemma transSampleN_spec_neck {c : GWord N → ℕ} (hc : IsGBushySample c) {a : List ℕ}
     {y₀ : GWord N} (ha : transSampleN c a = vals y₀) (hy₀ : y₀ ∈ sample c)
     (hs : Survives (ambSub c y₀)) {i : ℕ} (hi : i < (gShapeRoot (ambSub c y₀)).decs.length) :
     ∃ v ∈ sample c, transSampleN c (a ++ neckAddr (gShapeRoot (ambSub c y₀)).decs i) = vals v ∧
@@ -977,7 +977,7 @@ lemma transSampleN_spec_neck {c : GWord N → ℕ} (hc : IsGHairySample c) {a : 
 /-- The bush case of the dictionary: a bush address of the shape at a vertex translates
 to a vertex of the dying subtree hanging off its neck ray, whose children are the
 children of that vertex. -/
-lemma transSampleN_spec_bush {c : GWord N → ℕ} (hc : IsGHairySample c) {a : List ℕ}
+lemma transSampleN_spec_bush {c : GWord N → ℕ} (hc : IsGBushySample c) {a : List ℕ}
     {y₀ : GWord N} (ha : transSampleN c a = vals y₀) (hy₀ : y₀ ∈ sample c)
     (hs : Survives (ambSub c y₀)) {i : ℕ} (hi : i < (gShapeRoot (ambSub c y₀)).decs.length)
     {m₀ : ℕ} (hm₀ : m₀ < (gShapeRoot (ambSub c y₀)).decs[i].length) {z : List ℕ}
@@ -1081,7 +1081,7 @@ lemma transSampleN_spec_bush {c : GWord N → ℕ} (hc : IsGHairySample c) {a : 
 /-- **The dictionary** (**`thm:shape-iid`** at general arity): the translation carries a
 vertex of the skeleton assembly to a vertex of the sample, and the children of the two
 agree through the letter map. -/
-theorem transSampleN_code_spec {c : GWord N → ℕ} (hc : IsGHairySample c)
+theorem transSampleN_code_spec {c : GWord N → ℕ} (hc : IsGBushySample c)
     (x : SkelAssembly (gArityAt c) (gShapeAt c)) :
     (∃ v ∈ sample c, transSampleN c x.code = vals v) ∧
       ∀ m : ℕ, (∃ y : SkelAssembly (gArityAt c) (gShapeAt c), y.code = x.code ++ [m])
@@ -1123,7 +1123,7 @@ theorem transSampleN_code_spec {c : GWord N → ℕ} (hc : IsGHairySample c)
 
 /-- Every vertex of the sample is the translation of a vertex of the skeleton assembly:
 the chains of the skeleton and their bushes exhaust the sample. -/
-lemma exists_code_transSampleN {c : GWord N → ℕ} (hc : IsGHairySample c) :
+lemma exists_code_transSampleN {c : GWord N → ℕ} (hc : IsGBushySample c) :
     ∀ v : GWord N, v ∈ sample c →
       ∃ x : SkelAssembly (gArityAt c) (gShapeAt c), transSampleN c x.code = vals v := by
   intro v
@@ -1146,13 +1146,13 @@ lemma exists_code_transSampleN {c : GWord N → ℕ} (hc : IsGHairySample c) :
       rw [hy, transSampleN_concat, hx, sampleLetterN_vals, hmeq, vals_append, vals_cons, vals_nil]
 
 /-- **`thm:shape-iid` at general arity, the isometry** (the premise of
-**`it:general-glued`**): a bushy sample is isometric to the assembly of its own shapes
+**`thm:general-glued`**): a bushy sample is isometric to the assembly of its own shapes
 over its reduced skeleton.  The isometry is the address translation: it reads the
 letters of the assembly one for one, sending the neck of a copy to the chain of its entry
 vertex, its bushes to the dying subtrees hanging off that chain, and the copies below
 its exit to the surviving children of the split, so it preserves lengths and the prefix
 order, and with them every distance. -/
-theorem gAssembly_isometric_sample {c : GWord N → ℕ} (hc : IsGHairySample c) :
+theorem gAssembly_isometric_sample {c : GWord N → ℕ} (hc : IsGBushySample c) :
     ∃ Φ : SkelAssembly (gArityAt c) (gShapeAt c) → {v : GWord N // v ∈ sample c},
       Function.Bijective Φ ∧
       ∀ x y, (BranchingProcess.treeDist (Φ x).1 (Φ y).1 : ℝ) = dist x y := by

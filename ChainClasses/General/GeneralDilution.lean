@@ -3,7 +3,7 @@ import ChainClasses.General.GeneralShape
 
 /-!
 `sec:general-relabel` of `matching_classes_general.tex`,
-`it:general-dilution`: the greedy cut of `thm:dilution` at general arity.
+`thm:general-dilution`: the greedy cut of `thm:dilution` at general arity.
 
 The cut is the recursion of `Dilution.lean` run on rose trees: walking up from
 the leaves, the part being accumulated is cut off as soon as it reaches `s`
@@ -99,7 +99,7 @@ lemma maxPartF_le {bound : ℕ} : ∀ cs : List RTree,
       exact max_le (h c (List.mem_cons_self ..))
         (maxPartF_le cs fun d hd => h d (List.mem_cons_of_mem c hd))
 
-/-- **`it:general-dilution`, the part bound**: every part of a tree with
+/-- **`thm:general-dilution`, the part bound**: every part of a tree with
 offspring numbers in `{0,…,J}` has at most `1 + J(s-1)` vertices: a cut is
 made at a vertex whose up to `J` children's remainders are each below `s`. -/
 theorem maxPart_le (hs : 1 ≤ s) {J : ℕ} {t : RTree} (hdeg : DegLe J t) :
@@ -145,7 +145,7 @@ lemma cut_le (t : RTree) : s * cutCount s t + remSize s t ≤ t.size := by
       · simp only [Nat.mul_add, Nat.mul_zero]
         omega
 
-/-- **`it:general-dilution`, the count**: at most `|t|/s` parts are cut off,
+/-- **`thm:general-dilution`, the count**: at most `|t|/s` parts are cut off,
 so cut and remainder together are at most `|t|/s + 1` parts, each of at most
 `1 + J(s-1)` vertices. -/
 theorem cutCount_le_div (hs : 1 ≤ s) (t : RTree) : cutCount s t ≤ t.size / s := by

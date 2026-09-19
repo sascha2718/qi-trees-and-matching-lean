@@ -449,7 +449,7 @@ lemma gShapeRoot_eq_flatG [NeZero N] {c : GWord N → ℕ}
 
 /-- The original reduced shape field is the bare-neck field in the chain regime. -/
 theorem gShapeAt_eq_flatG [NeZero N] {c : GWord N → ℕ}
-    (hc : IsGHairySample c) (h1 : ∀ v, 1 ≤ c v) {u : GWord N}
+    (hc : IsGBushySample c) (h1 : ∀ v, 1 ≤ c v) {u : GWord N}
     (hu : u ∈ sample (gArityAt c)) :
     gShapeAt c u = flatG (neckAt c u) := by
   rw [gShapeAt, neckAt, (redSub_eq_ambSub_gEntryV' hc hu).1]

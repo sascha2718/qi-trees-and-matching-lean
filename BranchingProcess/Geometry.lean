@@ -1,5 +1,5 @@
 /-
-The coarse geometry of trees behind `thm:hair-separation` and `thm:three-rays`
+The coarse geometry of trees behind `thm:bush-separation` and `thm:three-rays`
 of `gw_classes_simple.tex`.  Both propositions are deterministic statements
 about arbitrary infinite trees, and both are proved here over Mathlib's
 `SimpleGraph` in its graph metric.
@@ -17,9 +17,9 @@ about arbitrary infinite trees, and both are proved here over Mathlib's
   isometric onto their images.  `IsLine.exists_far` is the form the separation
   consumes: one of the two half-rays runs away from any given vertex through
   the splitting point.
-* `IsHair`: a component of the complement of a single vertex, of depth `h`,
+* `IsBush`: a component of the complement of a single vertex, of depth `h`,
   with `between_of_notMem_componentCompl` for the separation it provides.
-* `not_quasiIsometric_of_hair_of_line`: `thm:hair-separation`.
+* `not_quasiIsometric_of_bush_of_line`: `thm:bush-separation`.
 * `rayGraph`, with `rayGraph_dist` and `rayGraph_isTree`: the ray `ℕ` with the
   path-graph structure.
 * `IsRay.eq_of_between` and `dist_ray_branch`: a geodesic out of the initial
@@ -186,12 +186,12 @@ lemma IsLine.exists_far (hG : G.IsTree) {l : ℤ → V} (hl : IsLine G l) (k : �
   · exact ⟨l (k + n), by rw [hl]; omega, h2.symm⟩
   · exact ⟨l (k - n), by rw [hl]; omega, h2⟩
 
-/-! ### Hairs -/
+/-! ### Bushes -/
 
-/-- `P` is a hair of depth `h` at `c`: a connected component of the complement
+/-- `P` is a bush of depth `h` at `c`: a connected component of the complement
 of `{c}`, contained in the ball of radius `h` around `c` and meeting its
 boundary. -/
-def IsHair (G : SimpleGraph V) (c : V) (P : Set V) (h : ℕ) : Prop :=
+def IsBush (G : SimpleGraph V) (c : V) (P : Set V) (h : ℕ) : Prop :=
   (∃ C : G.ComponentCompl ({c} : Set V), (C : Set V) = P) ∧
     (∀ v ∈ P, G.dist v c ≤ h) ∧ ∃ v ∈ P, G.dist v c = h
 
@@ -211,7 +211,7 @@ lemma mem_componentCompl_of_walk {c : V} {C : G.ComponentCompl ({c} : Set V)} :
       exact hc (by simp)
     exact ComponentCompl.mem_of_adj v u (ih h1 hb) h2 hadj.symm
 
-/-- **The separation by a hair.**  A vertex outside a component of the
+/-- **The separation by a bush.**  A vertex outside a component of the
 complement of `{c}` is separated from every vertex of that component by `c`. -/
 lemma between_of_notMem_componentCompl {c : V} {C : G.ComponentCompl ({c} : Set V)} {x q : V}
     (hx : x ∈ C) (hq : q ∉ C) : Between G q c x := by
@@ -219,17 +219,17 @@ lemma between_of_notMem_componentCompl {c : V} {C : G.ComponentCompl ({c} : Set 
   by_contra hc
   exact hq (mem_componentCompl_of_walk W hc hx)
 
-/-! ### Hairs against lines -/
+/-! ### Bushes against lines -/
 
-/-- **`thm:hair-separation`.**  A tree with hairs of unbounded depth is not
+/-- **`thm:bush-separation`.**  A tree with bushes of unbounded depth is not
 quasi-isometric to a tree all of whose vertices lie within a bounded distance
 of a line. -/
-theorem not_quasiIsometric_of_hair_of_line {R : ℕ} (hG : G.IsTree) (hG' : G'.IsTree)
-    (hhair : ∀ n : ℕ, ∃ (c : V) (P : Set V) (h : ℕ), n < h ∧ IsHair G c P h)
+theorem not_quasiIsometric_of_bush_of_line {R : ℕ} (hG : G.IsTree) (hG' : G'.IsTree)
+    (hbush : ∀ n : ℕ, ∃ (c : V) (P : Set V) (h : ℕ), n < h ∧ IsBush G c P h)
     (hline : ∀ u : V', ∃ (l : ℤ → V') (k : ℤ), IsLine G' l ∧ G'.dist u (l k) ≤ R) :
     ¬ QuasiIsometric G G' := by
   rintro ⟨D, f, hf⟩
-  obtain ⟨c, P, h, hh, ⟨C, hCP⟩, hball, x, hxP, hxd⟩ := hhair (D * (D + R) + D * D)
+  obtain ⟨c, P, h, hh, ⟨C, hCP⟩, hball, x, hxP, hxd⟩ := hbush (D * (D + R) + D * D)
   obtain ⟨l, k, hl, hly⟩ := hline (f x)
   obtain ⟨z, hzd, hzb⟩ := hl.exists_far hG' k (f c) (D * h + 2 * D + 1)
   obtain ⟨p, hp⟩ := hf.dense z
@@ -237,7 +237,7 @@ theorem not_quasiIsometric_of_hair_of_line {R : ℕ} (hG : G.IsTree) (hG' : G'.I
   have hwz : G'.dist (f c) (l k) + (D * h + 2 * D + 1) = G'.dist (f c) z := by
     have := hzb.dist_add hG'.connected
     omega
-  -- the preimage `p` of a far point on the line lies outside the hair
+  -- the preimage `p` of a far point on the line lies outside the bush
   have hpP : p ∉ P := by
     intro hmem
     have h1 : G.dist p c ≤ h := hball p hmem
@@ -258,7 +258,7 @@ theorem not_quasiIsometric_of_hair_of_line {R : ℕ} (hG : G.IsTree) (hG' : G'.I
   obtain ⟨i, -, hqd⟩ := exists_between_dist_le hG' hf pw hb2
   have hqb : Between G c (pw.getVert i) p :=
     between_of_mem_support hG hpw (pw.getVert_mem_support i)
-  -- that vertex is separated from the deep vertex of the hair by `c`
+  -- that vertex is separated from the deep vertex of the bush by `c`
   have hpc : Between G p c x := by
     refine between_of_notMem_componentCompl (C := C) ?_ ?_
     · rw [← SetLike.mem_coe, hCP]; exact hxP

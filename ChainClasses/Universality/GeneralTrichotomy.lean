@@ -1,6 +1,6 @@
 import ChainClasses.Universality.GeneralObstructions
 import ChainClasses.Universality.FullTree
-import ChainClasses.Universality.HairyGeneral
+import ChainClasses.Universality.BushyGeneral
 import ChainClasses.Engine.ChainEngineBridge
 import ChainClasses.Universality.ChainGeneral
 import ChainClasses.Bushy.Trichotomy
@@ -341,7 +341,7 @@ theorem gBushy_gBushy_ae (hJN : J ≤ N) (hq : θ.extinction < 1) (h0 : 0 < θ 0
     (h0' : 0 < θ' 0) (hJ2' : 2 ≤ J') (hθJ' : 0 < θ' J') :
     ∀ᵐ ω ∂((gBushyLaw θ hJN hq).law.prod (gBushyLaw θ' hJN' hq').law),
       GPairQI (gBushyLaw θ hJN hq) (gBushyLaw θ' hJN' hq') ω :=
-  hairy_general_ae θ hJN hq (θ.extinction_pos h0) h0 hθJ hJ2 θ' hJN' hq'
+  bushy_general_ae θ hJN hq (θ.extinction_pos h0) h0 hθJ hJ2 θ' hJN' hq'
     (θ'.extinction_pos h0') h0' hθJ' hJ2'
 
 end Positive
@@ -393,25 +393,25 @@ theorem gRay_gBushy_ae (hJN : J ≤ N) (h1 : θ 1 = 1) (hJN' : J' ≤ N')
     with ω hr h3
   exact not_gPairQI_of_ray_of_threeRays hr h3
 
-/-- **Hairs against lines**, `thm:hair-separation`, on a pair of laws. -/
-lemma not_gPairQI_of_hairs_of_nearLine {L L' : GSampleLaw} {ω : L.Ω × L'.Ω}
-    (hh : UnboundedHairsN (L.tree ω.1)) (hl : NearLineN (L'.tree ω.2)) :
+/-- **Bushes against lines**, `thm:bush-separation`, on a pair of laws. -/
+lemma not_gPairQI_of_bushes_of_nearLine {L L' : GSampleLaw} {ω : L.Ω × L'.Ω}
+    (hh : UnboundedBushesN (L.tree ω.1)) (hl : NearLineN (L'.tree ω.2)) :
     ¬ GPairQI L L' ω :=
-  not_quasiIsometric_of_hairsN_of_nearLineN (L.prefixClosed ω.1) (L'.prefixClosed ω.2)
+  not_quasiIsometric_of_bushesN_of_nearLineN (L.prefixClosed ω.1) (L'.prefixClosed ω.2)
     (L.root ω.1) (L'.root ω.2) hh hl
 
-/-- **Regime (B) against regime (F)**: hairs of unbounded depth against a tree near a
+/-- **Regime (B) against regime (F)**: bushes of unbounded depth against a tree near a
 line. -/
 theorem gBushy_gFull_ae (hJN : J ≤ N) (hq : θ.extinction < 1) (h0 : 0 < θ 0) (hJ2 : 2 ≤ J)
     (hθJ : 0 < θ J) (hJN' : J' ≤ N') (h0' : θ' 0 = 0) (h1' : θ' 1 = 0) :
     ∀ᵐ ω ∂((gBushyLaw θ hJN hq).law.prod (gFullLaw θ' hJN' h0').law),
       ¬ GPairQI (gBushyLaw θ hJN hq) (gFullLaw θ' hJN' h0') ω := by
   filter_upwards [ae_of_fst (ν := (gFullLaw θ' hJN' h0').law)
-      (unbounded_hairs_gSample_ae θ hJN hq (θ.extinction_pos h0) hJ2 hθJ),
+      (unbounded_bushes_gSample_ae θ hJN hq (θ.extinction_pos h0) hJ2 hθJ),
     ae_of_snd (μ := (gBushyLaw θ hJN hq).law) (nearLine_gSample_ae θ' hJN'
       (extinction_lt_one_of_chain θ' h0') h0' (skeletonWeight_one_lt_one_of_full θ' h0' h1'))]
     with ω hh hl
-  exact not_gPairQI_of_hairs_of_nearLine hh hl
+  exact not_gPairQI_of_bushes_of_nearLine hh hl
 
 /-- **Regime (B) against regime (C)**. -/
 theorem gBushy_gChain_ae (hJN : J ≤ N) (hq : θ.extinction < 1) (h0 : 0 < θ 0) (hJ2 : 2 ≤ J)
@@ -419,11 +419,11 @@ theorem gBushy_gChain_ae (hJN : J ≤ N) (hq : θ.extinction < 1) (h0 : 0 < θ 0
     ∀ᵐ ω ∂((gBushyLaw θ hJN hq).law.prod (gChainLaw θ' hJN' h0').law),
       ¬ GPairQI (gBushyLaw θ hJN hq) (gChainLaw θ' hJN' h0') ω := by
   filter_upwards [ae_of_fst (ν := (gChainLaw θ' hJN' h0').law)
-      (unbounded_hairs_gSample_ae θ hJN hq (θ.extinction_pos h0) hJ2 hθJ),
+      (unbounded_bushes_gSample_ae θ hJN hq (θ.extinction_pos h0) hJ2 hθJ),
     ae_of_snd (μ := (gBushyLaw θ hJN hq).law) (nearLine_gSample_ae θ' hJN'
       (extinction_lt_one_of_chain θ' h0') h0' (skeletonWeight_one_lt_one_of_chain θ' h0' h1'))]
     with ω hh hl
-  exact not_gPairQI_of_hairs_of_nearLine hh hl
+  exact not_gPairQI_of_bushes_of_nearLine hh hl
 
 /-- **Regime (C) against regime (F)**, `thm:bottleneck`: thin balls against a tree
 quasi-isometric to the binary tree. -/

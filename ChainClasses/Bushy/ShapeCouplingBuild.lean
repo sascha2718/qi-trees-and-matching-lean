@@ -43,7 +43,7 @@ forward and `3D²` back, both below `9D³`.
   `exists_isShapeCoupling`: **`thm:shape-coupling`**, the coupling of the two shape laws
   supported on `9D³`-comparable pairs, at every `D` past a largeness condition on the two
   laws, with the shrinking taken at `s = ⌊√(D/2592)⌋`.
-* `hairy_ae_shape_tree_cross_large`, `hairy_ae_shape_tree_two_law`: **`thm:hairy` across two
+* `bushy_ae_shape_tree_cross_large`, `bushy_ae_shape_tree_two_law`: **`thm:hairy` across two
   laws**, the assembly reading the coupling at the scale it chooses, and the almost sure
   statement with no hypothesis left.
 -/
@@ -1075,16 +1075,16 @@ theorem exists_isShapeCoupling (θ θ' : Offspring 2) (hq : θ.extinction < 1)
 /-- **`thm:hairy` across two laws, over the couplings at large scales**: the scale at which
 the coupling is taken is chosen along with the scale of `def:shape-net`, so a coupling past
 a threshold is all the assembly asks for. -/
-theorem hairy_ae_shape_tree_cross_large (θ θ' : Offspring 2) (hq : θ.extinction < 1)
+theorem bushy_ae_shape_tree_cross_large (θ θ' : Offspring 2) (hq : θ.extinction < 1)
     (hq0 : 0 < θ.extinction) (h2 : 0 < θ 2) (hq' : θ'.extinction < 1)
     (hq0' : 0 < θ'.extinction) (h2' : 0 < θ' 2)
     (hcoup : ∃ D₂ : ℕ, ∀ D : ℕ, D₂ ≤ D → ∃ π : PMF (Shape × Shape),
       IsShapeCoupling (D : ℝ) (shapePMF θ hq hq0 h2) (shapePMF θ' hq' hq0' h2') π) :
-    twoHairyMeasure θ θ'
+    twoBushyMeasure θ θ'
       {ω | ¬ ∃ (L : ℝ) (F : {v : Amb // v ∈ sample ω.1.1} → {v : Amb // v ∈ sample ω.2.1}),
         IsSampleQI L F} = 0 := by
   obtain ⟨D₂, hcoup⟩ := hcoup
-  refine hairy_ae_tree θ θ' fun ε hε ↦ ?_
+  refine bushy_ae_tree θ θ' fun ε hε ↦ ?_
   obtain ⟨D₀, hD₀⟩ := exists_etaG_shapeNet_small θ hq hq0 h2
   by_cases htop : ε = ⊤
   · exact ⟨0, htop ▸ le_top⟩
@@ -1104,7 +1104,7 @@ theorem hairy_ae_shape_tree_cross_large (θ θ' : Offspring 2) (hq : θ.extincti
         show (16 : ℝ) * (ε.toReal / 16) = ε.toReal by ring]
       exact ENNReal.ofReal_toReal htop
     refine ⟨8 * 19683 ^ 2 * (D : ℝ) ^ 14, le_trans
-      (hairy_rate_shape_tree_cross θ θ' hq hq0 h2 hq' hq0' h2' h30 hπ (hD₀ D hDD₀)) ?_⟩
+      (bushy_rate_shape_tree_cross θ θ' hq hq0 h2 hq' hq0' h2' h30 hπ (hD₀ D hDD₀)) ?_⟩
     calc (16 : ℝ≥0∞) * etaG (shapePMF θ hq hq0 h2) (shapeNet (D : ℝ))
         ≤ 16 * ENNReal.ofReal (ε.toReal / 16) := by gcongr
       _ = ε := h16
@@ -1112,13 +1112,13 @@ theorem hairy_ae_shape_tree_cross_large (θ θ' : Offspring 2) (hq : θ.extincti
 /-- **`thm:hairy` across two laws**: two independent samples of two supercritical offspring
 laws on `{0,1,2}` with `θ₀,θ₀'>0` are almost surely quasi-isometric, with no hypothesis
 left: the coupling of `thm:shape-coupling` is built by the cascade over the shrinking. -/
-theorem hairy_ae_shape_tree_two_law (θ θ' : Offspring 2) (hq : θ.extinction < 1)
+theorem bushy_ae_shape_tree_two_law (θ θ' : Offspring 2) (hq : θ.extinction < 1)
     (hq0 : 0 < θ.extinction) (h2 : 0 < θ 2) (hq' : θ'.extinction < 1)
     (hq0' : 0 < θ'.extinction) (h2' : 0 < θ' 2) :
-    twoHairyMeasure θ θ'
+    twoBushyMeasure θ θ'
       {ω | ¬ ∃ (L : ℝ) (F : {v : Amb // v ∈ sample ω.1.1} → {v : Amb // v ∈ sample ω.2.1}),
         IsSampleQI L F} = 0 :=
-  hairy_ae_shape_tree_cross_large θ θ' hq hq0 h2 hq' hq0' h2'
+  bushy_ae_shape_tree_cross_large θ θ' hq hq0 h2 hq' hq0' h2'
     (exists_isShapeCoupling θ θ' hq hq0 h2 hq' hq0' h2')
 
 end ChainClasses

@@ -242,7 +242,7 @@ def restrictQI {K : ℕ} {f : Word → Word} (h : IsQIWith K T T' f) :
 
 /-- **The bridge.** A `K`-quasi-isometry of word sets in the sense of
 `thm:transfer` is a `K`-quasi-isometry of their graphs in the sense of
-`def:qi`, so `thm:tree-stability`, `thm:hair-separation` and
+`def:qi`, so `thm:tree-stability`, `thm:bush-separation` and
 `thm:three-rays` apply to the trees of `sec:encoding`. -/
 theorem isQIWith_wordGraph (hT : PrefixClosed T) (hT' : PrefixClosed T') {K : ℕ}
     {f : Word → Word} (h : IsQIWith K T T' f) :

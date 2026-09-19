@@ -4,7 +4,7 @@ elementary facts the rest of the development needs:
 
 * `le_phiA`             `eq:phi-dominates`:  `t ≤ φ_α t` on `[0,1)`
 * `one_sub_rpow_leA`    the tangent line to `t ↦ t^α` at `t = 1`, used for `eq:W-bound`
-* `chordA`              `eq:iid-chord`:  `(1-z)^{-α} ≤ 1 + C_α z` on `[0,1/2]`
+* `chordA`              `eq:chord`:  `(1-z)^{-α} ≤ 1 + C_α z` on `[0,1/2]`
 * `rpow_alpha_eq_sqrt_pow`  the substitution `s = √(1-t)` that removes `rpow`
                         from the analysis at `α = 5/2`
 
@@ -116,7 +116,7 @@ lemma rpow_alpha_eq_sqrt_pow {x : ℝ} (hx : 0 ≤ x) : x ^ alpha = (Real.sqrt x
   rw [Real.sqrt_eq_rpow, ← Real.rpow_natCast (x ^ (1 / (2 : ℝ))) 5, ← Real.rpow_mul hx]
   norm_num [alpha]
 
-/-! ### The chord bound, `eq:iid-chord`
+/-! ### The chord bound, `eq:chord`
 
 `z ↦ (1-z)^{-α}` is convex on `[0,1/2]` and so lies below the chord through
 `(0,1)` and `(1/2, 2^α)`, whose slope is `C_α = 2(2^α - 1)`. Mathlib has no
@@ -130,7 +130,7 @@ applications, both at exponents the chord itself supplies:
 
 No derivative and no surd enters, and the argument holds at every `α ≥ 0`. -/
 
-/-- **`eq:iid-chord`**: the chord slope `C_α = 2(2^α - 1)` through `(0,1)` and
+/-- **`eq:chord`**: the chord slope `C_α = 2(2^α - 1)` through `(0,1)` and
 `(1/2, 2^α)`. -/
 noncomputable def chordConstA (α : ℝ) : ℝ := 2 * (2 ^ α - 1)
 
@@ -165,7 +165,7 @@ lemma two_rpow_chord {α z : ℝ} (h0 : 0 ≤ z) (h1 : z ≤ 1 / 2) :
   rw [chordConstA]
   nlinarith [h]
 
-/-- **`eq:iid-chord`** at a general exponent: `(1-z)^{-α} ≤ 1 + C_α z` on `[0,1/2]`,
+/-- **`eq:chord`** at a general exponent: `(1-z)^{-α} ≤ 1 + C_α z` on `[0,1/2]`,
 for every `α ≥ 0`. -/
 lemma chordA {α : ℝ} (hα : 0 ≤ α) {z : ℝ} (h0 : 0 ≤ z) (h1 : z ≤ 1 / 2) :
     (1 - z) ^ (-α) ≤ 1 + chordConstA α * z := by
@@ -187,7 +187,7 @@ lemma chordA {α : ℝ} (hα : 0 ≤ α) {z : ℝ} (h0 : 0 ≤ z) (h1 : z ≤ 1 
         rw [← Real.rpow_mul (by norm_num : (0 : ℝ) ≤ 2)]; ring_nf
     _ ≤ 1 + chordConstA α * z := two_rpow_chord h0 h1
 
-/-- The chord slope for `eq:iid-chord`.
+/-- The chord slope for `eq:chord`.
 
 The paper uses the exact chord slope `8√2 - 2 ≈ 9.3137` through `(0,1)` and
 `(1/2, 2^{5/2})`. Any `C ≥ 8√2 - 2` bounds the function on `[0,1/2]` just as
@@ -198,7 +198,7 @@ keeps `√2` out of the development and leaves the downstream check at
 `93/250 · 28/3 + 1/2 = 3.972 < 4`. -/
 noncomputable def chordConst : ℝ := 28 / 3
 
-/-- `(x^α)² = x⁵`. This is what lets `eq:iid-chord` be squared into a polynomial. -/
+/-- `(x^α)² = x⁵`. This is what lets `eq:chord` be squared into a polynomial. -/
 lemma sq_rpow_alpha {x : ℝ} (hx : 0 ≤ x) : (x ^ alpha) ^ (2 : ℕ) = x ^ (5 : ℕ) := by
   rw [← Real.rpow_natCast (x ^ alpha) 2, ← Real.rpow_mul hx, ← Real.rpow_natCast x 5]
   norm_num [alpha]
@@ -213,7 +213,7 @@ lemma chordConstA_alpha_le : chordConstA alpha ≤ chordConst := by
   rw [chordConstA, chordConst]
   linarith
 
-/-- **`eq:iid-chord`** at `α = 5/2`, with the rational slope in place of `C_α`. -/
+/-- **`eq:chord`** at `α = 5/2`, with the rational slope in place of `C_α`. -/
 lemma chord {z : ℝ} (h0 : 0 ≤ z) (h1 : z ≤ 1 / 2) :
     (1 - z) ^ (-alpha) ≤ 1 + chordConst * z :=
   (chordA alpha_nonneg h0 h1).trans

@@ -37,7 +37,7 @@ it; nothing here consumes `ChainClasses`, `GraphMatching` or
   `Measure.infinitePi`, with the Bernoulli specialisation in the shape the
   chain half of the paper consumes.
 * `Geometry`: the coarse geometry of trees on `SimpleGraph`, with the two
-  separations `thm:hair-separation` and `thm:three-rays`.
+  separations `thm:bush-separation` and `thm:three-rays`.
 -/
 import BranchingProcess.Word
 import BranchingProcess.Offspring

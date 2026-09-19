@@ -1,6 +1,6 @@
 /-
-The one-site quantities of `markov_matching_new_proof.tex` (`eq:root-defect`,
-`sec:root-contributions`, `sec:independent-root`) and their bounds:
+The one-site quantities of `arbitrary_offspring_matching.tex` (`eq:root-defect`
+and `sec:independent-root`) and their bounds:
 
 * `eta`, `delta`, `e0`, `zeta`: the graph potential `η_{G,α}(μ)`, the incompatible root
   mass `δ = 1 - b(0)`, the forced-state term `φ_α(δ)` and the defect
@@ -83,7 +83,7 @@ namespace Model
 
 variable {V I : Type} (M : Model V I)
 
-/-! ### The one-site quantities (`eq:root-defect`, `sec:root-contributions`) -/
+/-! ### The one-site quantities (`eq:root-defect`, `sec:independent-root`) -/
 
 /-- The graph potential `η_{G,α}(μ) = ∑_v μ(v) φ_α(1 - b(v))`. -/
 noncomputable def eta (α : ℝ) : ℝ≥0∞ := PhiD α M.μ M.μ M.R
@@ -269,9 +269,9 @@ lemma DmuC_le (hc : M.IsCompat) {α : ℝ} (hα : 1 ≤ α) :
           gcongr
           exact M.e0_le_zeta α
 
-/-! ### The bounds through `η` at `μ(0) ≥ p > 0` (`sec:root-contributions`) -/
+/-! ### The bounds through `η` at `μ(0) ≥ p > 0` (`sec:independent-root`) -/
 
-/-- A state incompatible with `0` has bad degree at least `μ(0)` (`sec:root-contributions`). -/
+/-- A state incompatible with `0` has bad degree at least `μ(0)` (`sec:independent-root`). -/
 private lemma mu_zero_le_qE {v : V} (hv : ¬ M.R v M.zero) : M.μ M.zero ≤ qE M.μ M.R v := by
   rw [qE]
   calc M.μ M.zero = if M.R v M.zero then 0 else M.μ M.zero := by rw [if_neg hv]

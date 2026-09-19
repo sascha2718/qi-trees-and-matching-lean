@@ -4,7 +4,7 @@ import ChainClasses.Bushy.ShapeCouplingSelf
 import ChainClasses.Shape.Binarise
 
 /-!
-`sec:shape-eta` and `sec:hairy` of `gw_classes_simple.tex`: the potential
+`sec:shape-eta` and `thm:hairy` of `gw_classes_simple.tex`: the potential
 bound `thm:shape-eta` at the label law of `thm:shape-coupling` for one law, and
 `thm:hairy` over it with no hypothesis left.
 
@@ -36,7 +36,7 @@ size `Shape.size`.
   above a size threshold, from the exponential tail.
 * `exists_etaG_shapeNet_le`: **`eq:shape-eta`**, with `exists_etaG_shapeNet_le_ofReal` and
   `exists_etaG_shapeNet_small` the potential condition of `thm:matching`.
-* `hairy_rate_shape_tree`, `hairy_ae_shape_tree`: **`thm:hairy` for one law**, with the
+* `bushy_rate_shape_tree`, `bushy_ae_shape_tree`: **`thm:hairy` for one law**, with the
   potential hypothesis discharged.
 -/
 
@@ -697,28 +697,28 @@ theorem exists_etaG_shapeNet_small (θ : Offspring 2) (hq : θ.extinction < 1)
 /-- **`eq:hairy-rate`, one law**: past a threshold the failure probability of the
 quasi-isometry between the two sampled trees at the scale `8·729²D⁸` is bounded by the
 potential of the label law, with no hypothesis on the potential. -/
-theorem hairy_rate_shape_tree (θ : Offspring 2) (hq : θ.extinction < 1)
+theorem bushy_rate_shape_tree (θ : Offspring 2) (hq : θ.extinction < 1)
     (hq0 : 0 < θ.extinction) (h2 : 0 < θ 2) :
     ∃ D₀ : ℕ, ∀ D : ℕ, D₀ ≤ D →
-      twoHairyMeasure θ θ
+      twoBushyMeasure θ θ
           {ω | ¬ ∃ F : {v : Amb // v ∈ sample ω.1.1} → {v : Amb // v ∈ sample ω.2.1},
             IsSampleQI (8 * 729 ^ 2 * (D : ℝ) ^ 8) F}
         ≤ 16 * etaG (shapePMF θ hq hq0 h2) (shapeNet (D : ℝ)) := by
   obtain ⟨D₀, hD₀⟩ := exists_etaG_shapeNet_small θ hq hq0 h2
   refine ⟨D₀ + 1, fun D hD ↦ ?_⟩
   have hDR : (1 : ℝ) ≤ (D : ℝ) := by exact_mod_cast (by omega : 1 ≤ D)
-  exact hairy_rate_shape_tree_self θ hq hq0 h2 hDR (hD₀ D (by omega))
+  exact bushy_rate_shape_tree_self θ hq hq0 h2 hDR (hD₀ D (by omega))
 
 /-- **`thm:hairy` for one law**: two independent samples of a supercritical law on
 `{0,1,2}` with `θ₀>0` and `θ₂>0` are almost surely quasi-isometric.  The scales of
 `def:shape-net` at which the potential is arbitrarily small are supplied by
 `exists_etaG_shapeNet_le_ofReal`, so nothing is left to assume. -/
-theorem hairy_ae_shape_tree (θ : Offspring 2) (hq : θ.extinction < 1)
+theorem bushy_ae_shape_tree (θ : Offspring 2) (hq : θ.extinction < 1)
     (hq0 : 0 < θ.extinction) (h2 : 0 < θ 2) :
-    twoHairyMeasure θ θ
+    twoBushyMeasure θ θ
       {ω | ¬ ∃ (L : ℝ) (F : {v : Amb // v ∈ sample ω.1.1} → {v : Amb // v ∈ sample ω.2.1}),
         IsSampleQI L F} = 0 := by
-  refine hairy_ae_shape_tree_self θ hq hq0 h2 fun ε hε ↦ ?_
+  refine bushy_ae_shape_tree_self θ hq hq0 h2 fun ε hε ↦ ?_
   obtain ⟨D₀, hD₀⟩ := exists_etaG_shapeNet_small θ hq hq0 h2
   by_cases htop : ε = ⊤
   · refine ⟨((D₀ + 1 : ℕ) : ℝ), by exact_mod_cast (by omega : 1 ≤ D₀ + 1),
@@ -741,4 +741,3 @@ theorem hairy_ae_shape_tree (θ : Offspring 2) (hq : θ.extinction < 1)
       _ = ε := h16
 
 end ChainClasses
-

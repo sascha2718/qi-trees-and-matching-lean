@@ -13,7 +13,7 @@ Harris-Sevastyanov transformation. The arithmetic half is everything the rest
 of the section actually consumes, and it is certified here over the offspring
 distribution alone.
 
-* `IsHairy`: an offspring law on `{0,1,2}` that is supercritical with
+* `IsBushy`: an offspring law on `{0,1,2}` that is supercritical with
   `θ₀ > 0`, the standing hypothesis of `sec:shapes`.
 * `harris_quadratic` and `extinction_fixed_point`: the fixed-point equation
   factors as `(s-1)(θ₂s-θ₀)`, so the extinction probability is `θ₀/θ₂ ∈ (0,1)`.
@@ -36,15 +36,15 @@ namespace ChainClasses
 
 /-- The standing hypothesis of `sec:shapes`: an offspring law supported on
 `{0,1,2}`, supercritical, with `θ₀ > 0`. -/
-structure IsHairy (θ₀ θ₁ θ₂ : ℝ) : Prop where
+structure IsBushy (θ₀ θ₁ θ₂ : ℝ) : Prop where
   sum : θ₀ + θ₁ + θ₂ = 1
   pos₀ : 0 < θ₀
   nonneg₁ : 0 ≤ θ₁
   supercritical : 1 < θ₁ + 2 * θ₂
 
-namespace IsHairy
+namespace IsBushy
 
-variable {θ₀ θ₁ θ₂ : ℝ} (h : IsHairy θ₀ θ₁ θ₂)
+variable {θ₀ θ₁ θ₂ : ℝ} (h : IsBushy θ₀ θ₁ θ₂)
 include h
 
 /-- Supercriticality with `θ₀ > 0` forces `θ₂ > θ₀ > 0`. -/
@@ -175,6 +175,6 @@ lemma shape_factors_mem :
   · rw [div_le_one hp]; linarith
   · rw [div_le_one hp]; linarith
 
-end IsHairy
+end IsBushy
 
 end ChainClasses

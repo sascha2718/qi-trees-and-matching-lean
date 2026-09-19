@@ -1,5 +1,5 @@
 /-
-The independent root of `markov_matching_new_proof.tex` (`sec:independent-root`): the
+The independent root of `arbitrary_offspring_matching.tex` (`sec:independent-root`): the
 restricted potential at height `h+1` is at most `ζ + D_μ Q` whenever the child-pair
 restricted potential is at most `Q`, using the root identity
 `(1 - sr)/(sr)^α = (1-s)/s^α · r^{-α} + s^{1-α}(1-r)/r^α`, the inverse moment

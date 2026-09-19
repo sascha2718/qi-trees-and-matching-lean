@@ -2,17 +2,18 @@ import ChainClasses.Bushy.Trichotomy
 import ChainClasses.General.GeneralHarris
 
 /-!
-`thm:cross-relabel` and transitivity of quasi-isometry (`thm:trichotomy`) of `trichotomy.tex`, the law level:
+The law-level bushy comparison used in the bushy-universality proposition
+labelled `thm:hairy-general` in `trichotomy.tex`:
 the bushy-regime pair of reduced laws sits inside the hypotheses of
 the two-law application of `thm:markov-matching` in `sec:common-presentations` at `J' ≤ 2J - 1`, and almost sure quasi-isometry
 composes across independent samples.
 
-* `hairyCross_chart`: **the chart of
+* `bushyCross_chart`: **the chart of
   `thm:cross-relabel`**: the exceptional arities
   are `{J+1, …, J'}`, each carrying the composite pair `(z + 1 - J, J)` in the
   core `{2, …, J}`, with no chart below `J + 1`.
-* `hairyCross_core_charged`, `hairyCross_pair_floor`: **the full-support
-  clauses**: both reduced laws charge every core arity by `thm:full-support`,
+* `bushyCross_core_pos`, `bushyCross_pair_floor`: **the full-support
+  clauses**: both reduced laws give positive mass to every core arity by `thm:full-support`,
   and every composite pair carries a positive tilt floor depending on the two
   laws alone.
 * the composition `QuasiIsometric.trans` lives in `Trichotomy.lean` with the
@@ -34,7 +35,7 @@ namespace ChainClasses
 /-- **The chart of `thm:cross-relabel`**: at `J' ≤ 2J - 1` the exceptional
 arities `{J+1, …, J'}` carry the composite pairs `(z + 1 - J, J)`, both
 components in the core `{2, …, J}`, and nothing else is charted. -/
-theorem hairyCross_chart {J J' : ℕ} (hJ2 : 2 ≤ J)
+theorem bushyCross_chart {J J' : ℕ} (hJ2 : 2 ≤ J)
     (hJ'2 : J' ≤ 2 * J - 1) :
     ∃ exc : ℕ → Option (ℕ × ℕ),
       (∀ j, j ≤ J → exc j = none) ∧
@@ -76,9 +77,9 @@ theorem hairyCross_chart {J J' : ℕ} (hJ2 : 2 ≤ J)
       · intro hcon
         exact absurd hcon h
 
-/-- **The common core is charged by both reduced laws**, by
+/-- **The common core has positive mass under both reduced laws**, by
 `thm:full-support`. -/
-theorem hairyCross_core_charged {J J' : ℕ} (θ θ' : ℕ → ℝ) {q q' : ℝ}
+theorem bushyCross_core_pos {J J' : ℕ} (θ θ' : ℕ → ℝ) {q q' : ℝ}
     (hnn : ∀ j, 0 ≤ θ j) (hnn' : ∀ j, 0 ≤ θ' j)
     (hJ : 0 < θ J) (hJ' : 0 < θ' J')
     (hq0 : 0 < q) (hq1 : q < 1) (hq'0 : 0 < q') (hq'1 : q' < 1)
@@ -90,7 +91,7 @@ theorem hairyCross_core_charged {J J' : ℕ} (θ θ' : ℕ → ℝ) {q q' : ℝ}
 
 /-- **The floor of a composite pair of `thm:cross-relabel`**: the tilt floor
 `(1/2) ν̃'_{z+1-J} ν̃'_J` is positive and depends on the two laws alone. -/
-theorem hairyCross_pair_floor {J J' : ℕ} (θ' : ℕ → ℝ) {q' : ℝ}
+theorem bushyCross_pair_floor {J J' : ℕ} (θ' : ℕ → ℝ) {q' : ℝ}
     (hnn' : ∀ j, 0 ≤ θ' j) (hJ' : 0 < θ' J')
     (hq'0 : 0 < q') (hq'1 : q' < 1) (hsub' : genDeriv J' θ' q' < 1)
     (hJ2 : 2 ≤ J) (hJJ' : J ≤ J')

@@ -1,5 +1,5 @@
 /-
-The Markov label models of `markov_matching_new_proof.tex` (`sec:markov-proof`):
+The Markov label models of `arbitrary_offspring_matching.tex` (`sec:markov-proof`):
 a countable state space `V` with a compatibility relation `R`, a distinguished
 state `zero`, and a state law `μ`; a countable type set `I` with the fresh
 types and the child-type kernel `π`.  A vertex of a fresh type carries a state
@@ -276,7 +276,7 @@ lemma deg_zero (u : I) (s : I × V) : M.deg u 0 (leaf s) = M.rootDeg u s.2 := by
   · rw [if_pos hR, if_pos ((fullSim_leaf M.srel s (u, v)).mpr hR)]
   · rw [if_neg hR, if_neg (fun hc => hR ((fullSim_leaf M.srel s (u, v)).mp hc))]
 
-/-- **The degree recursion** (`sec:root-contributions`): the degree of a branch against a
+/-- **The degree recursion** (`sec:independent-root`): the degree of a branch against a
 type is the root factor at the source root state times the degree of the child pair
 against the target's child-pair mixture under straight-or-crossed matching. -/
 lemma deg_succ (u : I) (h : ℕ) (s : I × V) (p : FullLab (I × V) h × FullLab (I × V) h) :

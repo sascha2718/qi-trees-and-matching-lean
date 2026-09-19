@@ -1,5 +1,5 @@
 /-
-Numerical evaluation of the scalar constants of `markov_matching_new_proof.tex`
+Numerical evaluation of the scalar constants of `arbitrary_offspring_matching.tex`
 (`sec:exponent-values`: `sec:exponent-range`, `sec:exponent-four-thirds`,
 `sec:optimal-coefficient-two`, `sec:two-exponent-values`).
 

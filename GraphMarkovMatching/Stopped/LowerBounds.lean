@@ -1,5 +1,5 @@
 /-
-The two limitations of `markov_matching_new_proof.tex` (`sec:contraction-lower-bound`,
+The two limitations of `arbitrary_offspring_matching.tex` (`sec:contraction-lower-bound`,
 `sec:extension-limits`):
 
 * `pathRel`, `muEps`, `iidModel`, `eta_muEps`, `failProb_ge`, `ratio_ge`, `liminf_ratio`:

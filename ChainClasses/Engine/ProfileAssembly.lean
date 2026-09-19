@@ -38,7 +38,7 @@ lemma bFamily_state {L : ℕ} (C : Family) {c : GWord N → ℕ}
 /-- A state-only matching gives a quasi-isometry whenever compatible states prescribe
 uniform marked comparisons of the corresponding pieces, including singleton pieces. -/
 theorem sample_qi_of_encoded_match {L L' : ℕ} (C C' : Family)
-    {c : GWord N → ℕ} {c' : GWord N' → ℕ} (hc : IsGHairySample c) (hc' : IsGHairySample c')
+    {c : GWord N → ℕ} {c' : GWord N' → ℕ} (hc : IsGBushySample c) (hc' : IsGBushySample c')
     (hs : SkelBounded L (gArityAt c)) (hs' : SkelBounded L' (gArityAt c'))
     (hL : 1 ≤ L) (hL' : 1 ≤ L') {K : ℝ} (hK : 1 ≤ K)
     (A A' : GShape → ℕ → Prop) (R : ℕ → ℕ → Prop) (v0 : ℕ)

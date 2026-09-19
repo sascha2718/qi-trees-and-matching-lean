@@ -1,8 +1,9 @@
 /-
-The geometric inputs of `markov_matching_new_proof.tex` (`sec:applications`): the two
-one-site computations and the probability-one conclusion.
+The one-site estimates used by the chain and bushy applications: the chain-law calculation
+behind `thm:eta-bound`, the abstract shape-law calculation behind `thm:shape-eta`, and the
+probability-one passage used in `thm:cross-law` and `thm:hairy`.
 
-* **Chain classes** (`eq:chain-moment`): the chain law `p_j = a^{D^j-1} - a^{D^{j+1}-1}` on
+* **Chain classes** (`thm:eta-bound`): the chain law `p_j = a^{D^j-1} - a^{D^{j+1}-1}` on
   `ℕ` with the path relation (`chainLaw`, `pathRelNat`); the explicit estimates
   `p_{j-1} ≥ a^{D^{j-1}-1}/2` (`chainMass_ge_half`),
   `p_j / p_{j-1}^α ≤ 2^α a^{α-1} a^{(D-α)D^{j-1}}` (`chainLaw_ratio_le`), the summed
@@ -19,7 +20,8 @@ one-site computations and the probability-one conclusion.
   `1 - μ(v₀) ≤ A₀ e^{-c₀ D²}` (`bushy_v0_mass_le`), and the limits `μ_D(v₀) → 1`,
   `η_{G_D,α}(μ_D) → 0` (`bushy_v0_tendsto`, `bushy_eta_tendsto_ennreal`,
   `bushy_eta_tendsto`).
-* **The probability-one conclusion** (`sec:applications`): an event containing events of
+* **The probability-one conclusion** used in `thm:cross-law` and `thm:hairy`: an event
+  containing events of
   probability at least `1 - ε_D` with `ε_D → 0` has probability one (`prob_eq_one_of_le`,
   `prob_eq_one_of_eventually_le`), with no independence, nesting or coupling between the
   scales.
@@ -34,9 +36,9 @@ namespace GraphMarkovMatching.Stopped
 open GraphMarkovMatching GraphMarkovMatching.Support Filter
 open scoped ENNReal Classical
 
-/-! ### Chain classes (`sec:applications`, `eq:chain-moment`) -/
+/-! ### Chain classes (`thm:eta-bound`) -/
 
-/-- The masses `p_j = a^{D^j-1} - a^{D^{j+1}-1}` of the chain law (`sec:applications`). -/
+/-- The masses `p_j = a^{D^j-1} - a^{D^{j+1}-1}` of the chain law (`thm:eta-bound`). -/
 noncomputable def chainMass (a : ℝ) (D j : ℕ) : ℝ := a ^ (D ^ j - 1) - a ^ (D ^ (j + 1) - 1)
 
 lemma chainMass_nonneg {a : ℝ} (ha0 : 0 ≤ a) (ha1 : a ≤ 1) {D : ℕ} (hD : 1 ≤ D) (j : ℕ) :
@@ -67,7 +69,7 @@ private lemma pow_succ_sub_one (D i : ℕ) (hD : 1 ≤ D) :
   rw [pow_succ, h1]
   omega
 
-/-- The masses telescope to `1` (`sec:applications`): `∑_j p_j = a^{D^0-1} = 1`. -/
+/-- The masses telescope to `1` (`thm:eta-bound`): `∑_j p_j = a^{D^0-1} = 1`. -/
 lemma hasSum_chainMass {a : ℝ} (ha0 : 0 < a) (ha1 : a < 1) {D : ℕ} (hD : 2 ≤ D) :
     HasSum (chainMass a D) 1 := by
   rw [hasSum_iff_tendsto_nat_of_nonneg (fun j => chainMass_nonneg ha0.le ha1.le (by omega) j)]
@@ -85,7 +87,7 @@ lemma hasSum_chainMass {a : ℝ} (ha0 : 0 < a) (ha1 : a < 1) {D : ℕ} (hD : 2 �
   simp
 
 /-- The chain law `p_j = a^{D^j-1} - a^{D^{j+1}-1}` on `ℕ`, `0 < a < 1`, `D ≥ 2`
-(`sec:applications`, the common law `μ_* = p^{(D)}`). -/
+(`thm:eta-bound`, the common law `μ_* = p^{(D)}`). -/
 noncomputable def chainLaw (a : ℝ) (ha0 : 0 < a) (ha1 : a < 1) (D : ℕ) (hD : 2 ≤ D) : PMF ℕ :=
   ⟨fun j => ENNReal.ofReal (chainMass a D j), by
     have h := hasSum_chainMass ha0 ha1 hD
@@ -105,7 +107,7 @@ noncomputable def chainLaw' (a : ℝ) (ha0 : 0 < a) (ha1 : a < 1) (D : ℕ) : PM
 lemma chainLaw'_apply (a : ℝ) (ha0 : 0 < a) (ha1 : a < 1) (D j : ℕ) :
     chainLaw' a ha0 ha1 D j = ENNReal.ofReal (chainMass a (max D 2) j) := rfl
 
-/-- The path relation on `ℕ`: equality or adjacency (`sec:applications`). -/
+/-- The path relation on `ℕ`: equality or adjacency (`thm:eta-bound`). -/
 def pathRelNat (i j : ℕ) : Prop := i = j ∨ i = j + 1 ∨ j = i + 1
 
 theorem pathRelNat_refl (i : ℕ) : pathRelNat i i := Or.inl rfl
@@ -120,7 +122,7 @@ lemma pathRelNat_succ_left (j : ℕ) : pathRelNat (j + 1) j := Or.inr (Or.inl rf
 
 lemma pathRelNat_zero_one : pathRelNat 0 1 := Or.inr (Or.inr rfl)
 
-/-- `p_{j-1} ≥ a^{D^{j-1}-1}/2` once `a^{D-1} ≤ 1/2` (`sec:applications`), written at the
+/-- `p_{j-1} ≥ a^{D^{j-1}-1}/2` once `a^{D-1} ≤ 1/2` (`thm:eta-bound`), written at the
 index `i = j - 1`. -/
 theorem chainMass_ge_half {a : ℝ} (ha0 : 0 < a) (ha1 : a < 1) {D : ℕ} (hD : 2 ≤ D)
     (hhalf : a ^ (D - 1) ≤ 1 / 2) (i : ℕ) :
@@ -149,7 +151,7 @@ private lemma chain_ratio_eq {a : ℝ} (ha0 : 0 < a) {D : ℕ} (hD : 1 ≤ D) (i
   rw [Real.div_rpow hg.le (by norm_num), div_div_eq_mul_div, mul_comm, mul_div_assoc, key,
     mul_assoc]
 
-/-- **The ratio estimate** of `sec:applications`: once `a^{D-1} ≤ 1/2`,
+/-- **The ratio estimate** of `thm:eta-bound`: once `a^{D-1} ≤ 1/2`,
 `p_j / p_{j-1}^α ≤ 2^α a^{α-1} a^{(D-α)D^{j-1}}` for every `j ≥ 1`, written at `i = j-1`. -/
 theorem chainLaw_ratio_le {a : ℝ} (ha0 : 0 < a) (ha1 : a < 1) {D : ℕ} (hD : 2 ≤ D)
     (hhalf : a ^ (D - 1) ≤ 1 / 2) {α : ℝ} (hα : 0 ≤ α) (i : ℕ) :
@@ -163,7 +165,7 @@ theorem chainLaw_ratio_le {a : ℝ} (ha0 : 0 < a) (ha1 : a < 1) {D : ℕ} (hD : 
   have := pow_pos ha0 (D ^ (i + 1 + 1) - 1)
   linarith
 
-/-- `a^{(D-α)D^i} ≤ (a^{D-α})^{i+1}` for `D > α`, from `D^i ≥ i + 1` (`sec:applications`). -/
+/-- `a^{(D-α)D^i} ≤ (a^{D-α})^{i+1}` for `D > α`, from `D^i ≥ i + 1` (`thm:eta-bound`). -/
 private lemma rpow_exponent_pow_le {a : ℝ} (ha0 : 0 < a) (ha1 : a < 1) {D : ℕ} (hD : 2 ≤ D)
     {α : ℝ} (hαD : α < D) (i : ℕ) :
     a ^ (((D : ℝ) - α) * (D : ℝ) ^ i) ≤ (a ^ ((D : ℝ) - α)) ^ (i + 1) := by
@@ -178,7 +180,7 @@ private lemma rpow_exponent_pow_le {a : ℝ} (ha0 : 0 < a) (ha1 : a < 1) {D : �
     _ = (a ^ ((D : ℝ) - α)) ^ (i + 1) := by
         rw [← Nat.cast_succ, Real.rpow_mul_natCast ha0.le]
 
-/-- **The summed ratio bound** of `sec:applications`: for `D > α` and `a^{D-1} ≤ 1/2`,
+/-- **The summed ratio bound** of `thm:eta-bound`: for `D > α` and `a^{D-1} ≤ 1/2`,
 `∑_{j ≥ 1} p_j / p_{j-1}^α ≤ 2^α a^{α-1} a^{D-α}/(1 - a^{D-α})`. -/
 theorem chainLaw_tail_sum_le {a : ℝ} (ha0 : 0 < a) (ha1 : a < 1) {D : ℕ} (hD : 2 ≤ D)
     (hhalf : a ^ (D - 1) ≤ 1 / 2) {α : ℝ} (hα : 0 ≤ α) (hαD : α < D) :
@@ -209,7 +211,7 @@ theorem chainLaw_tail_sum_le {a : ℝ} (ha0 : 0 < a) (ha1 : a < 1) {D : ℕ} (hD
     _ = C * (x / (1 - x)) := by
         rw [tsum_mul_left, tsum_geometric_of_lt_one hx0.le hx1, div_eq_mul_inv, mul_assoc]
 
-/-- The bad degree at `0` is at most `a^{D^2-1}` (`sec:applications`: the incompatible mass
+/-- The bad degree at `0` is at most `a^{D^2-1}` (`thm:eta-bound`: the incompatible mass
 at `0` is `a^{D^2-1}`), since `0` is compatible with `0` and `1`. -/
 theorem chainLaw_q_zero_le {a : ℝ} (ha0 : 0 < a) (ha1 : a < 1) {D : ℕ} (hD : 2 ≤ D) :
     q (chainLaw a ha0 ha1 D hD) pathRelNat 0 ≤ a ^ (D ^ 2 - 1) := by
@@ -229,7 +231,7 @@ theorem chainLaw_q_zero_le {a : ℝ} (ha0 : 0 < a) (ha1 : a < 1) {D : ℕ} (hD :
   rw [toReal_rE_eq, hreal] at this
   linarith
 
-/-- **The potential bound of the chain law** (`sec:applications`): for `D > α` and
+/-- **The potential bound of the chain law** (`thm:eta-bound`): for `D > α` and
 `a^{D-1} ≤ 1/2`,
 `η_{P,α}(μ_*) ≤ φ_α(a^{D^2-1}) + 2^α a^{α-1} a^{D-α}/(1 - a^{D-α})`. -/
 theorem eta_chainLaw_le {a : ℝ} (ha0 : 0 < a) (ha1 : a < 1) {D : ℕ} (hD : 2 ≤ D)
@@ -311,7 +313,7 @@ private lemma tendsto_phi_zero (α : ℝ) : Tendsto (phi α) (nhds 0) (nhds 0) :
 private lemma tendsto_max_sub_one : Tendsto (fun D : ℕ => max D 2 - 1) atTop atTop :=
   tendsto_atTop_mono (fun D => by omega) (tendsto_sub_atTop_nat 1)
 
-/-- **`eq:chain-moment`, the mass at `0`**: `p_0 → 1` as `D → ∞`. -/
+/-- **`thm:eta-bound`, the mass at `0`**: `p_0 → 1` as `D → ∞`. -/
 theorem chainLaw_zero_tendsto (a : ℝ) (ha0 : 0 < a) (ha1 : a < 1) :
     Tendsto (fun D : ℕ => chainLaw' a ha0 ha1 D 0) atTop (nhds 1) := by
   have hg : Tendsto (fun D : ℕ => a ^ (max D 2 - 1)) atTop (nhds 0) :=
@@ -321,7 +323,7 @@ theorem chainLaw_zero_tendsto (a : ℝ) (ha0 : 0 < a) (ha1 : a < 1) :
   refine h.congr fun D => ?_
   rw [chainLaw'_apply, chainMass_zero]
 
-/-- The real bound of `eta_chainLaw_le` tends to `0` as `D → ∞` (`sec:applications`). -/
+/-- The real bound of `eta_chainLaw_le` tends to `0` as `D → ∞` (`thm:eta-bound`). -/
 private lemma tendsto_chain_bound {a : ℝ} (ha0 : 0 < a) (ha1 : a < 1) (α : ℝ) :
     Tendsto (fun D : ℕ => phi α (a ^ (D ^ 2 - 1))
       + 2 ^ α * a ^ (α - 1) * (a ^ ((D : ℝ) - α) / (1 - a ^ ((D : ℝ) - α))))
@@ -347,7 +349,7 @@ private lemma tendsto_chain_bound {a : ℝ} (ha0 : 0 < a) (ha1 : a < 1) (α : �
   have := t1'.add (t3.const_mul (2 ^ α * a ^ (α - 1)))
   simpa using this
 
-/-- **`eq:chain-moment`, the potential** in `ℝ≥0∞`: `η_{P,α}(μ_*) → 0` as `D → ∞`, for every
+/-- **`thm:eta-bound`, the potential** in `ℝ≥0∞`: `η_{P,α}(μ_*) → 0` as `D → ∞`, for every
 `α ≥ 1`. -/
 theorem eta_chainLaw_tendsto_ennreal (α : ℝ) (hα : 1 ≤ α) (a : ℝ) (ha0 : 0 < a) (ha1 : a < 1) :
     Tendsto (fun D : ℕ => PhiD α (chainLaw' a ha0 ha1 D) (chainLaw' a ha0 ha1 D) pathRelNat)
@@ -372,7 +374,7 @@ theorem eta_chainLaw_tendsto_ennreal (α : ℝ) (hα : 1 ≤ α) (a : ℝ) (ha0 
   filter_upwards [e1, e2] with D h1 h2
   exact eta_chainLaw_le ha0 ha1 (le_max_right D 2) hα h1 h2
 
-/-- **`eq:chain-moment`, the potential**: `η_{P,α}(μ_*) → 0` as `D → ∞`, for every
+/-- **`thm:eta-bound`, the potential**: `η_{P,α}(μ_*) → 0` as `D → ∞`, for every
 `α ≥ 1`. -/
 theorem eta_chainLaw_tendsto (α : ℝ) (hα : 1 ≤ α) (a : ℝ) (ha0 : 0 < a) (ha1 : a < 1) :
     Tendsto (fun D : ℕ =>
@@ -382,9 +384,9 @@ theorem eta_chainLaw_tendsto (α : ℝ) (hα : 1 ≤ α) (a : ℝ) (ha0 : 0 < a)
     (eta_chainLaw_tendsto_ennreal α hα a ha0 ha1)
   simpa [Function.comp_def] using this
 
-/-! ### Bushy trees (`sec:applications`) -/
+/-! ### Bushy trees (`thm:shape-eta`) -/
 
-/-- The `v₀` contribution to `η` is at most `(1 - μ(v₀))/μ(v₀)^α` (`sec:applications`):
+/-- The `v₀` contribution to `η` is at most `(1 - μ(v₀))/μ(v₀)^α` (`thm:shape-eta`):
 `v₀` is compatible with itself, so `b(v₀) ≥ μ(v₀)`. -/
 theorem bushy_v0_term_le {V : Type} (μ : PMF V) (R : V → V → Prop) (v0 : V) {α : ℝ}
     (hα : 0 ≤ α) (hrefl : R v0 v0) :
@@ -408,8 +410,8 @@ theorem bushy_v0_term_le {V : Type} (μ : PMF V) (R : V → V → Prop) (v0 : V)
           (Real.rpow_le_rpow hm.le hmb hα)
 
 /-- Every label other than `v₀` contributes at most `μ(v) e^{αC₀} e^{αC₀ N(v) D^{-1/2}}`
-(`sec:applications`): from `b(v) ≥ exp(-C₀(N D^{-1/2} + 1))`, `φ_α(1 - b(v)) ≤ b(v)^{-α}`,
-and every charged label other than `v₀` has `N > D²`. -/
+(`thm:shape-eta`): from `b(v) ≥ exp(-C₀(N D^{-1/2} + 1))`, `φ_α(1 - b(v)) ≤ b(v)^{-α}`,
+and every positive-mass label other than `v₀` has `N > D²`. -/
 theorem bushy_other_terms_le {V : Type} (μ : PMF V) (R : V → V → Prop) (N : V → ℕ) (v0 : V)
     (D : ℕ) {α C₀ : ℝ} (hα : 0 ≤ α)
     (hN : ∀ v, μ v ≠ 0 → v ≠ v0 → D ^ 2 < N v)
@@ -454,7 +456,7 @@ theorem bushy_other_terms_le {V : Type} (μ : PMF V) (R : V → V → Prop) (N :
                 ring
     _ = _ := by ring
 
-/-- The tail sum of `sec:applications`: if `μ{N > n} ≤ A₀ e^{-c₀ n}` for every `n` and
+/-- The tail sum of `thm:shape-eta`: if `μ{N > n} ≤ A₀ e^{-c₀ n}` for every `n` and
 `κ ≤ c₀/2`, then, summing over the integer values of `N > D²`,
 `𝔼[𝟙{N > D²} e^{κ N}] ≤ A₀ e^{c₀} (1 - e^{-c₀/2})^{-1} e^{-c₀ D²/2}`. -/
 theorem bushy_moment_le {V : Type} (μ : PMF V) (N : V → ℕ) (D : ℕ) {A₀ c₀ κ : ℝ}
@@ -579,8 +581,8 @@ theorem bushy_moment_le {V : Type} (μ : PMF V) (N : V → ℕ) (D : ℕ) {A₀ 
                 (mul_le_of_le_one_right (pow_nonneg hr0.le _) hr1.le) hKr
 
 
-/-- The mass outside `v₀` is at most the tail `μ{N > D²} ≤ A₀ e^{-c₀ D²}` (`sec:applications`):
-every charged label other than `v₀` comes from a shape of size `N > D²`. -/
+/-- The mass outside `v₀` is at most the tail `μ{N > D²} ≤ A₀ e^{-c₀ D²}` (`thm:shape-eta`):
+every positive-mass label other than `v₀` comes from a shape of size `N > D²`. -/
 theorem bushy_v0_mass_le {V : Type} (μ : PMF V) (N : V → ℕ) (v0 : V) (D : ℕ) {A₀ c₀ : ℝ}
     (hN : ∀ v, μ v ≠ 0 → v ≠ v0 → D ^ 2 < N v)
     (htail : ∀ n : ℕ, ∑' v, (if n < N v then μ v else 0)
@@ -609,7 +611,7 @@ theorem bushy_v0_mass_le_real {V : Type} (μ : PMF V) (N : V → ℕ) (v0 : V) (
   rw [ENNReal.toReal_sub_of_le (PMF.coe_le_one μ v0) ENNReal.one_ne_top, ENNReal.toReal_one] at h
   rwa [ENNReal.toReal_ofReal (by positivity)] at h
 
-/-- **The potential bound of the bushy laws** (`sec:applications`): for
+/-- **The potential bound of the bushy laws** (`thm:shape-eta`): for
 `α C₀ D^{-1/2} ≤ c₀/2`,
 `η_{G_D,α}(μ_D) ≤ (1-μ_D(v₀))/μ_D(v₀)^α + e^{αC₀} A₀ e^{c₀} (1-e^{-c₀/2})^{-1} e^{-c₀D²/2}`. -/
 theorem bushy_eta_le {V : Type} (μ : PMF V) (R : V → V → Prop) (N : V → ℕ) (v0 : V) (D : ℕ)
@@ -661,7 +663,7 @@ private lemma tendsto_half_tail (c₀ : ℝ) (hc : 0 < c₀) :
     Tendsto (fun D : ℕ => Real.exp (-(c₀ * (D : ℝ) ^ 2 / 2))) atTop (nhds 0) :=
   Real.tendsto_exp_neg_atTop_nhds_zero.comp ((tendsto_const_mul_sq c₀ hc).atTop_div_const two_pos)
 
-/-- The large-`D` condition `α C₀ D^{-1/2} ≤ c₀/2` holds eventually (`sec:applications`). -/
+/-- The large-`D` condition `α C₀ D^{-1/2} ≤ c₀/2` holds eventually (`thm:shape-eta`). -/
 private lemma eventually_kappa_le {α C₀ c₀ : ℝ} (hα : 0 ≤ α) (hC : 0 ≤ C₀) (hc : 0 < c₀) :
     ∀ᶠ D : ℕ in atTop, α * C₀ / Real.sqrt D ≤ c₀ / 2 := by
   filter_upwards [eventually_ge_atTop 1, eventually_ge_atTop ⌈(2 * α * C₀ / c₀) ^ 2⌉₊]
@@ -676,7 +678,7 @@ private lemma eventually_kappa_le {α C₀ c₀ : ℝ} (hα : 0 ≤ α) (hC : 0 
   calc α * C₀ = c₀ / 2 * (2 * α * C₀ / c₀) := by field_simp
     _ ≤ c₀ / 2 * Real.sqrt D := by gcongr
 
-/-- **`μ_D(v₀) → 1`** (`sec:applications`): the distinguished mass of the bushy laws tends
+/-- **`μ_D(v₀) → 1`** (`thm:shape-eta`): the distinguished mass of the bushy laws tends
 to one, from the tail bound alone. -/
 theorem bushy_v0_tendsto {V : ℕ → Type} (μ : ∀ D, PMF (V D)) (N : ∀ D, V D → ℕ)
     (v0 : ∀ D, V D) {A₀ c₀ : ℝ} (hc : 0 < c₀)
@@ -696,7 +698,7 @@ theorem bushy_v0_tendsto {V : ℕ → Type} (μ : ∀ D, PMF (V D)) (N : ∀ D, 
   rw [tsub_le_iff_right] at h ⊢
   rw [add_comm]; exact h
 
-/-- The real bound of `bushy_eta_le` tends to `0` (`sec:applications`). -/
+/-- The real bound of `bushy_eta_le` tends to `0` (`thm:shape-eta`). -/
 private lemma tendsto_bushy_bound {V : ℕ → Type} (μ : ∀ D, PMF (V D)) (N : ∀ D, V D → ℕ)
     (v0 : ∀ D, V D) {α A₀ c₀ C₀ : ℝ} (hc : 0 < c₀)
     (hN : ∀ᶠ D : ℕ in atTop, ∀ v, μ D v ≠ 0 → v ≠ v0 D → D ^ 2 < N D v)
@@ -722,9 +724,9 @@ private lemma tendsto_bushy_bound {V : ℕ → Type} (μ : ∀ D, PMF (V D)) (N 
   simp only [mul_zero] at h2
   simpa using h1.add h2
 
-/-- **`η_{G_D,α}(μ_D) → 0`** (`sec:applications`), in `ℝ≥0∞`: under the tail bound
+/-- **`η_{G_D,α}(μ_D) → 0`** (`thm:shape-eta`), in `ℝ≥0∞`: under the tail bound
 `μ_D{N > n} ≤ A₀ e^{-c₀ n}`, the shrinking bound `b_D(v) ≥ exp(-C₀(N D^{-1/2} + 1))` on the
-charged labels other than `v₀`, and `N > D²` off `v₀`, the potential of the bushy laws tends
+positive-mass labels other than `v₀`, and `N > D²` off `v₀`, the potential of the bushy laws tends
 to zero. -/
 theorem bushy_eta_tendsto_ennreal {V : ℕ → Type} (μ : ∀ D, PMF (V D))
     (R : ∀ D, V D → V D → Prop) (N : ∀ D, V D → ℕ) (v0 : ∀ D, V D)
@@ -744,7 +746,7 @@ theorem bushy_eta_tendsto_ennreal {V : ℕ → Type} (μ : ∀ D, PMF (V D))
     with D hrefl' hN' htail' hb' hκ
   exact bushy_eta_le (μ D) (R D) (N D) (v0 D) D hα hA hc hrefl' hN' htail' hb' hκ
 
-/-- **`η_{G_D,α}(μ_D) → 0`** (`sec:applications`), the real form of
+/-- **`η_{G_D,α}(μ_D) → 0`** (`thm:shape-eta`), the real form of
 `bushy_eta_tendsto_ennreal`. -/
 theorem bushy_eta_tendsto {V : ℕ → Type} (μ : ∀ D, PMF (V D))
     (R : ∀ D, V D → V D → Prop) (N : ∀ D, V D → ℕ) (v0 : ∀ D, V D)
@@ -760,9 +762,9 @@ theorem bushy_eta_tendsto {V : ℕ → Type} (μ : ∀ D, PMF (V D))
     (bushy_eta_tendsto_ennreal μ R N v0 hα hA hc hC hrefl hN htail hb)
   simpa [Function.comp_def] using this
 
-/-! ### The probability-one conclusion (`sec:applications`) -/
+/-! ### The probability-one conclusion (`thm:cross-law` and `thm:hairy`) -/
 
-/-- **The probability-one conclusion** (`sec:applications`): if an event `A` contains events
+/-- **The probability-one conclusion** (`thm:cross-law` and `thm:hairy`): if an event `A` contains events
 `B_D` with `P(B_D) ≥ 1 - ε_D` and `ε_D → 0`, then `P(A) = 1`. The events `B_D` need not be
 independent, nested or consistently coupled. -/
 theorem prob_eq_one_of_le {Ω : Type*} [MeasurableSpace Ω] (P : MeasureTheory.Measure Ω)
@@ -775,7 +777,7 @@ theorem prob_eq_one_of_le {Ω : Type*} [MeasurableSpace Ω] (P : MeasureTheory.M
   exact le_of_tendsto' hlim fun D => (h D).trans (MeasureTheory.measure_mono (hB D))
 
 /-- `prob_eq_one_of_le` with the inclusions and the bounds required only for every
-sufficiently large `D` (`sec:applications`). -/
+sufficiently large `D` (`thm:cross-law` and `thm:hairy`). -/
 theorem prob_eq_one_of_eventually_le {Ω : Type*} [MeasurableSpace Ω] (P : MeasureTheory.Measure Ω)
     [MeasureTheory.IsProbabilityMeasure P] (A : Set Ω) (B : ℕ → Set Ω)
     (hB : ∀ᶠ D : ℕ in atTop, B D ⊆ A) (ε : ℕ → ℝ≥0∞) (hε : Tendsto ε atTop (nhds 0))

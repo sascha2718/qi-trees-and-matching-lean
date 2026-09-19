@@ -1,5 +1,5 @@
 /-
-Binary profiles and their composites (`markov_matching_new_proof.tex`,
+Binary profiles and their composites (`arbitrary_offspring_matching.tex`,
 `sec:common-presentations`): full binary trees with marked graft roots.
 
 * `MTree`: `leaf` is a fresh continuation, `node` a forced vertex, `gnode` a forced vertex
@@ -11,8 +11,8 @@ Binary profiles and their composites (`markov_matching_new_proof.tex`,
   core block `node l.flatten r.flatten` (`sec:common-presentations`: a composite profile is
   a core profile with composite profiles at some of its leaves);
 * `graftAt`, `graftShallowest`: replacing a leaf by a core profile, at a shallowest leaf;
-* the height bounds `thm:shallow-grafting`, the optimal height recursion
-  `eq:optimal-profile-height`, and the Kraft bound behind them.
+* the height bounds `thm:shallow-grafting`, an internal optimal-height recursion that
+  strengthens that estimate, and the Kraft bound behind them.
 
 The Markov model built from these profiles is in `Presentation.lean`.
 -/
@@ -596,7 +596,7 @@ theorem composite_cons (D : ℕ → MTree) (a : ℕ) (as : List ℕ)
 lemma composite_singleton (D : ℕ → MTree) (a : ℕ) : composite D [a] = markRoot (D a) := by
   simp [composite, graftShallowest, shallowestPath, graftAt]
 
-/-! ### The optimal height recursion (`eq:optimal-profile-height`) -/
+/-! ### An optimal-height recursion -/
 
 /-- Graft, at every leaf of `t` reached by the path `p`, the tree `f p` (marked as a graft
 root when it is not a leaf). -/
@@ -610,8 +610,9 @@ leaf (`sec:common-presentations`, the case `s_i = 0`). -/
 def IsCompositeProfile (S : Finset ℕ) (D : ℕ → MTree) (t : MTree) : Prop :=
   AllComp S D t ∧ ((∃ l r, t = gnode l r) ∨ t = leaf)
 
-/-- The least height of a composite profile with `s + 1` leaves (`h(s)` of
-`eq:optimal-profile-height`), as an infimum over the (finite) set of realisable heights. -/
+/-- The least height of a composite profile with `s + 1` leaves, as an infimum over the
+(finite) set of realisable heights. This internal quantity sharpens the direct bound in
+`thm:shallow-grafting`. -/
 noncomputable def optHeight (S : Finset ℕ) (D : ℕ → MTree) (s : ℕ) : ℕ :=
   sInf {h | ∃ t, IsCompositeProfile S D t ∧ t.leaves = s + 1 ∧ t.height = h}
 
@@ -830,7 +831,7 @@ theorem isCompositeProfile_iff (S : Finset ℕ) (D : ℕ → MTree)
     · exact hf (false :: q) (by simp [leafPaths, hq])
     · exact hf (true :: q) (by simp [leafPaths, hq])
 
-/-- **`eq:optimal-profile-height`**: the least height `h(s)` of a composite profile with
+/-- **Optimal-height recursion.** The least height `h(s)` of a composite profile with
 `s + 1` leaves is the minimum over the root core profile `D a` and the sizes `s_q` at its
 leaves with `a + ∑ s_q = s` of `max_q (|q| + h(s_q))`; `h(0) = 0`. -/
 theorem optHeight_eq (S : Finset ℕ) (D : ℕ → MTree)

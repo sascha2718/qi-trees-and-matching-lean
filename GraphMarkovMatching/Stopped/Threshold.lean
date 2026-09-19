@@ -1,5 +1,5 @@
 /-
-The scalar threshold analysis of `markov_matching_new_proof.tex` (`sec:completion`,
+The scalar threshold analysis of `arbitrary_offspring_matching.tex` (`sec:completion`,
 "Completion of the proof"): the real forms of the explicit constants `S_H`, `G_H`,
 `E(M)` and `Q(M)`, with their bridges to the `ℝ≥0∞` versions of `Paths.lean`, the
 scalar upper bounds `Z̄(t)`, `Ē(t, M)`, `Q̄(t, M)` at the root bounds `δ ≤ ζ`,

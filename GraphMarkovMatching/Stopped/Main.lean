@@ -1,5 +1,5 @@
 /-
-The headline theorem of `markov_matching_new_proof.tex`: `thm:markov-matching` assembled
+The headline theorem of `arbitrary_offspring_matching.tex`: `thm:markov-matching` assembled
 from the height induction (`Induction.lean`), the König step (`Infinite.lean`) and the
 scalar threshold analysis (`Threshold.lean`), following "Completion of the proof" in
 `sec:completion`.

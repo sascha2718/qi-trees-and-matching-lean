@@ -1,5 +1,5 @@
 /-
-Averaging the transitions in `markov_matching_new_proof.tex` (`sec:averaging`):
+Averaging the transitions in `arbitrary_offspring_matching.tex` (`sec:averaging`):
 the zero-mixture convexity lemma `thm:zero-mixture-convexity`, and the bound `Q(M)` on the
 restricted potential of the source child-pair mixture against the target child-pair
 mixture, in the finite alternative (selected components, mixture error

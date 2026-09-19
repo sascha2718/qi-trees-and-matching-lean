@@ -1,5 +1,5 @@
 /-
-The infinite-tree conclusion of `markov_matching_new_proof.tex` (`sec:completion`, the
+The infinite-tree conclusion of `arbitrary_offspring_matching.tex` (`sec:completion`, the
 König step).  Two independent infinite samples of the Markov label model, started at the
 types `s` and `t`, are realised on the product of the two trajectory measures over the
 level laws `ρ_{s,·}` and `ρ_{t,·}`.  The finite-height matching events decrease with the

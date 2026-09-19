@@ -1,7 +1,7 @@
-import ChainClasses.Bushy.HairyUniversality
+import ChainClasses.Bushy.Universality
 
 /-!
-`sec:shape-harris` of `matching_classes_simple.tex` and `sec:hairy` of
+`sec:shape-harris` of `matching_classes_simple.tex` and `thm:hairy` of
 `gw_classes_simple.tex`: the shape law is a probability law, the label law it pushes
 forward along a label map, and the product form of the label field that `thm:hairy`
 consumes.
@@ -35,7 +35,7 @@ hypotheses.
 * `labMass`, `tsum_uniform_fibres`, `tsum_labMass`, `labPMF`: **the label law `q` of
   `thm:shape-coupling` (`it:shape-coupling-law`)**, the shape law pushed forward
   along a label map against the uniform variable, and its total mass.
-* `hairyMeasure_shapeLab_prod`: **`thm:shape-coupling` (`it:shape-coupling-law`),
+* `bushyMeasure_shapeLab_prod`: **`thm:shape-coupling` (`it:shape-coupling-law`),
   the product form**, the labels of a prefix-closed finite set of copies are independent
   with the law `q`.
 * `shapeIdx`: the index of a shape in the enumeration `shapeEnum`, with
@@ -235,11 +235,11 @@ noncomputable def labPMF [MeasurableSpace V] [Countable V] (θ : Offspring 2)
 prefix-closed finite set of copies the labels are independent with the law `q`.  The
 shapes factorise by `thm:shape-iid` and the uniform variables by independence, and the
 two products are exchanged with the sum over the shape fields. -/
-theorem hairyMeasure_shapeLab_prod [MeasurableSpace V] (θ : Offspring 2)
+theorem bushyMeasure_shapeLab_prod [MeasurableSpace V] (θ : Offspring 2)
     (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction) (h2 : 0 < θ 2) {ℓ : Shape → ℝ → V}
     (hℓ : ∀ (τ : Shape) (v : V), MeasurableSet {u : ℝ | ℓ τ u = v}) (S : Finset Word)
     (hS : ∀ w ∈ S, ∀ p, p <+: w → p ∈ S) (v : Word → V) :
-    hairyMeasure θ (⋂ w ∈ S, {ω : HairySample | shapeLab ℓ ω w = v w})
+    bushyMeasure θ (⋂ w ∈ S, {ω : BushySample | shapeLab ℓ ω w = v w})
       = ∏ w ∈ S, labMass θ ℓ (v w) := by
   classical
   have _ := BranchingProcess.isProbabilityMeasure_survivalMeasure θ le_rfl hq
@@ -252,7 +252,7 @@ theorem hairyMeasure_shapeLab_prod [MeasurableSpace V] (θ : Offspring 2)
     intro f
     exact MeasurableSet.biInter (Set.to_countable _) fun w _ ↦
       (BranchingProcess.measurable_coord w) (hAmeas f w)
-  have hdecomp : (⋂ w ∈ S, {ω : HairySample | shapeLab ℓ ω w = v w})
+  have hdecomp : (⋂ w ∈ S, {ω : BushySample | shapeLab ℓ ω w = v w})
       = ⋃ f : ↥S → Shape, shapeEvent S f ×ˢ B f := by
     ext ω
     simp only [Set.mem_iInter, Set.mem_setOf_eq, Set.mem_iUnion, Set.mem_prod, hB, hA,
@@ -276,17 +276,17 @@ theorem hairyMeasure_shapeLab_prod [MeasurableSpace V] (θ : Offspring 2)
     intro f f' hff
     refine Set.disjoint_left.mpr fun ω hω hω' ↦ ?_
     exact Set.disjoint_left.mp (pairwise_shapeEvent S hff) hω.1 hω'.1
-  have hterm : ∀ f : ↥S → Shape, hairyMeasure θ (shapeEvent S f ×ˢ B f)
+  have hterm : ∀ f : ↥S → Shape, bushyMeasure θ (shapeEvent S f ×ˢ B f)
       = ∏ x ∈ S.attach, shapeMass θ (f x)
           * (volume.restrict (Set.Ico (0 : ℝ) 1)) {u : ℝ | ℓ (f x) u = v x.1} := by
     intro f
-    rw [hairyMeasure, Measure.prod_prod, survivalMeasure_shapeEvent θ hq hq0 h2 S hS f, hB,
+    rw [bushyMeasure, Measure.prod_prod, survivalMeasure_shapeEvent θ hq hq0 h2 S hS f, hB,
       uniField_iInter S (A f) (fun w _ ↦ hAmeas f w), Finset.prod_mul_distrib]
     congr 1
     rw [← Finset.prod_attach S fun w ↦ (volume.restrict (Set.Ico (0 : ℝ) 1)) (A f w)]
     exact Finset.prod_congr rfl fun x _ ↦ by rw [hA]; simp only [shapeExt_mem f x]
-  calc hairyMeasure θ (⋂ w ∈ S, {ω : HairySample | shapeLab ℓ ω w = v w})
-      = ∑' f : ↥S → Shape, hairyMeasure θ (shapeEvent S f ×ˢ B f) := by
+  calc bushyMeasure θ (⋂ w ∈ S, {ω : BushySample | shapeLab ℓ ω w = v w})
+      = ∑' f : ↥S → Shape, bushyMeasure θ (shapeEvent S f ×ˢ B f) := by
         rw [hdecomp, measure_iUnion hdisj fun f ↦ (measurableSet_shapeEvent S f).prod (hBmeas f)]
     _ = ∑' f : ↥S → Shape, ∏ x ∈ S.attach, shapeMass θ (f x)
           * (volume.restrict (Set.Ico (0 : ℝ) 1)) {u : ℝ | ℓ (f x) u = v x.1} :=

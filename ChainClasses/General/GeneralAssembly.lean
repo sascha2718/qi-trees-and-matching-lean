@@ -5,7 +5,7 @@ import ChainClasses.General.GeneralShapeShrink
 import ChainClasses.Shape.AddrMetric
 
 /-!
-`sec:general-relabel` of `matching_classes_general.tex`, item `it:general-glued`:
+`sec:general-relabel` of `matching_classes_general.tex`, item `thm:general-glued`:
 the assembly of a family of shapes at general arity and `thm:glued-transfer` over
 it.
 
@@ -41,7 +41,7 @@ case verbatim and the arithmetic of `GluedTransfer.lean` applies unchanged.
 * `GAssembly.neckSum_bounds`, `GAssembly.glue`, `GAssembly.glue_dist_bounds_anc`,
   `GAssembly.glue_dist_bounds_div`, `GAssembly.glue_dense` and
   `GAssembly.glued_transfer`: **`thm:glued-transfer`** at general arity
-  (**`it:general-glued`**), the per-shape maps read copy by copy, an
+  (**`thm:general-glued`**), the per-shape maps read copy by copy, an
   `8K²`-quasi-isometry of the assemblies.
 -/
 
@@ -629,7 +629,7 @@ lemma glue_dense {K : ℝ}
   rw [h]
   exact ha
 
-/-- **`thm:glued-transfer`** at general arity (**`it:general-glued`**): two families
+/-- **`thm:glued-transfer`** at general arity (**`thm:general-glued`**): two families
 of shapes that are `K`-comparable copy by copy have `8K²`-quasi-isometric assemblies,
 the glued map being the per-shape maps read copy by copy. -/
 theorem glued_transfer {K : ℝ} (hK : 1 ≤ K)

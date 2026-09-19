@@ -1,6 +1,6 @@
 /-
-The weighted stopped expansion of `markov_matching_new_proof.tex`
-(`sec:weighted-zero`, `thm:explicit-weighted-bound`): one inverse-degree weight `W_{u,h}` is
+The weighted stopped expansion of `arbitrary_offspring_matching.tex`
+(`sec:weighted-mass`, `thm:explicit-weighted-bound`): one inverse-degree weight `W_{u,h}` is
 carried through the stopped expansion of an impossible comparison.
 
 * `wZero_succ_le`: the expansion step; the incompatible root contributes
@@ -24,10 +24,10 @@ namespace Model
 
 variable {V I : Type} (M : Model V I)
 
-/-! ### Fubini identities for the child pair (`sec:weighted-zero`) -/
+/-! ### Fubini identities for the child pair (`sec:weighted-mass`) -/
 
 /-- A separated integrand against a product law integrates to the product of the two
-marginal integrals (`sec:weighted-zero`, conditional independence of the children). -/
+marginal integrals (`sec:weighted-mass`, conditional independence of the children). -/
 private lemma tsum_prodPMF_mul {X Y : Type} (ρ₁ : PMF X) (ρ₂ : PMF Y) (f : X → ℝ≥0∞)
     (g : Y → ℝ≥0∞) :
     ∑' p : X × Y, prodPMF ρ₁ ρ₂ p * (f p.1 * g p.2)
@@ -49,20 +49,20 @@ private lemma tsum_mul_finset_sum {X ι : Type} (ρ : X → ℝ≥0∞) (s : Fin
     _ = ∑ i ∈ s, c i * ∑' p, ρ p * f i p :=
         Finset.sum_congr rfl fun i _ => ENNReal.tsum_mul_left
 
-/-- Two constants pulled out of an integral (`sec:weighted-zero`). -/
+/-- Two constants pulled out of an integral (`sec:weighted-mass`). -/
 private lemma tsum_mul_const_add {X : Type} (ρ f g : X → ℝ≥0∞) (x y : ℝ≥0∞) :
     ∑' p, ρ p * (x * f p + y * g p) = x * ∑' p, ρ p * f p + y * ∑' p, ρ p * g p := by
   rw [← ENNReal.tsum_mul_left, ← ENNReal.tsum_mul_left, ← ENNReal.tsum_add]
   exact tsum_congr fun p => by ring
 
-/-- Two integrals pulled out of a root-state average (`sec:weighted-zero`). -/
+/-- Two integrals pulled out of a root-state average (`sec:weighted-mass`). -/
 private lemma tsum_mul_add_mul {X : Type} (ρ a c : X → ℝ≥0∞) (x y : ℝ≥0∞) :
     ∑' v, ρ v * (a v * x + c v * y) = (∑' v, ρ v * a v) * x + (∑' v, ρ v * c v) * y := by
   rw [← ENNReal.tsum_mul_right, ← ENNReal.tsum_mul_right, ← ENNReal.tsum_add]
   exact tsum_congr fun v => by ring
 
 /-- A constant and a scaled integrand averaged against a probability law
-(`sec:weighted-zero`, the source transition is averaged with its original law). -/
+(`sec:weighted-mass`, the source transition is averaged with its original law). -/
 private lemma tsum_pmf_mul_const_add {X : Type} (ρ : PMF X) (f : X → ℝ≥0∞) (x y : ℝ≥0∞) :
     ∑' p, ρ p * (x + y * f p) = x + y * ∑' p, ρ p * f p := by
   calc ∑' p, ρ p * (x + y * f p)
@@ -74,7 +74,7 @@ private lemma tsum_pmf_mul_const_add {X : Type} (ρ : PMF X) (f : X → ℝ≥0�
 /-! ### The pointwise ingredients of the expansion step -/
 
 /-- The two-pairing product of child weights against a target pair `j'`
-(`sec:weighted-zero`): the restricted inverse pair degree is at most this sum. -/
+(`sec:weighted-mass`): the restricted inverse pair degree is at most this sum. -/
 private noncomputable def pairW (α : ℝ) (h : ℕ) (j' : I × I)
     (p : FullLab (I × V) h × FullLab (I × V) h) : ℝ≥0∞ :=
   M.W α j'.1 h p.1 * M.W α j'.2 h p.2 + M.W α j'.2 h p.1 * M.W α j'.1 h p.2
@@ -92,7 +92,7 @@ private noncomputable def indW (D' : Set I) (h : ℕ)
   (if M.ZeroEv D' h p.1 then 1 else 0) + (if M.ZeroEv D' h p.2 then 1 else 0)
     + (if M.UnionEv D' h p.1 then 1 else 0) * (if M.UnionEv D' h p.2 then 1 else 0)
 
-/-- **The pointwise bound of the weighted expansion step** (`sec:weighted-zero`): at a
+/-- **The pointwise bound of the weighted expansion step** (`sec:weighted-mass`): at a
 realised root state and a realised child pair, the zero-restricted weight of the branch is
 at most the incompatible-root weight times the selected pair weight, plus the
 compatible-root weight times the selected pair weight times the split indicator. -/
@@ -157,7 +157,7 @@ private lemma wUnion_le_Zt [Fintype I] {α : ℝ} (hα : 1 ≤ α) {g : ℕ} (Θ
     exact_mod_cast hT _
 
 /-- **The unrestricted pair moment**: against an independent source child pair, the
-two-pairing weight integrates to at most `2 U(M)²` (`sec:weighted-zero`). -/
+two-pairing weight integrates to at most `2 U(M)²` (`sec:weighted-mass`). -/
 private lemma pair_unres_le {α : ℝ} {h : ℕ} {Mb : ℝ≥0∞} {j j' : I × I}
     (hm11 : ∑' x, M.rho j.1 h x * M.W α j'.1 h x ≤ Ufun α Mb)
     (hm12 : ∑' x, M.rho j.1 h x * M.W α j'.2 h x ≤ Ufun α Mb)
@@ -182,7 +182,7 @@ private lemma pair_unres_le {α : ℝ} {h : ℕ} {Mb : ℝ≥0∞} {j j' : I × 
 
 /-- **One pairing against the split indicator**: the continuing terms carry one weighted
 zero integral times an unrestricted moment, the split term the product of two weighted
-union integrals (`sec:weighted-zero`). -/
+union integrals (`sec:weighted-mass`). -/
 private lemma pair_zero_le {α : ℝ} {h : ℕ} {Mb Zt : ℝ≥0∞} {a b c d : I} {D' : Set I}
     (hm1 : ∑' x, M.rho a h x * M.W α c h x ≤ Ufun α Mb)
     (hm2 : ∑' x, M.rho b h x * M.W α d h x ≤ Ufun α Mb)
@@ -235,7 +235,7 @@ private lemma pair_zero_le {α : ℝ} {h : ℕ} {Mb Zt : ℝ≥0∞} {a b c d : 
           (mul_le_mul' hu1 hu2)
     _ = Ufun α Mb * (M.wZero α a D' c h + M.wZero α b D' d h) + Zt ^ 2 := by ring
 
-/-- **Both pairings against the split indicator** (`sec:weighted-zero`): the four continuing
+/-- **Both pairings against the split indicator** (`sec:weighted-mass`): the four continuing
 weighted zero integrals times `U(M)`, plus twice the split term. -/
 private lemma pair_total_le {α : ℝ} {h : ℕ} {Mb Zt : ℝ≥0∞} {j j' : I × I} {D' : Set I}
     (hm11 : ∑' x, M.rho j.1 h x * M.W α j'.1 h x ≤ Ufun α Mb)

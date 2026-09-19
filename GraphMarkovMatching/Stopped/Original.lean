@@ -1,7 +1,8 @@
 /-
-The original Markov statements (`markov_matching_new_proof.tex`, `sec:original-statements`,
-"A single bounded counter law"): the varying-offspring process of `Models/Counter.lean`
-(kernel `varyK`, fresh law `Tlaw`) as an instance of the Markov model of a presentation.
+Internal reference models retained to compare the current common-presentation construction
+with the earlier single-counter and composite formulations: the varying-offspring process
+of `Models/Counter.lean` (kernel `varyK`, fresh law `Tlaw`) as an instance of the Markov
+model of a presentation.
 
 * `rem`: the balanced profile below a vertex with counter `k`, a graft-free tree with
   `max k 2` leaves (`rem_leaves`, `rem_noGraft`);
@@ -19,11 +20,11 @@ The original Markov statements (`markov_matching_new_proof.tex`, `sec:original-s
   process;
 * `graftPort`, `compProfile`, `CompositeData`, `CompositeData.toPresentation`: the composite
   profiles of the declared pairs and the presentation of the prescribed composite two-law
-  process (`sec:composite-process`);
+  process (the composite reference model);
 * `cT_states_eq`, `cFailProb_eq`: the law identification for the composite kernel `compK` of
   `Models/Composite.lean` and the agreement of the two-law failure probabilities;
 * `composite_two_law_matching`: the two-law statement recovered for the composite
-  processes, with the bound `B = max_σ ∑_{k ∈ S} ν_σ(k)^{-α}` of `sec:composite-process`.
+  processes, with the bound `B = max_σ ∑_{k ∈ S} ν_σ(k)^{-α}` of the composite reference model.
 -/
 import GraphMarkovMatching.Stopped.Exponent
 import GraphMarkovMatching.Stopped.PresentationLaws
@@ -38,9 +39,9 @@ namespace GraphMarkovMatching.Stopped
 open GraphMarkovMatching GraphMarkovMatching.Support Model
 open scoped ENNReal Classical
 
-/-! ### The balanced profiles (`sec:single-counter-law`) -/
+/-! ### The balanced profiles (the single-counter reference model) -/
 
-/-- The balanced profile below a vertex carrying the counter `j` (`sec:single-counter-law`):
+/-- The balanced profile below a vertex carrying the counter `j` (the single-counter reference model):
 a counter `j ≥ 4` has forced children with counters `⌊j/2⌋` and `⌈j/2⌉`, a counter `3` one
 forced child of counter `2` and one fresh child, a counter at most `2` two fresh children. -/
 def rem (j : ℕ) : MTree :=
@@ -66,7 +67,7 @@ lemma rem_of_le_two {j : ℕ} (hj : j ≤ 2) : rem j = MTree.node MTree.leaf MTr
 /-- The balanced profile of the counter `2`. -/
 lemma rem_two : rem 2 = MTree.node MTree.leaf MTree.leaf := rem_of_le_two le_rfl
 
-/-- The balanced profile of a counter has `max j 2` leaves (`sec:single-counter-law`). -/
+/-- The balanced profile of a counter has `max j 2` leaves (the single-counter reference model). -/
 lemma rem_leaves (j : ℕ) : (rem j).leaves = max j 2 := by
   induction j using Nat.strong_induction_on with
   | _ j ih =>
@@ -114,22 +115,22 @@ lemma typeOf_rem (σ : Bool) (j : ℕ) : typeOf σ (rem j) = (σ, some (rem j)) 
   Presentation.typeOf_of_ne_leaf σ (rem_ne_leaf j)
 
 /-- The balanced profile depends on the counter only through `max j 2`
-(`sec:single-counter-law`: the counters `0, 1, 2` have the same profile). -/
+(the single-counter reference model: the counters `0, 1, 2` have the same profile). -/
 lemma rem_max (j : ℕ) : rem (max j 2) = rem j := by
   by_cases hj : j ≤ 2
   · rw [max_eq_right hj, rem_two, rem_of_le_two hj]
   · rw [max_eq_left (by omega)]
 
-/-! ### The merged law (`sec:single-counter-law`) -/
+/-! ### The merged law (the single-counter reference model) -/
 
 /-- The merged law `ν̄`: the masses of the counters `0, 1, 2` combined at `2`, the other
-masses unchanged (`sec:single-counter-law`); the pushforward of `ν` under `k ↦ max k 2`. -/
+masses unchanged (the single-counter reference model); the pushforward of `ν` under `k ↦ max k 2`. -/
 noncomputable def nuBar (ν : PMF ℕ) : PMF ℕ := ν.map fun k => max k 2
 
 /-- The support of the merged law: the supported counters with `0, 1` replaced by `2`. -/
 def suppBar (supp : Finset ℕ) : Finset ℕ := supp.image fun k => max k 2
 
-/-- The masses of the merged law (`sec:single-counter-law`). -/
+/-- The masses of the merged law (the single-counter reference model). -/
 lemma nuBar_apply (ν : PMF ℕ) (k : ℕ) :
     nuBar ν k = if k = 2 then ν 0 + ν 1 + ν 2 else if k < 2 then 0 else ν k := by
   rw [nuBar, PMF.map_apply]
@@ -172,10 +173,10 @@ lemma two_le_of_mem_suppBar {supp : Finset ℕ} {k : ℕ} (hk : k ∈ suppBar su
   obtain ⟨a, -, rfl⟩ := Finset.mem_image.mp hk
   exact le_max_right _ _
 
-/-! ### The balanced presentation (`sec:single-counter-law`) -/
+/-! ### The balanced presentation (the single-counter reference model) -/
 
 /-- The presentation of a finitely supported counter law with the balanced profiles as
-common core on both sides (`sec:single-counter-law`): the core `S = supp ν̄`, the core
+common core on both sides (the single-counter reference model): the core `S = supp ν̄`, the core
 profiles `D k = rem k`, the composite profiles `C σ k = markRoot (rem k)`, and the merged
 law `ν̄` on both sides. -/
 noncomputable def balancedPresentation (ν : PMF ℕ) (supp : Finset ℕ)
@@ -211,19 +212,19 @@ noncomputable def balancedPresentation (ν : PMF ℕ) (supp : Finset ℕ)
 variable {V : Type}
 
 /-- Matching of state-and-counter labellings sees only the states
-(`sec:single-counter-law`). -/
+(the single-counter reference model). -/
 lemma fullSim_labRel_iff (Rv : V → V → Prop) (h : ℕ) (x y : FullLab (V × ℕ) h) :
     fullSim (labRel Rv) h x y ↔ fullSim Rv h (statesOf h x) (statesOf h y) :=
   exists_congr fun π => fullMatchesK_fst_iff Rv h π x y
 
 /-- Matching of state-and-tagged-counter labellings sees only the states
-(`sec:composite-process`). -/
+(the composite reference model). -/
 lemma fullSim_cRel_iff (Rv : V → V → Prop) (h : ℕ)
     (x y : FullLab (Composite.CState V) h) :
     fullSim (Composite.cRel Rv) h x y ↔ fullSim Rv h (statesOf h x) (statesOf h y) :=
   exists_congr fun π => fullMatchesK_fst_iff Rv h π x y
 
-/-! ### The law identification (`sec:single-counter-law`) -/
+/-! ### The law identification (the single-counter reference model) -/
 
 section Identification
 
@@ -249,7 +250,7 @@ lemma rootPair_markRoot_rem (k : ℕ) :
   rw [h]
   rfl
 
-/-- The forced identity at height `h` (`sec:single-counter-law`): below a vertex with the
+/-- The forced identity at height `h` (the single-counter reference model): below a vertex with the
 counter `j`, the state labelling of the varying-offspring tree law has the law of the state
 labelling of the tree law of the forced type with the balanced profile `rem j`, for every
 root state. -/
@@ -258,14 +259,14 @@ def ForcedClaim (h : ℕ) : Prop :=
     (muM (varyK μ ν v0) (v, j) h).map (statesOf h)
       = (muM (bM).kernel ((bP).toLive (σ, some (rem j)), v) h).map (statesOf' h)
 
-/-- The fresh identity at height `h` (`sec:single-counter-law`): below a fresh vertex, the
+/-- The fresh identity at height `h` (the single-counter reference model): below a fresh vertex, the
 `ν`-mixture over the counter of the state labellings of the varying-offspring tree laws has
 the law of the state labelling of the tree law of the fresh type, for every root state. -/
 def FreshClaim (h : ℕ) : Prop :=
   ∀ v : V, (ν.bind fun k => (muM (varyK μ ν v0) (v, k) h).map (statesOf h))
     = (muM (bM).kernel ((bP).freshL σ, v) h).map (statesOf' h)
 
-/-- The pair identity at height `h` (`sec:single-counter-law`): the state labellings of the
+/-- The pair identity at height `h` (the single-counter reference model): the state labellings of the
 child pair below a counter `k` have the law of the state labellings of the child pair below
 the balanced profile `rem k`. -/
 def PairClaim (h : ℕ) : Prop :=
@@ -297,7 +298,7 @@ lemma freshClaim_zero : FreshClaim μ ν v0 supp hsupp hne Rv σ 0 := by
   exact PMF.bind_const ν _
 
 /-- The pair identity at height `h` from the forced and fresh identities at height `h`
-(`sec:single-counter-law`: the three splitting rules). -/
+(the single-counter reference model: the three splitting rules). -/
 lemma pairClaim_of (h : ℕ) (hZ : ForcedClaim μ ν v0 supp hsupp hne Rv σ h)
     (hF : FreshClaim μ ν v0 supp hsupp hne Rv σ h) :
     PairClaim μ ν v0 supp hsupp hne Rv σ h := by
@@ -333,7 +334,7 @@ lemma forcedClaim_succ (h : ℕ) (hX : PairClaim μ ν v0 supp hsupp hne Rv σ h
   rw [← PMF.map_comp, ← PMF.map_comp, hX j hl hr]
 
 /-- The fresh identity at height `h + 1` from the pair identity at height `h`
-(`sec:single-counter-law`: the merged law charges the same profiles). -/
+(the single-counter reference model: the merged law charges the same profiles). -/
 lemma freshClaim_succ (h : ℕ) (hX : PairClaim μ ν v0 supp hsupp hne Rv σ h) :
     FreshClaim μ ν v0 supp hsupp hne Rv σ (h + 1) := by
   intro v
@@ -364,7 +365,7 @@ theorem forcedClaim_and_freshClaim :
     ⟨forcedClaim_succ μ ν v0 supp hsupp hne Rv σ h hX,
       freshClaim_succ μ ν v0 supp hsupp hne Rv σ h hX⟩
 
-/-- **The law identification** (`sec:single-counter-law`: "The state-labelled process is
+/-- **The law identification** (the single-counter reference model: "The state-labelled process is
 unchanged in law"): the state labelling of the varying-offspring process `Tlaw μ ν v0 h`
 and the state labelling of a fresh type of the balanced presentation of `ν̄` have the same
 law, at every height. -/
@@ -377,7 +378,7 @@ theorem Tlaw_states_eq (h : ℕ) :
 
 end Identification
 
-/-! ### The failure probability (`sec:single-counter-law`) -/
+/-! ### The failure probability (the single-counter reference model) -/
 
 /-- The directed failure mass under pushforwards: when the relation factors through two maps,
 the failure mass of two laws is that of their pushforwards. -/
@@ -400,7 +401,7 @@ section Identification
 variable (μ : PMF V) (ν : PMF ℕ) (v0 : V) (supp : Finset ℕ)
   (hsupp : ∀ k, ν k ≠ 0 ↔ k ∈ supp) (hne : supp.Nonempty) (Rv : V → V → Prop)
 
-/-- **The failure probabilities agree** (`sec:single-counter-law`): the failure probability
+/-- **The failure probabilities agree** (the single-counter reference model): the failure probability
 of the varying-offspring process against itself at height `h` is the failure probability of
 any two fresh types of the balanced presentation of `ν̄`. -/
 theorem failProb_Tlaw_eq (h : ℕ) (σ σ' : Bool) :
@@ -415,9 +416,9 @@ theorem failProb_Tlaw_eq (h : ℕ) (σ σ' : Bool) :
 
 end Identification
 
-/-! ### The inverse-sum and potential comparisons (`sec:single-counter-law`) -/
+/-! ### The inverse-sum and potential comparisons (the single-counter reference model) -/
 
-/-- **The inverse-sum comparison** (`sec:single-counter-law`): combining components only reduces
+/-- **The inverse-sum comparison** (the single-counter reference model): combining components only reduces
 the required sum, and `p^{-α} ≤ p^{-5/2}` for `0 < p ≤ 1` and `α ≤ 5/2`, so
 `∑_{k ∈ supp ν̄} ν̄(k)^{-α} ≤ ∑_{k ∈ supp ν} ν(k)^{-5/2}`. -/
 theorem inverseSum_nuBar_le (ν : PMF ℕ) (supp : Finset ℕ) {α : ℝ} (hα0 : 0 ≤ α)
@@ -430,15 +431,15 @@ theorem inverseSum_nuBar_le (ν : PMF ℕ) (supp : Finset ℕ) {α : ℝ} (hα0 
     _ ≤ (ν k) ^ (-(5 / 2 : ℝ)) :=
         ENNReal.rpow_le_rpow_of_exponent_ge (PMF.coe_le_one _ _) (by linarith)
 
-/-- The inverse-sum comparison at exponent `2` (`sec:single-counter-law`). -/
+/-- The inverse-sum comparison at exponent `2` (the single-counter reference model). -/
 theorem inverseSum_nuBar_le_two (ν : PMF ℕ) (supp : Finset ℕ) :
     ∑ k ∈ suppBar supp, (nuBar ν k) ^ (-(2 : ℝ)) ≤ ∑ k ∈ supp, (ν k) ^ (-(5 / 2 : ℝ)) :=
   inverseSum_nuBar_le ν supp (by norm_num) (by norm_num)
 
-/-! ### The one-law statement recovered (`sec:single-counter-law`) -/
+/-! ### The one-law statement recovered (the single-counter reference model) -/
 
 /-- The return bound `H` of the balanced presentation of a support, a function of the
-support alone (`sec:single-counter-law`: the profiles are prescribed by the counters). -/
+support alone (the single-counter reference model: the profiles are prescribed by the counters). -/
 noncomputable def HretBal (supp : Finset ℕ) : ℕ :=
   HretOf (suppBar supp) rem (fun _ => suppBar supp) fun _ k => MTree.markRoot (rem k)
 
@@ -460,7 +461,7 @@ lemma balancedPresentation_Tcount (ν : PMF ℕ) (supp : Finset ℕ)
 lemma one_le_TcountBal (supp : Finset ℕ) : 1 ≤ TcountBal supp := one_le_TcountOf _ _
 
 /-- **The one-law statement recovered, with explicit constants**
-(`sec:single-counter-law`): for an exponent parameter set with `α ≤ 5/2`, a finite counter
+(the single-counter reference model): for an exponent parameter set with `α ≤ 5/2`, a finite counter
 support, and a bound `T₀ ≥ ∑_{k ∈ supp ν} ν(k)^{-5/2}`, with `H = HretBal supp`,
 `T = TcountBal supp`, `B = max T₀ 1` and any `K > K₀(H, B)`: for every counter law with
 that support, every state space with a reflexive symmetric compatibility, a distinguished
@@ -503,7 +504,7 @@ theorem original_one_law_matching_explicit (p : Params) (hα : p.α ≤ 5 / 2) (
     (P.commonReturns_Hret Rv v0 μ) (by norm_num) (by norm_num) hμ hη (P.freshL false)
     (P.freshL false) (P.phase_freshL_eq Rv v0 μ false false) h
 
-/-- **The one-law statement recovered** (`sec:single-counter-law`): for an exponent
+/-- **The one-law statement recovered** (the single-counter reference model): for an exponent
 parameter set with `α ≤ 5/2`, a finite counter support and a bound `T₀`, there are
 constants `K, ε` depending only on these data such that, for every counter law `ν` with that
 support and `∑_{k ∈ supp ν} ν(k)^{-5/2} ≤ T₀`, every state space with a reflexive symmetric
@@ -529,7 +530,7 @@ theorem original_one_law_matching (p : Params) (hα : p.α ≤ 5 / 2) (supp : Fi
   exact original_one_law_matching_explicit p hα supp hne T0 (K0 + 1) hK ν hsupp hbud Rv v0 μ
     hrefl hsymm hμ hη h
 
-/-- **The one-law statement at exponent `2`** (`sec:single-counter-law`): the hypotheses
+/-- **The one-law statement at exponent `2`** (the single-counter reference model): the hypotheses
 `∑ ν(k)^{-5/2} ≤ T₀`, `μ(0) ≥ 1/2` and `η_2(μ) ≤ ε` of the manuscript give failure
 probability at most `K η_2(μ)` at every height, with `K, ε` depending only on `T₀` and the
 counter support. -/
@@ -544,7 +545,7 @@ theorem original_one_law_matching_two (supp : Finset ℕ) (hne : supp.Nonempty) 
   original_one_law_matching paramsTwo (by rw [paramsTwo_α]; norm_num) supp hne T0
 
 /-- **The one-law statement at exponent `2` under the `η_{5/2}` hypothesis**
-(`sec:single-counter-law`: `η_2(μ) ≤ η_{5/2}(μ)`, so the original hypotheses imply the new
+(the single-counter reference model: `η_2(μ) ≤ η_{5/2}(μ)`, so the original hypotheses imply the new
 ones): `η_{5/2}(μ) ≤ ε` gives failure probability at most `K η_{5/2}(μ)`. -/
 theorem original_one_law_matching_fiveHalf (supp : Finset ℕ) (hne : supp.Nonempty) (T0 : ℝ) :
     ∃ Kc ε : ℝ, 0 < ε ∧ ∀ ν : PMF ℕ, (∀ k, ν k ≠ 0 ↔ k ∈ supp) →
@@ -563,7 +564,7 @@ theorem original_one_law_matching_fiveHalf (supp : Finset ℕ) (hne : supp.Nonem
         hbound ν hsupp hbud Rv v0 μ hrefl hsymm hμ (h25.trans hη) h
     _ ≤ ENNReal.ofReal Kc * PhiD (5 / 2) μ μ Rv := mul_le_mul_right h25 _
 
-/-- **Any fixed positive lower bound on the matching probability** (`sec:single-counter-law`:
+/-- **Any fixed positive lower bound on the matching probability** (the single-counter reference model:
 "The conclusion with any fixed positive lower bound on matching probability follows by
 decreasing the threshold further"): for every `δ > 0` a threshold `ε` such that `η_α(μ) ≤ ε`
 gives failure probability at most `δ` at every height. -/
@@ -596,11 +597,11 @@ theorem original_one_law_matching_prob (p : Params) (hα : p.α ≤ 5 / 2) (supp
   · rw [ENNReal.ofReal_of_nonpos (by linarith), zero_mul]
     exact zero_le
 
-/-! ### The composite profiles (`sec:composite-process`) -/
+/-! ### The composite profiles (the composite reference model) -/
 
 /-- The balanced profile of the counter `v` with the designated leaf, the leftmost of the
-next fresh vertices of minimal depth (`sec:composite-process`), replaced by the tree `g`
-(`sec:composite-process`: "inserting one core descent into a specified leaf of another"). -/
+next fresh vertices of minimal depth (the composite reference model), replaced by the tree `g`
+(the composite reference model: "inserting one core descent into a specified leaf of another"). -/
 def graftPort (g : MTree) (v : ℕ) : MTree :=
   if h4 : 4 ≤ v then MTree.node (graftPort g (v / 2)) (rem (v - v / 2))
   else if v = 3 then MTree.node (rem 2) g
@@ -623,7 +624,7 @@ lemma graftPort_of_le_two (g : MTree) {v : ℕ} (hv : v ≤ 2) :
   rw [graftPort, dif_neg (by omega), if_neg (by omega)]
 
 /-- The grafted profile has `max v 2 - 1` leaves of the balanced profile plus the leaves of
-the graft (`sec:composite-process`: the arity `a + b - 1`). -/
+the graft (the composite reference model: the arity `a + b - 1`). -/
 lemma graftPort_leaves (g : MTree) (v : ℕ) :
     (graftPort g v).leaves = max v 2 - 1 + g.leaves := by
   induction v using Nat.strong_induction_on with
@@ -704,7 +705,7 @@ lemma allComp_markRoot_rem {S : Finset ℕ} {b : ℕ} (hb : max b 2 ∈ S) :
   rw [MTree.flatten_eq_self_of_noGraft hng.1, MTree.flatten_eq_self_of_noGraft hng.2, rem_max, h]
 
 /-- The composite profile of a counter under the exceptional data `exc`
-(`sec:composite-process`): the balanced profile of `a` with the
+(the composite reference model): the balanced profile of `a` with the
 marked balanced profile of `b` at the designated leaf for a declared pair `(a, b)`, the
 marked balanced profile otherwise. -/
 def compProfile (exc : ℕ → Option (ℕ × ℕ)) (k : ℕ) : MTree :=
@@ -726,12 +727,12 @@ lemma compProfile_of_none {exc : ℕ → Option (ℕ × ℕ)} {k : ℕ} (h : exc
 lemma rootPair_markRoot_node (σ : Bool) (l r : MTree) :
     rootPair σ (MTree.markRoot (MTree.node l r)) = rootPair σ (MTree.node l r) := rfl
 
-/-- The data of the prescribed composite two-law process (`sec:composite-process`,
-`sec:composite-process`): on each side `σ`, a counter law `ν σ` with finite support `K σ`
+/-- The data of the prescribed composite two-law process (the composite reference model,
+the composite reference model): on each side `σ`, a counter law `ν σ` with finite support `K σ`
 and exceptional data `exc σ`; a common core `S` of counters at least `2` and at most `N`;
 no counter at most `N` is exceptional; every charged ordinary counter merges into the core;
 every declared pair merges into the core and its counter is the arity `a + b - 1`
-(`sec:composite-process`) of the composite profile. -/
+(the composite reference model) of the composite profile. -/
 structure CompositeData where
   /-- the exceptional data of each side -/
   exc : Bool → ℕ → Option (ℕ × ℕ)
@@ -741,7 +742,7 @@ structure CompositeData where
   K : Bool → Finset ℕ
   /-- the common core -/
   S : Finset ℕ
-  /-- the bound above which the exceptional counters lie (`sec:composite-process`) -/
+  /-- the bound above which the exceptional counters lie (the composite reference model) -/
   N : ℕ
   mem_K : ∀ σ k, ν σ k ≠ 0 ↔ k ∈ K σ
   exc_none : ∀ σ j, j ≤ N → exc σ j = none
@@ -774,7 +775,7 @@ lemma pair_le_N {σ : Bool} {z : ℕ} {p : ℕ × ℕ} (h : C.exc σ z = some p)
   obtain ⟨h1, h2, -⟩ := C.pair_spec σ z p h
   exact ⟨(le_max_left _ _).trans (C.S_le_N _ h1), (le_max_left _ _).trans (C.S_le_N _ h2)⟩
 
-/-- **The presentation of the composite process** (`sec:composite-process`): the merged laws
+/-- **The presentation of the composite process** (the composite reference model): the merged laws
 on both sides, the balanced core profiles, and the composite profiles of the declared
 pairs. -/
 noncomputable def toPresentation : Presentation where
@@ -837,7 +838,7 @@ noncomputable def toPresentation : Presentation where
 
 end CompositeData
 
-/-! ### The law identification for the composite process (`sec:composite-process`) -/
+/-! ### The law identification for the composite process (the composite reference model) -/
 
 section CompositeIdentification
 
@@ -887,7 +888,7 @@ lemma typeOf_markRoot_rem (b : ℕ) :
   rw [h]
   rfl
 
-/-- The forced identity for ordinary counters at height `h` (`sec:composite-process`):
+/-- The forced identity for ordinary counters at height `h` (the composite reference model):
 below a forced vertex with an ordinary counter `j ≤ N`, whether a plain or a graft root, the
 state labelling of the composite tree law has the law of the state labelling of the tree law
 of the forced type with the balanced profile. -/
@@ -896,7 +897,7 @@ def CForcedClaim (h : ℕ) : Prop :=
     ∀ v : V, (muM cK (v, CtrC.ord j) h).map (statesOf h)
       = (muM (cM).kernel ((cP).toLive (σ, some τ), v) h).map (statesOf' h)
 
-/-- The forced identity for marked counters at height `h` (`sec:composite-process`): below a
+/-- The forced identity for marked counters at height `h` (the composite reference model): below a
 marked vertex of the pair `(a, b)` at stage `i`, the state labelling of the composite tree
 law has the law of the state labelling of the tree law of the forced type with the grafted
 profile of the running value. -/
@@ -908,7 +909,7 @@ def CMarkClaim (h : ℕ) : Prop :=
           ((cP).toLive (σ, some (graftPort (MTree.markRoot (rem b)) (val a i))), v) h).map
             (statesOf' h)
 
-/-- The fresh identity at height `h` for the composite process (`sec:composite-process`). -/
+/-- The fresh identity at height `h` for the composite process (the composite reference model). -/
 def CFreshClaim (h : ℕ) : Prop :=
   ∀ v : V, ((C.ν σ).bind fun k => (muM cK (v, CtrC.ord k) h).map (statesOf h))
     = (muM (cM).kernel ((cP).freshL σ, v) h).map (statesOf' h)
@@ -962,7 +963,7 @@ lemma cFreshClaim_zero : CFreshClaim C μ v0 Rv σ 0 := by
   exact PMF.bind_const (C.ν σ) _
 
 /-- The pair identity for ordinary counters at height `h` from the forced and fresh
-identities at height `h` (`sec:composite-process`, rule (i)). -/
+identities at height `h` (the composite reference model, rule (i)). -/
 lemma cPairOrd_of (h : ℕ) (hZ : CForcedClaim C μ v0 Rv σ h) (hF : CFreshClaim C μ v0 Rv σ h) :
     CPairOrd C μ v0 Rv σ h := by
   intro j hjN h1 h2
@@ -987,7 +988,7 @@ lemma cPairOrd_of (h : ℕ) (hZ : CForcedClaim C μ v0 Rv σ h) (hF : CFreshClai
         prodPMF_map_prod, (cP).toLive_fresh, cT_map_eq_of_fresh C μ v0 Rv σ h hF]
 
 /-- The pair identity for marked counters at height `h` from the forced, marked and fresh
-identities at height `h` (`sec:composite-process`, rules (ii) and (iii)). -/
+identities at height `h` (the composite reference model, rules (ii) and (iii)). -/
 lemma cPairMark_of (h : ℕ) (hZ : CForcedClaim C μ v0 Rv σ h) (hMk : CMarkClaim C μ v0 Rv σ h)
     (hF : CFreshClaim C μ v0 Rv σ h) : CPairMark C μ v0 Rv σ h := by
   intro a b i haN hbN h1 h2
@@ -1046,7 +1047,7 @@ lemma cMarkClaim_succ (h : ℕ) (hX : CPairMark C μ v0 Rv σ h) :
   rw [← PMF.map_comp, ← PMF.map_comp, hX a b i haN hbN hl hr]
 
 /-- The fresh identity at height `h + 1` from the pair identities at height `h`
-(`sec:composite-process`: the fresh mixture runs over the ordinary and the exceptional
+(the composite reference model: the fresh mixture runs over the ordinary and the exceptional
 counters of the side). -/
 lemma cFreshClaim_succ (h : ℕ) (hO : CPairOrd C μ v0 Rv σ h) (hMk : CPairMark C μ v0 Rv σ h) :
     CFreshClaim C μ v0 Rv σ (h + 1) := by
@@ -1106,7 +1107,7 @@ theorem cClaims : ∀ h, CForcedClaim C μ v0 Rv σ h ∧ CMarkClaim C μ v0 Rv 
     ⟨cForcedClaim_succ C μ v0 Rv σ h hO, cMarkClaim_succ C μ v0 Rv σ h hM,
       cFreshClaim_succ C μ v0 Rv σ h hO hM⟩
 
-/-- **The law identification for the composite process** (`sec:composite-process`: "the
+/-- **The law identification for the composite process** (the composite reference model: "the
 new proof covers the original composite Markov kernels exactly"): the state labelling of the
 fresh law of the composite kernel of side `σ` has the law of the state labelling of the fresh
 type of side `σ` of the composite presentation, at every height. -/
@@ -1122,7 +1123,7 @@ section CompositeFailure
 
 variable (C : CompositeData) (μ : PMF V) (v0 : V) (Rv : V → V → Prop)
 
-/-- **The two-law failure probabilities agree** (`sec:composite-process`): the failure
+/-- **The two-law failure probabilities agree** (the composite reference model): the failure
 probability of the left composite process against the right one at height `h` is the failure
 probability of the two fresh types of the composite presentation. -/
 theorem cFailProb_eq (h : ℕ) :
@@ -1136,7 +1137,7 @@ theorem cFailProb_eq (h : ℕ) :
 
 end CompositeFailure
 
-/-! ### The two-law statement recovered (`sec:composite-process`) -/
+/-! ### The two-law statement recovered (the composite reference model) -/
 
 /-- The return bound `H` of the composite presentation, a function of the exceptional data,
 the supports and the core alone. -/
@@ -1159,7 +1160,7 @@ lemma Hret_eq : C.toPresentation.Hret = HretComp C.exc C.K C.S := rfl
 lemma Tcount_eq : C.toPresentation.Tcount = TcountComp C.exc C.K := rfl
 
 /-- The core bound of the merged law is at most that of the original law
-(`sec:composite-process`: `B = max_σ ∑_{k ∈ S} ν_σ(k)^{-α}`). -/
+(the composite reference model: `B = max_σ ∑_{k ∈ S} ν_σ(k)^{-α}`). -/
 lemma inverseSum_nuBar_le {α : ℝ} (hα : 0 ≤ α) (σ : Bool) :
     ∑ a ∈ C.S, (nuBar (C.ν σ) a) ^ (-α) ≤ ∑ a ∈ C.S, (C.ν σ a) ^ (-α) := by
   refine Finset.sum_le_sum fun a ha => ?_
@@ -1173,7 +1174,7 @@ end CompositeData
 lemma one_le_TcountComp (exc : Bool → ℕ → Option (ℕ × ℕ)) (K : Bool → Finset ℕ) :
     1 ≤ TcountComp exc K := one_le_TcountOf _ _
 
-/-- **The two-law statement recovered, with explicit constants** (`sec:composite-process`):
+/-- **The two-law statement recovered, with explicit constants** (the composite reference model):
 for composite data with bound `B ≥ max_σ ∑_{k ∈ S} ν_σ(k)^{-α}`, with `H = HretComp`,
 `T = TcountComp` and any `K > K₀(H, B)`, every state space with a reflexive symmetric
 compatibility, a distinguished state of mass at least `1/2` and `η_α(μ) ≤ ε_K / 2` has the
@@ -1214,7 +1215,7 @@ theorem composite_two_law_matching_explicit (p : Params) (C : CompositeData) (B 
     (P.commonReturns_Hret Rv v0 μ) (by norm_num) (by norm_num) hμ hη (P.freshL false)
     (P.freshL true) (P.phase_freshL_eq Rv v0 μ false true) h
 
-/-- **The two-law statement recovered** (`sec:composite-process`
+/-- **The two-law statement recovered** (the composite reference model
 of the manuscript): for an exponent parameter set, exceptional data, supports, a common
 core and a bound `B`, there are constants `K, ε` such that, for every pair of counter laws
 forming composite data with these parameters and `max_σ ∑_{k ∈ S} ν_σ(k)^{-α} ≤ B`, every
@@ -1245,7 +1246,7 @@ theorem composite_two_law_matching (p : Params) (exc : Bool → ℕ → Option (
   exact composite_two_law_matching_explicit p C (max B 1) (le_max_right _ _) hbud' (K0 + 1) hK
     Rv v0 μ hrefl hsymm hμ hη h
 
-/-- **The two-law statement recovered at exponent `2`** (`sec:composite-process`: "The
+/-- **The two-law statement recovered at exponent `2`** (the composite reference model: "The
 exponent `2` already suffices"): the constants of `paramsTwo` and the `η_2` hypothesis. -/
 theorem composite_two_law_matching_two (exc : Bool → ℕ → Option (ℕ × ℕ))
     (K : Bool → Finset ℕ) (S : Finset ℕ) (B : ℝ) :

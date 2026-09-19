@@ -6,7 +6,7 @@ import ChainClasses.General.GeneralBushPoint
 import ChainClasses.Bushy.AssemblyRelabel
 import ChainClasses.Bushy.ShapeDecomposition
 import ChainClasses.General.GeneralCascade
-import ChainClasses.Universality.HairyCross
+import ChainClasses.Universality.BushyCross
 
 /-!
 `thm:hairy-general` of `trichotomy.tex`, the deterministic geometry, first part: binary

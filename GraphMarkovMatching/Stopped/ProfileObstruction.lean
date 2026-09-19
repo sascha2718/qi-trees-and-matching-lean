@@ -1,5 +1,5 @@
 /-
-The obstruction for preassigned profiles of `markov_matching_new_proof.tex`
+The obstruction for preassigned profiles of `arbitrary_offspring_matching.tex`
 (`sec:profile-obstruction`): equal branching semigroups alone do not ensure matching for
 fixed binary encodings.  The two varying-offspring processes of `Models/Counter.lean` with
 `ν_L = δ₄` and `ν_R = (δ₄ + δ₇)/2`, the path relation `0 – 1 – 2` on `Fin 3` and the

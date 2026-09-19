@@ -3,16 +3,18 @@ import ChainClasses.Bushy.ShapeLabelLaw
 import ChainClasses.Bushy.ShapeEtaSelf
 
 /-!
-`thm:regime-obstructions` (`it:obstr-hair`) of `gw_classes_simple.tex`:
+`thm:regime-obstructions` (`it:obstr-bushes`) of `gw_classes_simple.tex`:
 conditioned on survival, a sample of an offspring law on `{0,1,2}` with
-`θ₀ > 0` almost surely has hairs of unbounded depth.
+`θ₀ > 0` almost surely has bushes of unbounded depth.
 
 The sample tree is read as a set of binary words through the alphabet
 translation, the setting `Trichotomy.lean` assembles the classification in.
-The hairs are the bushes: a bush is joined to the rest of the sample by the
-single edge at its neck vertex, so it is a component of the punctured sample,
-finite because its subtree dies, and its depth is realised by a deepest bush
-vertex.  A bush of depth exceeding `n` appears almost surely because the shape
+Here a **bush** is the finite geometric obstruction formalised by `IsBush`:
+it is joined to the rest of the sample by the single edge at its neck vertex,
+so it is a component of the punctured sample.  This is distinct from
+**bushy**, which names regime (B).  The component is finite because its
+subtree dies, and its depth is realised by a deepest vertex.  A bush of depth
+exceeding `n` appears almost surely because the shape
 `deepShape n`, one neck vertex carrying the complete binary tree of height
 `n`, has positive mass, and by the product formula of `thm:shape-iid` the
 shapes along a ray of index words avoid it with probability `(1-p)^N → 0`.
@@ -20,11 +22,11 @@ shapes along a ray of index words avoid it with probability `(1-p)^N → 0`.
 * `letterBack`, `unletters`, `letters_treeDist`, `sampleWord`:
   the alphabet translation and its inverse, an isometry of the two ambient
   trees, and the sample of an offspring field as a set of binary words.
-* `exists_componentCompl_cone`, `exists_isHair_cone`, `UnboundedHairs`,
-  `unboundedHairs_of_deep_cones`: the deterministic half.  In the graph of a
+* `exists_componentCompl_cone`, `exists_isBush_cone`, `UnboundedBushes`,
+  `unboundedBushes_of_deep_cones`: the deterministic half.  In the graph of a
   prefix-closed set the vertices extending a child `x ++ [b]` form the
   component of `x`'s complement containing it; when that cone is finite it is
-  a hair at `x`, of depth the largest distance to `x`, realised by a deepest
+  a bush at `x`, of depth the largest distance to `x`, realised by a deepest
   cone vertex.
 * `Tri.complete`, `deepShape`, `shapeMass_deepShape_pos`: the witness shape,
   one neck vertex decorated by the complete binary tree of height `n`; it is
@@ -38,7 +40,7 @@ shapes along a ray of index words avoid it with probability `(1-p)^N → 0`.
   has a neck vertex with a dying second child whose subtree realises the
   complete binary tree, giving a finite cone with a vertex at distance
   `n + 1` from the neck vertex.
-* `unbounded_hairs_ae`: **`thm:regime-obstructions` (`it:obstr-hair`)**, in
+* `unbounded_bushes_ae`: **`thm:regime-obstructions` (`it:obstr-bushes`)**, in
   the form the separations of `Trichotomy.lean` consume.
 -/
 
@@ -46,7 +48,7 @@ namespace ChainClasses
 
 open MeasureTheory ProbabilityTheory
 open scoped ENNReal
-open BranchingProcess (Offspring IsHair sample survivalMeasure Survives)
+open BranchingProcess (Offspring IsBush sample survivalMeasure Survives)
 
 /-! ### The two ambient alphabets -/
 
@@ -207,11 +209,11 @@ theorem exists_componentCompl_cone (hT : PrefixClosed T) {x : Word} {b : Bool}
     obtain ⟨t, rfl⟩ := hz
     exact key t hzv
 
-/-- **A finite cone is a hair**, of depth the largest distance to the puncture,
+/-- **A finite cone is a bush**, of depth the largest distance to the puncture,
 realised by a deepest cone vertex. -/
-theorem exists_isHair_cone (hT : PrefixClosed T) {x : Word} {b : Bool}
+theorem exists_isBush_cone (hT : PrefixClosed T) {x : Word} {b : Bool}
     (hx : T x) (hy : T (x ++ [b])) (hfin : {w : Word | T w ∧ x ++ [b] <+: w}.Finite) :
-    ∃ h : ℕ, IsHair (wordGraph T) ⟨x, hx⟩ {w : {w : Word // T w} | x ++ [b] <+: w.1} h ∧
+    ∃ h : ℕ, IsBush (wordGraph T) ⟨x, hx⟩ {w : {w : Word // T w} | x ++ [b] <+: w.1} h ∧
       ∀ z : Word, (hz : T z) → x ++ [b] <+: z →
         (wordGraph T).dist ⟨z, hz⟩ ⟨x, hx⟩ ≤ h := by
   classical
@@ -234,23 +236,23 @@ theorem exists_isHair_cone (hT : PrefixClosed T) {x : Word} {b : Bool}
   · exact Finset.le_sup (f := fun w ↦ (wordGraph T).dist w ⟨x, hx⟩)
       (hfin'.mem_toFinset.mpr hpre)
 
-/-- **`thm:regime-obstructions` (`it:obstr-hair`)**, in the form
-`thm:hair-separation` consumes: hairs of unbounded depth. -/
-def UnboundedHairs (T : Word → Prop) : Prop :=
+/-- **`thm:regime-obstructions` (`it:obstr-bushes`)**, in the form
+`thm:bush-separation` consumes: bushes of unbounded depth. -/
+def UnboundedBushes (T : Word → Prop) : Prop :=
   ∀ n : ℕ, ∃ (c : {w : Word // T w}) (P : Set {w : Word // T w}) (h : ℕ),
-    n < h ∧ IsHair (wordGraph T) c P h
+    n < h ∧ IsBush (wordGraph T) c P h
 
-/-- A finite cone with a deep vertex for every depth gives hairs of unbounded
+/-- A finite cone with a deep vertex for every depth gives bushes of unbounded
 depth. -/
-theorem unboundedHairs_of_deep_cones (hT : PrefixClosed T)
+theorem unboundedBushes_of_deep_cones (hT : PrefixClosed T)
     (hdeep : ∀ n : ℕ, ∃ (x : Word) (b : Bool) (z : Word), T (x ++ [b]) ∧
       {w : Word | T w ∧ x ++ [b] <+: w}.Finite ∧ T z ∧ x ++ [b] <+: z ∧ n < treeDist z x) :
-    UnboundedHairs T := by
+    UnboundedBushes T := by
   intro n
   obtain ⟨x, b, z, hy, hfin, hz, hyz, hn⟩ := hdeep n
   have hx : T x := hT (List.prefix_append x [b]) hy
-  obtain ⟨h, hhair, hle⟩ := exists_isHair_cone hT hx hy hfin
-  refine ⟨⟨x, hx⟩, _, h, ?_, hhair⟩
+  obtain ⟨h, hbush, hle⟩ := exists_isBush_cone hT hx hy hfin
+  refine ⟨⟨x, hx⟩, _, h, ?_, hbush⟩
   have hd : treeDist z x ≤ h := by
     have h0 := hle z hz hyz
     rwa [wordGraph_dist hT] at h0
@@ -417,12 +419,12 @@ theorem ae_exists_shapeAt (θ : Offspring 2) (hq : θ.extinction < 1)
   exact nonpos_iff_eq_zero.mp
     (ge_of_tendsto' (ENNReal.tendsto_pow_atTop_nhds_zero_of_lt_one hlt) hle)
 
-/-! ### From the witness shape to a hair in the sample -/
+/-! ### From the witness shape to a bush in the sample -/
 
 /-- **The bridge.**  A copy whose shape is `deepShape n` has a neck vertex
 with a dying second child; the cone above that child is finite and reaches
 depth `n + 1` below the neck vertex. -/
-theorem deep_cone_of_shapeAt {c : Amb → ℕ} (hc : IsHairySample c) {w : Word} {n : ℕ}
+theorem deep_cone_of_shapeAt {c : Amb → ℕ} (hc : IsBushySample c) {w : Word} {n : ℕ}
     (hshape : shapeAt c w = deepShape n) :
     ∃ (x : Word) (b : Bool) (z : Word), sampleWord c (x ++ [b]) ∧
       {a : Word | sampleWord c a ∧ x ++ [b] <+: a}.Finite ∧
@@ -514,17 +516,17 @@ theorem deep_cone_of_shapeAt {c : Amb → ℕ} (hc : IsHairySample c) {w : Word}
 
 /-! ### The obstruction, almost surely -/
 
-/-- **`thm:regime-obstructions` (`it:obstr-hair`)**: conditioned on
-survival, the sample almost surely has hairs of unbounded depth. -/
-theorem unbounded_hairs_ae (θ : Offspring 2) (hq : θ.extinction < 1)
+/-- **`thm:regime-obstructions` (`it:obstr-bushes`)**: conditioned on
+survival, the sample almost surely has bushes of unbounded depth. -/
+theorem unbounded_bushes_ae (θ : Offspring 2) (hq : θ.extinction < 1)
     (hq0 : 0 < θ.extinction) (h2 : 0 < θ 2) :
-    ∀ᵐ c ∂(survivalMeasure (N := 2) θ), UnboundedHairs (sampleWord c) := by
+    ∀ᵐ c ∂(survivalMeasure (N := 2) θ), UnboundedBushes (sampleWord c) := by
   have hae : ∀ᵐ c ∂(survivalMeasure (N := 2) θ), ∀ n : ℕ,
       ∃ k : ℕ, shapeAt c (List.replicate k false) = deepShape n :=
     ae_all_iff.mpr fun n ↦ ae_exists_shapeAt θ hq hq0 h2 (deepShape n)
       (shapeMass_deepShape_pos θ hq hq0 h2 n)
-  filter_upwards [ae_isHairySample_of_pos θ hq h2, hae] with c hc hdeep
-  refine unboundedHairs_of_deep_cones (prefixClosed_sampleWord c) fun n ↦ ?_
+  filter_upwards [ae_isBushySample_of_pos θ hq h2, hae] with c hc hdeep
+  refine unboundedBushes_of_deep_cones (prefixClosed_sampleWord c) fun n ↦ ?_
   obtain ⟨k, hk⟩ := hdeep n
   obtain ⟨x, b, z, hy, hfin, hz, hyz, hn⟩ := deep_cone_of_shapeAt hc hk
   exact ⟨x, b, z, hy, hfin, hz, hyz, hn⟩

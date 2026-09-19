@@ -1,7 +1,8 @@
 /-
 The application of `thm:markov-matching` to two product laws with a common core
-(`markov_matching_new_proof.tex`, `sec:markov-hypotheses` (last paragraphs), `sec:common-generators`,
-and the "In particular" after `thm:markov-matching`).
+(`arbitrary_offspring_matching.tex`, `sec:common-presentations`,
+`sec:types-degrees`, `sec:return-times`, `thm:common-semigroup-matching`, and the
+"In particular" after `thm:markov-matching`).
 
 * `liveOf`, `TcountOf`, `coreDepthsOf`, `gPhaseOf`, `returnThresholdOf`, `ellOf`, `HretOf`,
   `inverseSumOf`: the constants `T`, `H`, `B` of the finite alternative as functions of the
@@ -10,7 +11,7 @@ and the "In particular" after `thm:markov-matching`).
 * `Presentation.commonReturns_Hret`, `Presentation.commonReturns_exists`: the return bound
   `thm:bounded-return` at `H = c_Γ + 2ℓ` with the explicit return threshold;
 * `Presentation.inverseSum_le_of_floor`: the bound `B ≤ #S c^{-α}` from a floor `c` on the core
-  probabilities (`sec:positive-matching`);
+  probabilities (`thm:atomic-normalisation`);
 * `Presentation.presentation_matching_explicit`, `presentation_matching`,
   `presentation_matching_infinite`, `presentation_matching_eta`,
   `presentation_matching_of_lambda`: `thm:markov-matching` for the Markov model of a
@@ -33,9 +34,9 @@ namespace GraphMarkovMatching.Stopped
 open GraphMarkovMatching GraphMarkovMatching.Support Model
 open scoped ENNReal Classical
 
-/-! ### The constants as functions of the profile data (`sec:markov-hypotheses`) -/
+/-! ### The constants as functions of the profile data -/
 
-/-- The live types of profile data (`sec:markov-hypotheses`): the two fresh types and the forced types
+/-- The live types of profile data (`sec:types-degrees`): the two fresh types and the forced types
 at the proper subtrees, other than leaves, of the supported profiles. This is the body of
 `Presentation.live`, as a function of the supports and profiles alone. -/
 noncomputable def liveOf (supp : Bool → Finset ℕ) (C : Bool → ℕ → MTree) : Finset PType :=
@@ -49,14 +50,15 @@ noncomputable def liveOf (supp : Bool → Finset ℕ) (C : Bool → ℕ → MTre
 noncomputable def TcountOf (supp : Bool → Finset ℕ) (C : Bool → ℕ → MTree) : ℕ :=
   (liveOf supp C).card
 
-/-- The core leaf depths `R_0` of profile data (`sec:markov-hypotheses`). -/
+/-- The core leaf depths `R_0` of profile data (`sec:return-times`). -/
 noncomputable def coreDepthsOf (S : Finset ℕ) (D : ℕ → MTree) : Finset ℕ :=
   S.biUnion fun a => (D a).leafDepths
 
-/-- `g = gcd R_0` of profile data (`sec:markov-hypotheses`). -/
+/-- `g = gcd R_0` of profile data (`sec:return-times`). -/
 noncomputable def gPhaseOf (S : Finset ℕ) (D : ℕ → MTree) : ℕ := (coreDepthsOf S D).gcd id
 
-/-- The explicit return threshold `g (a_0 - 1)(b_0 - 1)` of `sec:markov-hypotheses` (`thm:bounded-return`),
+/-- The explicit return threshold `g (a_0 - 1)(b_0 - 1)` of `sec:return-times`
+(`thm:bounded-return`),
 zero when the core is empty. -/
 noncomputable def returnThresholdOf (S : Finset ℕ) (D : ℕ → MTree) : ℕ :=
   if h : (coreDepthsOf S D).Nonempty then
@@ -64,7 +66,7 @@ noncomputable def returnThresholdOf (S : Finset ℕ) (D : ℕ → MTree) : ℕ :
       * ((coreDepthsOf S D).max' h / gPhaseOf S D - 1))
   else 0
 
-/-- The maximal profile height `ℓ` of profile data (`sec:markov-hypotheses`). -/
+/-- The maximal profile height `ℓ` of profile data (`sec:common-presentations`). -/
 noncomputable def ellOf (supp : Bool → Finset ℕ) (C : Bool → ℕ → MTree) : ℕ :=
   (Finset.univ (α := Bool)).sup fun σ => (supp σ).sup fun k => (C σ k).height
 
@@ -74,7 +76,7 @@ noncomputable def HretOf (S : Finset ℕ) (D : ℕ → MTree) (supp : Bool → F
     (C : Bool → ℕ → MTree) : ℕ :=
   returnThresholdOf S D + 2 * ellOf supp C
 
-/-- The bound `B` `#S c^{-α}` from the core floor `c` (`sec:positive-matching`). -/
+/-- The bound `B = #S c^{-α}` from the core floor `c` (`thm:atomic-normalisation`). -/
 noncomputable def inverseSumOf (S : Finset ℕ) (c α : ℝ) : ℝ := S.card * c ^ (-α)
 
 /-- The live types of profile data contain the left fresh type. -/
@@ -87,7 +89,8 @@ lemma one_le_TcountOf (supp : Bool → Finset ℕ) (C : Bool → ℕ → MTree) 
     1 ≤ TcountOf supp C :=
   Finset.card_pos.mpr ⟨_, fresh_mem_liveOf supp C false⟩
 
-/-- `1 ≤ #S c^{-α}` for a nonempty core and a floor `0 < c ≤ 1` (`sec:positive-matching`). -/
+/-- `1 ≤ #S c^{-α}` for a nonempty core and a floor `0 < c ≤ 1`
+(`thm:atomic-normalisation`). -/
 lemma one_le_inverseSumOf {S : Finset ℕ} (hS : S.Nonempty) {c : ℝ} (hc0 : 0 < c) (hc1 : c ≤ 1)
     {α : ℝ} (hα : 0 ≤ α) : 1 ≤ inverseSumOf S c α := by
   unfold inverseSumOf
@@ -104,7 +107,7 @@ variable (P : Presentation) {V : Type} (R : V → V → Prop) (zero : V) (μ : P
 /-- The live types are those of the profile data. -/
 lemma live_eq : P.live = liveOf P.supp P.C := rfl
 
-/-- `T = #live` (`eq:transition-budget`, `sec:markov-hypotheses`). -/
+/-- `T = #live` (`eq:transition-budget`, `sec:types-degrees`). -/
 noncomputable def Tcount : ℕ := TcountOf P.supp P.C
 
 /-- `T = #live`. -/
@@ -119,7 +122,7 @@ lemma coreDepths_eq : P.coreDepths = coreDepthsOf P.S P.D := rfl
 /-- The explicit return threshold of a presentation (`thm:bounded-return`). -/
 noncomputable def returnThreshold : ℕ := returnThresholdOf P.S P.D
 
-/-- The return-threshold bound (`thm:bounded-return`, `sec:markov-hypotheses`): every multiple of `g` at
+/-- The return-threshold bound (`thm:bounded-return`, `sec:return-times`): every multiple of `g` at
 least the return threshold lies in `Γ`. -/
 theorem returnThreshold_spec : ∀ n, P.returnThreshold ≤ n → P.gPhase ∣ n → n ∈ P.Gamma := by
   have h := P.returnThreshold_bound P.S_nonempty
@@ -147,8 +150,8 @@ theorem commonReturns_exists :
       (P.toModel R zero μ).CommonReturns (P.phase R zero μ) H :=
   ⟨P.Hret, fun R zero μ => P.commonReturns_Hret R zero μ⟩
 
-/-- The bound `B` `#S c^{-α}` of a presentation from the core floor `c`
-(`sec:positive-matching`). -/
+/-- The bound `B = #S c^{-α}` of a presentation from the core floor `c`
+(`thm:atomic-normalisation`). -/
 noncomputable def coreInverseSum (c α : ℝ) : ℝ := inverseSumOf P.S c α
 
 /-- `1 ≤ B` for a floor `0 < c ≤ 1`. -/
@@ -156,7 +159,7 @@ lemma one_le_coreInverseSum {c : ℝ} (hc0 : 0 < c) (hc1 : c ≤ 1) {α : ℝ} (
     1 ≤ P.coreInverseSum c α :=
   one_le_inverseSumOf P.S_nonempty hc0 hc1 hα
 
-/-- **The bound `B` from a core floor** (`sec:positive-matching`): if every core probability on
+/-- **The bound `B` from a core floor** (`thm:atomic-normalisation`): if every core probability on
 either side is at least `c`, the inverse-probability sum of the core selection is at most `#S c^{-α}`. -/
 theorem inverseSum_le_of_floor (hc : (P.toModel R zero μ).IsCompat) (hb0 : rE μ R zero ≠ 0)
     {α : ℝ} (hα : 0 ≤ α) {c : ℝ} (hc0 : 0 < c)
@@ -177,7 +180,7 @@ theorem inverseSum_le_of_floor (hc : (P.toModel R zero μ).IsCompat) (hb0 : rE �
 /-- The fresh live types are fresh in the model. -/
 lemma fresh_freshL (σ : Bool) : (P.toModel R zero μ).fresh (P.freshL σ) := rfl
 
-/-- The phase of a fresh live type is zero (`sec:markov-hypotheses`). -/
+/-- The phase of a fresh live type is zero (`sec:return-times`). -/
 lemma phase_freshL (σ : Bool) : (P.phase R zero μ).θ (P.freshL σ) = 0 :=
   (P.phase R zero μ).fresh_zero _ (P.fresh_freshL R zero μ σ)
 
@@ -189,7 +192,7 @@ lemma phase_freshL_eq (σ σ' : Bool) :
 /-! ### The matching theorem for a presentation (`thm:markov-matching`, "In particular") -/
 
 /-- **`thm:markov-matching` for the Markov model of a presentation, with the explicit
-constants** (`sec:markov-hypotheses`, "The construction verifies every hypothesis"): with `T = #live`,
+constants** (the verification leading to `thm:common-semigroup-matching`): with `T = #live`,
 `H = c_Γ + 2ℓ` and `B = #S c^{-α}` from a floor `c` on the core probabilities, if
 `ζ_α ≤ ε_K` then every equal-phase pair fails at every height with probability at most
 `K_match ζ_α`, the fresh pairs with probability at most `K ζ_α`, and every equal-phase
@@ -319,9 +322,9 @@ theorem presentation_matching_of_lambda {α : ℝ} (hα : 1 ≤ α) (hlam : lamb
           ≤ ENNReal.ofReal Kc * (P.toModel R zero μ).zeta α :=
   P.presentation_matching (Params.ofLambda hα hlam) hc0 hc1 hfloor
 
-/-! ### Uniformity over the arity masses (`sec:markov-hypotheses`, last paragraph) -/
+/-! ### Uniformity over the arity masses (`thm:common-semigroup-matching`) -/
 
-/-- **Uniformity** (`sec:markov-hypotheses`: "The constants depend only on the finite supports, the
+/-- **Uniformity** (`thm:common-semigroup-matching`): the constants depend only on the finite supports, the
 atomic floor and the exponent"): for fixed supports, profiles and a floor `c`, constants
 uniform over all presentations with these data and all core probabilities at least `c`. -/
 theorem presentation_matching_uniform (p : Params) (S : Finset ℕ) (D : ℕ → MTree)
@@ -348,7 +351,7 @@ theorem presentation_matching_uniform (p : Params) (S : Finset ℕ) (D : ℕ →
     intro P hPS
     exact absurd (hPS ▸ P.S_nonempty) hS
 
-/-- **Uniformity on the infinite tree** (`sec:markov-hypotheses`, last paragraph). -/
+/-- **Uniformity on the infinite tree** (`thm:common-semigroup-matching`). -/
 theorem presentation_matching_uniform_infinite (p : Params) (S : Finset ℕ) (D : ℕ → MTree)
     (supp : Bool → Finset ℕ) (C : Bool → ℕ → MTree) {c : ℝ} (hc0 : 0 < c) (hc1 : c ≤ 1) :
     ∃ Kc ε : ℝ, 0 < ε ∧ ∀ P : Presentation, P.S = S → P.D = D → P.supp = supp → P.C = C →
@@ -640,13 +643,14 @@ theorem exists_presentation (νL νR : PMF ℕ) (suppL suppR : Finset ℕ)
       ∧ (↑P.S : Set ℕ) = (fun a => a + 1) '' atoms (shiftSemigroup ↑suppL) :=
   ⟨atomicPresentation νL νR suppL suppR hL hR h2L h2R hne hsem, rfl, rfl, coe_atomCore suppL⟩
 
-/-! ### The floor of a fixed pair of laws (`sec:markov-hypotheses`, last paragraph) -/
+/-! ### The floor of a fixed pair of laws (`thm:common-semigroup-matching`) -/
 
 namespace Presentation
 
 variable (P : Presentation)
 
-/-- **The core floor is automatically positive** (`sec:markov-hypotheses`: "For each fixed pair of
+/-- **The core floor is automatically positive** (the paragraph following
+`thm:common-semigroup-matching`): for each fixed pair of
 arity laws this floor is automatically positive, since the finite atomic core belongs to
 both supports"): some `0 < c ≤ 1` is a lower bound for every core probability on either
 side. -/

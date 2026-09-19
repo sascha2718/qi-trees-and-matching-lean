@@ -11,7 +11,7 @@ This is the one genuinely two-variable `rpow` inequality in the whole
 development, and the paper proves it by a two-case split on `e ≤ d/2`:
 
 * `e ≤ d/2`  the d-term goes through `L_bound` (`eq:lambda-max`) and the `chord`
-             (`eq:iid-chord`) with `z = 2e/(1+d) ≤ 1/2`; the e-term is a `v ≤ s`
+             (`eq:chord`) with `z = 2e/(1+d) ≤ 1/2`; the e-term is a `v ≤ s`
              monotonicity plus `e ≤ d/2`. The product-term coefficient is
              `2·(14/75)·(28/3) + 1/2 = 3.984 < 4`, the same rational check that
              fixes the constants in `Maxima.lean`.
@@ -19,7 +19,7 @@ development, and the paper proves it by a two-case split on `e ≤ d/2`:
              `d/2 < e ≤ d`) give the bound directly with the product term alone.
 
 The paper writes `L_α = 6√15/125` and `C = 8√2-2` in `eq:row-bound`, `eq:lambda-max`
-and `eq:iid-chord`; we use the rational surrogates `L_α = 14/75` and
+and `eq:chord`; we use the rational surrogates `L_α = 14/75` and
 `C = chordConst = 28/3` throughout, so no surd enters. Both cases reduce every
 denominator to `u^α v^α` via `s ≥ v`, so
 the only `rpow` facts used are `chord`, `L_bound`, `Real.rpow_le_rpow`

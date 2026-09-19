@@ -14,7 +14,7 @@ law of bounded support against the obstructions, on the graph footing of
 Everything is stated for the graph `gSampleGraph c = wordGraphN (· ∈ sample c)` of
 the sample tree of an offspring field `c : GWord N → ℕ`, almost surely under the
 conditioned law `survivalMeasure θ`.  The deterministic layer mirrors
-`Trichotomy.lean`, `Hairs.lean`, `ThreeRays.lean` and `Converse.lean` over words in
+`Trichotomy.lean`, `Bushes.lean`, `ThreeRays.lean` and `Converse.lean` over words in
 `Fin N`, the rays being chains of children rather than the chain-letter descents of
 the binary case.  The probabilistic layer reads the skeleton through the rank-indexed
 subfields `bushAt` and `neckIter` of the Harris decomposition, which `neckVertex`
@@ -26,10 +26,10 @@ of the stepped field fail along the first `k + 1` iterates with probability at m
 * `wordGraphN_connected`, `wordGraphN_isBridge`, `wordGraphN_isTree`: the graph of a
   nonempty prefix-closed set of words over `Fin N` is a tree.
 * `HasThreeRaysN`, `not_quasiIsometric_rayGraph_of_threeRaysN`, `NearLineN`,
-  `UnboundedHairsN`, `not_quasiIsometric_of_hairsN_of_nearLineN`, `HasThinBallsG`,
+  `UnboundedBushesN`, `not_quasiIsometric_of_bushesN_of_nearLineN`, `HasThinBallsG`,
   `not_quasiIsometric_binary_of_thinBalls`, `HasThinBallsN`,
   `not_quasiIsometric_binary_of_thinBallsN`, `not_quasiIsometric_of_thinBallsN_of_binary`:
-  **the obstructions of `thm:three-rays`, `thm:hair-separation` and
+  **the obstructions of `thm:three-rays`, `thm:bush-separation` and
   `thm:bottleneck`** in the forms the general assembly consumes.
 * `IsChain`, `exists_chain_of_forall_child`, `isRayN_of_chain`, `chainFrom`, `upChain`,
   `treeDist_chain_upChain`: chains of children as rays, the ray climbing to a split and
@@ -41,9 +41,9 @@ of the stepped field fail along the first `k + 1` iterates with probability at m
   **`thm:regime-obstructions-general` (`it:gen-obstr-lines`), the deterministic
   form**: in a tree without leaves every vertex lies within the depth of a split of a
   line.
-* `exists_componentCompl_coneN`, `exists_isHair_coneN`, `unboundedHairsN_of_deep_cones`:
-  **`thm:regime-obstructions-general` (`it:gen-obstr-hair`), the deterministic
-  form**: a finite cone above a child is a hair.
+* `exists_componentCompl_coneN`, `exists_isBush_coneN`, `unboundedBushesN_of_deep_cones`:
+  **`thm:regime-obstructions-general` (`it:gen-obstr-bushes`), the deterministic
+  form**: a finite cone above a child is a bush.
 * `ball_subset_neck`, `hasThinBallsN_of_necks`: **`thm:regime-obstructions-general`
   (`it:gen-obstr-thin`), the deterministic form**: the midpoint of a neck of
   length `2ℓ` has a thin ball.
@@ -63,17 +63,17 @@ of the stepped field fail along the first `k + 1` iterates with probability at m
   **`thm:regime-obstructions-general` (`it:gen-obstr-lines`)**.
 * `ae_exists_neck`, `hasThinBallsN_sample`, `thinBalls_gSample_ae`:
   **`thm:regime-obstructions-general` (`it:gen-obstr-thin`)**.
-* `deepEvent`, `bushMeasure_deepEvent_pos`, `hairEvent`, `hairMass_ne_zero`,
-  `survivalMeasure_hairEvent_inter`, `unboundedHairsN_sample`,
-  `unbounded_hairs_gSample_ae`:
-  **`thm:regime-obstructions-general` (`it:gen-obstr-hair`)**.
+* `deepEvent`, `bushMeasure_deepEvent_pos`, `bushEvent`, `bushMass_ne_zero`,
+  `survivalMeasure_bushEvent_inter`, `unboundedBushesN_sample`,
+  `unbounded_bushes_gSample_ae`:
+  **`thm:regime-obstructions-general` (`it:gen-obstr-bushes`)**.
 -/
 
 namespace ChainClasses
 
 open MeasureTheory ProbabilityTheory SimpleGraph
 open scoped ENNReal
-open BranchingProcess (Offspring QuasiIsometric IsRay IsLine IsHair rayGraph sample
+open BranchingProcess (Offspring QuasiIsometric IsRay IsLine IsBush rayGraph sample
   survivalMeasure Survives survivors skeletonDegree skeleton bushAt skelSub bushMeasure
   decorationEvent decorationMass dyingAt)
 
@@ -221,28 +221,28 @@ theorem not_quasiIsometric_rayGraph_of_threeRaysN (hT : PrefixClosedN T)
   exact BranchingProcess.not_quasiIsometric_rayGraph (wordGraphN_isTree hT ⟨v⟩) hray hbase hmeet
 
 /-- **`thm:regime-obstructions-general` (`it:gen-obstr-lines`)**, in the form
-`thm:hair-separation` consumes: every vertex lies within a bounded distance of a
+`thm:bush-separation` consumes: every vertex lies within a bounded distance of a
 line. -/
 def NearLineN (T : BranchingProcess.Word N → Prop) : Prop :=
   ∃ R : ℕ, ∀ u : {w : BranchingProcess.Word N // T w},
     ∃ (l : ℤ → {w : BranchingProcess.Word N // T w}) (k : ℤ),
       IsLine (wordGraphN T) l ∧ (wordGraphN T).dist u (l k) ≤ R
 
-/-- **`thm:regime-obstructions-general` (`it:gen-obstr-hair`)**, in the form
-`thm:hair-separation` consumes: hairs of unbounded depth. -/
-def UnboundedHairsN (T : BranchingProcess.Word N → Prop) : Prop :=
+/-- **`thm:regime-obstructions-general` (`it:gen-obstr-bushes`)**, in the form
+`thm:bush-separation` consumes: bushes of unbounded depth. -/
+def UnboundedBushesN (T : BranchingProcess.Word N → Prop) : Prop :=
   ∀ n : ℕ, ∃ (c : {w : BranchingProcess.Word N // T w})
     (P : Set {w : BranchingProcess.Word N // T w}) (h : ℕ),
-    n < h ∧ IsHair (wordGraphN T) c P h
+    n < h ∧ IsBush (wordGraphN T) c P h
 
-/-- **`thm:hair-separation` for two sets of words over `Fin N`.** -/
-theorem not_quasiIsometric_of_hairsN_of_nearLineN {N' : ℕ}
+/-- **`thm:bush-separation` for two sets of words over `Fin N`.** -/
+theorem not_quasiIsometric_of_bushesN_of_nearLineN {N' : ℕ}
     {T' : BranchingProcess.Word N' → Prop} (hT : PrefixClosedN T) (hT' : PrefixClosedN T')
-    (hne : T []) (hne' : T' []) (hhair : UnboundedHairsN T) (hline : NearLineN T') :
+    (hne : T []) (hne' : T' []) (hbush : UnboundedBushesN T) (hline : NearLineN T') :
     ¬ QuasiIsometric (wordGraphN T) (wordGraphN T') := by
   obtain ⟨R, hR⟩ := hline
-  exact BranchingProcess.not_quasiIsometric_of_hair_of_line (R := R)
-    (wordGraphN_isTree hT ⟨⟨[], hne⟩⟩) (wordGraphN_isTree hT' ⟨⟨[], hne'⟩⟩) hhair hR
+  exact BranchingProcess.not_quasiIsometric_of_bush_of_line (R := R)
+    (wordGraphN_isTree hT ⟨⟨[], hne⟩⟩) (wordGraphN_isTree hT' ⟨⟨[], hne'⟩⟩) hbush hR
 
 /-- The hypothesis of `thm:bottleneck` for a graph: at every radius `ℓ` some ball of
 radius `ℓ` is covered by `2ℓ + 1` vertices, as it is when the ball is a segment of
@@ -790,7 +790,7 @@ theorem nearLineN_of_split (hT : PrefixClosedN T)
   · obtain ⟨q, x, y, hxy, hqu, hqb⟩ := exists_divergeFin hub hbu
     exact hline q x y hxy (hT hqb (hT (List.prefix_append b [a]) hba)) hqu
 
-/-! ### The cone above a child is a hair -/
+/-! ### The cone above a child is a bush -/
 
 /-- One step of the tree metric keeps the cone: a neighbour of a vertex extending
 `x ++ [j]`, other than `x` itself, extends `x ++ [j]` too. -/
@@ -870,11 +870,11 @@ theorem exists_componentCompl_coneN (hT : PrefixClosedN T) {x : GWord N} {j : Fi
     obtain ⟨t, rfl⟩ := hz
     exact key t hzv
 
-/-- **A finite cone is a hair**, of depth the largest distance to the puncture,
+/-- **A finite cone is a bush**, of depth the largest distance to the puncture,
 realised by a deepest cone vertex. -/
-theorem exists_isHair_coneN (hT : PrefixClosedN T) {x : GWord N} {j : Fin N}
+theorem exists_isBush_coneN (hT : PrefixClosedN T) {x : GWord N} {j : Fin N}
     (hx : T x) (hy : T (x ++ [j])) (hfin : {w : GWord N | T w ∧ x ++ [j] <+: w}.Finite) :
-    ∃ h : ℕ, IsHair (wordGraphN T) ⟨x, hx⟩ {w : {w : GWord N // T w} | x ++ [j] <+: w.1} h ∧
+    ∃ h : ℕ, IsBush (wordGraphN T) ⟨x, hx⟩ {w : {w : GWord N // T w} | x ++ [j] <+: w.1} h ∧
       ∀ z : GWord N, (hz : T z) → x ++ [j] <+: z →
         (wordGraphN T).dist ⟨z, hz⟩ ⟨x, hx⟩ ≤ h := by
   classical
@@ -897,17 +897,17 @@ theorem exists_isHair_coneN (hT : PrefixClosedN T) {x : GWord N} {j : Fin N}
   · exact Finset.le_sup (f := fun w ↦ (wordGraphN T).dist w ⟨x, hx⟩)
       (hfin'.mem_toFinset.mpr hpre)
 
-/-- A finite cone with a deep vertex for every depth gives hairs of unbounded depth. -/
-theorem unboundedHairsN_of_deep_cones (hT : PrefixClosedN T)
+/-- A finite cone with a deep vertex for every depth gives bushes of unbounded depth. -/
+theorem unboundedBushesN_of_deep_cones (hT : PrefixClosedN T)
     (hdeep : ∀ n : ℕ, ∃ (x : GWord N) (j : Fin N) (z : GWord N), T (x ++ [j]) ∧
       {w : GWord N | T w ∧ x ++ [j] <+: w}.Finite ∧ T z ∧ x ++ [j] <+: z ∧
         n < BranchingProcess.treeDist z x) :
-    UnboundedHairsN T := by
+    UnboundedBushesN T := by
   intro n
   obtain ⟨x, j, z, hy, hfin, hz, hyz, hn⟩ := hdeep n
   have hx : T x := hT (List.prefix_append x [j]) hy
-  obtain ⟨h, hhair, hle⟩ := exists_isHair_coneN hT hx hy hfin
-  refine ⟨⟨x, hx⟩, _, h, ?_, hhair⟩
+  obtain ⟨h, hbush, hle⟩ := exists_isBush_coneN hT hx hy hfin
+  refine ⟨⟨x, hx⟩, _, h, ?_, hbush⟩
   have hd : BranchingProcess.treeDist z x ≤ h := by
     have h0 := hle z hz hyz
     rwa [wordGraphN_dist hT] at h0
@@ -1722,9 +1722,9 @@ theorem thinBalls_gSample_ae (hJN : J ≤ N) (hq : θ.extinction < 1) (h0 : θ 0
 
 end ThinBalls
 
-/-! ### Hairs of unbounded depth at `θ₀ > 0` -/
+/-! ### Bushes of unbounded depth at `θ₀ > 0` -/
 
-section Hairs
+section Bushes
 
 variable (θ : Offspring J)
 
@@ -1790,30 +1790,30 @@ theorem bushMeasure_deepEvent_pos (hJN : J ≤ N) (hq0 : 0 < θ.extinction) (hJ1
     _ ≤ bushMeasure (N := N) θ (deepEvent n) := measure_mono hsub
 
 /-- The constraint sets of the witness decoration: the first dying subtree is deep. -/
-def hairSets (n : ℕ) : ℕ → Set (GWord N → ℕ) :=
+def bushSets (n : ℕ) : ℕ → Set (GWord N → ℕ) :=
   fun m ↦ if m = 0 then deepEvent n else Set.univ
 
-lemma measurableSet_hairSets (n m : ℕ) : MeasurableSet (hairSets (N := N) n m) := by
-  rw [hairSets]
+lemma measurableSet_bushSets (n m : ℕ) : MeasurableSet (bushSets (N := N) n m) := by
+  rw [bushSets]
   split
   · exact measurableSet_deepEvent n
   · exact MeasurableSet.univ
 
 /-- **The witness decoration**: a neck vertex of full offspring whose first dying
 subtree reaches depth `n`. -/
-def hairEvent (J : ℕ) (n : ℕ) : Set (GWord N → ℕ) := decorationEvent J 1 (hairSets n)
+def bushEvent (J : ℕ) (n : ℕ) : Set (GWord N → ℕ) := decorationEvent J 1 (bushSets n)
 
-lemma measurableSet_hairEvent (n : ℕ) : MeasurableSet (hairEvent (N := N) J n) :=
-  BranchingProcess.measurableSet_decorationEvent J 1 (measurableSet_hairSets n)
+lemma measurableSet_bushEvent (n : ℕ) : MeasurableSet (bushEvent (N := N) J n) :=
+  BranchingProcess.measurableSet_decorationEvent J 1 (measurableSet_bushSets n)
 
 /-- The mass of the witness decoration. -/
-noncomputable def hairMass (n : ℕ) : ℝ≥0∞ := decorationMass (N := N) θ J 1 (hairSets n)
+noncomputable def bushMass (n : ℕ) : ℝ≥0∞ := decorationMass (N := N) θ J 1 (bushSets n)
 
 /-- **The witness decoration has positive mass.** -/
-lemma hairMass_ne_zero (hJN : J ≤ N) (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction)
-    (hJ2 : 2 ≤ J) (hθJ : 0 < θ J) (n : ℕ) : hairMass (N := N) θ n ≠ 0 := by
+lemma bushMass_ne_zero (hJN : J ≤ N) (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction)
+    (hJ2 : 2 ≤ J) (hθJ : 0 < θ J) (n : ℕ) : bushMass (N := N) θ n ≠ 0 := by
   haveI := BranchingProcess.isProbabilityMeasure_bushMeasure (N := N) θ hJN hq0
-  rw [hairMass, decorationMass]
+  rw [bushMass, decorationMass]
   refine mul_ne_zero ?_ ?_
   · have h1q : (0 : ℝ) < 1 - θ.extinction := by linarith
     have hJpos : (0 : ℝ) < J := by exact_mod_cast (by omega : 0 < J)
@@ -1822,7 +1822,7 @@ lemma hairMass_ne_zero (hJN : J ≤ N) (hq : θ.extinction < 1) (hq0 : 0 < θ.ex
     have := θ.extinction_nonneg
     positivity
   · refine Finset.prod_ne_zero_iff.mpr fun m _ ↦ ?_
-    rw [hairSets]
+    rw [bushSets]
     split
     · exact (bushMeasure_deepEvent_pos θ hJN hq0 (by omega) hθJ n).ne'
     · rw [measure_univ]
@@ -1830,10 +1830,10 @@ lemma hairMass_ne_zero (hJN : J ≤ N) (hq : θ.extinction < 1) (hq0 : 0 < θ.ex
 
 /-- The witness decoration at the root is independent of the subtree below its
 surviving child, with the product mass. -/
-lemma survivalMeasure_hairEvent_inter (hJN : J ≤ N) (hq : θ.extinction < 1)
+lemma survivalMeasure_bushEvent_inter (hJN : J ≤ N) (hq : θ.extinction < 1)
     (hq0 : 0 < θ.extinction) (n : ℕ) {A : Set (GWord N → ℕ)} (hA : MeasurableSet A) :
-    survivalMeasure (N := N) θ (hairEvent J n ∩ (fun c ↦ bushAt c 0) ⁻¹' A)
-      = hairMass (N := N) θ n * survivalMeasure (N := N) θ A := by
+    survivalMeasure (N := N) θ (bushEvent J n ∩ (fun c ↦ bushAt c 0) ⁻¹' A)
+      = bushMass (N := N) θ n * survivalMeasure (N := N) θ A := by
   classical
   set A' : ℕ → Set (GWord N → ℕ) := fun m ↦ if m = 0 then A else Set.univ with hA'
   have hA'meas : ∀ m, MeasurableSet (A' m) := by
@@ -1842,23 +1842,23 @@ lemma survivalMeasure_hairEvent_inter (hJN : J ≤ N) (hq : θ.extinction < 1)
     split
     · exact hA
     · exact MeasurableSet.univ
-  have he : hairEvent J n ∩ (fun c ↦ bushAt c 0) ⁻¹' A
-      = decorationEvent J 1 (hairSets n)
+  have he : bushEvent J n ∩ (fun c ↦ bushAt c 0) ⁻¹' A
+      = decorationEvent J 1 (bushSets n)
         ∩ {c : GWord N → ℕ | ∀ m, m < 1 → bushAt c m ∈ A' m} := by
     ext c
-    simp [hairEvent, hA']
+    simp [bushEvent, hA']
   rw [he, BranchingProcess.survivalMeasure_root_decorated θ hJN hq hq0 hJN one_ne_zero hA'meas
-    (measurableSet_hairSets n), Finset.prod_range_one, hairMass]
+    (measurableSet_bushSets n), Finset.prod_range_one, bushMass]
   simp [hA']
 
-/-- **`thm:regime-obstructions-general` (`it:gen-obstr-hair`), read in the
+/-- **`thm:regime-obstructions-general` (`it:gen-obstr-bushes`), read in the
 sample**: a witness decoration along the neck descent is a neck vertex with a dying
 child whose subtree reaches depth `n`, and the cone above that child is a finite
-component of the punctured sample, a hair of depth exceeding `n`. -/
-theorem unboundedHairsN_sample (hJN : J ≤ N) (hJ2 : 2 ≤ J) {c : GWord N → ℕ}
-    (hsurv : Survives c) (hdeep : ∀ n, ∃ k, neckIter c k ∈ hairEvent (N := N) J n) :
-    UnboundedHairsN (fun w : GWord N ↦ w ∈ sample c) := by
-  refine unboundedHairsN_of_deep_cones (prefixClosedN_sample c) fun n ↦ ?_
+component of the punctured sample, a bush of depth exceeding `n`. -/
+theorem unboundedBushesN_sample (hJN : J ≤ N) (hJ2 : 2 ≤ J) {c : GWord N → ℕ}
+    (hsurv : Survives c) (hdeep : ∀ n, ∃ k, neckIter c k ∈ bushEvent (N := N) J n) :
+    UnboundedBushesN (fun w : GWord N ↦ w ∈ sample c) := by
+  refine unboundedBushesN_of_deep_cones (prefixClosedN_sample c) fun n ↦ ?_
   obtain ⟨k, hk⟩ := hdeep n
   obtain ⟨hx, -, hxeq⟩ := neckVertex_spec hsurv k
   set x := neckVertex c k
@@ -1870,7 +1870,7 @@ theorem unboundedHairsN_sample (hJN : J ≤ N) (hJ2 : 2 ≤ J) {c : GWord N → 
     rwa [ambSub_apply, List.append_nil] at h
   have hdeepdying : dyingAt (ambSub c x) 0 ∈ deepEvent n := by
     have h := hdying 0 (by show 0 < J - 1; omega)
-    rwa [hairSets, if_pos rfl] at h
+    rwa [bushSets, if_pos rfl] at h
   obtain ⟨i, hi, hns, hieq⟩ := exists_dyingAt_zero_eq_ambSub
     (d := ambSub c x) (by show ambSub c x [] ≤ N; rw [hroot]; exact hJN)
     (by show skeletonDegree (ambSub c x) < ambSub c x []; rw [hroot, hdeg]; omega)
@@ -1899,28 +1899,28 @@ theorem unboundedHairsN_sample (hJN : J ≤ N) (hJ2 : 2 ≤ J) {c : GWord N → 
   simp only [List.length_append, List.length_singleton, hwlen]
   omega
 
-/-- **`thm:regime-obstructions-general` (`it:gen-obstr-hair`)**: at `θ₀ > 0`,
-almost surely the sample has hairs of unbounded depth. -/
-theorem unbounded_hairs_gSample_ae (hJN : J ≤ N) (hq : θ.extinction < 1)
+/-- **`thm:regime-obstructions-general` (`it:gen-obstr-bushes`)**: at `θ₀ > 0`,
+almost surely the sample has bushes of unbounded depth. -/
+theorem unbounded_bushes_gSample_ae (hJN : J ≤ N) (hq : θ.extinction < 1)
     (hq0 : 0 < θ.extinction) (hJ2 : 2 ≤ J) (hθJ : 0 < θ J) :
-    ∀ᵐ c ∂survivalMeasure (N := N) θ, UnboundedHairsN (fun w : GWord N ↦ w ∈ sample c) := by
+    ∀ᵐ c ∂survivalMeasure (N := N) θ, UnboundedBushesN (fun w : GWord N ↦ w ∈ sample c) := by
   haveI := BranchingProcess.isProbabilityMeasure_survivalMeasure (N := N) θ hJN hq
-  have hae : ∀ᵐ c ∂survivalMeasure (N := N) θ, ∀ n, ∃ k, neckIter c k ∈ hairEvent (N := N) J n := by
+  have hae : ∀ᵐ c ∂survivalMeasure (N := N) θ, ∀ n, ∃ k, neckIter c k ∈ bushEvent (N := N) J n := by
     refine ae_all_iff.mpr fun n ↦ ?_
     filter_upwards [ae_exists_iterate_mem (μ := survivalMeasure (N := N) θ)
-      (Φ := fun d ↦ bushAt d 0) (D := hairEvent (N := N) J n)
+      (Φ := fun d ↦ bushAt d 0) (D := bushEvent (N := N) J n)
       (BranchingProcess.measurable_bushAt 0)
       (fun A hA ↦ survivalMeasure_bushAt_zero_preimage θ hJN hq hA)
-      (measurableSet_hairEvent n)
-      (fun A hA ↦ survivalMeasure_hairEvent_inter θ hJN hq hq0 n hA)
-      (hairMass_ne_zero θ hJN hq hq0 hJ2 hθJ n)] with c hc
+      (measurableSet_bushEvent n)
+      (fun A hA ↦ survivalMeasure_bushEvent_inter θ hJN hq hq0 n hA)
+      (bushMass_ne_zero θ hJN hq hq0 hJ2 hθJ n)] with c hc
     obtain ⟨k, hk⟩ := hc
     rw [iterate_bushAt_zero] at hk
     exact ⟨k, hk⟩
   filter_upwards [hae, ae_survives θ hJN hq] with c hdeep hsurv
-  exact unboundedHairsN_sample hJN hJ2 hsurv hdeep
+  exact unboundedBushesN_sample hJN hJ2 hsurv hdeep
 
-end Hairs
+end Bushes
 
 
 end ChainClasses

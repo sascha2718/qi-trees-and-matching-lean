@@ -1,10 +1,11 @@
 /-
-The moment estimates of `markov_matching_new_proof.tex`, `sec:restricted-potential`,
-`sec:positive-degrees`, and the root contributions of `sec:root-contributions`:
+The moment estimates of `arbitrary_offspring_matching.tex`, `sec:restricted-potential`,
+`sec:positive-degrees`, and the root contributions of `sec:independent-root`:
 
 * `moment_le` (`eq:moment`): `∫ W_{u,h} dρ_{s,h} ≤ 1 + α P_h(s,u)`;
-* `wZero_le_moment`, `wUnion_le` (`eq:zero-moment`, `eq:zero-union-moment`): the
-  weighted zero integrals, the union bound applied to the constant part only;
+* `wZero_le_moment`, `wUnion_le` (`eq:zero-union-moment`): the single-target weighted
+  zero integral and its finite-union form, with the union bound applied only to the
+  constant part;
 * `WresD_childMix_le` (`eq:selected-inverse-mixture`): the selected inverse mixture,
   with total coefficient at most the bound `B`;
 * `deg_ne_zero_of_delta_zero` (`sec:positive-degrees`): when `δ = 0` every charged
@@ -244,7 +245,7 @@ lemma wZero_eq_zero_of_delta_zero (hc : M.IsCompat) (hδ : M.delta = 0) {α : �
 lemma freshPositive_of_delta_zero (hc : M.IsCompat) (hδ : M.delta = 0) : M.FreshPositive :=
   fun h f f' x _ _ hx => M.deg_ne_zero_of_delta_zero hc hδ h f f' x hx
 
-/-! ### The root contributions (`sec:root-contributions`) -/
+/-! ### The root contributions (`sec:independent-root`) -/
 
 /-- **The height-zero zero event**: a source root compatible with `0` has positive degree
 against every type, so the zero event at height zero against a nonempty `D` is contained
@@ -260,7 +261,7 @@ lemma zeroEv_zero_imp (hc : M.IsCompat) (hb0 : rE M.μ M.R M.zero ≠ 0) {D : Se
 
 /-- The restricted weight of a forced normaliser is the compatibility indicator against
 `0`: weight one at a compatible root, zero at an incompatible one
-(`sec:root-contributions`). -/
+(`sec:independent-root`). -/
 lemma WresD_rootLaw_forced (α : ℝ) {u : I} (hu : ¬ M.fresh u) (v : V) :
     WresD α (M.rootLaw u) M.R v = if M.R v M.zero then 1 else 0 := by
   have hr : rE (M.rootLaw u) M.R v = if M.R v M.zero then 1 else 0 := by

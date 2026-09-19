@@ -1,5 +1,5 @@
 /-
-Polynomial dependence on the largest arity (`markov_matching_new_proof.tex`,
+Polynomial dependence on the largest arity (`arbitrary_offspring_matching.tex`,
 `sec:arity-dependence`): for a fixed atom set `𝒜` and a probability floor `c` on the core
 arities, the canonical presentations (`sec:profile-depths`: one root child a leaf, the other
 a balanced tree) with largest arity `N` satisfy `thm:markov-matching` at exponent `2` with
@@ -314,7 +314,7 @@ lemma card_live_le : P.live.card ≤ N ^ 2 := by
         gcongr
     _ ≤ (m + 2) ^ 2 := by nlinarith
 
-/-- The inverse-probability sum of the core selection is at most `B₀` (`sec:positive-matching`,
+/-- The inverse-probability sum of the core selection is at most `B₀` (`thm:atomic-normalisation`,
 `sec:arity-dependence`). -/
 lemma inverseSum_le {V : Type} (R : V → V → Prop) (zero : V) (μ : PMF V)
     (hc : (P.toModel R zero μ).IsCompat) (hb0 : rE μ R zero ≠ 0) (hc0 : 0 < c)

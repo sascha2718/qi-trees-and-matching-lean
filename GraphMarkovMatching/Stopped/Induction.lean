@@ -1,5 +1,5 @@
 /-
-The height induction of `markov_matching_new_proof.tex` (`sec:completion`): the scalar
+The height induction of `arbitrary_offspring_matching.tex` (`sec:completion`): the scalar
 barrier `ζ + D_μ Q(M) ≤ M` of `eq:scalar-barrier-condition` propagates the bound `M` on
 every equal-phase restricted potential from the heights below `h+1` to the height `h+1`,
 through the uniform zero bound `Z` (`z_le_fixed`), the weighted zero bound `E(M)`
@@ -29,10 +29,10 @@ namespace Model
 
 variable {V I : Type} (M : Model V I)
 
-/-! ### The bridge to the four-law contraction (`sec:local-estimate`) -/
+/-! ### The bridge to the four-law contraction (`thm:four-law-contraction`) -/
 
 /-- The abstract weighted zero integral of the process laws is the weighted zero integral
-against the singleton target (`sec:weighted-zero`). -/
+against the singleton target (`sec:weighted-mass`). -/
 lemma wZeroD_eq_wZero (α : ℝ) (s t t' : I) (h : ℕ) :
     wZeroD α (M.rho s h) (M.rho t h) (M.rho t' h) (M.sim h) = M.wZero α s {t} t' h := by
   rw [wZeroD, wZero]
