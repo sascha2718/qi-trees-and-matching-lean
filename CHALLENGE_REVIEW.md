@@ -3,8 +3,7 @@ Implementation audit of `Challenge.lean`, completed on 12 September 2026.
 The challenge now uses a smaller statement vocabulary and retains the twelve endpoints selected
 by the manuscript. `lake build Challenge Solution` and `./comparator-audit.sh` passed. Comparator
 confirmed equality of the challenge and solution statements and their defining dependencies,
-checked the permitted axioms, and accepted the proofs through Lean kernel replay. The
-[Comparator log](/tmp/ja-st-comparator-refactor.log) records the successful run.
+checked the permitted axioms, and accepted the proofs through Lean kernel replay.
 
 The refactor reduced the challenge from 659 to 470 lines, and from 89 to 53 named vocabulary
 declarations. The remaining vocabulary consists of 47 definitions or abbreviations, five
@@ -39,7 +38,7 @@ The substantive simplifications are:
 - The contraction coefficient is written directly by its extremum formula, and the two-value
   rate is written directly in the quantitative statement.
 
-The twelve headline endpoints remain exactly those in `comparator-config.json`. All names below
+The twelve headline endpoints remain exactly those in `comparator.json`. All names below
 are in namespace `Challenge`.
 
 | Endpoint | Paper counterpart |

@@ -3,9 +3,7 @@
 # "The quasi-isometry classes of Galton--Watson trees" (Athreya and Troscheit).
 # Follows the mathlib-initiative formalization.yaml v0.4 self-reporting format.
 #
-# Before submission to the Palomar Registry: add the arXiv identifier of the manuscript to
-# sources[0].id and sources[0].location, confirm the automation cost entries, and confirm the
-# classification codes.
+# When the manuscript is posted, record its identifier in sources[0].id and sources[0].location.
 
 version: "v0.4"
 
@@ -46,13 +44,15 @@ sources:
     authors:
       - "Jayadev S. Athreya"
       - "Sascha Troscheit"
-    type: "preprint"
+    type: "paper"
     relationship: "formalizes"
     note: >-
-      The manuscript whose matching theorems and classification are formalised here. The
-      formalisation and the manuscript were developed together by the same authors; the paper's
-      appendix records the statement-by-statement correspondence with the Lean declarations.
-      No novelty is claimed here beyond what the manuscript itself claims.
+      The manuscript whose matching theorems and classification are formalised here. It is in
+      preparation and has not been posted, so no public identifier exists and a reader cannot
+      consult it independently at present; its appendix records the statement-by-statement
+      correspondence with the Lean declarations. The formalisation and the manuscript were
+      developed together by the same authors. No novelty is claimed here beyond what the
+      manuscript itself claims.
     license: "unknown"
     author_endorsement: "participated"
   - title: "Branching Processes"
@@ -64,11 +64,12 @@ sources:
     relationship: "background"
     note: "Standard reference for the Galton--Watson foundations used by the BranchingProcess library."
 
+# No earlier formalisation of these results, in Lean or another system, is known to the authors.
 related_formalizations: []
 
 status:
   scope: >-
-    Formalised and audited: the twelve theorems listed in comparator-config.json, namely the i.i.d.
+    Formalised and audited: the twelve theorems listed in comparator.json, namely the i.i.d.
     matching theorem (Theorem 5.1 of the manuscript: leaf bound, full bound and the infinite
     tree), the Markov matching theorem (Theorem 6.1, in four forms: finite-type and
     zero-compatible alternatives, each at finite height and at infinite height), the complete
@@ -87,7 +88,7 @@ status:
     maxima.
   sorry_count: 0
   sorry_in_definitions: 0
-  axioms: []
+  axioms: ["propext", "Classical.choice", "Quot.sound"]
 
 automation:
   methods:
@@ -161,7 +162,7 @@ fidelity:
     classification statements use the same parent-child graph and quasi-isometry definitions. The
     i.i.d. constants are checked through rational upper bounds for the closed-form maxima
     L_{5/2}, K_{5/2} and C_{5/2}. Challenge.lean contains one sorry per audited theorem, which
-    Solution.lean supplies; comparator-config.json declares no definition_names, so no part of
+    Solution.lean supplies; comparator.json declares no definition_names, so no part of
     the statement vocabulary is left open for the solution to instantiate.
 
 review:

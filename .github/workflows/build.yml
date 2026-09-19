@@ -332,4 +332,4 @@ jobs:
             --setenv="PATH=$audit_path" \
             --setenv="COMPARATOR_LANDRUN=$landrun_bin" \
             --setenv="COMPARATOR_LEAN4EXPORT=$lean4export_bin" \
-            "$lake_bin" env "$comparator_bin" comparator-config.json
+            "$lake_bin" env "$comparator_bin" comparator.json

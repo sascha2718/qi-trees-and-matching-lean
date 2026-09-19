@@ -1,0 +1,718 @@
+version: 1
+
+manuscript_files:
+  - prelims.tex
+  - matching_classes_simple.tex
+  - graph_matching_selfcontained.tex
+  - gw_classes_simple.tex
+  - matching_classes_general.tex
+  - arbitrary_offspring_matching.tex
+  - trichotomy.tex
+
+# This manifest records statement-level correspondences only. It deliberately
+# omits source-file locations and proof-helper inventories, which are not part
+# of the mathematical correspondence and become stale under refactoring.
+entries:
+  - source: "def:branching-semigroup"
+    kind: definition
+    status: formalized
+    lean: ["ChainClasses.shiftSupp"]
+    relation: representation
+    headline: false
+
+  - source: "thm:trichotomy"
+    kind: theorem
+    status: formalized
+    lean: ["Challenge.audit_bounded_graph_qi_point", "Challenge.audit_extinction_of_not_supercritical", "Challenge.audit_full_classification_ae_iff"]
+    relation: split
+    headline: true
+    note: "The three audited declarations separate the finite-class input from the full classification."
+
+  - source: "thm:twovalue"
+    kind: theorem
+    status: formalized
+    lean: ["Challenge.audit_twovalue_ae_tree_family", "Challenge.audit_twovalue_rate_tree"]
+    relation: split
+    headline: true
+
+  - source: "thm:boundary"
+    kind: corollary
+    status: intentionally_unformalized
+    lean: []
+    headline: false
+    reason: "The quasi-isometry input is formalized, but the visual-boundary and quasisymmetry implication is outside the Lean development."
+
+  - source: "def:qi"
+    kind: definition
+    status: formalized
+    lean: ["BranchingProcess.IsQIWith"]
+    relation: specialization
+    headline: false
+    note: "The paper gives the metric-space definition; the Lean declaration is its graph-metric form."
+
+  - source: "def:qs"
+    kind: definition
+    status: intentionally_unformalized
+    lean: []
+    headline: false
+    reason: "Quasisymmetry and visual boundaries are outside the Lean development."
+
+  - source: "thm:fractal-percolation"
+    kind: corollary
+    status: intentionally_unformalized
+    lean: []
+    headline: false
+    reason: "The fractal-percolation application and its quasisymmetric conclusion are outside the Lean development."
+
+  - source: "thm:matching"
+    kind: theorem
+    status: formalized
+    lean: ["Challenge.audit_graph_leaf_matching_bound", "Challenge.audit_graph_full_matching_bound", "Challenge.audit_exists_infinite_tree_matching_graphAut"]
+    relation: split
+    headline: true
+
+  - source: "thm:full-probability-recursion"
+    kind: proposition
+    status: formalized
+    lean: ["GraphMatching.full_probability_recursion"]
+    relation: exact
+    headline: false
+
+  - source: "thm:iid-scalar-failure"
+    kind: corollary
+    status: formalized
+    lean: ["GraphMatching.iid_scalar_failure"]
+    relation: exact
+    headline: false
+
+  - source: "thm:markov-matching"
+    kind: theorem
+    status: formalized
+    lean: ["Challenge.audit_markov_matching_finite", "Challenge.audit_markov_matching_zero", "Challenge.audit_markov_matching_finite_infinite", "Challenge.audit_markov_matching_zero_infinite"]
+    relation: split
+    headline: true
+
+  - source: "thm:two-sided-potential"
+    kind: lemma
+    status: intentionally_unformalized
+    lean: []
+    headline: false
+    reason: "The continuous random branching-time model is outside the Lean development."
+
+  - source: "thm:branching-times"
+    kind: theorem
+    status: intentionally_unformalized
+    lean: []
+    headline: false
+    reason: "The continuous random branching-time model is outside the Lean development."
+
+  - source: "thm:chains"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.tree_eq_chains", "ChainClasses.chain_unique", "ChainClasses.ray_chain_disjoint"]
+    relation: split
+    headline: false
+
+  - source: "thm:geometric"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.label_marginal", "ChainClasses.label_iIndepFun"]
+    relation: split
+    headline: false
+
+  - source: "thm:isometry"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.isometry_of_relabel"]
+    relation: exact
+    headline: false
+
+  - source: "thm:transfer"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.transfer"]
+    relation: exact
+    headline: false
+
+  - source: "thm:level"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.level_close_comparable"]
+    relation: exact
+    headline: false
+
+  - source: "thm:quantised-law"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.qPMF", "ChainClasses.class_sum", "ChainClasses.qF_le", "ChainClasses.quantised_label_iIndepFun"]
+    relation: split
+    headline: false
+
+  - source: "thm:chain-coupling"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.coupling_law"]
+    relation: exact
+    headline: false
+
+  - source: "thm:harris"
+    kind: proposition
+    status: formalized
+    lean: ["BranchingProcess.survivalMeasure_decorations_treeLaw", "BranchingProcess.survivalMeasure_skelField_pattern"]
+    relation: split
+    headline: false
+
+  - source: "def:shape"
+    kind: definition
+    status: formalized
+    lean: ["ChainClasses.Shape"]
+    relation: representation
+    headline: false
+
+  - source: "thm:shape-iid"
+    kind: proposition
+    status: formalized
+    lean: ["ChainClasses.shape_decomposition"]
+    relation: exact
+    headline: false
+
+  - source: "thm:shape-mass"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.shape_mass_tail", "ChainClasses.shape_mass_point"]
+    relation: split
+    headline: false
+
+  - source: "def:shape-net"
+    kind: definition
+    status: formalized
+    lean: ["ChainClasses.netMem", "ChainClasses.repIdx", "ChainClasses.NetLink"]
+    relation: representation
+    headline: false
+
+  - source: "thm:shape-net"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.markedQI_of_repIdx_adjacent", "ChainClasses.size_repIdx_le"]
+    relation: split
+    headline: false
+
+  - source: "thm:shape-connected"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.netLink_connected_shapeFamily"]
+    relation: exact
+    headline: false
+
+  - source: "thm:dilution"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.markedQI_contract_shape", "ChainClasses.dilution"]
+    relation: split
+    headline: false
+
+  - source: "thm:glued-transfer"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.Assembly.glued_transfer"]
+    relation: exact
+    headline: false
+
+  - source: "thm:toolkit"
+    kind: lemma
+    status: formalized
+    lean: ["GraphMarkovMatching.Stopped.phi_mul_le_beta", "GraphMarkovMatching.Stopped.sq_le_K_phi_add", "GraphMarkovMatching.Stopped.chord_gen", "GraphMarkovMatching.Support.rpow_neg_alpha_le", "GraphMarkovMatching.Support.phi_prod_le"]
+    relation: split
+    headline: false
+
+  - source: "thm:contraction"
+    kind: lemma
+    status: formalized
+    lean: ["GraphMatching.Phi_square_leA"]
+    relation: exact
+    headline: false
+
+  - source: "thm:transversal"
+    kind: lemma
+    status: formalized
+    lean: ["GraphMatching.transversal"]
+    relation: exact
+    headline: false
+
+  - source: "thm:product"
+    kind: lemma
+    status: formalized
+    lean: ["GraphMatching.PhiA_prodPMF_le"]
+    relation: exact
+    headline: false
+
+  - source: "thm:reduction"
+    kind: theorem
+    status: formalized
+    lean: ["GraphMatching.leaf_matching_boundA", "GraphMatching.full_matching_boundA"]
+    relation: split
+    headline: false
+
+  - source: "thm:dominance"
+    kind: corollary
+    status: formalized
+    lean: ["GraphMatching.etaGA_le_localDominance"]
+    relation: exact
+    headline: false
+
+  - source: "thm:double-exp"
+    kind: corollary
+    status: formalized
+    lean: ["GraphMatching.double_exp_matching"]
+    relation: exact
+    headline: false
+
+  - source: "thm:eta-bound"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.quantised_eta_le"]
+    relation: exact
+    headline: false
+
+  - source: "thm:cross-law"
+    kind: proposition
+    status: formalized
+    lean: ["ChainClasses.crosslaw_ae_tree", "ChainClasses.exists_crosslaw_rate_tree"]
+    relation: split
+    headline: false
+
+  - source: "thm:shape-shrink"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.markedQI_shape_shrink", "ChainClasses.markedQI_shape_fix"]
+    relation: split
+    headline: false
+
+  - source: "thm:shape-eta"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.shape_eta_final"]
+    relation: exact
+    headline: false
+
+  - source: "thm:shape-coupling"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.exists_isShapeCoupling_etaS"]
+    relation: exact
+    headline: false
+
+  - source: "thm:hairy"
+    kind: proposition
+    status: formalized
+    lean: ["ChainClasses.hairy_ae_tree", "ChainClasses.hairy_rate_two_law"]
+    relation: split
+    headline: false
+
+  - source: "thm:trichotomy-simple"
+    kind: theorem
+    status: formalized
+    lean: ["ChainClasses.simple_classification"]
+    relation: exact
+    headline: false
+
+  - source: "thm:tree-stability"
+    kind: lemma
+    status: formalized
+    lean: ["BranchingProcess.exists_between_dist_le"]
+    relation: exact
+    headline: false
+
+  - source: "thm:bush-separation"
+    kind: proposition
+    status: formalized
+    lean: ["BranchingProcess.not_quasiIsometric_of_hair_of_line"]
+    relation: exact
+    headline: false
+
+  - source: "thm:three-rays"
+    kind: proposition
+    status: formalized
+    lean: ["BranchingProcess.not_quasiIsometric_rayGraph"]
+    relation: exact
+    headline: false
+
+  - source: "thm:regime-obstructions"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.hasThreeRays_sampleWord", "ChainClasses.nearLine_inTree", "ChainClasses.unbounded_hairs_ae"]
+    relation: split
+    headline: false
+
+  - source: "thm:bottleneck"
+    kind: proposition
+    status: formalized
+    lean: ["ChainClasses.not_isQIWith_binary_of_thinBalls"]
+    relation: exact
+    headline: false
+
+  - source: "thm:converse"
+    kind: theorem
+    status: formalized
+    lean: ["ChainClasses.converse_binary_ae"]
+    relation: exact
+    headline: false
+
+  - source: "thm:harris-general"
+    kind: proposition
+    status: formalized
+    lean: ["ChainClasses.transform_expansion", "BranchingProcess.survivalMeasure_skelField_pattern", "BranchingProcess.survivalMeasure_decorations_treeLaw", "ChainClasses.survivalMeasure_gArities"]
+    relation: split
+    headline: false
+
+  - source: "thm:full-support"
+    kind: corollary
+    status: formalized
+    lean: ["ChainClasses.reducedLaw_pos"]
+    relation: exact
+    headline: false
+
+  - source: "def:shape-general"
+    kind: definition
+    status: formalized
+    lean: ["ChainClasses.GShape", "ChainClasses.RTree"]
+    relation: representation
+    headline: false
+
+  - source: "thm:split-joint"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.splitJoint"]
+    relation: representation
+    headline: false
+    note: "The Lean definition is the displayed joint mass; its support consequences are proved separately."
+
+  - source: "def:conditional-laws"
+    kind: definition
+    status: formalized
+    lean: ["ChainClasses.gCondPMF", "ChainClasses.gMixMass"]
+    relation: representation
+    headline: false
+
+  - source: "thm:conditional-explicit"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.gCondMass_def", "ChainClasses.survivalMeasure_gShapeSplit", "ChainClasses.gMixMass_eq_measure"]
+    relation: split
+    headline: false
+
+  - source: "thm:conditional-iid"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.conditional_iid"]
+    relation: exact
+    headline: false
+
+  - source: "thm:mass-uniform"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.ofReal_pow_le_gCondMass", "ChainClasses.ofReal_pow_le_gMixMass", "ChainClasses.exists_gShape_size_tail"]
+    relation: split
+    headline: false
+
+  - source: "thm:general-dilution"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.markedQI_gContractTree", "ChainClasses.gDilution"]
+    relation: split
+    headline: false
+
+  - source: "thm:general-glued"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.GAssembly.glued_transfer"]
+    relation: exact
+    headline: false
+
+  - source: "thm:relabel"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.exists_gShapeCoupling_relabel"]
+    relation: exact
+    headline: false
+
+  - source: "thm:product-form"
+    kind: proposition
+    status: formalized
+    lean: ["ChainClasses.labelMeasure_label_pattern"]
+    relation: exact
+    headline: false
+
+  - source: "thm:cross-relabel"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.exists_gShapeCoupling_cond_mix"]
+    relation: exact
+    headline: false
+
+  - source: "thm:profile-encoding"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.Profile.profileEncHeight", "ChainClasses.CascadeEnc.skelToB_isQIMap"]
+    relation: split
+    headline: false
+
+  - source: "thm:profile-encoding-law"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.Profile.map_encLab_of_pattern", "ChainClasses.Profile.map_encodedStates"]
+    relation: split
+    headline: false
+
+  - source: "thm:profile-transfer"
+    kind: corollary
+    status: formalized
+    lean: ["ChainClasses.Profile.exists_portrait_of_infMatchK", "ChainClasses.Profile.sample_qi_of_profile_match"]
+    relation: split
+    headline: false
+
+  - source: "thm:four-law-contraction"
+    kind: lemma
+    status: formalized
+    lean: ["GraphMarkovMatching.Stopped.fourLaw_contraction"]
+    relation: exact
+    headline: false
+
+  - source: "thm:zero-degree-dichotomy"
+    kind: lemma
+    status: formalized
+    lean: ["GraphMarkovMatching.Stopped.Model.zeroEv_succ_imp", "GraphMarkovMatching.Stopped.Model.zeroMass_succ_le"]
+    relation: split
+    headline: false
+
+  - source: "thm:explicit-zero-bound"
+    kind: lemma
+    status: formalized
+    lean: ["GraphMarkovMatching.Stopped.Model.zeroMass_le_of_stops", "GraphMarkovMatching.Stopped.Model.z_le_of_returns"]
+    relation: split
+    headline: false
+
+  - source: "thm:explicit-weighted-bound"
+    kind: lemma
+    status: formalized
+    lean: ["GraphMarkovMatching.Stopped.Model.wZero_le_of_stops", "GraphMarkovMatching.Stopped.Model.wZero_le_Efun"]
+    relation: split
+    headline: false
+
+  - source: "thm:one-step-closure"
+    kind: lemma
+    status: formalized
+    lean: ["GraphMarkovMatching.Stopped.Model.fourLawAt_of_params"]
+    relation: exact
+    headline: false
+
+  - source: "thm:zero-mixture-convexity"
+    kind: lemma
+    status: formalized
+    lean: ["GraphMarkovMatching.Stopped.zero_mixture_convexity"]
+    relation: exact
+    headline: false
+
+  - source: "thm:averaged-child-pair"
+    kind: lemma
+    status: formalized
+    lean: ["GraphMarkovMatching.Stopped.Model.childPair_le_Qfun"]
+    relation: exact
+    headline: false
+
+  - source: "thm:common-atoms"
+    kind: lemma
+    status: formalized
+    lean: ["GraphMarkovMatching.Stopped.isAtom_mem_generators", "GraphMarkovMatching.Stopped.atoms_subset_inter", "GraphMarkovMatching.Stopped.mem_closure_atoms", "GraphMarkovMatching.Stopped.length_le_of_sum_atoms", "GraphMarkovMatching.Stopped.exists_atoms_finset"]
+    relation: split
+    headline: false
+
+  - source: "thm:shallow-grafting"
+    kind: lemma
+    status: formalized
+    lean: ["GraphMarkovMatching.Stopped.MTree.height_composite_le", "GraphMarkovMatching.Stopped.MTree.minLeafDepth_le_log"]
+    relation: split
+    headline: false
+
+  - source: "thm:fresh-positive"
+    kind: lemma
+    status: formalized
+    lean: ["GraphMarkovMatching.Stopped.Presentation.freshPositive"]
+    relation: exact
+    headline: false
+
+  - source: "thm:atomic-normalisation"
+    kind: lemma
+    status: formalized
+    lean: ["GraphMarkovMatching.Stopped.Presentation.selection", "GraphMarkovMatching.Stopped.Presentation.inverseSum_le"]
+    relation: exact
+    headline: false
+
+  - source: "thm:bounded-return"
+    kind: lemma
+    status: formalized
+    lean: ["GraphMarkovMatching.Stopped.Presentation.commonReturns"]
+    relation: exact
+    headline: false
+
+  - source: "thm:common-semigroup-matching"
+    kind: proposition
+    status: formalized
+    lean: ["GraphMarkovMatching.Stopped.atomicPresentation", "GraphMarkovMatching.Stopped.Presentation.presentation_matching_uniform", "GraphMarkovMatching.Stopped.Presentation.presentation_matching_uniform_infinite"]
+    relation: split
+    headline: false
+
+  - source: "thm:constructive-threshold"
+    kind: proposition
+    status: formalized
+    lean: ["GraphMarkovMatching.Stopped.finiteEps", "GraphMarkovMatching.Stopped.finiteKmatch", "GraphMarkovMatching.Stopped.epsK_spec", "GraphMarkovMatching.Stopped.markov_matching_finite", "GraphMarkovMatching.Stopped.markov_matching_finite_infinite"]
+    relation: split
+    headline: false
+
+  - source: "thm:bushy"
+    kind: proposition
+    status: formalized
+    lean: ["ChainClasses.fullTree_quasiIsometric_binary"]
+    relation: exact
+    headline: false
+
+  - source: "thm:regime-obstructions-general"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.threeRays_ae", "ChainClasses.nearLine_gSample_ae", "ChainClasses.unbounded_hairs_gSample_ae", "ChainClasses.thinBalls_gSample_ae"]
+    relation: split
+    headline: false
+
+  - source: "thm:chain-separation"
+    kind: proposition
+    status: formalized
+    lean: ["ChainClasses.chainSeparation"]
+    relation: exact
+    headline: false
+
+  - source: "thm:chain-star-obstruction"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.star_pair_no_qi"]
+    relation: exact
+    headline: false
+
+  - source: "thm:hairy-general"
+    kind: proposition
+    status: formalized
+    lean: ["ChainClasses.hairy_general_ae"]
+    relation: exact
+    headline: false
+
+  - source: "thm:chain-cross"
+    kind: lemma
+    status: formalized
+    lean: ["ChainClasses.neck_ratio_of_compat", "ChainClasses.flatG_markedQI"]
+    relation: split
+    headline: false
+
+  - source: "thm:chain-general"
+    kind: proposition
+    status: formalized
+    lean: ["ChainClasses.chain_general_ae"]
+    relation: exact
+    headline: false
+
+  - source: "thm:core-weight-obstruction"
+    kind: proposition
+    status: formalized
+    lean: ["ChainClasses.Profile.no_uniform_core_weight_bound", "ChainClasses.Profile.no_uniform_core_weight_infinite_bound"]
+    relation: split
+    headline: false
+
+  - source: "structure:general-rooted-tree"
+    kind: structure
+    status: formalized
+    lean: ["ChainClasses.RTree"]
+    relation: representation
+    headline: false
+
+  - source: "structure:general-shape"
+    kind: structure
+    status: formalized
+    lean: ["ChainClasses.GShape"]
+    relation: representation
+    headline: false
+
+  - source: "structure:reduced-skeleton"
+    kind: structure
+    status: formalized
+    lean: ["BranchingProcess.skeleton", "ChainClasses.reducedPMF"]
+    relation: representation
+    headline: false
+    note: "The first declaration gives the surviving skeleton and the second its reduced arity law used by the profile construction."
+
+  - source: "structure:binary-profile"
+    kind: structure
+    status: formalized
+    lean: ["GraphMarkovMatching.Stopped.MTree"]
+    relation: representation
+    headline: false
+
+  - source: "structure:profile-family"
+    kind: structure
+    status: formalized
+    lean: ["ChainClasses.Profile.Family"]
+    relation: representation
+    headline: false
+
+  - source: "structure:cascade-encoding"
+    kind: structure
+    status: formalized
+    lean: ["ChainClasses.CascadeEnc"]
+    relation: representation
+    headline: false
+
+  - source: "structure:skeleton-assembly"
+    kind: structure
+    status: formalized
+    lean: ["ChainClasses.SkelAssembly"]
+    relation: representation
+    headline: false
+
+  - source: "structure:common-presentation"
+    kind: structure
+    status: formalized
+    lean: ["GraphMarkovMatching.Stopped.Presentation"]
+    relation: representation
+    headline: false
+
+  - source: "structure:markov-model"
+    kind: structure
+    status: formalized
+    lean: ["GraphMarkovMatching.Stopped.Model"]
+    relation: representation
+    headline: false
+
+  - source: "structure:markov-phase"
+    kind: structure
+    status: formalized
+    lean: ["GraphMarkovMatching.Stopped.Model.Phase"]
+    relation: representation
+    headline: false
+
+  - source: "structure:transition-selection"
+    kind: structure
+    status: formalized
+    lean: ["GraphMarkovMatching.Stopped.Model.Selection"]
+    relation: representation
+    headline: false
+
+  - source: "structure:general-assembly"
+    kind: structure
+    status: formalized
+    lean: ["ChainClasses.GAssembly"]
+    relation: representation
+    headline: false
+
+  - source: "structure:finite-star"
+    kind: structure
+    status: formalized
+    lean: ["ChainClasses.Star"]
+    relation: representation
+    headline: false
