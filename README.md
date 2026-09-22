@@ -181,12 +181,14 @@ of these results, in Lean or in another system, is known to the authors.
 
 AI tools were used extensively in the Lean development, following the principles of the Leiden
 Declaration on the responsible use of artificial intelligence in research. Agentic sessions in
-Claude Code wrote, refactored and repaired library proofs against a fixed statement surface; an
-earlier AI-assisted workflow produced an intermediate formalisation that the present development
-supersedes; and interactive assistance was used for individual arguments and for copy-editing. The
-statement design, `Challenge.lean`, `Solution.lean` and the comparator configuration were written
-and reviewed by the authors, who verified every non-human part of the development and accept full
-responsibility for its contents. The Lean code has had no independent human review.
+Claude Code, with Claude Opus and Claude Fable, wrote, refactored and repaired library proofs
+against a fixed statement surface; agentic sessions in Codex, with Sol and Astra, formalised
+arguments in Lean; an earlier AI-assisted workflow produced an intermediate formalisation that
+the present development supersedes; and interactive assistance was used for individual arguments
+and for copy-editing. The authors designed the statements and reviewed `Challenge.lean`,
+`Solution.lean` and the comparator configuration, verified every non-human part of the
+development and accept full responsibility for its contents. The Lean code has had no
+independent human review.
 
 `formalization.yaml` records the sources, licence, classification codes, scope, divergences and
 production process in the mathlib-initiative v0.4 self-reporting format.

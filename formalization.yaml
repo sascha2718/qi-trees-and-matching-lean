@@ -103,12 +103,23 @@ status:
 automation:
   methods:
     - method: "agent"
-      models: ["Claude (Anthropic)"]
+      models: ["Claude Opus (Anthropic)", "Claude Fable (Anthropic)"]
       framework: "Claude Code (Anthropic)"
       tool_setup: >-
         Agentic Lean development in Claude Code, including multi-agent sessions with one agent
         per file, used to write, refactor and repair library proofs against a fixed statement
         surface. Every retained argument was selected, checked and curated by the authors.
+      cost:
+        wall_time: "not tracked"
+        spend_usd: "subscription-based"
+        hardware: "local machine"
+      prompting_notes: "n/a"
+    - method: "agent"
+      models: ["Sol", "Astra"]
+      framework: "Codex (OpenAI)"
+      tool_setup: >-
+        Agentic Lean development in Codex, used to formalise arguments in Lean. Every retained
+        argument was selected, checked and curated by the authors.
       cost:
         wall_time: "not tracked"
         spend_usd: "subscription-based"
@@ -140,8 +151,8 @@ automation:
       models: []
       framework: "n/a"
       tool_setup: >-
-        Statement design, the Challenge and Solution modules, the comparator configuration,
-        mathematical review of every retained argument, and the correspondence appendix.
+        Statement design, review of the Challenge statements against the paper, mathematical
+        review of every retained argument, and the correspondence appendix.
       cost:
         wall_time: "not tracked"
         spend_usd: "not tracked"
@@ -151,8 +162,8 @@ automation:
   notes: >-
     AI tools were used extensively during the Lean formalisation, following the principles of
     the Leiden Declaration on the responsible use of artificial intelligence in research. The
-    Challenge module, which fixes the audited statements, was written and reviewed by the
-    authors. The authors verified every non-human part of the formalisation and accept full
+    Challenge module, which fixes the audited statements, was reviewed by the authors against
+    the paper. The authors verified every non-human part of the formalisation and accept full
     responsibility for its contents.
 
 fidelity:

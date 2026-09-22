@@ -80,7 +80,7 @@ noncomputable def gdeg (μ : PMF V) (G : SimpleGraph V) (v : V) : ℝ :=
 noncomputable def etaGraph (μ : PMF V) (G : SimpleGraph V) : ℝ≥0∞ :=
   ∑' v, μ v * ENNReal.ofReal ((1 - gdeg μ G v) / gdeg μ G v ^ (5 / 2 : ℝ))
 
-/-! ## Conditioned Galton--Watson trees and their coarse classes -/
+/-! ## Conditioned Galton–Watson trees and their coarse classes -/
 
 def wedgeN {N : ℕ} : GWWord N → GWWord N → GWWord N
   | [], _ => []
@@ -90,7 +90,7 @@ def wedgeN {N : ℕ} : GWWord N → GWWord N → GWWord N
 def treeDistN {N : ℕ} (v w : GWWord N) : ℕ :=
   v.length + w.length - 2 * (wedgeN v w).length
 
-/-- The parent--child graph of a Galton--Watson sample. -/
+/-- The parent–child graph of a Galton–Watson sample. -/
 def gwTreeGraph {N : ℕ} (c : GWWord N → ℕ) :
     SimpleGraph {w : GWWord N // inGWSample c w} :=
   SimpleGraph.fromRel fun u v => treeDistN u.1 v.1 = 1
@@ -201,7 +201,7 @@ lemma graphQIEmbeddable_iff {V V' : Type*} (G : SimpleGraph V) (G' : SimpleGraph
   · rintro ⟨D, f, hf⟩
     exact ⟨D, f, (graphQIEmbWith_iff D G G' f).2 hf⟩
 
-/-- The challenge's parent--child graph of a set of words over `Fin N` is the library's. -/
+/-- The challenge's parent–child graph of a set of words over `Fin N` is the library's. -/
 lemma wordGraph_eq_wordGraphN {N : ℕ} (T : GWWord N → Prop) :
     wordGraph T = ChainClasses.wordGraphN T := by
   ext u v
@@ -618,7 +618,7 @@ lemma coord_toLib {V : Type u} :
 
 /-! ## The i.i.d. matching theorem -/
 
-/-- `thm:matching`(1): the leaf bound. -/
+/-- Theorem 5.1(1): the leaf bound (5.2). -/
 theorem audit_graph_leaf_matching_bound {V : Type u} (μ : PMF V) (G : SimpleGraph V)
     (h0 : etaGraph μ G ≤ 1 / 256) (h : ℕ) :
     ∑' x, leafMu μ h x * qE (leafMu μ h) (leafSim (compat G) h) x
@@ -634,7 +634,7 @@ theorem audit_graph_leaf_matching_bound {V : Type u} (μ : PMF V) (G : SimpleGra
   rw [map_equiv_apply (leafToLib V h) (leafMu μ h) y, leafMu_eq, leafSim_iff]
   rfl
 
-/-- `thm:matching`(2): the full bound. -/
+/-- Theorem 5.1(2): the full bound (5.3). -/
 theorem audit_graph_full_matching_bound {V : Type u} (μ : PMF V) (G : SimpleGraph V)
     (hη : etaGraph μ G ≤ 1 / 10000) (h : ℕ) :
     ∑' x, fullMu μ h x * qE (fullMu μ h) (Challenge.fullSim (compat G) h) x
@@ -650,7 +650,7 @@ theorem audit_graph_full_matching_bound {V : Type u} (μ : PMF V) (G : SimpleGra
   rw [map_equiv_apply (fullToLib V h) (fullMu μ h) y, fullMu_eq, fullSimIid_iff]
   rfl
 
-/-- `thm:matching`, the infinite tree: the matching automorphism as a root-fixing
+/-- Theorem 5.1(2) at infinite height: the matching automorphism as a root-fixing
 automorphism of the infinite binary tree. -/
 theorem audit_exists_infinite_tree_matching_graphAut {V : Type u} (μ : PMF V)
     [MeasurableSpace V] [MeasurableSingletonClass V] [Countable V] (R₀ : V → V → Prop)
@@ -722,7 +722,7 @@ theorem audit_extinction_of_not_supercritical {J N : ℕ} (theta : Offspring J) 
     hmean' h1] with c hc
   exact hc
 
-/-- `thm:trichotomy` in full: for two independent Galton--Watson trees with finitely supported
+/-- Theorem 1.2 in full: for two independent Galton–Watson trees with finitely supported
 offspring laws, almost surely a root-preserving quasi-isometry exists exactly when both are
 finite, or both are infinite and the two laws lie in the same infinite class, and otherwise no
 quasi-isometry exists at all. -/
@@ -745,7 +745,7 @@ theorem audit_full_classification_ae_iff {J J' N N' : ℕ}
 
 /-! ## Mutual embeddability -/
 
-/-- `thm:embedding-hierarchy`: on survival, the sample almost surely embeds
+/-- Theorem 1.3: on survival, the sample almost surely embeds
 quasi-isometrically into the binary tree and receives an embedding of it. -/
 theorem audit_mutual_embeddability {J N : ℕ} (theta : Offspring J) (hJN : J ≤ N)
     (hsup : theta.IsSupercritical) :
@@ -803,7 +803,7 @@ lemma qBound_eq : @qBound = @ChainClasses.qBound := rfl
 
 /-! ## Universality in the two-value family -/
 
-/-- `thm:twovalue`: two independent Galton--Watson trees whose offspring law is
+/-- Theorem 1.4: two independent Galton–Watson trees whose offspring law is
 supported on `{1,2}` almost surely admit a root-preserving quasi-isometry. -/
 theorem audit_twovalue_ae_tree_family {t : ℝ} (ht0 : 0 ≤ t) (ht1 : t ≤ 1) :
     ((bernoulliField ht0 ht1).prod (bernoulliField ht0 ht1))
@@ -815,7 +815,7 @@ theorem audit_twovalue_ae_tree_family {t : ℝ} (ht0 : 0 ≤ t) (ht1 : t ≤ 1) 
   ext ω
   simp only [Set.mem_setOf_eq, inTree_eq, isQIWith_eq]
 
-/-- The quantitative half of `thm:twovalue`: above a threshold, failure of a root-preserving
+/-- The rate (1.1) of Theorem 1.4: above a threshold, failure of a root-preserving
 `(D²+3)`-quasi-isometry has probability at most the explicit rate. -/
 theorem audit_twovalue_rate_tree {t : ℝ} (ht0 : 0 < t) (ht1 : t < 1) :
     ∃ D₀ : ℕ, ∀ D : ℕ, D₀ ≤ D →
@@ -844,7 +844,7 @@ end StoppedPotential
 
 namespace Stopped
 
-/-- A Markov label model (`sec:markov-proof`): states with a compatibility relation and a
+/-- A Markov label model (Section 16): states with a compatibility relation and a
 distinguished state `0`, the label law `μ`, the fresh types (the set `I_μ`) and a child-type
 kernel. -/
 structure Model (V I : Type) where
@@ -911,31 +911,31 @@ def StatesIn (A : Set V) : (h : ℕ) → FullLab (I × V) h → Prop
   | 0, x => x.2 ∈ A
   | _ + 1, x => x.1.2 ∈ A ∧ StatesIn A _ x.2.1 ∧ StatesIn A _ x.2.2
 
-/-- The graph potential `η_{G,α}(μ) = ∑_v μ(v) φ_α(1 - b(v))` (`eq:root-defect`). -/
+/-- The graph potential `η_{G,α}(μ) = ∑_v μ(v) φ_α(1 - b(v))` (equation (6.1)). -/
 noncomputable def eta (α : ℝ) : ℝ≥0∞ := PhiD α M.μ M.μ M.R
 
-/-- The incompatible root mass `δ = 1 - b(0) = μ{v : v ≁ 0}` (`eq:root-defect`). -/
+/-- The incompatible root mass `δ = 1 - b(0) = μ{v : v ≁ 0}` (equation (6.1)). -/
 noncomputable def delta : ℝ≥0∞ := qE M.μ M.R M.zero
 
-/-- The forced-state term `e_0 = φ_α(δ)`, infinite when `b(0) = 0` (`eq:root-defect`). -/
+/-- The forced-state term `e_0 = φ_α(δ)`, infinite when `b(0) = 0` (equation (6.1)). -/
 noncomputable def e0 (α : ℝ) : ℝ≥0∞ := phiE α (q M.μ M.R M.zero)
 
-/-- The one-site defect `ζ_α = max{η_α, φ_α(δ)}` (`eq:root-defect`). -/
+/-- The one-site defect `ζ_α = max{η_α, φ_α(δ)}` (equation (6.1)). -/
 noncomputable def zeta (α : ℝ) : ℝ≥0∞ := max (M.eta α) (M.e0 α)
 
 /-- The failure probability `P(M_h(s,t)^c) = ∑_x ρ_{s,h}(x) q_{ρ_{t,h}}(x)`
-(`sec:completion`). -/
+(Section 19). -/
 noncomputable def failProb (s t : I) (h : ℕ) : ℝ≥0∞ :=
   failureD (M.rho s h) (M.rho t h) (M.sim h)
 
-/-- The class index (`sec:finite-hypotheses`), here called the phase: fresh types have phase
+/-- The class index (Section 6.2), here called the phase: fresh types have phase
 zero and every child in a charged transition has phase one greater than its parent. -/
 structure Phase (M : Model V I) (g : ℕ) where
   θ : I → ZMod g
   fresh_zero : ∀ t, M.fresh t → θ t = 0
   child : ∀ t j, M.π t j ≠ 0 → θ j.1 = θ t + 1 ∧ θ j.2 = θ t + 1
 
-/-- The number of types of phase `i` (`eq:transition-budget`). -/
+/-- The number of types of phase `i` (equation (18.6)). -/
 noncomputable def Phase.count {M : Model V I} [Fintype I] {g : ℕ} (Θ : Phase M g)
     (i : ZMod g) : ℕ :=
   (Finset.univ.filter fun t => Θ.θ t = i).card
@@ -954,25 +954,25 @@ def reach (D : Set I) : ℕ → Set I
 /-- A possible type path of length `n`: successive possible children. -/
 def IsPath (p : ℕ → I) (n : ℕ) : Prop := ∀ i < n, M.child (p i) (p (i + 1))
 
-/-- The stopping predicate (`sec:finite-hypotheses`): every possible source path of
+/-- The stopping predicate (Section 6.2): every possible source path of
 length `n` from `s` passes, at some depth `k ≤ n`, a fresh type at which some type reachable
 from `D` in `k` steps is fresh. -/
 def Stops (s : I) (D : Set I) (n : ℕ) : Prop :=
   ∀ p : ℕ → I, p 0 = s → M.IsPath p n → ∃ k ≤ n, M.fresh (p k) ∧ ∃ f ∈ M.reach D k, M.fresh f
 
-/-- Common returns, condition `it:markov-returns`: from any two types of the same class, every
+/-- Common returns, condition (M2): from any two types of the same class, every
 possible source path reaches a fresh type at a depth at most `H` at which some possible
 target path is fresh as well. -/
 def CommonReturns {g : ℕ} (Θ : Phase M g) (H : ℕ) : Prop :=
   ∀ s t, Θ.θ s = Θ.θ t → M.Stops s {t} H
 
-/-- Positivity, condition `it:markov-positivity`: every charged realisation of a fresh type
+/-- Positivity, condition (M1): every charged realisation of a fresh type
 has positive degree against every fresh type. -/
 def FreshPositive : Prop :=
   ∀ (h : ℕ) (f f' : I) (x : FullLab (I × V) h),
     M.fresh f → M.fresh f' → M.rho f h x ≠ 0 → M.deg f' h x ≠ 0
 
-/-- A transition selection (`eq:transition-budget`): for every target type a nonempty
+/-- A transition selection (equation (18.6)): for every target type a nonempty
 finite set of charged child pairs such that, for every source child pair with states in
 `V_μ`, positive degree against the full child-pair mixture implies positive degree against
 some selected component. -/
@@ -986,23 +986,23 @@ structure Selection (M : Model V I) where
     ∃ j ∈ J t, rE (prodPMF (M.rho j.1 h) (M.rho j.2 h)) (SquareRel (M.sim h)) p ≠ 0
 
 /-- The inverse-probability sum `∑_{j ∈ J_t} π_t(j)^{-α}` of a type
-(`eq:transition-budget`). -/
+(equation (18.6)). -/
 noncomputable def Selection.inverseSum {M : Model V I} (Sel : Selection M) (α : ℝ) (t : I) :
     ℝ≥0∞ :=
   ∑ j ∈ Sel.J t, (M.π t j) ^ (-α)
 
 end Model
 
-/-- The summand of `L_α(β)` at `q` (`eq:mean-constants`). -/
+/-- The summand of `L_α(β)` at `q` (equation (17.1)). -/
 noncomputable def Lsummand (α β q : ℝ) : ℝ := q / (1 + q) ^ α + β * (1 - q) ^ α
 
-/-- `L_α(β) = max_{0 ≤ q ≤ 1} (q/(1+q)^α + β(1-q)^α)` (`eq:mean-constants`). -/
+/-- `L_α(β) = max_{0 ≤ q ≤ 1} (q/(1+q)^α + β(1-q)^α)` (equation (17.1)). -/
 noncomputable def Lfun (α β : ℝ) : ℝ := sSup (Lsummand α β '' Set.Icc 0 1)
 
-/-- `K_α(β) = α^α/(α+1)^{α+1} (1-β)^{α+1}` (`eq:mean-constants`). -/
+/-- `K_α(β) = α^α/(α+1)^{α+1} (1-β)^{α+1}` (equation (17.1)). -/
 noncomputable def Kfun (α β : ℝ) : ℝ := α ^ α / (α + 1) ^ (α + 1) * (1 - β) ^ (α + 1)
 
-/-- `λ_α = 2 min_{0 ≤ β ≤ 1} (L_α(β) + K_α(β))` (`eq:mean-constants`). -/
+/-- `λ_α = 2 min_{0 ≤ β ≤ 1} (L_α(β) + K_α(β))` (equations (6.2) and (17.1)). -/
 noncomputable def lambda (α : ℝ) : ℝ :=
   2 * sInf ((fun β => Lfun α β + Kfun α β) '' Set.Icc 0 1)
 
@@ -1012,7 +1012,7 @@ end Stopped
 
 namespace Stopped
 
-/-- The scalar functions of `eq:mean-constants` are literally the library's. -/
+/-- The scalar functions of equation (17.1) are literally the library's. -/
 lemma Lsummand_eq : @Lsummand = @GraphMarkovMatching.Stopped.Lsummand := rfl
 lemma Lfun_eq : @Lfun = @GraphMarkovMatching.Stopped.Lfun := rfl
 lemma Kfun_eq : @Kfun = @GraphMarkovMatching.Stopped.Kfun := rfl
@@ -1104,10 +1104,10 @@ lemma failProb_eq (s t : I) (h : ℕ) : M.failProb s t h = M.lib.failProb s t h 
   rw [rho_apply, qE_map_equiv (toLib (I × V) h) (M.rho t h) (M.sim h) (M.lib.sim h)
     (M.sim_iff h) x, rho_eq]
 
-/-- The one-site defect `ζ_α` is literally the library's (`eq:root-defect`). -/
+/-- The one-site defect `ζ_α` is literally the library's (equation (6.1)). -/
 lemma zeta_eq (α : ℝ) : M.zeta α = M.lib.zeta α := rfl
 
-/-- The incompatible root mass `δ` is literally the library's (`eq:root-defect`). -/
+/-- The incompatible root mass `δ` is literally the library's (equation (6.1)). -/
 lemma delta_eq : M.delta = M.lib.delta := rfl
 
 /-- The challenge's phase map as the library's. -/
@@ -1115,7 +1115,7 @@ def Phase.lib {M : Model V I} {g : ℕ} (Θ : Phase M g) :
     GraphMarkovMatching.Stopped.Model.Phase M.lib g :=
   ⟨Θ.θ, Θ.fresh_zero, Θ.child⟩
 
-/-- The class sizes agree (`eq:transition-budget`). -/
+/-- The class sizes agree (equation (18.6)). -/
 lemma Phase.count_eq {M : Model V I} [Fintype I] {g : ℕ} (Θ : Phase M g) (i : ZMod g) :
     Θ.count i = Θ.lib.count i := rfl
 
@@ -1223,7 +1223,7 @@ def Selection.lib {M : Model V I} (Sel : Selection M) :
     rw [rE_prodPMF_rho_eq, Equiv.apply_symm_apply] at hj'
     exact hj'
 
-/-- The inverse-probability sums agree (`eq:transition-budget`). -/
+/-- The inverse-probability sums agree (equation (18.6)). -/
 lemma Selection.inverseSum_eq {M : Model V I} (Sel : Selection M) (α : ℝ) (t : I) :
     Sel.inverseSum α t = Sel.lib.inverseSum α t := rfl
 
@@ -1233,7 +1233,7 @@ end Stopped
 
 /-! ## The stopped Markov matching theorem -/
 
-/-- `thm:markov-matching`, finite alternative: under the exponent condition `λ_α < 1`,
+/-- Theorem 6.1, finite alternative: under the exponent condition `λ_α < 1`,
 there are constants `K`, `ε > 0` depending only on `α, H, T, B` such that every finite
 model with type classes of size at most `T`, transition selections with inverse sums at most
 `B`, fresh positivity and common returns within `H`, and one-site defect `ζ_α ≤ ε`, has
@@ -1253,7 +1253,7 @@ theorem audit_markov_matching_finite {α : ℝ} (hα : 1 ≤ α) (hlam : Stopped
   exact hbound M.lib ((M.isCompat_iff).1 hc) Θ.lib hTc Sel.lib hBs
     ((M.freshPositive_iff).1 hFP) ((M.commonReturns_iff Θ H).1 hCR) hζ s t hst h
 
-/-- `thm:markov-matching`, zero-compatible alternative: under the exponent condition
+/-- Theorem 6.1, zero-compatible alternative: under the exponent condition
 `λ_α < 1`, there are constants `K`, `ε > 0` depending only on `α` such that every model
 with `δ = 0` and `ζ_α ≤ ε` has every pair of types failing to match at every height with
 probability at most `K ζ_α`. -/
@@ -1267,7 +1267,7 @@ theorem audit_markov_matching_zero {α : ℝ} (hα : 1 ≤ α) (hlam : Stopped.l
   rw [Stopped.Model.failProb_eq, Stopped.Model.zeta_eq]
   exact hbound M.lib ((M.isCompat_iff).1 hc) hδ hζ s t h
 
-/-- `thm:markov-matching`, finite alternative at infinite height: two independent
+/-- Theorem 6.1, finite alternative at infinite height: two independent
 consistent processes of same-class types admit one root-fixing infinite-tree
 automorphism matching their states at every vertex with probability at least
 `1 - K ζ_α`. -/
@@ -1374,7 +1374,7 @@ theorem audit_markov_matching_finite_infinite {α : ℝ} (hα : 1 ≤ α)
     · simpa [X, Y, Stopped.Model.srel, GraphMarkovMatching.Stopped.Model.srel,
         Stopped.Model.lib, coord_supportToGraph] using haut w
 
-/-- `thm:markov-matching`, zero-compatible alternative at infinite height: two independent
+/-- Theorem 6.1, zero-compatible alternative at infinite height: two independent
 consistent processes of any two types admit one root-fixing infinite-tree automorphism
 matching their states at every vertex with probability at least `1 - K ζ_α`. -/
 theorem audit_markov_matching_zero_infinite {α : ℝ} (hα : 1 ≤ α)

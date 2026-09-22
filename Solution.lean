@@ -1,6 +1,15 @@
-/- The thirteen challenge theorems, proved using the internal transports.
-Solution.Definitions repeats the independent challenge vocabulary. -/
 import Solution.Transport
+
+/-!
+# Proofs of the audited statements
+
+Proofs of the thirteen theorems stated in `Challenge.lean`, for J. S. Athreya and S. Troscheit,
+*The quasi-isometry classes of Galton–Watson trees*, arXiv:2609.23882. Theorem, equation and
+condition numbers refer to version 1 of that paper. Each proof applies the corresponding
+theorem of `Solution.Infrastructure`, which is proved from the four libraries, through the
+identifications of `Solution.Transport`. `Solution.Definitions` repeats the challenge
+vocabulary without importing `Challenge.lean`.
+-/
 
 namespace Challenge
 
@@ -9,7 +18,12 @@ open MeasureTheory
 
 /-! ## The i.i.d. matching theorem -/
 
-/-- `thm:matching`(1): the leaf bound. -/
+/-- Theorem 5.1(1), the leaf bound (5.2). Let `μ` be a law on the vertex set of a graph `G`,
+and call two labels compatible when they are equal or adjacent. If `η_{5/2}(μ) ≤ 1/256`, then
+two independent leaf labellings of the binary tree of height `h`, each with i.i.d. labels of
+law `μ`, admit no automorphism carrying every leaf to a leaf with a compatible label with
+probability at most `(253/256)^h η_{5/2}(μ)`. The left side is this probability, written as
+the expected mass of second labellings that the first labelling fails to match. -/
 theorem audit_graph_leaf_matching_bound {V : Type u} (μ : PMF V) (G : SimpleGraph V)
     (h0 : potential (5 / 2) μ (compat G) ≤ 1 / 256) (h : ℕ) :
     ∑' x, leafMu μ h x * qE (leafMu μ h) (leafSim (compat G) h) x
@@ -17,7 +31,10 @@ theorem audit_graph_leaf_matching_bound {V : Type u} (μ : PMF V) (G : SimpleGra
   rw [Solution.Transport.potential_eq_graph] at h0 ⊢
   exact Solution.Infrastructure.audit_graph_leaf_matching_bound μ G h0 h
 
-/-- `thm:matching`(2): the full bound. -/
+/-- Theorem 5.1(2), the full bound (5.3) at finite height. In the setting of the leaf bound,
+with every vertex labelled, `η_{5/2}(μ) ≤ 10⁻⁴` implies that two independent labellings of the
+binary tree of height `h` admit no automorphism matching every vertex with probability at most
+`16 η_{5/2}(μ)`, uniformly in `h`. -/
 theorem audit_graph_full_matching_bound {V : Type u} (μ : PMF V) (G : SimpleGraph V)
     (hη : potential (5 / 2) μ (compat G) ≤ 1 / 10000) (h : ℕ) :
     ∑' x, fullMu μ h x * qE (fullMu μ h) (fullSim (compat G) h) x
@@ -25,8 +42,14 @@ theorem audit_graph_full_matching_bound {V : Type u} (μ : PMF V) (G : SimpleGra
   rw [Solution.Transport.potential_eq_graph] at hη ⊢
   exact Solution.Infrastructure.audit_graph_full_matching_bound μ G hη h
 
-/-- `thm:matching`, the infinite tree: the matching automorphism as a root-fixing
-automorphism of the infinite binary tree. -/
+/-- Theorem 5.1(2) at infinite height. Let `R₀` be a reflexive symmetric compatibility
+relation on a countable label set, which is compatibility in the graph joining distinct related
+labels, and let `η_{5/2}(μ) ≤ 10⁻⁴`. There is a probability space carrying two sequences of
+full labellings `X h`, `Y h` of all heights, each restricting to the previous one, such that
+`(X h, Y h)` has the law of two independent labellings of height `h` with i.i.d. labels of law
+`μ`. With probability at least `1 - 16 η_{5/2}(μ)`, there is one root-fixing automorphism `g`
+of the infinite binary tree such that, at every vertex `s`, the label of `X` at `g s` is
+compatible with the label of `Y` at `s`. -/
 theorem audit_exists_infinite_tree_matching_graphAut {V : Type u} (μ : PMF V)
     [MeasurableSpace V] [MeasurableSingletonClass V] [Countable V] (R₀ : V → V → Prop)
     (hrefl : ∀ v, R₀ v v) (hsymm : ∀ a b, R₀ a b → R₀ b a)
@@ -46,24 +69,30 @@ theorem audit_exists_infinite_tree_matching_graphAut {V : Type u} (μ : PMF V)
 
 /-! ## The finite class and the complete classification -/
 
-/-- Bounded connected graphs form one quasi-isometry class: each is quasi-isometric to a
-single vertex. -/
+/-- The finite class of Theorem 1.2, geometric input: a connected graph of bounded diameter is
+quasi-isometric to the one-vertex graph. In particular, all finite trees are quasi-isometric to
+one another. -/
 theorem audit_bounded_graph_qi_point {V : Type u} (G : SimpleGraph V) (hconn : G.Connected)
     (hbdd : ∃ D : ℕ, ∀ x y, G.dist x y ≤ D) :
     GraphQuasiIsometric G (⊥ : SimpleGraph Unit) := by
   exact Solution.Infrastructure.audit_bounded_graph_qi_point G hconn hbdd
 
-/-- A law with mean at most one dies out almost surely, unless it is the deterministic
-single child `θ_1 = 1`. -/
+/-- The finite class of Theorem 1.2, probabilistic input: an offspring distribution with mean
+at most one, other than the deterministic single child `θ(1) = 1`, gives an almost surely
+finite Galton–Watson tree. Hence only the laws admitted in Theorem 1.2 survive with positive
+probability. -/
 theorem audit_extinction_of_not_supercritical {J N : ℕ} (theta : Offspring J) (hJN : J ≤ N)
     (hmean : ¬ theta.IsSupercritical) (h1 : theta 1 ≠ 1) :
     ∀ᵐ c ∂(gwField (N := N) theta), ¬ gwSurvives c := by
   exact Solution.Infrastructure.audit_extinction_of_not_supercritical theta hJN hmean h1
 
-/-- `thm:trichotomy` in full: for two independent Galton--Watson trees with finitely supported
-offspring laws, almost surely a root-preserving quasi-isometry exists exactly when both are
-finite, or both are infinite and the two laws lie in the same infinite class, and otherwise no
-quasi-isometry exists at all. -/
+/-- Theorem 1.2, including the finite class, over the unconditioned laws. Let `θ` and `θ'` be
+finitely supported offspring distributions and consider the trees cut out by independent
+offspring fields. Almost surely, a root-preserving quasi-isometry between the two trees exists
+exactly when both trees are finite, or both are infinite and `SameInfiniteClass θ θ'` holds;
+and any quasi-isometry, root-preserving or not, forces the same alternative. The paper
+conditions both trees on infinite diameter; here that conditioning is expressed through the
+survival events, and the laws are unrestricted. -/
 theorem audit_full_classification_ae_iff {J J' N N' : ℕ}
     (theta : Offspring J) (hJN : J ≤ N) (theta' : Offspring J') (hJN' : J' ≤ N') :
     ∀ᵐ omega ∂((gwField (N := N) theta).prod (gwField (N := N') theta')),
@@ -79,11 +108,11 @@ theorem audit_full_classification_ae_iff {J J' N N' : ℕ}
 
 /-! ## Mutual embeddability -/
 
-/-- `thm:embedding-hierarchy`: a Galton--Watson tree with a finitely supported supercritical
-offspring law, conditioned on infinite diameter, almost surely admits quasi-isometric
-embeddings into the binary tree and from it. The binary tree is the parent--child graph of
-all words over a two-letter alphabet, and the conditioning is expressed by quantifying over
-the surviving samples of the unconditioned law. -/
+/-- Theorem 1.3, mutual embeddability: a Galton–Watson tree with a finitely supported
+supercritical offspring distribution, conditioned on infinite diameter, almost surely admits a
+quasi-isometric embedding into the binary tree and receives one from it. The binary tree is
+the parent–child graph of all words over a two-letter alphabet, and the conditioning is
+expressed by quantifying over the surviving samples of the unconditioned law. -/
 theorem audit_mutual_embeddability {J N : ℕ} (theta : Offspring J) (hJN : J ≤ N)
     (hsup : theta.IsSupercritical) :
     ∀ᵐ c ∂(gwField (N := N) theta), gwSurvives c →
@@ -94,8 +123,9 @@ theorem audit_mutual_embeddability {J N : ℕ} (theta : Offspring J) (hJN : J �
 
 /-! ## Universality in the two-value family -/
 
-/-- `thm:twovalue`: two independent Galton--Watson trees whose offspring law is
-supported on `{1,2}` almost surely admit a root-preserving quasi-isometry. -/
+/-- Theorem 1.4, almost-sure part. Let every vertex independently have two children with
+probability `t` and one child otherwise. For every `t ∈ [0, 1]`, two independent such trees
+almost surely admit a root-preserving quasi-isometry. -/
 theorem audit_twovalue_ae_tree_family {t : ℝ} (ht0 : 0 ≤ t) (ht1 : t ≤ 1) :
     ((bernoulliField ht0 ht1).prod (bernoulliField ht0 ht1))
       {ω | ¬ GraphQuasiIsometricRooted (wordGraph (InTree ω.1)) (wordGraph (InTree ω.2))
@@ -111,8 +141,10 @@ theorem audit_twovalue_ae_tree_family {t : ℝ} (ht0 : 0 ≤ t) (ht1 : t ≤ 1) 
       exact h ⟨K, g, hg, hgr⟩
     _ = 0 := Solution.Infrastructure.audit_twovalue_ae_tree_family ht0 ht1
 
-/-- The quantitative half of `thm:twovalue`: above a threshold, failure of a root-preserving
-`(D²+3)`-quasi-isometry has probability at most the explicit rate. -/
+/-- Theorem 1.4, the rate (1.1). For `0 < t < 1` there is `D₀` such that, for every `D ≥ D₀`,
+the probability that two independent trees of the two-value family admit no root-preserving
+`(D² + 3)`-quasi-isometry is at most `256 √((1 - t)^(D(2D - 5)))`. For `D ≥ 3` this equals
+`256 θ(1)^(D(D - 5/2))` with `θ(1) = 1 - t`, so the constant `C` of (1.1) is `256`. -/
 theorem audit_twovalue_rate_tree {t : ℝ} (ht0 : 0 < t) (ht1 : t < 1) :
     ∃ D₀ : ℕ, ∀ D : ℕ, D₀ ≤ D →
       ((bernoulliField ht0.le ht1.le).prod (bernoulliField ht0.le ht1.le))
@@ -127,11 +159,13 @@ theorem audit_twovalue_rate_tree {t : ℝ} (ht0 : 0 < t) (ht1 : t < 1) :
 
 /-! ## The stopped Markov matching theorem -/
 
-/-- `thm:markov-matching`, finite alternative: under the exponent condition `λ_α < 1`,
-there are constants `K`, `ε > 0` depending only on `α, H, T, B` such that every finite
-model with type classes of size at most `T`, full-support transition inverse sums at most
-`B`, fresh positivity and common returns within `H`, and one-site defect `ζ_α ≤ ε`, has
-every same-class pair failing to match at every height with probability at most `K ζ_α`. -/
+/-- Theorem 6.1, finite-type alternative at finite height. Fix `α ≥ 1` with `λ_α < 1` and
+bounds `H`, `T ≥ 1` and `B ≥ 1`. There are constants `K` and `ε > 0`, depending only on
+`α, H, T, B`, with the following property. Take any model with finitely many types and
+reflexive symmetric compatibility, with a partition into cyclic classes of at most `T` types
+each, transition sums `∑_{j ∈ supp P_t} P_t(j)^(-α) ≤ B`, conditions (M1) and (M2) with return
+bound `H`, and `ζ_α ≤ ε`. Then two independent processes started at types of the same class
+fail to match with probability at most `K ζ_α`, at every height. -/
 theorem audit_markov_matching_finite {α : ℝ} (hα : 1 ≤ α) (hlam : Stopped.lambda α < 1)
     (H T : ℕ) (hT : 1 ≤ T) (B : ℝ) (hB : 1 ≤ B) :
     ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} [Fintype I] (M : Stopped.Model V I), M.IsCompat →
@@ -146,10 +180,11 @@ theorem audit_markov_matching_finite {α : ℝ} (hα : 1 ≤ α) (hlam : Stopped
   exact hb M.toOld (M.toOld_compat hc) Θ.toOld hT' (Solution.Transport.fullSelection M) hB'
     (Solution.Transport.freshPositive_toOld M hFP) (M.returns_toOld Θ H hCR) hζ s t hst h
 
-/-- `thm:markov-matching`, zero-compatible alternative: under the exponent condition
-`λ_α < 1`, there are constants `K`, `ε > 0` depending only on `α` such that every model
-with `δ = 0` and `ζ_α ≤ ε` has every pair of types failing to match at every height with
-probability at most `K ζ_α`. -/
+/-- Theorem 6.1, zero-compatible alternative at finite height. Fix `α ≥ 1` with `λ_α < 1`.
+There are constants `K` and `ε > 0`, depending only on `α`, such that for every model with
+reflexive symmetric compatibility, `δ = 0` (that is, `b(0) = 1`) and `ζ_α ≤ ε`, two independent
+processes started at any two types fail to match with probability at most `K ζ_α`, at every
+height. No finiteness, class or return hypothesis is imposed on the types. -/
 theorem audit_markov_matching_zero {α : ℝ} (hα : 1 ≤ α) (hlam : Stopped.lambda α < 1) :
     ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} (M : Stopped.Model V I), M.IsCompat → M.delta = 0 →
       M.zeta α ≤ ENNReal.ofReal ε → ∀ s t h,
@@ -160,10 +195,13 @@ theorem audit_markov_matching_zero {α : ℝ} (hα : 1 ≤ α) (hlam : Stopped.l
   rw [Solution.Transport.failProb_eq]
   exact hb M.toOld (M.toOld_compat hc) hδ hζ s t h
 
-/-- `thm:markov-matching`, finite alternative at infinite height: two independent
-consistent processes of same-class types admit one root-fixing infinite-tree
-automorphism matching their states at every vertex with probability at least
-`1 - K ζ_α`. -/
+/-- Theorem 6.1, finite-type alternative at infinite height. Under the hypotheses of
+`audit_markov_matching_finite`, with a countable state set, let `s` and `t` be types of the
+same class. There is a probability space carrying two sequences of state labellings `X n`,
+`Y n` of all heights, each restricting to the previous one, such that `(X n, Y n)` has the law
+of two independent labellings of height `n` started at `s` and `t`. With probability at least
+`1 - K ζ_α`, one root-fixing automorphism of the infinite binary tree matches their states at
+every vertex. -/
 theorem audit_markov_matching_finite_infinite {α : ℝ} (hα : 1 ≤ α)
     (hlam : Stopped.lambda α < 1) (H T : ℕ) (hT : 1 ≤ T) (B : ℝ) (hB : 1 ≤ B) :
     ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} [Fintype I] [Countable V] [MeasurableSpace V]
@@ -195,9 +233,9 @@ theorem audit_markov_matching_finite_infinite {α : ℝ} (hα : 1 ≤ α)
     (hb M.toOld (M.toOld_compat hc) Θ.toOld hT' (Solution.Transport.fullSelection M) hB'
       (Solution.Transport.freshPositive_toOld M hFP) (M.returns_toOld Θ H hCR) hζ s t hst)
 
-/-- `thm:markov-matching`, zero-compatible alternative at infinite height: two independent
-consistent processes of any two types admit one root-fixing infinite-tree automorphism
-matching their states at every vertex with probability at least `1 - K ζ_α`. -/
+/-- Theorem 6.1, zero-compatible alternative at infinite height. Under the hypotheses of
+`audit_markov_matching_zero`, with countable state and type sets, the conclusion of
+`audit_markov_matching_finite_infinite` holds for any two types `s` and `t`. -/
 theorem audit_markov_matching_zero_infinite {α : ℝ} (hα : 1 ≤ α)
     (hlam : Stopped.lambda α < 1) :
     ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} [Countable V] [MeasurableSpace V]
