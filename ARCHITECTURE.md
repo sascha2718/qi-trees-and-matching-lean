@@ -82,7 +82,7 @@ formula must agree with that domain, including exponents below two.
 
 The rational bounds `L = 14/75`, `K = 1/8` and chord constant `C = 28/3` are coupled through
 `2L + 4K < 7/8` and `2LC + 1/2 < 4`. Changing one requires checking both inequalities.
-They bound the paper's exact constants from above, as disclosed in Appendix B.
+They bound the paper's exact constants from above, as recorded in the correspondence manifest.
 
 Useful proof-maintenance details:
 
@@ -202,7 +202,8 @@ binary embedding. The product-law argument uses `Measure.ae_ae_of_ae_prod` and p
 survival probability, without requiring measurability of the embedding event.
 
 The printed proof instead chooses representatives by regime and uses the survival skeleton
-for its bushy reduction. Appendix B records this difference and the pruning estimate difference.
+for its bushy reduction. The correspondence manifest records this difference and the pruning
+estimate difference.
 Boundaries, fractal applications and continuous branching times remain outside the formalised
 scope; see the exclusions in the correspondence manifest.
 

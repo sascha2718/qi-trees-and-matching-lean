@@ -27,7 +27,7 @@ entries:
     lean: ["Challenge.audit_bounded_graph_qi_point", "Challenge.audit_extinction_of_not_supercritical", "Challenge.audit_full_classification_ae_iff"]
     relation: split
     headline: true
-    note: "The three audited declarations separate the finite-class input from the full classification."
+    note: "The three audited declarations separate the finite-class input from the full classification. The classification endpoint places no restriction on the two laws and holds almost surely under the product of the unconditioned laws. It expresses the conditioning on infinite diameter by quantifying over the surviving samples, and its first alternative is the finite class. The library internally replaces a nonminimal support bound J by the actual largest supported arity."
 
   - source: "thm:twovalue"
     kind: theorem
@@ -57,7 +57,7 @@ entries:
     lean: ["Challenge.audit_mutual_embeddability"]
     relation: exact
     headline: true
-    note: "The conditioning on infinite diameter is expressed by quantifying over the surviving samples of the unconditioned law, as in the classification endpoint."
+    note: "The conditioning on infinite diameter is expressed by quantifying over the surviving samples of the unconditioned law, as in the classification endpoint. The proof chooses a representative of a chain class from the atoms of its semigroup and treats the bushy class through the survival skeleton. Lean first trims the support bound to J = max supp theta, then uses one representative for all three supercritical classes, the mixture theta' = (7/8) delta_{J_1} + (1/8) theta with J_1 - 1 = 24(J - 1) a multiple of a generator of Lambda_theta (BranchingProcess.Offspring.concentrate), which lies in the class of theta by BranchingProcess.Offspring.sameInfiniteClass_concentrate. The retained vertex of the representative is found under the conditioned law as in the note on thm:concentrated-regular-subtree, so the bushy case does not pass through the skeleton, and the classification transports the binary subtree in every case. The passage from the product law to the law of the tree uses that the representative survives with positive probability. No measurability of the embedding event is asserted. The strict hierarchy Fin < N_0 < T of sec:embedding-hierarchy carries no numbered statement in the paper. Lean records it in ChainClasses.qiEmbeddable_rayGraph_of_not_survives, ChainClasses.not_qiEmbeddable_rayGraph_of_not_survives, ChainClasses.qiEmbeddable_rayGraph_of_survives and ChainClasses.ae_not_qiEmbeddable_rayGraph, the last through BranchingProcess.not_qiEmbeddable_rayGraph, the form of thm:three-rays for quasi-isometric embeddings from which the quasi-isometry statement is derived. The composition of the two embeddings for two independent laws is ChainClasses.mutual_embeddability_ae."
 
   - source: "thm:concentrated-regular-subtree"
     kind: lemma
@@ -65,7 +65,7 @@ entries:
     lean: ["BranchingProcess.retainedInf_iff", "BranchingProcess.retainedProb_succ", "BranchingProcess.ofReal_le_retainedProb", "BranchingProcess.ofReal_le_sampleMeasure_retainedInf", "BranchingProcess.retainedTreeLaw_eq_treeLaw", "BranchingProcess.exists_regular_embedding_of_retainedInf", "BranchingProcess.exists_binary_embedding_of_retainedInf", "ChainClasses.sampleMeasure_spine_fail", "ChainClasses.sampleMeasure_spine_fail_le", "ChainClasses.ae_exists_spine_retained", "ChainClasses.ae_exists_retained_vertex", "ChainClasses.ae_qiEmbeddable_binary_of_concentrated"]
     relation: split
     headline: false
-    note: "The retained-root probability is bounded below by 4/5 through a union bound in place of Chebyshev's inequality; the exact recursion and its fixed point are separate identities. The Galton-Watson law is identified for the retained descendant tree re-addressed by rank, under the law conditioned on a retained root. The first-child-ray trials give the exact failure probability and the bound (11/32)^N; the embedding theorem instead locates a retained vertex along the skeleton descent under the conditioned law."
+    note: "The proof bounds the binomial lower tail by Chebyshev's inequality and runs the induction at the level 3/4. Lean bounds P(Bin(J,p) < m) by the union bound over the at most 2^J patterns of fewer than m surviving children, which gives 2^J (1-p)^(J - floor(J/2)) <= 7/100 for p >= 4/5 and J >= 24, and runs the induction at the level 4/5 (BranchingProcess.ofReal_le_retainedProb). The stated bound 3/4 follows. The exact identity eq:pruned-subtree-recursion is BranchingProcess.retainedProb_succ, and its fixed point for the retained root, p = theta_J P(Bin(J,p) >= m), is BranchingProcess.sampleMeasure_retainedInf_eq. Only the induction replaces the identity by the union bound. The retained vertex of the sample is found in two ways. Along the first-child ray, as in the paper, the events A_n have common probability theta_J p and ChainClasses.sampleMeasure_spine_fail gives P(tau >= N) = (1 - theta_J p)^N, bounded by (11/32)^N in ChainClasses.sampleMeasure_spine_fail_le, with the retained vertex 1^n 2 of the sample in ChainClasses.ae_exists_spine_retained. Along the descent through first surviving children of the skeleton under the conditioned law, ChainClasses.ae_exists_retained_vertex uses the branching property of the surviving subtrees instead. This form does not require theta_0 = 0 and is the one the proof of thm:embedding-hierarchy uses. The Galton-Watson assertion is stated, as the Harris decomposition is in thm:harris, for the retained descendant tree of the root re-addressed by rank, BranchingProcess.retTree. Under the law conditioned on the root being retained, BranchingProcess.retainedTreeLaw_eq_treeLaw identifies its law with that of a Galton-Watson tree whose offspring law BranchingProcess.Offspring.pruned is the binomial law with parameters J and p conditioned to be at least m, supported on {m,...,J}. The regular m-ary subtree rooted at a retained vertex of the sample, every vertex of which has J children in the tree, is BranchingProcess.exists_regular_embedding_of_retainedInf."
 
   - source: "def:qs"
     kind: definition
@@ -87,6 +87,7 @@ entries:
     lean: ["Challenge.audit_graph_leaf_matching_bound", "Challenge.audit_graph_full_matching_bound", "Challenge.audit_exists_infinite_tree_matching_graphAut"]
     relation: split
     headline: true
+    note: "The library constructs the probability space of the infinite-height declaration from the infinite product measure."
 
   - source: "thm:full-probability-recursion"
     kind: proposition
@@ -108,6 +109,7 @@ entries:
     lean: ["Challenge.audit_markov_matching_finite", "Challenge.audit_markov_matching_zero", "Challenge.audit_markov_matching_finite_infinite", "Challenge.audit_markov_matching_zero_infinite"]
     relation: split
     headline: true
+    note: "The library obtains the processes of the infinite-height declarations from the Ionescu-Tulcea trajectory measure. It proves the finite alternative for retained transitions J_t, recorded in GraphMarkovMatching.Stopped.Model.Selection, and Solution.lean applies it with J_t = supp P_t. The finite-height bound in terms of eta_alpha for the finite alternative is GraphMarkovMatching.Stopped.markov_matching_finite_eta. The remaining bounds in terms of eta_alpha follow from the audited bounds and the inequality zeta_alpha <= eta_alpha/p, which is GraphMarkovMatching.Stopped.Model.zeta_le_eta_div."
 
   - source: "thm:two-sided-potential"
     kind: lemma
@@ -171,6 +173,7 @@ entries:
     lean: ["ChainClasses.coupling_law"]
     relation: exact
     headline: false
+    note: "The paper introduces an independent random variable U that is uniform on [0,1) and states P(l'(lambda',U) = k) = p^(D)_k. Lean represents the law of U by Lebesgue measure on [0,1) and expresses the same assertion as an identity of product measures."
 
   - source: "thm:harris"
     kind: proposition
@@ -178,6 +181,7 @@ entries:
     lean: ["BranchingProcess.survivalMeasure_decorations_treeLaw", "BranchingProcess.survivalMeasure_skelField_pattern"]
     relation: split
     headline: false
+    note: "In the paper, the Harris decomposition describes each bush by its full offspring field, with the fields conditionally independent and distributed according to the conjugate law. Lean states the conditional law after mapping each field to its realised tree. This omits the unused field coordinates outside that tree, which remain unconditioned."
 
   - source: "def:shape"
     kind: definition
@@ -192,6 +196,7 @@ entries:
     lean: ["ChainClasses.shape_decomposition"]
     relation: exact
     headline: false
+    note: "The paper says that the entire family (S(w)) indexed by the binary tree is i.i.d. Lean expresses this by the corresponding product formula for every prefix-closed finite set of index words. The paper also identifies the realised tree with the assembly of this family, whereas the formal isometry is not required to preserve word addresses."
 
   - source: "thm:shape-mass"
     kind: lemma
@@ -199,6 +204,7 @@ entries:
     lean: ["ChainClasses.shape_mass_tail", "ChainClasses.shape_mass_point"]
     relation: split
     headline: false
+    note: "The paper derives both conclusions directly from the offspring law. The generic Lean lemmas instead assume the exponential moment used for the tail bound and the product factorisation used for the point-mass bound. Separate library results verify these assumptions for the shape law."
 
   - source: "def:shape-net"
     kind: definition
@@ -227,6 +233,7 @@ entries:
     lean: ["ChainClasses.markedQI_contract_shape", "ChainClasses.dilution"]
     relation: split
     headline: false
+    note: "The statement records only the entropy bound, while its proof uses a contraction of each shape. Lean exposes the contraction as an address map P and records the estimate d(x,y) <= s d(Px,Py) + 2s - 2. At general arity it also records that the map is 2s-marked and that the contracted tree has at most J(1 + J(s-1)) children per vertex."
 
   - source: "thm:glued-transfer"
     kind: lemma
@@ -241,6 +248,7 @@ entries:
     lean: ["GraphMarkovMatching.Stopped.phi_mul_le_beta", "GraphMarkovMatching.Stopped.sq_le_K_phi_add", "GraphMarkovMatching.Stopped.chord_gen", "GraphMarkovMatching.Support.rpow_neg_alpha_le", "GraphMarkovMatching.Support.phi_prod_le"]
     relation: split
     headline: false
+    note: "The paper uses the exact values L_{5/2} = 6 sqrt(15)/125, K_{5/2} = (2/7)(5/7)^{5/2} and c_{5/2} = 8 sqrt(2) - 2 in the i.i.d. pointwise estimates. Lean checks the same estimates with the respective rational upper bounds 14/75, 1/8 and 28/3."
 
   - source: "thm:contraction"
     kind: lemma
@@ -297,6 +305,7 @@ entries:
     lean: ["ChainClasses.crosslaw_ae_tree", "ChainClasses.exists_crosslaw_rate_tree"]
     relation: split
     headline: false
+    note: "The paper incorporates the four largeness conditions in eq:d0-conditions into the thresholds D_0, D_1 appearing in thm:twovalue and thm:cross-law. Lean first proves rate estimates under the four explicit conditions and then uses ChainClasses.forall_scale to obtain a suitable scale. In that namespace, the wrappers exists_twovalue_rate_tree and exists_crosslaw_rate_tree recover the printed threshold statements. The final shape and classification declarations bushy_ae_tree, bushy_ae_shape_tree_two_law, bushy_general_ae and chain_general_ae likewise have no additional largeness hypothesis."
 
   - source: "thm:shape-shrink"
     kind: lemma
@@ -304,6 +313,7 @@ entries:
     lean: ["ChainClasses.markedQI_shape_shrink", "ChainClasses.markedQI_shape_fix"]
     relation: split
     headline: false
+    note: "Where item it:shape-shrink states the result after choosing the scale from D, Lean retains the unspecialised marked constant 216 J^2 s^2."
 
   - source: "thm:shape-eta"
     kind: lemma
@@ -311,6 +321,7 @@ entries:
     lean: ["ChainClasses.shape_eta_final"]
     relation: exact
     headline: false
+    note: "The paper formulates the lemma for the pushforward law on equivalence classes of shapes and treats the class of the one-vertex shape as one graph vertex. Lean works with shapes before taking the quotient and represents that distinguished vertex by a block of at most D^2 shapes. The contribution of this block is the same error 6 exp(-c D^2) used in the printed proof."
 
   - source: "thm:shape-coupling"
     kind: lemma
@@ -487,6 +498,7 @@ entries:
     lean: ["ChainClasses.Profile.exists_portrait_of_infMatchK", "ChainClasses.Profile.sample_qi_of_profile_match"]
     relation: split
     headline: false
+    note: "The printed transfer result assumes a common profile-height bound h and gives the quasi-isometry constant 72(h+1)^2 K^2. The Lean statement replaces the two actual profile heights by the offspring bounds J, J' and consequently uses 216 J J'^2 K^2. A separate library declaration retains the sharper dependence on the actual profile heights."
 
   - source: "thm:four-law-contraction"
     kind: lemma
@@ -494,6 +506,7 @@ entries:
     lean: ["GraphMarkovMatching.Stopped.fourLaw_contraction"]
     relation: exact
     headline: false
+    note: "The paper uses the exact constants L_alpha(beta), K_alpha(beta) and L_alpha. The Lean lemma permits arbitrary majorants L >= L_alpha(beta), K >= K_alpha(beta) and L_0 >= L_alpha. The four audited matching declarations choose these majorants before the Markov model, which makes their claimed uniformity part of the quantified statement."
 
   - source: "thm:zero-degree-dichotomy"
     kind: lemma
