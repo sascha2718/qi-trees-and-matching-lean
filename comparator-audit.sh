@@ -1,34 +1,70 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
 # Run the comparator audit of the headline theorems: the statements frozen in
 # Challenge.lean, proved in Solution.lean, with the audited names listed in
 # comparator.json.
 #
-# The judge is `lake comparator`, which ships in the pinned toolchain together
-# with the kernels it replays through, so the audit needs no separately built
-# verifier. It builds Challenge and Solution, compares their statements,
-# enforces the permitted axioms, and replays the exported proofs through Lean's
-# kernel and, under --paranoid, through every external checker the toolchain
-# bundles.
+# This follows PalomarTemplate's scripts/verify-comparator.sh. The judge is the
+# `lake comparator` that ships in this project's own toolchain, replaying the
+# proof through Lean's kernel and the toolchain's bundled independent kernels
+# (NanoDa and con-ron). Nothing is built from a pin; everything that judges
+# comes from `lean-toolchain`, which Palomar requires to be v4.35.0-rc2 or
+# later.
 #
 # The judge builds and exports the project inside a `bwrap` sandbox: `/` is
 # bound read-only, only `.lake` is writable, and the build, the export and the
-# kernels run in an empty network namespace. `bubblewrap` is therefore
-# required, and needs unprivileged user namespaces or to be installed setuid
-# root; set COMPARATOR_BWRAP to select a particular binary. Ubuntu 24.04
-# restricts unprivileged user namespaces by AppArmor, so the CI workflow builds
-# the pinned bubblewrap release and loads a profile for it.
-#
-# The sandbox is what the verdict rests on, so this script does not offer to
-# disable it. A host without bubblewrap cannot run the audit.
-set -euo pipefail
-cd "$(dirname "$0")"
+# kernels run in an empty network namespace. The sandbox is what the verdict
+# rests on, so this script does not offer to disable it.
+repository_root=$(cd "$(dirname "$0")" && pwd)
+cd "$repository_root"
 
-bwrap_bin="${COMPARATOR_BWRAP:-bwrap}"
-if ! command -v "$bwrap_bin" >/dev/null 2>&1; then
-  echo "comparator-audit: bubblewrap ($bwrap_bin) is not available, so the audit cannot run." >&2
-  echo "comparator-audit: run it on Linux with bubblewrap installed, or through" >&2
-  echo "comparator-audit: .github/workflows/build.yml, which provisions the pinned release." >&2
-  exit 2
-fi
+for required_command in bwrap lake lean python3; do
+  if ! command -v "$required_command" >/dev/null 2>&1; then
+    echo "error: $required_command is required to run lake comparator" >&2
+    exit 1
+  fi
+done
 
-exec lake comparator --config comparator.json --paranoid
+toolchain=$(tr -d '[:space:]' < lean-toolchain)
+prefix=$(lean --print-prefix)
+for tool in lake leanexport leanchecker nanoda_bin con-ron; do
+  if [ ! -x "$prefix/bin/$tool" ]; then
+    echo "error: toolchain $toolchain does not bundle $tool" >&2
+    echo "Palomar requires leanprover/lean4:v4.35.0-rc2 or later" >&2
+    exit 1
+  fi
+done
+
+# Palomar ignores `enable_nanoda` and rejects `external_kernels` in a submitted
+# comparator.json: it registers the toolchain's bundled kernels itself. This
+# generated copy does the same, so the local check judges as the registry does.
+config=$(mktemp "${TMPDIR:-/tmp}/palomar-comparator.XXXXXX")
+trap 'rm -f "$config"' EXIT
+python3 - comparator.json "$config" "$prefix" <<'PY'
+import json
+import pathlib
+import sys
+
+source, destination, prefix = sys.argv[1:]
+try:
+    config = json.loads(pathlib.Path(source).read_text(encoding="utf-8"))
+except (OSError, UnicodeError, json.JSONDecodeError) as error:
+    print(f"error: cannot read valid Comparator config {source}: {error}", file=sys.stderr)
+    raise SystemExit(1)
+if not isinstance(config, dict):
+    print(f"error: {source} must contain one JSON object", file=sys.stderr)
+    raise SystemExit(1)
+if "external_kernels" in config:
+    print(f"error: {source}: external_kernels is not a submitter field; Palomar rejects it", file=sys.stderr)
+    raise SystemExit(1)
+config.pop("enable_nanoda", None)
+config["external_kernels"] = {
+    "nanoda": [f"{prefix}/bin/nanoda_bin"],
+    "con-ron": [f"{prefix}/bin/con-ron"],
+}
+pathlib.Path(destination).write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
+PY
+
+lake exe cache get
+lake comparator --config "$config"
