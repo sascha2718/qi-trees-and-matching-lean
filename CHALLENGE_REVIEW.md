@@ -67,21 +67,25 @@ All names below are in namespace `Challenge`.
 
 ## Evidence
 
-- The Palomar mechanical preflight
-  ([run 35715019939](https://github.com/sascha2718/qi-trees-and-matching-lean/actions/runs/35715019939))
-  passed at `68c8d2d` with no errors. It ran Palomar's verifier at PalomarSubmission commit
-  `ce0e71a` under the profile `palomar-standard-v1`, with Comparator `5756749`, NanoDa
-  `68d5ca9` and lean4export `86e4a33`. The Challenge compiled against canonical Mathlib
-  `905b958` with high trust and no untrusted sources. Comparator exported the thirteen theorems
-  from Solution, and both the NanoDa kernel and Lean's kernel accepted them under `propext`,
-  `Quot.sound` and `Classical.choice`. The only warning is that the Challenge, at 605 lines and
-  33,315 bytes, exceeds the preferred review surface of 300 lines and 32 KiB. The Comparator
-  phase took 594 seconds, with peak memory 3.9 GB, on a four-core runner.
-- The CI workflow built the four libraries and ran Comparator on a fresh checkout at
-  `68c8d2d`, with replay through Lean's kernel
-  ([run 35714917347](https://github.com/sascha2718/qi-trees-and-matching-lean/actions/runs/35714917347)).
-- `lake env lean Challenge.lean` elaborates against Mathlib `v4.32.2` with exactly thirteen
+- `lake --wfail build` builds the four libraries against Lean and Mathlib `v4.35.0-rc2` with no
+  errors and no warnings, across 3,944 jobs. `lake --wfail build Solution` adds the comparator
+  side, 9,116 jobs, equally clean.
+- `lake env lean Challenge.lean` elaborates against Mathlib `v4.35.0-rc2` with exactly thirteen
   `sorry` warnings and no errors.
+- `#print axioms` reports each of the thirteen audited theorems, as `Solution.lean` proves them,
+  to depend on `propext`, `Classical.choice` and `Quot.sound` alone.
+- `lake comparator --config comparator.json --paranoid` accepts the solution: the statements
+  agree with the Challenge, the permitted axioms hold, and `leanchecker-paranoid`, `lean4lean`,
+  `nanoda`, `con-leche`, `con-ron` and Lean's own kernel each accept the export of 47,200
+  declarations. That run was made on macOS, which has no bubblewrap, so it passed
+  `--inadvisably-no-sandbox` and the judge recorded the result as untrustworthy. It is a
+  development check. The sandboxed audit is the CI comparator job, which provisions the pinned
+  bubblewrap release and judges a fresh checkout that carries no compiled project code.
+- The registry submission `9ji1jvxxbyjl` records the state at `cb13bb6`, on Lean `v4.32.2`. The
+  upgraded tree needs its own Palomar preflight, at a pipeline commit that carries the
+  toolchain's `lake comparator`, before it is submitted.
+- The Challenge, at 605 lines and 33,315 bytes, exceeds Palomar's preferred review surface of
+  300 lines and 32 KiB, and stays within the hard limits of 1,000 lines and 100 KiB.
 - `python3 -B scripts/check_paper_correspondence.py` passes, with 89 labelled paper
   declarations, 13 structure entries and 6,564 Lean source declarations, against the authors'
   current manuscript sources and against the source files of arXiv:2609.23882v1.

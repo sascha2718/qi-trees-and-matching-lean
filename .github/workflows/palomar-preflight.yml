@@ -1,9 +1,10 @@
 name: Palomar preflight
 
 # Runs Palomar's own mechanical verifier on the current commit: metadata and layout checks,
-# the challenge dependency audit, and Comparator with replay through both Lean's kernel and
-# NanoDa. This is a predictive preflight, not a registry submission. The pipeline is pinned to
-# a full PalomarSubmission commit, and palomar-standard-v1 selects a GitHub-hosted runner.
+# the challenge dependency audit, and the toolchain's `lake comparator` with replay through
+# Lean's kernel and the kernels Palomar registers. This is a predictive preflight, not a
+# registry submission. The pipeline is pinned to a full PalomarSubmission commit, and
+# palomar-standard-v1 selects a GitHub-hosted runner rather than the catalogue default.
 on:
   workflow_dispatch:
 
@@ -12,11 +13,11 @@ permissions:
 
 jobs:
   preflight:
-    uses: PalomarRegistry/PalomarSubmission/.github/workflows/submission.yml@ce0e71a3615a025ba0cdc68930c51a2a993a5bf3
+    uses: PalomarRegistry/PalomarSubmission/.github/workflows/submission.yml@1703d7babd984ccc3831cdf89c28221abe34808f
     with:
       repository: ${{ github.repository }}
       commit: ${{ github.sha }}
-      pipeline_commit: ce0e71a3615a025ba0cdc68930c51a2a993a5bf3
+      pipeline_commit: 1703d7babd984ccc3831cdf89c28221abe34808f
       request_id: preflight001
       mode: full
       execution_profile: palomar-standard-v1

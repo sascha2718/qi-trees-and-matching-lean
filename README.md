@@ -19,7 +19,7 @@ The project has four default library targets.
 | `GraphMarkovMatching` | The general Markov matching theorem and its common-semigroup applications (`Stopped/`) |
 | `ChainClasses` | Chain and shape encodings, transfer, universality, separation, and classification |
 
-The toolchain is pinned to Lean `v4.32.2`, with Mathlib pinned to the matching release in
+The toolchain is pinned to Lean `v4.35.0-rc2`, with Mathlib pinned to the matching release in
 `lakefile.toml`.
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for the module map, representation choices and
@@ -103,30 +103,31 @@ lake build
 `Challenge.lean` states the audited results using Mathlib alone. `Solution.lean` proves them
 from the four libraries, with its definitions and proof transports in `Solution/`.
 
-The [local audit runner](comparator-audit.sh) requires separately built Comparator and
-lean4export tools. The exporter must match the project's `lean-toolchain`. Set
-`COMPARATOR_TOOLS` to a directory containing the `comparator/` and `lean4export/` checkouts
-and their built executables; the runner defaults to `~/Documents/lean`. On Linux, `landrun`
-must be on `PATH` or selected through `COMPARATOR_LANDRUN`. `COMPARATOR_LEAN4EXPORT` can
-override the exporter path. The [CI workflow](.github/workflows/build.yml), in its
-“Build pinned verification tools” step, records the exact tool revisions and build commands.
-
-With these prerequisites installed, for trusted local development run
+The judge is `lake comparator`, which ships in the pinned toolchain together with the kernels
+it replays through, so the audit needs no separately built verifier. The
+[local audit runner](comparator-audit.sh) wraps it:
 
 ```bash
 ./comparator-audit.sh
 ```
 
-Comparator builds Challenge and Solution, compares their statements and definitions, checks
-the permitted axioms, and replays the exported proofs through the Lean kernel. A separate
+It builds Challenge and Solution, compares their statements and definitions, checks the
+permitted axioms, and replays the exported proofs through Lean's kernel and, under
+`--paranoid`, through the bundled independent kernels. A separate
 `lake build Challenge Solution` is useful during development but is not a prerequisite.
 
-On macOS the local script uses Comparator's development shim, which does not sandbox the
-builds. On Linux it defaults to real `landrun`. This local development command should not be
-confused with the fresh audit of potentially untrusted code: the CI comparator job uses a
-separate checkout, avoids compiling project code beforehand, and runs with real Landrun and
-additional systemd restrictions. Its verification tools are pinned to immutable revisions.
-The optional additional nanoda kernel is disabled in the current configuration.
+The judge builds and exports the project inside a `bwrap` sandbox: `/` is bound read-only, the
+invoking user's home directories are covered, only `.lake` is writable, and the build, the
+export and the kernels run in an empty network namespace. Only dependency resolution reaches
+the network. `bubblewrap` is therefore required, and needs unprivileged user namespaces or to
+be installed setuid root; `COMPARATOR_BWRAP` selects a particular binary. The sandbox is what
+the verdict rests on, so the runner does not offer to disable it, and a host without
+bubblewrap, macOS included, cannot run the audit.
+
+The [CI comparator job](.github/workflows/build.yml) is the reference form: it uses a separate
+checkout, compiles no project code before the judge sees `Solution.lean`, and builds the
+pinned bubblewrap release with an AppArmor profile, as Palomar's verifier does, because Ubuntu
+24.04 restricts unprivileged user namespaces.
 
 The challenge imports Mathlib alone and contains only statement vocabulary and theorem holes;
 Solution and the libraries contain the proofs. The comparator permits only `propext`,

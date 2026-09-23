@@ -92,12 +92,6 @@ jobs:
           use-github-cache: false
           use-mathlib-cache: false
 
-      - name: Install pinned Go for Landrun
-        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
-        with:
-          go-version: "1.25.12"
-          cache: false
-
       # Comparator's README expressly permits obtaining a trusted Mathlib cache
       # before the audit. This step must not compile Challenge or Solution.
       - name: Prepare trusted dependencies
@@ -121,215 +115,42 @@ jobs:
           fi
           mkdir -p .lake
 
-      # Every verifier dependency is immutable. lean4export is separately pinned
-      # to the project's Lean version; Comparator's own dependency matches its
-      # newer build toolchain and is checked independently.
-      - name: Build pinned verification tools
-        env:
-          TOOLS_DIR: ${{ runner.temp }}/ja-st-verifier
+      # The judge sandboxes the build it is judging with bubblewrap. Ubuntu 24.04
+      # restricts unprivileged user namespaces by AppArmor, and the distribution
+      # package predates the fix for GHSA-pxhw-h44j-8pfx, so this builds the pinned
+      # upstream release and loads a profile for it, exactly as Palomar's verifier
+      # does. The installer is taken from an immutable PalomarSubmission commit.
+      - name: Build pinned bubblewrap
+        id: bwrap
         shell: bash
+        env:
+          PIPELINE_COMMIT: 1703d7babd984ccc3831cdf89c28221abe34808f
         run: |
           set -euo pipefail
+          git clone --filter=blob:none --no-checkout \
+            https://github.com/PalomarRegistry/PalomarSubmission.git "$RUNNER_TEMP/pipeline"
+          git -C "$RUNNER_TEMP/pipeline" checkout --detach "$PIPELINE_COMMIT"
+          test "$(git -C "$RUNNER_TEMP/pipeline" rev-parse HEAD)" = "$PIPELINE_COMMIT"
 
-          comparator_sha=2312244ac716564a61cc0bf4e107d9abf1757a61
-          comparator_export_sha=cacf989bd75f608700820f6afc595f32e7a99a4d
-          lean4export_sha=86e4a339507466921dc8c5417c8cb1de1ce7df60
-          landrun_sha=811cfff51ceaf3d9843708aa6d22e9b84ccac8b4
+          sudo apt-get update -qq >/dev/null
+          sudo apt-get install -y -qq meson ninja-build libcap-dev pkg-config >/dev/null
+          echo "COMPARATOR_BWRAP=$("$RUNNER_TEMP/pipeline/scripts/install_bwrap.sh" \
+            "$RUNNER_TEMP/bwrap-bin")" >> "$GITHUB_ENV"
 
-          mkdir -p "$TOOLS_DIR/bin"
-
-          git clone --filter=blob:none https://github.com/leanprover/comparator.git \
-            "$TOOLS_DIR/comparator"
-          git -C "$TOOLS_DIR/comparator" checkout --detach "$comparator_sha"
-          test "$(git -C "$TOOLS_DIR/comparator" rev-parse HEAD)" = "$comparator_sha"
-          elan toolchain install \
-            "$(tr -d '\r\n' < "$TOOLS_DIR/comparator/lean-toolchain")"
-          (
-            cd "$TOOLS_DIR/comparator"
-            lake build comparator
-          )
-          test "$(git -C "$TOOLS_DIR/comparator/.lake/packages/lean4export" rev-parse HEAD)" = \
-            "$comparator_export_sha"
-
-          git clone --filter=blob:none https://github.com/leanprover/lean4export.git \
-            "$TOOLS_DIR/lean4export"
-          git -C "$TOOLS_DIR/lean4export" checkout --detach "$lean4export_sha"
-          test "$(git -C "$TOOLS_DIR/lean4export" rev-parse HEAD)" = "$lean4export_sha"
-          test "$(tr -d '\r\n' < "$TOOLS_DIR/lean4export/lean-toolchain")" = \
-            "$(tr -d '\r\n' < "$PROJECT_DIR/lean-toolchain")"
-          (
-            cd "$TOOLS_DIR/lean4export"
-            lake build lean4export
-          )
-
-          GOBIN="$TOOLS_DIR/bin" \
-            go install "github.com/zouuup/landrun/cmd/landrun@$landrun_sha"
-
-      - name: Verify the sandbox and run Comparator
+      - name: Judge the headline theorems
         working-directory: ${{ env.PROJECT_DIR }}
-        env:
-          TOOLS_DIR: ${{ runner.temp }}/ja-st-verifier
         shell: bash
         run: |
           set -euo pipefail
 
-          test "$(id -u)" -ne 0
-          uname -r
-
-          landrun_bin="$TOOLS_DIR/bin/landrun"
-          comparator_bin="$TOOLS_DIR/comparator/.lake/build/bin/comparator"
-          lean4export_bin="$TOOLS_DIR/lean4export/.lake/build/bin/lean4export"
-          lake_bin="$HOME/.elan/bin/lake"
-
-          test -x "$landrun_bin"
-          test -x "$comparator_bin"
-          test -x "$lean4export_bin"
-          test -x "$lake_bin"
+          # The judge must read Solution as source, not as an olean built for it.
           test ! -e .lake/build/lib/lean/Solution.olean
 
-          # The network probes work against a live listener on an ephemeral
-          # loopback port: a closed well-known port measures the runner's packet
-          # filtering, not the sandbox. The probe scripts live in files because a
-          # dashed python argument would be eaten by landrun's argv parsing.
-          # probe.py prints one word for what a TCP connect to the listener did:
-          # connected, timeout, or the errno name.
-          probe_py="$RUNNER_TEMP/net-probe.py"
-          cat > "$probe_py" <<'PY'
-          import errno
-          import socket
-          import sys
-          sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-          sock.settimeout(10)
-          try:
-              sock.connect(("127.0.0.1", int(sys.argv[1])))
-          except socket.timeout:
-              print("timeout")
-          except OSError as exc:
-              print(errno.errorcode.get(exc.errno, "errno-%d" % exc.errno))
-          else:
-              print("connected")
-          finally:
-              sock.close()
-          PY
-
-          listener_py="$RUNNER_TEMP/net-listener.py"
-          cat > "$listener_py" <<'PY'
-          import socket
-          import sys
-          srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-          srv.bind(("127.0.0.1", 0))
-          srv.listen(16)
-          with open(sys.argv[1], "w") as fh:
-              fh.write(str(srv.getsockname()[1]))
-          while True:
-              conn, _ = srv.accept()
-              conn.close()
-          PY
-
-          port_file="$RUNNER_TEMP/net-probe-port"
-          rm -f "$port_file"
-          /usr/bin/python3 "$listener_py" "$port_file" >/dev/null 2>&1 &
-          listener_pid=$!
-          for _ in $(seq 100); do
-            [[ -s "$port_file" ]] && break
-            sleep 0.1
-          done
-          probe_port="$(cat "$port_file")"
-
-          control="$(/usr/bin/python3 "$probe_py" "$probe_port")"
-          if [[ "$control" != connected ]]; then
-            echo "::error::The unsandboxed control probe could not reach the listener: $control"
-            exit 1
-          fi
-
-          # Comparator itself requests --best-effort. These positive and negative
-          # controls ensure Landlock did not silently degrade to an ineffective jail.
-          landrun_policy=(
-            --best-effort --ro / --rw /dev
-            --rwx "$PROJECT_DIR/.lake"
-            --ldd --add-exec
-          )
-          allowed_probe="$PROJECT_DIR/.lake/landrun-must-create"
-          denied_probe="$RUNNER_TEMP/landrun-must-not-create"
-          rm -f "$allowed_probe" "$denied_probe"
-
-          "$landrun_bin" "${landrun_policy[@]}" -- /usr/bin/touch "$allowed_probe"
-          test -f "$allowed_probe"
-          rm -f "$allowed_probe"
-
-          if "$landrun_bin" "${landrun_policy[@]}" -- /usr/bin/touch "$denied_probe"; then
-            echo "::error::Landrun allowed a write outside the explicitly writable tree."
-            exit 1
-          fi
-          if [[ -e "$denied_probe" ]]; then
-            echo "::error::Landrun write probe unexpectedly created its target."
-            exit 1
-          fi
-
-          # Landlock denies a TCP connect at the syscall with EACCES. On a kernel
-          # whose Landlock ABI predates the network domain, --best-effort drops
-          # that domain silently; the audit's network isolation is then carried by
-          # the systemd unit below, which is verified strictly either way.
-          landrun_net="$("$landrun_bin" "${landrun_policy[@]}" -- \
-            /usr/bin/python3 "$probe_py" "$probe_port")"
-          case "$landrun_net" in
-            EACCES|EPERM)
-              echo "Landrun denies TCP connect at the syscall: $landrun_net" ;;
-            connected)
-              echo "::warning::Landlock did not deny TCP connect inside the Landrun jail on this runner." ;;
-            *)
-              echo "::error::Unexpected Landrun network probe outcome: $landrun_net"
-              exit 1 ;;
-          esac
-
-          # This is the noninteractive CI form of Comparator's documented
-          # systemd-run guard. The unit is launched by systemd but its payload runs
-          # as the unprivileged runner. NoNewPrivileges also disables the runner's
-          # passwordless sudo inside the unit. Dependencies are already local, so
-          # the complete comparator process can be denied network access.
-          audit_path="$HOME/.elan/bin:/usr/local/bin:/usr/bin:/bin"
-          systemd_guard=(
-            --quiet --wait --pipe --collect
-            --uid="$(id -u)" --gid="$(id -g)" \
-            --property="RestrictAddressFamilies=~AF_UNIX" \
-            --property="IPAddressDeny=any" \
-            --property="NoNewPrivileges=yes"
-          )
-
-          unix_probe_py="$RUNNER_TEMP/unix-probe.py"
-          cat > "$unix_probe_py" <<'PY'
-          import errno
-          import socket
-          try:
-              socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-          except OSError as exc:
-              if exc.errno not in (errno.EACCES, errno.EPERM, errno.EAFNOSUPPORT):
-                  raise
-          else:
-              raise SystemExit("systemd did not deny AF_UNIX socket creation")
-          PY
-          sudo systemd-run "${systemd_guard[@]}" \
-            /usr/bin/python3 "$unix_probe_py"
-
-          # IPAddressDeny filters packets in the unit's cgroup, so a denied
-          # connect surfaces as EPERM or as a silent drop; only reaching the
-          # listener is a failure.
-          systemd_net="$(sudo systemd-run "${systemd_guard[@]}" \
-            /usr/bin/python3 "$probe_py" "$probe_port")"
-          case "$systemd_net" in
-            EACCES|EPERM|timeout)
-              echo "The systemd unit denies TCP connect: $systemd_net" ;;
-            *)
-              echo "::error::The systemd unit did not deny the TCP connection: $systemd_net"
-              exit 1 ;;
-          esac
-
-          kill "$listener_pid" 2>/dev/null || true
-
-          sudo systemd-run "${systemd_guard[@]}" \
-            --working-directory="$PROJECT_DIR" \
-            --setenv="HOME=$HOME" \
-            --setenv="PATH=$audit_path" \
-            --setenv="COMPARATOR_LANDRUN=$landrun_bin" \
-            --setenv="COMPARATOR_LEAN4EXPORT=$lean4export_bin" \
-            "$lake_bin" env "$comparator_bin" comparator.json
+          # `lake comparator` ships in the pinned toolchain along with the kernels
+          # it replays through, so the audit has no separately built verifier to
+          # pin and no version skew to check. It builds Challenge and Solution
+          # inside the bubblewrap sandbox, compares the statements named in
+          # comparator.json, enforces the permitted axioms, and replays the
+          # exported proofs through Lean's kernel and, under `--paranoid`, through
+          # every external checker the toolchain bundles.
+          lake comparator --config comparator.json --paranoid

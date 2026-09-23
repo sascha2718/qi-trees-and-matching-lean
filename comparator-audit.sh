@@ -3,22 +3,32 @@
 # Challenge.lean, proved in Solution.lean, with the audited names listed in
 # comparator.json.
 #
-# Local development runner. Requires local builds of leanprover/comparator and
-# leanprover/lean4export, with lean4export matching the project's Lean version;
-# override the default locations with COMPARATOR_TOOLS or the variables below.
-# On Linux this uses real landrun. On macOS the development shim runs builds
-# without sandboxing. The fresh CI audit has additional systemd restrictions.
-# To add the independent nanoda kernel, build it with cargo, set COMPARATOR_NANODA to
-# the binary, and set "enable_nanoda": true in comparator.json.
+# The judge is `lake comparator`, which ships in the pinned toolchain together
+# with the kernels it replays through, so the audit needs no separately built
+# verifier. It builds Challenge and Solution, compares their statements,
+# enforces the permitted axioms, and replays the exported proofs through Lean's
+# kernel and, under --paranoid, through every external checker the toolchain
+# bundles.
+#
+# The judge builds and exports the project inside a `bwrap` sandbox: `/` is
+# bound read-only, only `.lake` is writable, and the build, the export and the
+# kernels run in an empty network namespace. `bubblewrap` is therefore
+# required, and needs unprivileged user namespaces or to be installed setuid
+# root; set COMPARATOR_BWRAP to select a particular binary. Ubuntu 24.04
+# restricts unprivileged user namespaces by AppArmor, so the CI workflow builds
+# the pinned bubblewrap release and loads a profile for it.
+#
+# The sandbox is what the verdict rests on, so this script does not offer to
+# disable it. A host without bubblewrap cannot run the audit.
 set -euo pipefail
 cd "$(dirname "$0")"
-TOOLS="${COMPARATOR_TOOLS:-$HOME/Documents/lean}"
-if [[ -z "${COMPARATOR_LANDRUN:-}" ]]; then
-  if [[ "$(uname -s)" == Darwin ]]; then
-    export COMPARATOR_LANDRUN="$TOOLS/comparator/scripts/fake-landrun.sh"
-  else
-    export COMPARATOR_LANDRUN=landrun
-  fi
+
+bwrap_bin="${COMPARATOR_BWRAP:-bwrap}"
+if ! command -v "$bwrap_bin" >/dev/null 2>&1; then
+  echo "comparator-audit: bubblewrap ($bwrap_bin) is not available, so the audit cannot run." >&2
+  echo "comparator-audit: run it on Linux with bubblewrap installed, or through" >&2
+  echo "comparator-audit: .github/workflows/build.yml, which provisions the pinned release." >&2
+  exit 2
 fi
-export COMPARATOR_LEAN4EXPORT="${COMPARATOR_LEAN4EXPORT:-$TOOLS/lean4export/.lake/build/bin/lean4export}"
-exec lake env "$TOOLS/comparator/.lake/build/bin/comparator" comparator.json
+
+exec lake comparator --config comparator.json --paranoid

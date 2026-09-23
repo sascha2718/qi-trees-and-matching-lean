@@ -215,15 +215,22 @@ maintained in [comparator.json](comparator.json), rather than in another list he
 Keep proof infrastructure and audit reports out of Challenge.
 
 The [CI workflow](.github/workflows/build.yml) separates cached library builds from a fresh
-Comparator audit. The audit prepares trusted Mathlib dependencies but does not restore project
-builds or compile project code before Comparator. Preserve the pinned verification tools,
-the check that lean4export matches the project toolchain, and the Landrun/systemd isolation.
-The local macOS shim is a trusted-development convenience, not equivalent isolation.
+audit. The audit prepares trusted Mathlib dependencies but does not restore project builds or
+compile project code before the judge sees `Solution.lean`; preserve that guard.
 
-When maintaining the CI probes, keep payloads after Landrun's `--` separator and use live
-loopback listeners: failure to connect to a closed port does not test isolation. Landrun's
-best-effort network restriction may be unavailable on a runner; the systemd restriction is
-the strict network check. A denied connection can surface as an error or a timeout.
+The judge is `lake comparator` from the pinned toolchain, which also supplies the kernels it
+replays through, so there is no separate verifier revision to pin and no exporter version to
+check against the project toolchain. It sandboxes the build and export itself with bubblewrap,
+binding `/` read-only, leaving only `.lake` writable, and giving the build, the export and the
+kernels an empty network namespace; only dependency resolution has a network, which is why the
+project must carry its `lake-manifest.json`.
+
+Preserve the pinned bubblewrap build in the workflow. Ubuntu 24.04 restricts unprivileged user
+namespaces by AppArmor, and the distribution package predates the fix for
+GHSA-pxhw-h44j-8pfx, so the upstream release is built and a profile loaded for it, as
+Palomar's verifier does. The sandbox is what the verdict rests on: neither the workflow nor
+the local runner may pass `--inadvisably-no-sandbox`, and a host without bubblewrap simply
+cannot run the audit.
 
 The author's workstation retains deprecated proofs in `GraphMarkovMatching/Archive/FullMatching/`
 and `ChainClasses/Archive/FullMatching/`. Their local source map is
