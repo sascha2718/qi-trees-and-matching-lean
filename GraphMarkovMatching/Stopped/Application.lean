@@ -128,7 +128,7 @@ theorem returnThreshold_spec : ∀ n, P.returnThreshold ≤ n → P.gPhase ∣ n
   have h := P.returnThreshold_bound P.S_nonempty
   have hne : (coreDepthsOf P.S P.D).Nonempty := P.coreDepths_nonempty P.S_nonempty
   unfold returnThreshold returnThresholdOf
-  rw [dif_pos hne]
+  rw [dite_eq_left hne]
   exact h
 
 /-- The return bound `H = c_Γ + 2ℓ` of a presentation (`thm:bounded-return`), a function of
@@ -413,7 +413,7 @@ arity). -/
 lemma coe_atomsFinset (supp : Finset ℕ) :
     (↑(atomsFinset supp) : Set ℕ) = atoms (shiftSemigroup ↑supp) := by
   ext a
-  simp only [atomsFinset, Finset.coe_filter, Finset.mem_image, Set.mem_setOf_eq, mem_atoms]
+  simp only [atomsFinset, Finset.coe_filter, Finset.mem_image, Set.mem_ofPred_eq, mem_atoms]
   refine ⟨fun h => h.2, fun h => ⟨?_, h⟩⟩
   obtain ⟨k, hk, hka⟩ := isAtom_mem_generators (G := (fun k => k - 1) '' ↑supp) h
   exact ⟨k, Finset.mem_coe.mp hk, hka⟩
@@ -463,7 +463,7 @@ noncomputable def atomExpr (Λ : AddSubmonoid ℕ) (n : ℕ) : List ℕ :=
 /-- The chosen expression consists of atoms and sums to the element. -/
 lemma atomExpr_spec {Λ : AddSubmonoid ℕ} {n : ℕ} (h : n ∈ Λ) :
     (∀ y ∈ atomExpr Λ n, y ∈ atoms Λ) ∧ (atomExpr Λ n).sum = n := by
-  rw [atomExpr, dif_pos h]
+  rw [atomExpr, dite_eq_left h]
   exact Classical.choose_spec (AddSubmonoid.exists_list_of_mem_closure (mem_closure_atoms Λ h))
 
 /-- The chosen expression of a positive element is nonempty. -/
@@ -608,7 +608,7 @@ noncomputable def atomicPresentation (νL νR : PMF ℕ) (suppL suppR : Finset �
   C_core := by
     intro σ a ha
     unfold atomicProfile
-    rw [if_pos ha]
+    rw [ite_eq_left ha]
 
 /-- The core of the atomic presentation. -/
 lemma atomicPresentation_S (νL νR : PMF ℕ) (suppL suppR : Finset ℕ)

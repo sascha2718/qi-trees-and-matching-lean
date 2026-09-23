@@ -148,20 +148,20 @@ lemma zeroMass_succ_le (hc : M.IsCompat) (hb0 : rE M.μ M.R M.zero ≠ 0) (s : I
         ≤ c v + M.splitInd (M.children D) h p := by
     intro v hv p
     by_cases hz : M.ZeroEv D (h + 1) (branch (s, v) p)
-    · rw [if_pos hz]
+    · rw [ite_eq_left hz]
       by_cases hv0 : M.R v M.zero
       · have hmem : v ∈ M.Vmu := M.rootLaw_mem_Vmu hv
         refine le_add_left ?_
         rcases M.zeroEv_succ_imp hc hb0 (s := (s, v)) hmem hv0 hz with h1 | h2 | ⟨h3, h4⟩
-        · simp only [splitInd, if_pos h1]
+        · simp only [splitInd, ite_eq_left h1]
           exact le_add_right le_self_add
-        · simp only [splitInd, if_pos h2]
+        · simp only [splitInd, ite_eq_left h2]
           exact le_add_right le_add_self
-        · simp only [splitInd, if_pos h3, if_pos h4, mul_one]
+        · simp only [splitInd, ite_eq_left h3, ite_eq_left h4, mul_one]
           exact le_add_self
-      · simp only [hcdef, if_neg hv0]
+      · simp only [hcdef, ite_eq_right hv0]
         exact le_self_add
-    · rw [if_neg hz]
+    · rw [ite_eq_right hz]
       exact zero_le
   calc M.zeroMass s D (h + 1)
       = ∑' v, M.rootLaw s v * ∑' p, M.childMix s h p
@@ -205,8 +205,8 @@ lemma zeroMass_zero_le (hc : M.IsCompat) (hb0 : rE M.μ M.R M.zero ≠ 0) (s : I
         by_cases hz : M.ZeroEv D 0 (leaf (s, v))
         · have hmem : v ∈ M.Vmu := M.rootLaw_mem_Vmu hv
           have hv0 := M.zeroEv_zero_imp hc hb0 hD (s := (s, v)) hmem hz
-          rw [if_pos hz, if_neg hv0]
-        · rw [if_neg hz]
+          rw [ite_eq_left hz, ite_eq_right hv0]
+        · rw [ite_eq_right hz]
           exact zero_le
     _ ≤ M.delta := M.rootLaw_incompatible_le hc s
 

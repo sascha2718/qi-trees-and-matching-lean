@@ -15,7 +15,7 @@ lemma potential_eq_iid {V : Type*} (μ : PMF V) (R : V → V → Prop)
   by_cases hv : μ v = 0
   · simp [hv]
   · have hq : q μ R v < 1 := GraphMatching.q_lt_one (hrefl v) hv
-    rw [phiE, if_pos hq]
+    rw [phiE, ite_eq_left hq]
 
 lemma potential_eq_graph {V : Type*} (μ : PMF V) (G : SimpleGraph V) :
     potential (5 / 2) μ (compat G) = Infrastructure.etaGraph μ G := by
@@ -312,8 +312,8 @@ lemma matchingProcess_erase {V I : Type} [MeasurableSpace V] [MeasurableSpace I]
     (h : MatchingProcess M.toOld.srel (M.toOld.rho s) (M.toOld.rho t) b) :
     MatchingProcess M.R (M.rho s) (M.rho t) b := by
   obtain ⟨Ω, inst, P, instP, X, Y, hX, hY, hmeas, hlaw, hbound⟩ := h
-  letI := inst
-  letI := instP
+  let := inst
+  let := instP
   refine ⟨Ω, inst, P, instP, fun n ω => erase n (X n ω), fun n ω => erase n (Y n ω),
     ?_, ?_, ?_, ?_, ?_⟩
   · intro n ω

@@ -83,7 +83,7 @@ lemma tvDist_arityMix_pure (t : ℝ≥0) (ht : t ≤ 1) :
         have hw : (↑(1 - t) : ℝ≥0∞) ≤ 1 := by
           exact_mod_cast (tsub_le_self : (1 - t : ℝ≥0) ≤ 1)
         norm_num only [PMF.pure_apply_self, show ¬(3 : ℕ) = 2 by decide,
-          if_false, if_true, zero_add]
+          ite_false, ite_true, zero_add]
         exact tsub_eq_zero_of_le hw
       · simp [hk2, hk3, PMF.pure_apply]
   simp_rw [hterm]
@@ -134,8 +134,8 @@ lemma prodPMF_not_rel_eq_failureD {W : Type} [MeasurableSpace W]
   refine tsum_congr fun y => ?_
   rw [Set.indicator_apply]
   by_cases h : R x y
-  · simp [Set.mem_setOf_eq, h]
-  · simp [Set.mem_setOf_eq, prodPMF_apply, h]
+  · simp [Set.mem_ofPred_eq, h]
+  · simp [Set.mem_ofPred_eq, prodPMF_apply, h]
 
 /-- Product patterns identify the encoded state law without a common-core assumption. -/
 theorem map_encodedStates_raw {Ω : Type*} [MeasurableSpace Ω] {N : ℕ}
@@ -167,7 +167,7 @@ theorem infFailure_le_of_finite {Ω : Type*} [MeasurableSpace Ω] (Q : Measure �
     simpa only [hX n ω, hY n ω, fullSim] using hr
   have hEq : {ω | ¬ InfMatch R (fun n => X n ω) (fun n => Y n ω)} = ⋃ n, E n := by
     ext ω
-    simp only [Set.mem_setOf_eq, Set.mem_iUnion, E]
+    simp only [Set.mem_ofPred_eq, Set.mem_iUnion, E]
     change (¬ InfMatchK R 1 0 (fun n => X n ω) (fun n => Y n ω)) ↔ _
     rw [infMatchK_iff_forall_level R 1 0 (fun n => X n ω) (fun n => Y n ω)
       (fun n => hX n ω) (fun n => hY n ω)]
@@ -385,9 +385,9 @@ theorem boundary_match_null (D : ℕ) (hD : 2 ≤ D) :
     ∀ᵐ ω ∂(boundaryLeftMeasure.prod boundaryRightMeasure),
       ¬ InfMatch (GraphMatching.compat GraphMatching.pathGraph)
         (fun n => boundaryField D n ω.1) (fun n => boundaryField D n ω.2) := by
-  haveI := BranchingProcess.isProbabilityMeasure_survivalMeasure theta2 (N := 3) (by decide)
+  have := BranchingProcess.isProbabilityMeasure_survivalMeasure theta2 (N := 3) (by decide)
     (extinction_lt_one_of_chain theta2 theta2_zero)
-  haveI := BranchingProcess.isProbabilityMeasure_survivalMeasure theta3 (N := 3) (by decide)
+  have := BranchingProcess.isProbabilityMeasure_survivalMeasure theta3 (N := 3) (by decide)
     (extinction_lt_one_of_chain theta3 theta3_zero)
   have hm : 1 ∈ AddSubmonoid.closure (shiftSupp theta2 : Set ℕ) :=
     AddSubmonoid.subset_closure (by simp)

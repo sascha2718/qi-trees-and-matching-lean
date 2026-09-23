@@ -87,16 +87,16 @@ lemma cut_le (hs : 1 ≤ s) (t : Tri) : s * cutCount s t + remSize s t ≤ t.siz
   induction t with
   | leaf =>
       by_cases h : s ≤ 1
-      · simp only [cutCount, remSize, size, if_pos h]; omega
-      · simp only [cutCount, remSize, size, if_neg h]; omega
+      · simp only [cutCount, remSize, size, ite_eq_left h]; omega
+      · simp only [cutCount, remSize, size, ite_eq_right h]; omega
   | one t ih =>
       by_cases h : s ≤ 1 + remSize s t
-      · simp only [cutCount, remSize, size, if_pos h, Nat.mul_add, Nat.mul_one]; omega
-      · simp only [cutCount, remSize, size, if_neg h, Nat.mul_add, Nat.mul_zero]; omega
+      · simp only [cutCount, remSize, size, ite_eq_left h, Nat.mul_add, Nat.mul_one]; omega
+      · simp only [cutCount, remSize, size, ite_eq_right h, Nat.mul_add, Nat.mul_zero]; omega
   | two l r ihl ihr =>
       by_cases h : s ≤ 1 + remSize s l + remSize s r
-      · simp only [cutCount, remSize, size, if_pos h, Nat.mul_add, Nat.mul_one]; omega
-      · simp only [cutCount, remSize, size, if_neg h, Nat.mul_add, Nat.mul_zero]; omega
+      · simp only [cutCount, remSize, size, ite_eq_left h, Nat.mul_add, Nat.mul_one]; omega
+      · simp only [cutCount, remSize, size, ite_eq_right h, Nat.mul_add, Nat.mul_zero]; omega
 
 /-- **`thm:dilution`, the cut**: at most `|t|/s` parts are cut off, so the cut
 and the remainder together are at most `|t|/s + 1` parts, each with at most

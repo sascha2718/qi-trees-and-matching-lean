@@ -78,7 +78,7 @@ lemma wedge_append_append (z p q : Word) : wedge (z ++ p) (z ++ q) = z ++ wedge 
   induction z with
   | nil => simp
   | cons a z ih =>
-      rw [List.cons_append, List.cons_append, wedge_cons_cons, if_pos rfl, ih, List.cons_append]
+      rw [List.cons_append, List.cons_append, wedge_cons_cons, ite_eq_left rfl, ih, List.cons_append]
 
 /-- Distances inside one copy are the distances of the addresses. -/
 lemma treeDist_append_append (z p q : Word) : treeDist (z ++ p) (z ++ q) = treeDist p q := by

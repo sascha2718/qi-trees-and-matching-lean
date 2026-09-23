@@ -33,9 +33,9 @@ noncomputable def phiE (α t : ℝ) : ℝ≥0∞ :=
   if t < 1 then ENNReal.ofReal (phi α t) else ⊤
 
 lemma phiE_of_lt {α t : ℝ} (h : t < 1) : phiE α t = ENNReal.ofReal (phi α t) :=
-  if_pos h
+  ite_eq_left h
 
-@[simp] lemma phiE_one (α : ℝ) : phiE α 1 = ⊤ := if_neg (lt_irrefl 1)
+@[simp] lemma phiE_one (α : ℝ) : phiE α 1 = ⊤ := ite_eq_right (lt_irrefl 1)
 
 @[simp] lemma phiE_zero (α : ℝ) : phiE α 0 = 0 := by
   rw [phiE_of_lt one_pos, phi, ENNReal.ofReal_eq_zero]
@@ -56,7 +56,7 @@ lemma phiE_mono {α t t' : ℝ} (hα : 0 ≤ α) (h0 : 0 ≤ t) (htt : t ≤ t')
   by_cases h1' : t' < 1
   · rw [phiE_of_lt (lt_of_le_of_lt htt h1'), phiE_of_lt h1']
     exact ENNReal.ofReal_le_ofReal (phi_mono hα h0 htt h1')
-  · have h : phiE α t' = ⊤ := if_neg h1'
+  · have h : phiE α t' = ⊤ := ite_eq_right h1'
     rw [h]
     exact le_top
 

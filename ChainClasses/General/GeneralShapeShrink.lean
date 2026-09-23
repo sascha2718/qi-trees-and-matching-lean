@@ -522,8 +522,7 @@ lemma decs_gOfList {L : List (List RTree)} (hL : L ≠ []) : (gOfList L).decs = 
     show L.length - 1 + 1 = L.length
     omega
   · intro i h1 h2
-    show (List.ofFn (gOfList L).dec)[i] = L[i]
-    simp only [List.getElem_ofFn]
+    simp only [GShape.decs, List.getElem_ofFn]
     exact List.getD_eq_getElem L [] h2
 
 /-- **`thm:shape-connected` at general arity, the descent step**: every shape of size

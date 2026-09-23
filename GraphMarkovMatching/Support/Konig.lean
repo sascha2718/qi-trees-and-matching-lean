@@ -65,9 +65,9 @@ theorem exists_compat_branchK {k m : ℕ} (Good : (n : ℕ) → AutK k m n → P
     induction hij with
     | refl => intro π hπ; rw [projAutK_refl]; exact hπ
     | step hij ih => intro π hπ; rw [projAutK_succ hij]; exact ih _ (hcompat _ π hπ)
-  haveI : ∀ n, Nonempty {π : AutK k m n // Good n π} := fun n =>
+  have : ∀ n, Nonempty {π : AutK k m n // Good n π} := fun n =>
     (hne n).elim fun π h => ⟨π, h⟩
-  haveI : ∀ n, Finite (AutK k m n) := fun n => autK_finite k m n
+  have : ∀ n, Finite (AutK k m n) := fun n => autK_finite k m n
   let proj : ∀ {i j : ℕ}, i ≤ j → {π : AutK k m j // Good j π}
       → {π : AutK k m i // Good i π} :=
     fun {i j} hij π => ⟨projAutK hij π.1, hgood hij π.1 π.2⟩

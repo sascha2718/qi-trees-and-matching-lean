@@ -97,8 +97,8 @@ noncomputable def dexpF (D : ℝ) : ℕ → ℝ≥0∞ :=
 
 lemma dexpF_tsum {D : ℝ} (hD : 5 ≤ D) : ∑' n, dexpF D n = 1 := by
   rw [tsum_eq_zero_add' ENNReal.summable]
-  have h0 : dexpF D 0 = ENNReal.ofReal (1 - dsum D) := if_pos rfl
-  have hs : ∀ n, dexpF D (n + 1) = ENNReal.ofReal (dseq D (n + 1)) := fun n => if_neg (by omega)
+  have h0 : dexpF D 0 = ENNReal.ofReal (1 - dsum D) := ite_eq_left rfl
+  have hs : ∀ n, dexpF D (n + 1) = ENNReal.ofReal (dseq D (n + 1)) := fun n => ite_eq_right (by omega)
   rw [h0]
   simp only [hs]
   rw [← ENNReal.ofReal_tsum_of_nonneg (fun n => (dseq_pos D _).le) (dseq_tail_le hD 1 le_rfl).1,
@@ -113,11 +113,11 @@ noncomputable def dexpPMF {D : ℝ} (hD : 5 ≤ D) : PMF ℕ :=
 lemma dexpPMF_apply {D : ℝ} (hD : 5 ≤ D) (n : ℕ) : dexpPMF hD n = dexpF D n := rfl
 
 lemma dexpPMF_zero_toReal {D : ℝ} (hD : 5 ≤ D) : (dexpPMF hD 0).toReal = 1 - dsum D := by
-  rw [dexpPMF_apply, dexpF, if_pos rfl, ENNReal.toReal_ofReal (by linarith [dsum_lt hD])]
+  rw [dexpPMF_apply, dexpF, ite_eq_left rfl, ENNReal.toReal_ofReal (by linarith [dsum_lt hD])]
 
 lemma dexpPMF_succ_toReal {D : ℝ} (hD : 5 ≤ D) (n : ℕ) :
     (dexpPMF hD (n + 1)).toReal = dseq D (n + 1) := by
-  rw [dexpPMF_apply, dexpF, if_neg (by omega), ENNReal.toReal_ofReal (dseq_pos D _).le]
+  rw [dexpPMF_apply, dexpF, ite_eq_right (by omega), ENNReal.toReal_ofReal (dseq_pos D _).le]
 
 /-! ### The good and bad degrees -/
 
@@ -126,17 +126,18 @@ lemma p_toReal_le_gdeg {W : Type*} (μ : PMF W) (G : SimpleGraph W) {v w : W}
     (h : compat G v w) : (μ w).toReal ≤ gdeg μ G v := by
   have hle : μ w ≤ rE μ (compat G) v := by
     rw [rE]
-    calc μ w = if compat G v w then μ w else 0 := (if_pos h).symm
-      _ ≤ ∑' k, if compat G v k then μ k else 0 := ENNReal.le_tsum w
+    calc μ w = if compat G v w then μ w else 0 := (ite_eq_left h).symm
+      _ ≤ ∑' k, if compat G v k then μ k else 0 :=
+          ENNReal.le_tsum (f := fun k => if compat G v k then μ k else 0) w
   exact ENNReal.toReal_mono rE_ne_top hle
 
 /-- Bad degree at `0`: the mass beyond the ball `{0,1}` is `∑_{k≥2} a_k`. -/
 lemma badDeg_zero {D : ℝ} (hD : 5 ≤ D) :
     qE (dexpPMF hD) (compat pathGraph) 0 = ENNReal.ofReal (∑' k, dseq D (k + 2)) := by
   rw [qE, tsum_eq_zero_add' ENNReal.summable, tsum_eq_zero_add' ENNReal.summable]
-  have e0 : (if compat pathGraph 0 0 then (0 : ℝ≥0∞) else dexpPMF hD 0) = 0 := if_pos (Or.inl rfl)
+  have e0 : (if compat pathGraph 0 0 then (0 : ℝ≥0∞) else dexpPMF hD 0) = 0 := ite_eq_left (Or.inl rfl)
   have e1 : (if compat pathGraph 0 (0 + 1) then (0 : ℝ≥0∞) else dexpPMF hD (0 + 1)) = 0 :=
-    if_pos (Or.inr (by rw [pathGraph_adj]; omega))
+    ite_eq_left (Or.inr (by rw [pathGraph_adj]; omega))
   have e2 : ∀ k, (if compat pathGraph 0 (k + 1 + 1) then (0 : ℝ≥0∞) else dexpPMF hD (k + 1 + 1))
       = ENNReal.ofReal (dseq D (k + 2)) := by
     intro k
@@ -144,7 +145,7 @@ lemma badDeg_zero {D : ℝ} (hD : 5 ≤ D) :
       rintro (h | h)
       · omega
       · rw [pathGraph_adj] at h; omega
-    rw [if_neg hnc, dexpPMF_apply, dexpF, if_neg (by omega)]
+    rw [ite_eq_right hnc, dexpPMF_apply, dexpF, ite_eq_right (by omega)]
   rw [e0, e1, zero_add, zero_add]
   simp only [e2]
   rw [ENNReal.ofReal_tsum_of_nonneg (fun k => (dseq_pos D _).le) (dseq_tail_le hD 2 (by norm_num)).1]
@@ -155,11 +156,11 @@ lemma badDeg_one {D : ℝ} (hD : 5 ≤ D) :
   rw [qE, tsum_eq_zero_add' ENNReal.summable, tsum_eq_zero_add' ENNReal.summable,
     tsum_eq_zero_add' ENNReal.summable]
   have e0 : (if compat pathGraph 1 0 then (0 : ℝ≥0∞) else dexpPMF hD 0) = 0 :=
-    if_pos (Or.inr (by rw [pathGraph_adj]; omega))
+    ite_eq_left (Or.inr (by rw [pathGraph_adj]; omega))
   have e1 : (if compat pathGraph 1 (0 + 1) then (0 : ℝ≥0∞) else dexpPMF hD (0 + 1)) = 0 :=
-    if_pos (Or.inl rfl)
+    ite_eq_left (Or.inl rfl)
   have e2 : (if compat pathGraph 1 (0 + 1 + 1) then (0 : ℝ≥0∞) else dexpPMF hD (0 + 1 + 1)) = 0 :=
-    if_pos (Or.inr (by rw [pathGraph_adj]; omega))
+    ite_eq_left (Or.inr (by rw [pathGraph_adj]; omega))
   have e3 : ∀ k,
       (if compat pathGraph 1 (k + 1 + 1 + 1) then (0 : ℝ≥0∞) else dexpPMF hD (k + 1 + 1 + 1))
         = ENNReal.ofReal (dseq D (k + 3)) := by
@@ -168,7 +169,7 @@ lemma badDeg_one {D : ℝ} (hD : 5 ≤ D) :
       rintro (h | h)
       · omega
       · rw [pathGraph_adj] at h; omega
-    rw [if_neg hnc, dexpPMF_apply, dexpF, if_neg (by omega)]
+    rw [ite_eq_right hnc, dexpPMF_apply, dexpF, ite_eq_right (by omega)]
   rw [e0, e1, e2, zero_add, zero_add, zero_add]
   simp only [e3]
   rw [ENNReal.ofReal_tsum_of_nonneg (fun k => (dseq_pos D _).le) (dseq_tail_le hD 3 (by norm_num)).1]

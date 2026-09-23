@@ -47,19 +47,19 @@ theorem bushyCross_chart {J J' : ℕ} (hJ2 : 2 ≤ J)
   refine ⟨fun z ↦ if h : J + 1 ≤ z ∧ z ≤ J' then some (z + 1 - J, J) else none,
     ?_, ?_, ?_⟩
   · intro j hj
-    exact dif_neg fun hcon ↦ absurd hcon.1 (by omega)
+    exact dite_eq_right fun hcon ↦ absurd hcon.1 (by omega)
   · intro z p hp
     by_cases h : J + 1 ≤ z ∧ z ≤ J'
     · have hp' : (if h' : J + 1 ≤ z ∧ z ≤ J' then some ((z + 1 - J, J) : ℕ × ℕ)
           else none) = some p := hp
-      rw [dif_pos h] at hp'
+      rw [dite_eq_left h] at hp'
       have hpair := Option.some.inj hp'
       have hpa : p.1 = z + 1 - J := by rw [← hpair]
       have hpb : p.2 = J := by rw [← hpair]
       exact ⟨hpa, hpb, by omega, by omega, by omega, by omega, by omega⟩
     · have hp' : (if h' : J + 1 ≤ z ∧ z ≤ J' then some ((z + 1 - J, J) : ℕ × ℕ)
           else none) = some p := hp
-      rw [dif_neg h] at hp'
+      rw [dite_eq_right h] at hp'
       simp at hp'
   · intro z
     by_cases h : J + 1 ≤ z ∧ z ≤ J'
@@ -69,11 +69,11 @@ theorem bushyCross_chart {J J' : ℕ} (hJ2 : 2 ≤ J)
       · intro _
         show (if h' : J + 1 ≤ z ∧ z ≤ J' then some ((z + 1 - J, J) : ℕ × ℕ)
           else none) ≠ none
-        rw [dif_pos h]
+        rw [dite_eq_left h]
         exact Option.some_ne_none _
     · constructor
       · intro hne
-        exact absurd (dif_neg h) hne
+        exact absurd (dite_eq_right h) hne
       · intro hcon
         exact absurd hcon h
 

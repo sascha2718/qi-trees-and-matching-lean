@@ -65,7 +65,7 @@ theorem survivalMeasure_gShapePair (θ : Offspring J) (hJN : J ≤ N)
   have he : {c : GWord N → ℕ | gShapeRoot c = σ}
       = {c : GWord N → ℕ | (gShapeRoot c).decs = σ.decs} := by
     ext c
-    simp only [Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq]
     exact ⟨fun h ↦ by rw [h], fun h ↦ GShape.eq_of_decs h⟩
   rw [he, show σ.decs = σ.neckList ++ [σ.bouquet] from σ.decs_eq_append,
     survivalMeasure_gShapeSplit θ hJN hq hq0 σ.neckList σ.bouquet hκ hA, gPairMass_def]
@@ -144,7 +144,7 @@ theorem survivalMeasure_gShapes_aux (θ : Offspring J) (hJN : J ≤ N)
                 ∩ {c : GWord N → ℕ | gArity c = k []})
               ∩ {c : GWord N → ℕ | ∀ m : ℕ, m < k [] → gSplitBush c m ∈ A m}) := by
           ext c
-          simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_setOf_eq]
+          simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_ofPred_eq]
           constructor
           · intro h
             obtain ⟨hs0, ha0⟩ := h [] hroot
@@ -152,7 +152,7 @@ theorem survivalMeasure_gShapes_aux (θ : Offspring J) (hJN : J ≤ N)
             simp only [hA]
             split
             · rename_i hmN
-              simp only [hE, Set.mem_iInter, Set.mem_inter_iff, Set.mem_setOf_eq]
+              simp only [hE, Set.mem_iInter, Set.mem_inter_iff, Set.mem_ofPred_eq]
               intro u hu
               exact h (⟨m, hmN⟩ :: u) (mem_consSub.mp hu)
             · exact Set.mem_univ _
@@ -163,8 +163,8 @@ theorem survivalMeasure_gShapes_aux (θ : Offspring J) (hJN : J ≤ N)
                 by_cases hik : (i : ℕ) < k []
                 · have hm := hrest (i : ℕ) hik
                   simp only [hA] at hm
-                  rw [dif_pos i.isLt, Fin.eta] at hm
-                  simp only [hE, Set.mem_iInter, Set.mem_inter_iff, Set.mem_setOf_eq] at hm
+                  rw [dite_eq_left i.isLt, Fin.eta] at hm
+                  simp only [hE, Set.mem_iInter, Set.mem_inter_iff, Set.mem_ofPred_eq] at hm
                   exact hm u (mem_consSub.mpr hu)
                 · exact absurd (mem_consSub.mpr hu)
                     (by rw [hconsEmpty i (not_lt.mp hik)]; exact Finset.notMem_empty u)
@@ -191,7 +191,7 @@ theorem survivalMeasure_gShapes_aux (θ : Offspring J) (hJN : J ≤ N)
             ∏ u ∈ consSub i F, gPairMass (N := N) θ (k (i :: u)) (f (i :: u))
               = G (i : ℕ) := by
           intro i
-          simp only [hGdef, dif_pos i.isLt, Fin.eta]
+          simp only [hGdef, dite_eq_left i.isLt, Fin.eta]
         have hGone : ∀ m : ℕ, k [] ≤ m → G m = 1 := by
           intro m hm
           simp only [hGdef]
@@ -214,7 +214,7 @@ theorem survivalMeasure_gShapes_aux (θ : Offspring J) (hJN : J ≤ N)
           have hone : ∀ m ∈ Finset.range (k []), m ∉ Finset.range N → G m = 1 := by
             intro m _ hm'
             simp only [hGdef]
-            exact dif_neg fun hc ↦ hm' (Finset.mem_range.mpr hc)
+            exact dite_eq_right fun hc ↦ hm' (Finset.mem_range.mpr hc)
           exact (Finset.prod_subset hsub hone).symm
 
 /-- **`thm:conditional-iid`, the joint product formula**, at any prefix-closed probe. -/
@@ -243,7 +243,7 @@ lemma gArityDepthEvent_zero {κ : ℕ} (hκ : 2 ≤ κ) (A : ℕ → Set (GWord 
       = ({c : GWord N → ℕ | skeletonDegree c = κ}
           ∩ {c : GWord N → ℕ | ∀ m : ℕ, m < κ → bushAt c m ∈ A m}) := by
   ext c
-  simp only [gArityDepthEvent, Set.mem_inter_iff, Set.mem_setOf_eq]
+  simp only [gArityDepthEvent, Set.mem_inter_iff, Set.mem_ofPred_eq]
   constructor
   · rintro ⟨⟨hd, ha⟩, hb⟩
     have hf : gSplitField c = c := gSplitField_of_depth_zero hd
@@ -264,7 +264,7 @@ lemma gArityDepthEvent_succ_inter {κ n : ℕ} (hκ : 2 ≤ κ) (A : ℕ → Set
           ∩ {c : GWord N → ℕ | bushAt c 0 ∈ gArityDepthEvent (N := N) κ n A})
         ∩ {c : GWord N → ℕ | Survives c}) := by
   ext c
-  simp only [gArityDepthEvent, Set.mem_inter_iff, Set.mem_setOf_eq]
+  simp only [gArityDepthEvent, Set.mem_inter_iff, Set.mem_ofPred_eq]
   constructor
   · rintro ⟨⟨⟨hd, ha⟩, hb⟩, hsurv⟩
     have hdne : gSplitDepth c ≠ 0 := by omega
@@ -330,16 +330,16 @@ theorem survivalMeasure_gArityDepthEvent (θ : Offspring J) (hJN : J ≤ N)
             ∈ (if m = 0 then gArityDepthEvent (N := N) κ n A else Set.univ)}
           = {c : GWord N → ℕ | bushAt c 0 ∈ gArityDepthEvent (N := N) κ n A} := by
         ext c
-        simp only [Set.mem_setOf_eq, Nat.lt_one_iff]
+        simp only [Set.mem_ofPred_eq, Nat.lt_one_iff]
         constructor
         · intro h
           have hc := h 0 rfl
-          rwa [if_pos rfl] at hc
+          rwa [ite_eq_left rfl] at hc
         · rintro h m rfl
-          rwa [if_pos rfl]
+          rwa [ite_eq_left rfl]
       rw [hbox] at hkey
       rw [measure_eq_of_inter_ae hnull (gArityDepthEvent_succ_inter hκ A), hkey,
-        Finset.prod_range_one, if_pos rfl, ih, pow_succ]
+        Finset.prod_range_one, ite_eq_left rfl, ih, pow_succ]
       ring
 
 /-! ### The reduced law at the root -/
@@ -375,7 +375,7 @@ theorem survivalMeasure_gArityPair (θ : Offspring J) (hJN : J ≤ N)
         ∩ {c : GWord N → ℕ | ∀ m : ℕ, m < κ → gSplitBush c m ∈ A m}
       = ⋃ n : ℕ, gArityDepthEvent (N := N) κ n A := by
     ext c
-    simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_iUnion, gArityDepthEvent]
+    simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, Set.mem_iUnion, gArityDepthEvent]
     constructor
     · rintro ⟨ha, hb⟩
       exact ⟨gSplitDepth c, ⟨rfl, ha⟩, hb⟩
@@ -457,14 +457,14 @@ theorem survivalMeasure_gArities_aux (θ : Offspring J) (hJN : J ≤ N)
             = ({c : GWord N → ℕ | gArity c = k []}
               ∩ {c : GWord N → ℕ | ∀ m : ℕ, m < k [] → gSplitBush c m ∈ A m}) := by
           ext c
-          simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_setOf_eq]
+          simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_ofPred_eq]
           constructor
           · intro h
             refine ⟨h [] hroot, fun m hm ↦ ?_⟩
             simp only [hA]
             split
             · rename_i hmN
-              simp only [hE, Set.mem_iInter, Set.mem_setOf_eq]
+              simp only [hE, Set.mem_iInter, Set.mem_ofPred_eq]
               intro u hu
               exact h (⟨m, hmN⟩ :: u) (mem_consSub.mp hu)
             · exact Set.mem_univ _
@@ -475,8 +475,8 @@ theorem survivalMeasure_gArities_aux (θ : Offspring J) (hJN : J ≤ N)
                 by_cases hik : (i : ℕ) < k []
                 · have hm := hrest (i : ℕ) hik
                   simp only [hA] at hm
-                  rw [dif_pos i.isLt, Fin.eta] at hm
-                  simp only [hE, Set.mem_iInter, Set.mem_setOf_eq] at hm
+                  rw [dite_eq_left i.isLt, Fin.eta] at hm
+                  simp only [hE, Set.mem_iInter, Set.mem_ofPred_eq] at hm
                   exact hm u (mem_consSub.mpr hu)
                 · exact absurd (mem_consSub.mpr hu)
                     (by rw [hconsEmpty i (not_lt.mp hik)]; exact Finset.notMem_empty u)
@@ -503,7 +503,7 @@ theorem survivalMeasure_gArities_aux (θ : Offspring J) (hJN : J ≤ N)
             ∏ u ∈ consSub i F, ENNReal.ofReal (reducedWeight θ (k (i :: u)))
               = G (i : ℕ) := by
           intro i
-          simp only [hGdef, dif_pos i.isLt, Fin.eta]
+          simp only [hGdef, dite_eq_left i.isLt, Fin.eta]
         have hGone : ∀ m : ℕ, k [] ≤ m → G m = 1 := by
           intro m hm
           simp only [hGdef]
@@ -526,7 +526,7 @@ theorem survivalMeasure_gArities_aux (θ : Offspring J) (hJN : J ≤ N)
           have hone : ∀ m ∈ Finset.range (k []), m ∉ Finset.range N → G m = 1 := by
             intro m _ hm'
             simp only [hGdef]
-            exact dif_neg fun hc ↦ hm' (Finset.mem_range.mpr hc)
+            exact dite_eq_right fun hc ↦ hm' (Finset.mem_range.mpr hc)
           exact (Finset.prod_subset hsub hone).symm
 
 /-- **The arity field is i.i.d. `ν̃`**, at any prefix-closed probe. -/

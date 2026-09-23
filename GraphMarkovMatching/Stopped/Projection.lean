@@ -78,9 +78,9 @@ lemma prodPMF_map_prod {A B A' B' : Type} (p : PMF A) (q : PMF B) (f : A → A')
   rw [prodPMF_apply]
   by_cases h1 : x.1 = f s.1
   · by_cases h2 : x.2 = g s.2
-    · rw [if_pos h1, if_pos h2, if_pos (Prod.ext h1 h2)]
-    · rw [if_neg h2, if_neg (fun h => h2 (congrArg Prod.snd h)), mul_zero]
-  · rw [if_neg h1, if_neg (fun h => h1 (congrArg Prod.fst h)), zero_mul]
+    · rw [ite_eq_left h1, ite_eq_left h2, ite_eq_left (Prod.ext h1 h2)]
+    · rw [ite_eq_right h2, ite_eq_right (fun h => h2 (congrArg Prod.snd h)), mul_zero]
+  · rw [ite_eq_right h1, ite_eq_right (fun h => h1 (congrArg Prod.fst h)), zero_mul]
 
 lemma bind_congr_of_ne_zero {A D : Type} (p : PMF A) {f g : A → PMF D}
     (h : ∀ a, p a ≠ 0 → f a = g a) : p.bind f = p.bind g := by

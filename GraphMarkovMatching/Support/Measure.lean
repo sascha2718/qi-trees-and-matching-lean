@@ -9,7 +9,9 @@ The probability space and consistent measurable level projections are arbitrary.
 `Stopped.Transfer` applies the estimate on a prescribed probability space.
 -/
 import GraphMarkovMatching.Support.Konig
-import Mathlib.MeasureTheory.Measure.MeasureSpace
+import Mathlib.Algebra.Order.Module.Field
+import Mathlib.Data.EReal.Inv
+import Mathlib.Tactic.Measurability
 import Mathlib.MeasureTheory.Measure.Typeclasses.Probability
 import Mathlib.Probability.ProbabilityMassFunction.Constructions
 
@@ -81,7 +83,7 @@ theorem infinite_tree_matchingK_ge {Ω : Type*} [MeasurableSpace Ω] (P : Measur
     exact hr
   have hM : {ω | InfMatchK R₀ k m (fun n => X n ω) (fun n => Y n ω)} = ⋂ n, E n := by
     ext ω
-    simp only [Set.mem_iInter, hE, Set.mem_setOf_eq]
+    simp only [Set.mem_iInter, hE, Set.mem_ofPred_eq]
     exact infMatchK_iff_forall_level R₀ k m (fun n => X n ω) (fun n => Y n ω)
       (fun n => hX n ω) (fun n => hY n ω)
   rw [hM]
@@ -102,7 +104,7 @@ theorem infinite_tree_matchingK_prob {Ω : Type*} [MeasurableSpace Ω] (P : Meas
   set s : Set Ω := {ω | fullSimK R₀ k m n (X n ω) (Y n ω)} with hs
   have hsmeas : MeasurableSet s := hmeas n
   have hcompl : sᶜ = {ω | ¬ fullSimK R₀ k m n (X n ω) (Y n ω)} := by
-    rw [hs, Set.compl_setOf]
+    rw [hs, Set.compl_ofPred]
   have h2 : P sᶜ ≤ b := by rw [hcompl]; exact hfail n
   have h3 : (1 : ℝ≥0∞) - P sᶜ = P s := by
     rw [prob_compl_eq_one_sub hsmeas]
@@ -123,13 +125,13 @@ lemma prodPMF_toMeasure_not_rel {W : Type*} [MeasurableSpace W] [MeasurableSingl
   refine tsum_congr fun y => ?_
   rw [Set.indicator_apply]
   by_cases h : R x y
-  · simp [Set.mem_setOf_eq, h]
-  · simp [Set.mem_setOf_eq, prodPMF_apply, h]
+  · simp [Set.mem_ofPred_eq, h]
+  · simp [Set.mem_ofPred_eq, prodPMF_apply, h]
 
 instance instCountableFullLab [Countable V] : (n : ℕ) → Countable (FullLab V n)
   | 0 => ‹Countable V›
   | n + 1 => by
-      haveI := instCountableFullLab n
+      have := instCountableFullLab n
       exact inferInstanceAs (Countable (V × (FullLab V n × FullLab V n)))
 
 instance instMeasurableFullLab [MeasurableSpace V] : (n : ℕ) → MeasurableSpace (FullLab V n)
@@ -142,7 +144,7 @@ instance instMeasurableSingletonFullLab [MeasurableSpace V] [MeasurableSingleton
     (n : ℕ) → MeasurableSingletonClass (FullLab V n)
   | 0 => ‹MeasurableSingletonClass V›
   | n + 1 => by
-      haveI : MeasurableSingletonClass (FullLab V n) := instMeasurableSingletonFullLab n
+      have : MeasurableSingletonClass (FullLab V n) := instMeasurableSingletonFullLab n
       exact inferInstanceAs (MeasurableSingletonClass (V × (FullLab V n × FullLab V n)))
 
 end GraphMarkovMatching.Support

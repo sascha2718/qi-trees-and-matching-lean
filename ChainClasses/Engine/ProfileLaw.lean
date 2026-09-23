@@ -17,7 +17,7 @@ def gChild (u : GWord N') (j : ℕ) : GWord N' :=
   if h : j < N' then u ++ [⟨j, h⟩] else u
 
 lemma gChild_of_lt (u : GWord N') {j : ℕ} (h : j < N') : gChild u j = u ++ [⟨j, h⟩] :=
-  dif_pos h
+  dite_eq_left h
 
 /-- The address and slot offset a child of the profile vertex `u` works at. -/
 def childAddr (u : GWord N') : ChildK → GWord N' × ℕ
@@ -130,7 +130,7 @@ lemma muM_succ_apply (P : V → PMF (V × V)) (s : V) (n : ℕ) (ℓ : FullLab V
       else 0 := by
   rw [GraphMarkovMatching.muM_succ, PMF.map_apply]
   by_cases hroot : rootLab (n + 1) ℓ = s
-  · rw [if_pos hroot]
+  · rw [ite_eq_left hroot]
     have hiff : ∀ p : FullLab V n × FullLab V n,
         (ℓ = GraphMarkovMatching.branch s p) ↔ p = (subL ℓ, subR ℓ) := by
       intro p
@@ -151,9 +151,9 @@ lemma muM_succ_apply (P : V → PMF (V × V)) (s : V) (n : ℕ) (ℓ : FullLab V
       · have hτ : τ ≠ rootLab n (subR ℓ) := fun h => hne (by rw [hσ, h])
         rw [GraphMarkovMatching.muM_eq_zero_of_rootLab_ne P (Ne.symm hτ), mul_zero, mul_zero]
       · rw [GraphMarkovMatching.muM_eq_zero_of_rootLab_ne P (Ne.symm hσ), zero_mul, mul_zero]
-  · rw [if_neg hroot]
+  · rw [ite_eq_right hroot]
     refine ENNReal.tsum_eq_zero.mpr fun p => ?_
-    rw [if_neg]
+    rw [ite_eq_right]
     intro h
     exact hroot (by rw [h]; rfl)
 
@@ -260,10 +260,10 @@ lemma childRec_iff (lab ar : GWord N' → ℕ) (v0 : ℕ) (u : GWord N') (c : Ch
       constructor
       · rintro ⟨M, hM, -⟩
         by_contra h
-        rw [if_neg h] at hM
+        rw [ite_eq_right h] at hM
         exact Option.some_ne_none M hM.symm
       · intro h
-        exact ⟨[], by rw [if_pos h], Levent_nil⟩
+        exact ⟨[], by rw [ite_eq_left h], Levent_nil⟩
   | slot j =>
       obtain ⟨a, m⟩ := r
       cases m with
@@ -312,16 +312,16 @@ lemma map_pair_left_apply {A : Type} (ρ : PMF A) (c r₁ r₂ : A) :
   rw [PMF.map_apply]
   by_cases h : r₁ = c
   · subst h
-    rw [if_pos rfl]
+    rw [ite_eq_left rfl]
     have hiff : ∀ f : A, ((r₁, r₂) = (r₁, f)) ↔ f = r₂ := by
       intro f
       simp only [Prod.mk.injEq, true_and]
       exact eq_comm
     simp_rw [hiff]
     rw [tsum_ite_eq]
-  · rw [if_neg h]
+  · rw [ite_eq_right h]
     refine ENNReal.tsum_eq_zero.mpr fun f => ?_
-    rw [if_neg]
+    rw [ite_eq_right]
     intro hf
     exact h (congrArg Prod.fst hf)
 
@@ -423,19 +423,19 @@ theorem encSub_eq_iff (exc : Family) (lab ar : GWord N' → ℕ) (v0 : ℕ) :
       rw [encSub_zero, dec_zero]
       constructor
       · intro h
-        exact ⟨[], by rw [if_pos h.symm], Levent_nil⟩
+        exact ⟨[], by rw [ite_eq_left h.symm], Levent_nil⟩
       · rintro ⟨L, hL, -⟩
         by_contra h
-        rw [if_neg (Ne.symm h)] at hL
+        rw [ite_eq_right (Ne.symm h)] at hL
         exact Option.some_ne_none L hL.symm
   | succ n ih =>
       intro u off s ℓ
       rw [encSub_succ, dec_succ, branch_eq_iff]
       by_cases hroot : rootLab (n + 1) ℓ = s
-      · rw [if_pos hroot, exists_bind_map_append_iff, ← decChild_iff exc lab ar v0 n ih,
+      · rw [ite_eq_left hroot, exists_bind_map_append_iff, ← decChild_iff exc lab ar v0 n ih,
           ← decChild_iff exc lab ar v0 n ih]
         simp only [hroot, true_and]
-      · rw [if_neg hroot]
+      · rw [ite_eq_right hroot]
         simp only [hroot, false_and, false_iff, not_exists, not_and]
         intro L hL
         exact (Option.some_ne_none L hL.symm).elim
@@ -490,11 +490,11 @@ theorem muM_eq_recMass (exc : Family) (μ ν : PMF ℕ) (v0 : ℕ) :
       intro u off s ℓ
       rw [muM_succ_apply, dec_succ]
       by_cases hroot : rootLab (n + 1) ℓ = s
-      · rw [if_pos hroot, if_pos hroot, optMass_bind_map_append, optMass_decChild,
+      · rw [ite_eq_left hroot, ite_eq_left hroot, optMass_bind_map_append, optMass_decChild,
           optMass_decChild, rawKernel_apply_eq exc μ ν v0 off, childMass_eq μ ν v0 u,
           childMass_eq μ ν v0 u, ih, ih]
         ring
-      · rw [if_neg hroot, if_neg hroot]
+      · rw [ite_eq_right hroot, ite_eq_right hroot]
         rfl
 
 lemma decTop_ord (exc : Family) (v0 n : ℕ) (ℓ : FullLab (RawState ℕ) n) {a k : ℕ}
@@ -657,9 +657,9 @@ lemma wfl_decChild (exc : Family) (v0 n : ℕ)
       simp only [childRec] at hM
       have hroot : rootLab n x = (v0, t) := by
         by_contra h
-        rw [if_neg h] at hM
+        rw [ite_eq_right h] at hM
         exact Option.some_ne_none M hM.symm
-      rw [if_pos hroot, Option.some.injEq] at hM
+      rw [ite_eq_left hroot, Option.some.injEq] at hM
       subst hM
       rw [hroot] at hL'
       simp only [List.nil_append, startK, servedK]
@@ -939,7 +939,7 @@ lemma measurableSet_levent_of {lab ar : Ω → GWord N' → ℕ}
   have hset : {ω | Levent L (lab ω) (ar ω)}
       = ⋂ t ∈ L, ({ω | lab ω t.1 = t.2.1} ∩ {ω | ar ω t.1 = t.2.2}) := by
     ext ω
-    simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.mem_inter_iff, Levent]
+    simp only [Set.mem_ofPred_eq, Set.mem_iInter, Set.mem_inter_iff, Levent]
   rw [hset]
   exact MeasurableSet.iInter fun t => MeasurableSet.iInter fun _ =>
     (hlab t.1 t.2.1).inter (har t.1 t.2.2)
@@ -960,7 +960,7 @@ lemma measurable_encLab_of {lab ar : Ω → GWord N' → ℕ}
   · have hset : (fun ω => encLab exc (lab ω) (ar ω) v0 n) ⁻¹' {ℓ}
         = {ω | Levent L (lab ω) (ar ω)} := by
       ext ω
-      simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_setOf_eq, encLab_eq_iff, hdec,
+      simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_ofPred_eq, encLab_eq_iff, hdec,
         Option.some.injEq, exists_eq_left']
     rw [hset]
     exact measurableSet_levent_of hlab har L
@@ -984,13 +984,13 @@ theorem encLab_apply_of_pattern (P : Measure Ω) {lab ar : Ω → GWord N' → �
   rcases hdec : decTop exc v0 n ℓ with _ | L
   · have hset : {ω | encLab exc (lab ω) (ar ω) v0 n = ℓ} = ∅ := by
       ext ω
-      rw [Set.mem_setOf_eq, encLab_eq_iff, hdec]
+      rw [Set.mem_ofPred_eq, encLab_eq_iff, hdec]
       simp
     rw [hset, measure_empty]
     rfl
   · have hset : {ω | encLab exc (lab ω) (ar ω) v0 n = ℓ} = {ω | Levent L (lab ω) (ar ω)} := by
       ext ω
-      simp only [Set.mem_setOf_eq, encLab_eq_iff, hdec, Option.some.injEq, exists_eq_left']
+      simp only [Set.mem_ofPred_eq, encLab_eq_iff, hdec, Option.some.injEq, exists_eq_left']
     rw [hset]
     obtain ⟨a, k, L₀, hr, rfl, hwf⟩ := decTop_some exc v0 n ℓ hdec
     -- the product formula over the probe of a well-formed list
@@ -1005,7 +1005,7 @@ theorem encLab_apply_of_pattern (P : Measure Ω) {lab ar : Ω → GWord N' → �
               ({ω | lab ω u = recLab (([], a, k) :: L₁) u}
                 ∩ {ω | ar ω u = recAr (([], a, k) :: L₁) u}) := by
         ext ω
-        simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.mem_inter_iff]
+        simp only [Set.mem_ofPred_eq, Set.mem_iInter, Set.mem_inter_iff]
         exact levent_iff_probe hnd _ _
       rw [hset']
       exact hpat _ (prefixClosed_of_wfl hw) _ _ (compat_of_wfl hw)

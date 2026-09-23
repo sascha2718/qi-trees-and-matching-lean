@@ -65,7 +65,7 @@ lemma measurableSet_childPattern_eq {E : Set (Word N → ℕ)} (hE : MeasurableS
   have h : {c : Word N → ℕ | childPattern J E c = S}
       = ⋂ i : Fin N, {c | i ∈ S ↔ ((i : ℕ) < J ∧ (fun w ↦ c (i :: w)) ∈ E)} := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iInter, Finset.ext_iff, mem_childPattern]
+    simp only [Set.mem_ofPred_eq, Set.mem_iInter, Finset.ext_iff, mem_childPattern]
     exact forall_congr' fun i ↦ Iff.comm
   rw [h]
   refine MeasurableSet.iInter fun i ↦ ?_
@@ -73,7 +73,7 @@ lemma measurableSet_childPattern_eq {E : Set (Word N → ℕ)} (hE : MeasurableS
     by_cases hij : (i : ℕ) < J
     · simp only [hij, true_and]
       exact measurable_shift i hE
-    · simp only [hij, false_and, Set.setOf_false]
+    · simp only [hij, false_and, Set.ofPred_false]
       exact MeasurableSet.empty
   by_cases hiS : i ∈ S
   · simp only [hiS, true_iff]
@@ -105,7 +105,7 @@ lemma split_preimage_patternBox (E : Set (Word N → ℕ)) {S : Finset (Fin N)}
     split ⁻¹' Set.univ.pi (patternBox (N := N) J E S)
       = {c : Word N → ℕ | c [] = J} ∩ {c | childPattern J E c = S} := by
   ext c
-  simp only [Set.mem_preimage, Set.mem_univ_pi, Set.mem_inter_iff, Set.mem_setOf_eq]
+  simp only [Set.mem_preimage, Set.mem_univ_pi, Set.mem_inter_iff, Set.mem_ofPred_eq]
   constructor
   · intro h
     refine ⟨h none, ?_⟩
@@ -115,24 +115,24 @@ lemma split_preimage_patternBox (E : Set (Word N → ℕ)) {S : Finset (Fin N)}
     constructor
     · rintro ⟨hij, hE⟩
       by_contra hiS
-      simp only [patternBox, if_neg hiS, if_pos hij] at hi
+      simp only [patternBox, ite_eq_right hiS, ite_eq_left hij] at hi
       exact hi hE
     · intro hiS
       refine ⟨mem_childSet.1 (hS hiS), ?_⟩
-      simp only [patternBox, if_pos hiS] at hi
+      simp only [patternBox, ite_eq_left hiS] at hi
       exact hi
   · rintro ⟨hroot, hpat⟩ i
     cases i with
     | none => exact hroot
     | some i =>
         by_cases hiS : i ∈ S
-        · simp only [patternBox, if_pos hiS]
+        · simp only [patternBox, ite_eq_left hiS]
           exact (mem_childPattern.1 (by rw [hpat]; exact hiS)).2
         · by_cases hij : (i : ℕ) < J
-          · simp only [patternBox, if_neg hiS, if_pos hij]
+          · simp only [patternBox, ite_eq_right hiS, ite_eq_left hij]
             intro hE'
             exact hiS (by rw [← hpat]; exact mem_childPattern.2 ⟨hij, hE'⟩)
-          · simp only [patternBox, if_neg hiS, if_neg hij]
+          · simp only [patternBox, ite_eq_right hiS, ite_eq_right hij]
             exact Set.mem_univ _
 
 variable (θ : Offspring J) {E : Set (Word N → ℕ)}
@@ -174,7 +174,7 @@ theorem sampleMeasure_pattern_card (hJN : J ≤ N) (hE : MeasurableSet E) (k : �
       = ⋃ S ∈ (childSet N J).powersetCard k,
           ({c : Word N → ℕ | c [] = J} ∩ {c | childPattern J E c = S}) := by
     ext c
-    simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_iUnion, Finset.mem_powersetCard,
+    simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, Set.mem_iUnion, Finset.mem_powersetCard,
       exists_prop]
     constructor
     · rintro ⟨hroot, hk⟩
@@ -215,7 +215,7 @@ theorem sampleMeasure_root_pattern_ge (hJN : J ≤ N) (hE : MeasurableSet E) (m 
       = ⋃ k ∈ (Finset.range (J + 1)).filter (m ≤ ·),
           ({c : Word N → ℕ | c [] = J} ∩ {c | (childPattern J E c).card = k}) := by
     ext c
-    simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_iUnion, Finset.mem_filter,
+    simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, Set.mem_iUnion, Finset.mem_filter,
       Finset.mem_range, exists_prop]
     constructor
     · rintro ⟨hroot, hm⟩
@@ -236,7 +236,7 @@ theorem sampleMeasure_root_pattern_ge (hJN : J ≤ N) (hE : MeasurableSet E) (m 
         = ⋃ S ∈ (Finset.univ : Finset (Finset (Fin N))).filter (fun S ↦ S.card = k),
             {c | childPattern J E c = S} := by
       ext c
-      simp only [Set.mem_setOf_eq, Set.mem_iUnion, Finset.mem_filter, Finset.mem_univ,
+      simp only [Set.mem_ofPred_eq, Set.mem_iUnion, Finset.mem_filter, Finset.mem_univ,
         true_and, exists_prop]
       exact ⟨fun h ↦ ⟨_, h, rfl⟩, fun ⟨S, hS, hc⟩ ↦ hc ▸ hS⟩
     rw [h]
@@ -284,7 +284,7 @@ theorem retainedProb_succ (hJN : J ≤ N) (n : ℕ) :
       = {c : Word N → ℕ | c [] = J}
         ∩ {c | m ≤ (childPattern J {d : Word N → ℕ | Retained J m d n []} c).card} := by
     ext c
-    rw [Set.mem_setOf_eq, retained_succ_iff, retainedChildren_nil_eq]
+    rw [Set.mem_ofPred_eq, retained_succ_iff, retainedChildren_nil_eq]
     rfl
   rw [retainedProb, hset, sampleMeasure_root_pattern_ge θ hJN (measurableSet_retained n []) m]
   rfl
@@ -300,7 +300,7 @@ theorem sampleMeasure_retainedInf_eq (hJN : J ≤ N) :
       = {c : Word N → ℕ | c [] = J}
         ∩ {c | m ≤ (childPattern J {d : Word N → ℕ | RetainedInf J m d []} c).card} := by
     ext c
-    rw [Set.mem_setOf_eq, retainedInf_iff, retainedInfChildren_nil_eq]
+    rw [Set.mem_ofPred_eq, retainedInf_iff, retainedInfChildren_nil_eq]
     rfl
   have h := sampleMeasure_root_pattern_ge θ hJN (measurableSet_retainedInf (J := J) (m := m) []) m
   rw [← hset] at h
@@ -375,7 +375,7 @@ lemma measurableSet_retDegree_eq (k : ℕ) :
       = ⋃ S ∈ (Finset.univ : Finset (Finset (Fin N))).filter (fun S ↦ S.card = k),
           {c : Word N → ℕ | retainedInfChildren J m c [] = S} := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iUnion, Finset.mem_filter, Finset.mem_univ, true_and,
+    simp only [Set.mem_ofPred_eq, Set.mem_iUnion, Finset.mem_filter, Finset.mem_univ, true_and,
       exists_prop, retDegree]
     exact ⟨fun h ↦ ⟨_, h, rfl⟩, fun ⟨S, hS, hc⟩ ↦ hc ▸ hS⟩
   rw [h]
@@ -394,7 +394,7 @@ lemma measurable_retAt (i : ℕ) : Measurable (fun c : Word N → ℕ ↦ retAt 
           ({c : Word N → ℕ | retainedInfChildren J m c [] = S}
             ∩ (fun c : Word N → ℕ ↦ bushOf S i c) ⁻¹' t) := by
     ext c
-    simp only [Set.mem_preimage, Set.mem_iUnion, Set.mem_inter_iff, Set.mem_setOf_eq]
+    simp only [Set.mem_preimage, Set.mem_iUnion, Set.mem_inter_iff, Set.mem_ofPred_eq]
     constructor
     · intro hc
       exact ⟨retainedInfChildren J m c [], rfl, hc⟩
@@ -414,7 +414,7 @@ lemma measurable_retSub (u : Word N) : Measurable (fun c : Word N → ℕ ↦ re
       exact ih.comp (measurable_retAt (j : ℕ))
 
 lemma measurable_retField : Measurable (retField J m : (Word N → ℕ) → Word N → ℕ) :=
-  measurable_pi_lambda _ fun u ↦ measurable_retDegree.comp (measurable_retSub u)
+  Measurable.of_eval fun u ↦ measurable_retDegree.comp (measurable_retSub u)
 
 /-- **The retained tree is a random tree.** -/
 lemma measurable_retTree : Measurable (retTree J m : (Word N → ℕ) → Subtree N) :=
@@ -430,7 +430,7 @@ lemma measurableSet_forall_retAt (k : ℕ) {A : ℕ → Set (Word N → ℕ)}
   have h : {c : Word N → ℕ | ∀ i : ℕ, i < k → retAt J m c i ∈ A i}
       = ⋂ i : ℕ, ⋂ _ : i < k, (fun c : Word N → ℕ ↦ retAt J m c i) ⁻¹' (A i) := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.mem_preimage]
+    simp only [Set.mem_ofPred_eq, Set.mem_iInter, Set.mem_preimage]
   rw [h]
   exact MeasurableSet.iInter fun i ↦ MeasurableSet.iInter fun _ ↦ measurable_retAt i (hA i)
 
@@ -471,10 +471,8 @@ lemma retainedBushesBox_eq_inter (S : Finset (Fin N)) (A : ℕ → Set (Word N �
       simp [retainedBushesBox, patternBox, bushesOnly]
   | some i => by
       by_cases hi : i ∈ S
-      · simp only [retainedBushesBox, patternBox, bushesOnly, if_pos hi]
-        rfl
-      · simp only [retainedBushesBox, patternBox, bushesOnly, if_neg hi, Set.inter_univ]
-        rfl
+      · simp only [retainedBushesBox, patternBox, bushesOnly, ite_eq_left hi]
+      · simp only [retainedBushesBox, patternBox, bushesOnly, ite_eq_right hi, Set.inter_univ]
 
 /-- **The product event constrains every retained subtree.** -/
 lemma split_preimage_retainedBushesBox {S : Finset (Fin N)} (hS : S ⊆ childSet N J)
@@ -489,7 +487,7 @@ lemma split_preimage_retainedBushesBox {S : Finset (Fin N)} (hS : S ⊆ childSet
     exact Set.pi_congr rfl fun i _ ↦ retainedBushesBox_eq_inter S A i
   rw [hbox, Set.preimage_inter, split_preimage_patternBox _ hS, split_preimage_bushesOnly]
   ext c
-  simp only [Set.mem_inter_iff, Set.mem_setOf_eq, forall_bushOf_iff S A c,
+  simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, forall_bushOf_iff S A c,
     retainedInfChildren_nil_eq]
 
 /-- **The mass of a retained pattern with every retained subtree constrained.**  The
@@ -547,7 +545,7 @@ theorem sampleMeasure_root_retDegree_bushes (hJN : J ≤ N) (k : ℕ) {A : ℕ �
           (({c : Word N → ℕ | c [] = J} ∩ {c | retainedInfChildren J m c [] = S})
             ∩ {c : Word N → ℕ | ∀ i : ℕ, i < S.card → bushOf S i c ∈ A i}) := by
     ext c
-    simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_iUnion, Finset.mem_powersetCard,
+    simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, Set.mem_iUnion, Finset.mem_powersetCard,
       exists_prop, retDegree, retAt]
     constructor
     · rintro ⟨⟨hroot, hk⟩, hbush⟩
@@ -709,7 +707,7 @@ noncomputable def pruned (N : ℕ) (θ : Offspring J) (m : ℕ)
 /-- The law of the retained tree is supported on `{m, …, J}`. -/
 lemma pruned_eq_zero_of_lt (θ : Offspring J) (m : ℕ) (hZ : 0 < binomialTailR J m (retProbR N θ m))
     {k : ℕ} (hk : k < m) : pruned N θ m hZ k = 0 := by
-  rw [pruned_apply, prunedWeight, if_neg (by omega)]
+  rw [pruned_apply, prunedWeight, ite_eq_right (by omega)]
 
 end Offspring
 
@@ -725,7 +723,7 @@ lemma prunedWeight_eq_of_le (θ : Offspring J) (hJN : J ≤ N) {k : ℕ} (hk : m
     exact hp.ne'
   have hθ : θ J ≠ 0 := left_ne_zero_of_mul hZ
   have hZ' : Offspring.binomialTailR J m (Offspring.retProbR N θ m) ≠ 0 := right_ne_zero_of_mul hZ
-  rw [Offspring.prunedWeight, if_pos hk]
+  rw [Offspring.prunedWeight, ite_eq_left hk]
   field_simp
   try ring
 
@@ -758,7 +756,7 @@ theorem retainedMeasure_retDegree_bushes (hJN : J ≤ N)
         = ({c : Word N → ℕ | c [] = J} ∩ {c | retDegree J m c = k})
           ∩ {c : Word N → ℕ | ∀ i : ℕ, i < k → retAt J m c i ∈ A i} := by
       ext c
-      simp only [hR, Set.mem_inter_iff, Set.mem_setOf_eq, retainedInf_iff]
+      simp only [hR, Set.mem_inter_iff, Set.mem_ofPred_eq, retainedInf_iff]
       constructor
       · rintro ⟨⟨hroot, -⟩, hd, hbush⟩
         exact ⟨⟨hroot, hd⟩, hbush⟩
@@ -796,7 +794,7 @@ theorem retainedMeasure_retDegree_bushes (hJN : J ≤ N)
   · have hset : R ∩ ({c : Word N → ℕ | retDegree J m c = k}
           ∩ {c : Word N → ℕ | ∀ i : ℕ, i < k → retAt J m c i ∈ A i}) = ∅ := by
       ext c
-      simp only [hR, Set.mem_inter_iff, Set.mem_setOf_eq, retainedInf_iff, Set.mem_empty_iff_false,
+      simp only [hR, Set.mem_inter_iff, Set.mem_ofPred_eq, retainedInf_iff, Set.mem_empty_iff_false,
         iff_false, not_and]
       intro hr hd
       exact absurd (hd ▸ hr.2) hk
@@ -836,7 +834,7 @@ theorem retainedMeasure_bushes (hJN : J ≤ N)
         ∩ {c : Word N → ℕ | retDegree J m c = k})
         ∩ {c : Word N → ℕ | ∀ i : ℕ, i < k → retAt J m c i ∈ A i}) := by
     ext c
-    simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_iUnion]
+    simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, Set.mem_iUnion]
     constructor
     · rintro ⟨hgec, hbush⟩
       exact ⟨retDegree J m c, ⟨hgec, rfl⟩, hbush⟩
@@ -865,22 +863,22 @@ theorem retainedMeasure_bushes (hJN : J ≤ N)
           = {c : Word N → ℕ | retDegree J m c = k}
             ∩ {c : Word N → ℕ | ∀ i : ℕ, i < k → retAt J m c i ∈ A i} := by
         ext c
-        simp only [Set.mem_inter_iff, Set.mem_setOf_eq]
+        simp only [Set.mem_inter_iff, Set.mem_ofPred_eq]
         constructor
         · rintro ⟨⟨-, hd⟩, hbush⟩
           exact ⟨hd, hbush⟩
         · rintro ⟨hd, hbush⟩
           exact ⟨⟨by rw [hd]; exact hk, hd⟩, hbush⟩
-      rw [hset, retainedMeasure_retDegree_bushes θ hJN hp hZ k hA, if_pos hk, hprodeq k hk]
+      rw [hset, retainedMeasure_retDegree_bushes θ hJN hp hZ k hA, ite_eq_left hk, hprodeq k hk]
     · have hset : (({c : Word N → ℕ | n ≤ retDegree J m c}
           ∩ {c : Word N → ℕ | retDegree J m c = k})
           ∩ {c : Word N → ℕ | ∀ i : ℕ, i < k → retAt J m c i ∈ A i})
           = (∅ : Set (Word N → ℕ)) := by
         ext c
-        simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+        simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
         rintro ⟨⟨hgec, hd⟩, -⟩
         exact hk (hd ▸ hgec)
-      rw [hset, measure_empty, if_neg hk, ENNReal.ofReal_zero, zero_mul]
+      rw [hset, measure_empty, ite_eq_right hk, ENNReal.ofReal_zero, zero_mul]
   have hvanish : ∀ k ∉ Finset.range (J + 1), retainedMeasure N θ m
       (({c : Word N → ℕ | n ≤ retDegree J m c} ∩ {c : Word N → ℕ | retDegree J m c = k})
         ∩ {c : Word N → ℕ | ∀ i : ℕ, i < k → retAt J m c i ∈ A i}) = 0 := by
@@ -888,9 +886,9 @@ theorem retainedMeasure_bushes (hJN : J ≤ N)
     rw [Finset.mem_range] at hk
     rw [hval k]
     by_cases hnk : n ≤ k
-    · rw [if_pos hnk, (Offspring.pruned N θ m hZ).vanishing k (by omega), ENNReal.ofReal_zero,
+    · rw [ite_eq_left hnk, (Offspring.pruned N θ m hZ).vanishing k (by omega), ENNReal.ofReal_zero,
         zero_mul]
-    · rw [if_neg hnk, ENNReal.ofReal_zero, zero_mul]
+    · rw [ite_eq_right hnk, ENNReal.ofReal_zero, zero_mul]
   have hnn : ∀ k ∈ Finset.range (J + 1),
       (0 : ℝ) ≤ if n ≤ k then Offspring.pruned N θ m hZ k else 0 := by
     intro k _
@@ -927,7 +925,7 @@ lemma measurableSet_subset_retTree (G : Set (Word N)) :
   have h : {c : Word N → ℕ | G ⊆ (retTree J m c : Set (Word N))}
       = ⋂ v ∈ G, {c : Word N → ℕ | v ∈ retTree J m c} := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.subset_def, SetLike.mem_coe]
+    simp only [Set.mem_ofPred_eq, Set.mem_iInter, Set.subset_def, SetLike.mem_coe]
   rw [h]
   exact MeasurableSet.biInter (Set.to_countable G) fun v _ ↦ measurableSet_mem_retTree v
 
@@ -956,8 +954,8 @@ theorem retainedMeasure_subset_retTree_step (hJN : J ≤ N)
         ∩ {c : Word N → ℕ | ∀ i : ℕ, i < retDegree J m c →
             retAt J m c i ∈ {d : Word N → ℕ | wordSub F i ⊆ (retTree J m d : Set (Word N))}} := by
     ext c
-    rw [Set.mem_setOf_eq, subset_retTree_iff hF c]
-    simp only [Set.mem_inter_iff, Set.mem_setOf_eq]
+    rw [Set.mem_ofPred_eq, subset_retTree_iff hF c]
+    simp only [Set.mem_inter_iff, Set.mem_ofPred_eq]
   rw [hset, retainedMeasure_bushes θ hJN hp hZ (rootDeg F) hA hAtop]
 
 /-- **The retained tree is a Galton-Watson tree with the pruned law, on every finite
@@ -981,13 +979,13 @@ theorem retainedMeasure_subset_retTree (hJN : J ≤ N)
         exact List.length_eq_zero_iff.mp (Nat.le_zero.mp (hn v hv))
       have h1 : {c : Word N → ℕ | F ⊆ (retTree J m c : Set (Word N))} = Set.univ := by
         ext c
-        simp only [Set.mem_setOf_eq, Set.mem_univ, iff_true]
+        simp only [Set.mem_ofPred_eq, Set.mem_univ, iff_true]
         intro v hv
         rw [hnil v hv]
         exact nil_mem_retTree c
       have h2 : {c : Word N → ℕ | F ⊆ (sample c : Set (Word N))} = Set.univ := by
         ext c
-        simp only [Set.mem_setOf_eq, Set.mem_univ, iff_true]
+        simp only [Set.mem_ofPred_eq, Set.mem_univ, iff_true]
         intro v hv
         rw [hnil v hv]
         exact nil_mem_sample c
@@ -1037,7 +1035,7 @@ theorem retainedTreeLaw_eq_treeLaw (hJN : J ≤ N)
   have _ := isProbabilityMeasure_retainedMeasure θ hp
   have hprob : IsProbabilityMeasure (retainedTreeLaw N θ m) := by
     rw [retainedTreeLaw]
-    exact Measure.isProbabilityMeasure_map measurable_retTree.aemeasurable
+    infer_instance
   refine ext_of_generate_finite (containmentSets N) generateFrom_containmentSets
     isPiSystem_containmentSets ?_ ?_
   · rintro _ ⟨F, hFfin, hF, rfl⟩

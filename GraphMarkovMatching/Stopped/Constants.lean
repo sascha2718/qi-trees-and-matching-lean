@@ -26,9 +26,9 @@ private lemma WresD_le_one_add {X : Type} {α : ℝ} (hα : 1 ≤ α) (ρ : PMF 
     (R : X → X → Prop) (x : X) :
     WresD α ρ R x ≤ 1 + ENNReal.ofReal α * phiE α (q ρ R x) := by
   by_cases h : rE ρ R x = 0
-  · rw [WresD, if_pos h]
+  · rw [WresD, ite_eq_left h]
     exact zero_le
-  · rw [WresD, if_neg h]
+  · rw [WresD, ite_eq_right h]
     exact WnnD_le hα ρ R x
 
 /-- On the positive set the bad degree times the restricted weight is the potential weight:
@@ -38,7 +38,7 @@ private lemma qE_mul_WresD_eq {X : Type} (α : ℝ) (ρ : PMF X) (R : X → X �
   have hq : q ρ R x < 1 := q_lt_one_of_rE_ne_zero h
   have hqE : qE ρ R x = ENNReal.ofReal (q ρ R x) := by
     rw [q, ENNReal.ofReal_toReal qE_ne_top]
-  rw [WresD, if_neg h, WnnD, phiE_of_lt hq, hqE, ← ENNReal.ofReal_mul q_nonneg]
+  rw [WresD, ite_eq_right h, WnnD, phiE_of_lt hq, hqE, ← ENNReal.ofReal_mul q_nonneg]
   congr 1
   rw [phi, Real.rpow_neg (by linarith), div_eq_mul_inv]
 
@@ -156,7 +156,7 @@ lemma fRoot_le (hc : M.IsCompat) {α : ℝ} (hα : 1 ≤ α) :
         refine ENNReal.tsum_le_tsum fun v => ?_
         by_cases hv : M.R v M.zero
         · simp [hv]
-        · rw [if_neg hv, if_neg hv]
+        · rw [ite_eq_right hv, ite_eq_right hv]
           calc M.μ v * WresD α M.μ M.R v
               ≤ M.μ v * (1 + ENNReal.ofReal α * phiE α (q M.μ M.R v)) := by
                 gcongr
@@ -274,8 +274,9 @@ lemma DmuC_le (hc : M.IsCompat) {α : ℝ} (hα : 1 ≤ α) :
 /-- A state incompatible with `0` has bad degree at least `μ(0)` (`sec:independent-root`). -/
 private lemma mu_zero_le_qE {v : V} (hv : ¬ M.R v M.zero) : M.μ M.zero ≤ qE M.μ M.R v := by
   rw [qE]
-  calc M.μ M.zero = if M.R v M.zero then 0 else M.μ M.zero := by rw [if_neg hv]
-    _ ≤ ∑' y, if M.R v y then 0 else M.μ y := ENNReal.le_tsum M.zero
+  calc M.μ M.zero = if M.R v M.zero then 0 else M.μ M.zero := by rw [ite_eq_right hv]
+    _ ≤ ∑' y, if M.R v y then 0 else M.μ y :=
+        ENNReal.le_tsum (f := fun y => if M.R v y then 0 else M.μ y) M.zero
 
 /-- With `μ(0) ≥ p > 0`: `φ_α(δ) ≤ η/p`, from the summand of `η` at `0`. -/
 lemma e0_le_eta_div (hc : M.IsCompat) {α : ℝ} (hα : 0 ≤ α) {p : ℝ≥0∞} (hp : p ≠ 0)
@@ -290,7 +291,7 @@ lemma e0_le_eta_div (hc : M.IsCompat) {α : ℝ} (hα : 0 ≤ α) {p : ℝ≥0�
     _ = M.μ M.zero * phiE α (q M.μ M.R M.zero) := mul_comm _ _
     _ ≤ M.eta α := by
         rw [eta, PhiD]
-        exact ENNReal.le_tsum M.zero
+        exact ENNReal.le_tsum (f := fun x => M.μ x * phiE α (q M.μ M.R x)) M.zero
 
 /-- With `μ(0) ≥ p > 0`: `f ≤ η/p`, since a state incompatible with `0` has
 `1 - b(v) ≥ p`. -/
@@ -311,7 +312,7 @@ lemma fRoot_le_eta_div (hc : M.IsCompat) {α : ℝ} (hα : 0 ≤ α) {p : ℝ≥
         · rw [zero_mul]
           exact zero_le
         · by_cases h : rE M.μ M.R v = 0
-          · rw [WresD, if_pos h, zero_mul]
+          · rw [WresD, ite_eq_left h, zero_mul]
             exact zero_le
           · calc WresD α M.μ M.R v * p ≤ WresD α M.μ M.R v * qE M.μ M.R v := by
                   gcongr

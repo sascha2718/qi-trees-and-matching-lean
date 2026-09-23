@@ -176,7 +176,7 @@ lemma splitSet_nonempty_of_arity {c : GWord N → ℕ} (h : 2 ≤ gArity c) :
   have haritydeg : gArity c = skeletonDegree c := by
     rw [gArity, gSplitField_of_depth_zero h0]
   have hmem : (0 : ℕ) ∈ {n | 2 ≤ skeletonDegree (neckIter c n)} := by
-    simp only [Set.mem_setOf_eq, neckIter_zero]
+    simp only [Set.mem_ofPred_eq, neckIter_zero]
     omega
   rw [hno] at hmem
   exact absurd hmem (Set.notMem_empty 0)
@@ -188,10 +188,10 @@ lemma splitSet_nonempty_down {c : GWord N → ℕ} (h1 : skeletonDegree c = 1)
   obtain ⟨n, hn⟩ := hne
   cases n with
   | zero =>
-      simp only [Set.mem_setOf_eq, neckIter_zero] at hn
+      simp only [Set.mem_ofPred_eq, neckIter_zero] at hn
       omega
   | succ m =>
-      rw [Set.mem_setOf_eq, neckIter_succ] at hn
+      rw [Set.mem_ofPred_eq, neckIter_succ] at hn
       exact ⟨m, hn⟩
 
 /-- **The descent one step down**: at a root with one surviving child the depth of the
@@ -202,7 +202,7 @@ lemma gSplitDepth_succ {c : GWord N → ℕ} (h1 : skeletonDegree c = 1)
   have hmem : gSplitDepth (bushAt c 0)
       ∈ {n | 2 ≤ skeletonDegree (neckIter (bushAt c 0) n)} := Nat.sInf_mem hne
   have hup : gSplitDepth (bushAt c 0) + 1 ∈ {n | 2 ≤ skeletonDegree (neckIter c n)} := by
-    rw [Set.mem_setOf_eq, neckIter_succ]
+    rw [Set.mem_ofPred_eq, neckIter_succ]
     exact hmem
   have hle : gSplitDepth c ≤ gSplitDepth (bushAt c 0) + 1 := Nat.sInf_le hup
   have h0 : gSplitDepth c ≠ 0 := by
@@ -210,13 +210,13 @@ lemma gSplitDepth_succ {c : GWord N → ℕ} (h1 : skeletonDegree c = 1)
     have hmem0 : (0 : ℕ) ∈ {n | 2 ≤ skeletonDegree (neckIter c n)} := by
       rw [← h0, gSplitDepth]
       exact Nat.sInf_mem ⟨_, hup⟩
-    simp only [Set.mem_setOf_eq, neckIter_zero] at hmem0
+    simp only [Set.mem_ofPred_eq, neckIter_zero] at hmem0
     omega
   obtain ⟨m, hm⟩ : ∃ m, gSplitDepth c = m + 1 := ⟨gSplitDepth c - 1, by omega⟩
   have hmm : m + 1 ∈ {n | 2 ≤ skeletonDegree (neckIter c n)} := by
     rw [← hm, gSplitDepth]
     exact Nat.sInf_mem ⟨_, hup⟩
-  rw [Set.mem_setOf_eq, neckIter_succ] at hmm
+  rw [Set.mem_ofPred_eq, neckIter_succ] at hmm
   have hlow : gSplitDepth (bushAt c 0) ≤ m :=
     Nat.sInf_le (show m ∈ {n | 2 ≤ skeletonDegree (neckIter (bushAt c 0) n)} from hmm)
   omega
@@ -426,7 +426,7 @@ lemma congr {X : Type*} {f g : (GWord N → ℕ) → X} (hf : FibreMeasurableG f
   intro x
   have he : {c : GWord N → ℕ | g c = x} = {c : GWord N → ℕ | f c = x} := by
     ext c
-    rw [Set.mem_setOf_eq, Set.mem_setOf_eq, h c]
+    rw [Set.mem_ofPred_eq, Set.mem_ofPred_eq, h c]
   rw [he]
   exact hf x
 
@@ -445,7 +445,7 @@ lemma preimage {X : Type*} [Countable X] {f : (GWord N → ℕ) → X}
     (hf : FibreMeasurableG f) (s : Set X) : MeasurableSet {c : GWord N → ℕ | f c ∈ s} := by
   have he : {c : GWord N → ℕ | f c ∈ s} = ⋃ x ∈ s, {c : GWord N → ℕ | f c = x} := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iUnion, exists_prop]
+    simp only [Set.mem_ofPred_eq, Set.mem_iUnion, exists_prop]
     exact ⟨fun hc ↦ ⟨f c, hc, rfl⟩, by rintro ⟨x, hx, rfl⟩; exact hx⟩
   rw [he]
   exact MeasurableSet.biUnion (Set.to_countable _) fun x _ ↦ hf x
@@ -476,7 +476,7 @@ lemma comp {X Y : Type*} [Countable X] {g : (GWord N → ℕ) → X}
   have he : {c : GWord N → ℕ | h (g c) c = y}
       = ⋃ x : X, ({c : GWord N → ℕ | g c = x} ∩ {c : GWord N → ℕ | h x c = y}) := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iUnion, Set.mem_inter_iff]
+    simp only [Set.mem_ofPred_eq, Set.mem_iUnion, Set.mem_inter_iff]
     exact ⟨fun hc ↦ ⟨g c, rfl, hc⟩, by rintro ⟨x, hx, hc⟩; rw [hx]; exact hc⟩
   rw [he]
   exact MeasurableSet.iUnion fun x ↦ (hg x).inter (hh x y)
@@ -486,7 +486,7 @@ lemma pi {X ι : Type*} [Countable ι] {g : ι → (GWord N → ℕ) → X}
   intro f
   have he : {c : GWord N → ℕ | (fun i ↦ g i c) = f} = ⋂ i, {c : GWord N → ℕ | g i c = f i} := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iInter, funext_iff]
+    simp only [Set.mem_ofPred_eq, Set.mem_iInter, funext_iff]
   rw [he]
   exact MeasurableSet.iInter fun i ↦ hg i (f i)
 
@@ -504,7 +504,7 @@ lemma measurableSet_sInf_mem_eq {α : Type*} [MeasurableSpace α] {P : ℕ → S
   rcases Nat.eq_zero_or_pos n with rfl | hn
   · have he : {a : α | sInf {k | a ∈ P k} = 0} = P 0 ∪ ⋂ k : ℕ, (P k)ᶜ := by
       ext a
-      simp only [Set.mem_setOf_eq, Set.mem_union, Set.mem_iInter, Set.mem_compl_iff]
+      simp only [Set.mem_ofPred_eq, Set.mem_union, Set.mem_iInter, Set.mem_compl_iff]
       constructor
       · intro h
         by_cases hex : ∃ k, a ∈ P k
@@ -522,7 +522,7 @@ lemma measurableSet_sInf_mem_eq {α : Type*} [MeasurableSpace α] {P : ℕ → S
   · have he : {a : α | sInf {k | a ∈ P k} = n}
         = P n ∩ ⋂ k ∈ Finset.range n, (P k)ᶜ := by
       ext a
-      simp only [Set.mem_setOf_eq, Set.mem_inter_iff, Set.mem_iInter, Set.mem_compl_iff,
+      simp only [Set.mem_ofPred_eq, Set.mem_inter_iff, Set.mem_iInter, Set.mem_compl_iff,
         Finset.mem_range]
       constructor
       · intro h
@@ -530,7 +530,7 @@ lemma measurableSet_sInf_mem_eq {α : Type*} [MeasurableSpace α] {P : ℕ → S
           by_contra hno
           have hempty : {k | a ∈ P k} = ∅ := by
             ext k
-            simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+            simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
             exact fun hk ↦ hno ⟨k, hk⟩
           rw [hempty, Nat.sInf_empty] at h
           omega
@@ -550,7 +550,7 @@ lemma measurableSet_sInf_mem_eq {α : Type*} [MeasurableSpace α] {P : ℕ → S
 
 /-- The field at an ambient vertex is a measurable function of the field. -/
 lemma measurable_ambSub (v : GWord N) : Measurable (fun c : GWord N → ℕ ↦ ambSub c v) :=
-  measurable_pi_lambda _ fun w ↦ measurable_pi_apply (v ++ w)
+  Measurable.of_eval fun w ↦ measurable_pi_apply (v ++ w)
 
 lemma fibreMeasurableG_coord (v : GWord N) : FibreMeasurableG (fun c : GWord N → ℕ ↦ c v) := by
   intro j
@@ -571,7 +571,7 @@ lemma fibreMeasurableG_sampleHeight : FibreMeasurableG (sampleHeight : (GWord N 
     have he : {d : GWord N → ℕ | ∀ u ∈ sample d, u.length ≤ n}
         = ⋂ u ∈ {u : GWord N | n < u.length}, {d : GWord N → ℕ | u ∈ sample d}ᶜ := by
       ext d
-      simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.mem_compl_iff]
+      simp only [Set.mem_ofPred_eq, Set.mem_iInter, Set.mem_compl_iff]
       constructor
       · intro h u hu hmem
         have hlen := h u hmem
@@ -643,7 +643,7 @@ lemma measurable_gSplitField : Measurable (gSplitField : (GWord N → ℕ) → G
       = ⋃ n : ℕ, ({c : GWord N → ℕ | gSplitDepth c = n}
           ∩ (fun c : GWord N → ℕ ↦ neckIter c n) ⁻¹' t) := by
     ext c
-    simp only [Set.mem_preimage, Set.mem_iUnion, Set.mem_inter_iff, Set.mem_setOf_eq]
+    simp only [Set.mem_preimage, Set.mem_iUnion, Set.mem_inter_iff, Set.mem_ofPred_eq]
     constructor
     · intro hc
       exact ⟨gSplitDepth c, rfl, hc⟩

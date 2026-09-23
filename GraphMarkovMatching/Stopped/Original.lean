@@ -54,15 +54,15 @@ decreasing_by all_goals omega
 /-- The balanced profile of a counter `j ≥ 4`. -/
 lemma rem_of_four_le {j : ℕ} (hj : 4 ≤ j) :
     rem j = MTree.node (rem (j / 2)) (rem (j - j / 2)) := by
-  rw [rem, dif_pos hj]
+  rw [rem, dite_eq_left hj]
 
 /-- The balanced profile of the counter `3`. -/
 lemma rem_three : rem 3 = MTree.node (MTree.node MTree.leaf MTree.leaf) MTree.leaf := by
-  rw [rem, dif_neg (by omega), if_pos rfl]
+  rw [rem, dite_eq_right (by omega), ite_eq_left rfl]
 
 /-- The balanced profile of a counter at most `2`. -/
 lemma rem_of_le_two {j : ℕ} (hj : j ≤ 2) : rem j = MTree.node MTree.leaf MTree.leaf := by
-  rw [rem, dif_neg (by omega), if_neg (by omega)]
+  rw [rem, dite_eq_right (by omega), ite_eq_right (by omega)]
 
 /-- The balanced profile of the counter `2`. -/
 lemma rem_two : rem 2 = MTree.node MTree.leaf MTree.leaf := rem_of_le_two le_rfl
@@ -136,21 +136,21 @@ lemma nuBar_apply (ν : PMF ℕ) (k : ℕ) :
   rw [nuBar, PMF.map_apply]
   by_cases h2 : k = 2
   · subst h2
-    rw [if_pos rfl, tsum_eq_sum (s := {0, 1, 2}) (fun b hb => by
-      rw [if_neg]
+    rw [ite_eq_left rfl, tsum_eq_sum (s := {0, 1, 2}) (fun b hb => by
+      rw [ite_eq_right]
       simp only [Finset.mem_insert, Finset.mem_singleton] at hb
       omega)]
     simp [Finset.sum_insert, add_assoc]
-  · rw [if_neg h2]
+  · rw [ite_eq_right h2]
     by_cases hk : k < 2
-    · rw [if_pos hk]
-      exact ENNReal.tsum_eq_zero.mpr fun a => by rw [if_neg (by omega)]
-    · rw [if_neg hk]
+    · rw [ite_eq_left hk]
+      exact ENNReal.tsum_eq_zero.mpr fun a => by rw [ite_eq_right (by omega)]
+    · rw [ite_eq_right hk]
       refine (tsum_congr fun a => ?_).trans (tsum_ite_eq k ν)
       by_cases hak : a = k
       · subst hak
-        rw [if_pos rfl, if_pos (by omega)]
-      · rw [if_neg hak, if_neg (by omega)]
+        rw [ite_eq_left rfl, ite_eq_left (by omega)]
+      · rw [ite_eq_right hak, ite_eq_right (by omega)]
 
 /-- The merged law charges exactly the merged support. -/
 lemma nuBar_ne_zero_iff (ν : PMF ℕ) (supp : Finset ℕ) (hsupp : ∀ k, ν k ≠ 0 ↔ k ∈ supp)
@@ -166,7 +166,7 @@ lemma nuBar_ne_zero_iff (ν : PMF ℕ) (supp : Finset ℕ) (hsupp : ∀ k, ν k 
 lemma le_nuBar (ν : PMF ℕ) (k : ℕ) : ν k ≤ nuBar ν (max k 2) := by
   rw [nuBar, PMF.map_apply]
   refine le_trans ?_ (ENNReal.le_tsum k)
-  rw [if_pos rfl]
+  rw [ite_eq_left rfl]
 
 /-- Every merged counter is at least `2`. -/
 lemma two_le_of_mem_suppBar {supp : Finset ℕ} {k : ℕ} (hk : k ∈ suppBar supp) : 2 ≤ k := by
@@ -393,8 +393,8 @@ lemma failureD_map_eq {X X' : Type} (ρs ρt : PMF X) (Q : X → X → Prop) (f 
   congr 1
   simp only [badInd]
   by_cases h : Q x y
-  · rw [if_pos h, if_pos ((hQ x y).mp h)]
-  · rw [if_neg h, if_neg fun h' => h ((hQ x y).mpr h')]
+  · rw [ite_eq_left h, ite_eq_left ((hQ x y).mp h)]
+  · rw [ite_eq_right h, ite_eq_right fun h' => h ((hQ x y).mpr h')]
 
 section Identification
 
@@ -612,16 +612,16 @@ decreasing_by all_goals omega
 /-- The grafted profile of a counter `v ≥ 4`: the designated path continues to the left. -/
 lemma graftPort_of_four_le (g : MTree) {v : ℕ} (hv : 4 ≤ v) :
     graftPort g v = MTree.node (graftPort g (v / 2)) (rem (v - v / 2)) := by
-  rw [graftPort, dif_pos hv]
+  rw [graftPort, dite_eq_left hv]
 
 /-- The grafted profile of the counter `3`: the designated leaf is the right child. -/
 lemma graftPort_three (g : MTree) : graftPort g 3 = MTree.node (rem 2) g := by
-  rw [graftPort, dif_neg (by omega), if_pos rfl]
+  rw [graftPort, dite_eq_right (by omega), ite_eq_left rfl]
 
 /-- The grafted profile of a counter at most `2`: the designated leaf is the left child. -/
 lemma graftPort_of_le_two (g : MTree) {v : ℕ} (hv : v ≤ 2) :
     graftPort g v = MTree.node g MTree.leaf := by
-  rw [graftPort, dif_neg (by omega), if_neg (by omega)]
+  rw [graftPort, dite_eq_right (by omega), ite_eq_right (by omega)]
 
 /-- The grafted profile has `max v 2 - 1` leaves of the balanced profile plus the leaves of
 the graft (the composite reference model: the arity `a + b - 1`). -/

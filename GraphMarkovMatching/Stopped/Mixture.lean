@@ -62,9 +62,9 @@ theorem zero_mixture_convexity {ι : Type} {α : ℝ} (hα : 1 ≤ α) (p : ι �
           * (if (∑' i, p i * r i) = 0 then 0 else (∑' i, p i * r i) ^ (-α)) := by
   set rbar := ∑' i, p i * r i with hrbar_def
   by_cases h0 : rbar = 0
-  · rw [if_pos h0]
+  · rw [ite_eq_left h0]
     exact zero_le
-  rw [if_neg h0, if_neg h0]
+  rw [ite_eq_right h0, ite_eq_right h0]
   set w := ∑' i, p i * (if r i = 0 then 1 else 0) with hw_def
   set N := ∑' i, p i * (if r i = 0 then 0 else 1) with hN_def
   set A := ∑' i, p i * (if r i = 0 then 0 else 1 - r i) with hA_def
@@ -82,7 +82,7 @@ theorem zero_mixture_convexity {ι : Type} {α : ℝ} (hα : 1 ≤ α) (p : ι �
     rw [← mul_add]
     by_cases hi : r i = 0
     · simp [hi]
-    · rw [if_neg hi, if_neg hi, tsub_add_cancel_of_le (hr i)]
+    · rw [ite_eq_right hi, ite_eq_right hi, tsub_add_cancel_of_le (hr i)]
   have hN1 : N ≤ 1 := by rw [← hwN]; exact le_add_self
   have hw1 : w ≤ 1 := by rw [← hwN]; exact le_self_add
   have hN_top : N ≠ ⊤ := ne_top_of_le_ne_top ENNReal.one_ne_top hN1
@@ -109,7 +109,7 @@ theorem zero_mixture_convexity {ι : Type} {α : ℝ} (hα : 1 ≤ α) (p : ι �
     refine tsum_congr fun i => ?_
     by_cases hi : r i = 0
     · simp [hi]
-    · rw [if_neg hi, if_neg hi, ENNReal.ofReal_sub _ ENNReal.toReal_nonneg,
+    · rw [ite_eq_right hi, ite_eq_right hi, ENNReal.ofReal_sub _ ENNReal.toReal_nonneg,
         ENNReal.ofReal_toReal (hr_top i), ENNReal.ofReal_one, mul_one, mul_assoc]
   have hright : (∑' i, c * (p i * (if r i = 0 then 0 else 1)) * phiE α (1 - (r i).toReal))
       = c * S := by
@@ -117,7 +117,7 @@ theorem zero_mixture_convexity {ι : Type} {α : ℝ} (hα : 1 ≤ α) (p : ι �
     refine tsum_congr fun i => ?_
     by_cases hi : r i = 0
     · simp [hi]
-    · rw [if_neg hi, if_neg hi, mul_one, mul_assoc]
+    · rw [ite_eq_right hi, ite_eq_right hi, mul_one, mul_assoc]
   rw [hmean, hright] at hJ
   have hNJ : N * phiE α (c * A).toReal ≤ S := by
     calc N * phiE α (c * A).toReal ≤ N * (c * S) := mul_le_mul_right hJ _
@@ -217,8 +217,8 @@ lemma tsum_prod_mul_le {X : Type} (ρ₁ ρ₂ : PMF X) (G : X × X → ℝ≥0�
 lemma ite_rpow_eq_WresD {X : Type} (α : ℝ) (ρ : PMF X) (R : X → X → Prop) (x : X) :
     (if rE ρ R x = 0 then 0 else (rE ρ R x) ^ (-α)) = WresD α ρ R x := by
   by_cases h0 : rE ρ R x = 0
-  · rw [if_pos h0, WresD, if_pos h0]
-  · rw [if_neg h0, rE_rpow_neg_eq_WresD _ _ _ h0]
+  · rw [ite_eq_left h0, WresD, ite_eq_left h0]
+  · rw [ite_eq_right h0, rE_rpow_neg_eq_WresD _ _ _ h0]
 
 /-- The constant bookkeeping of `sec:averaging`: the fixed-pair bound plus the mixture
 error `(α+1) B · 4(1+αM) E` is at most `Q(M)` with `C = 4 + 8(α+1)B`. -/
@@ -268,9 +268,9 @@ lemma wZero_singleton_eq (α : ℝ) (s a u : I) (h : ℕ) :
   · have hz : M.ZeroEv {a} h x := fun t ht => by
       rw [Set.mem_singleton_iff.mp ht]
       exact hx
-    rw [if_pos hz, if_pos hx, one_mul]
+    rw [ite_eq_left hz, ite_eq_left hx, one_mul]
   · have hz : ¬ M.ZeroEv {a} h x := fun hz => hx (hz a (Set.mem_singleton a))
-    rw [if_neg hz, if_neg hx, zero_mul]
+    rw [ite_eq_right hz, ite_eq_right hx, zero_mul]
 
 /-- **The pointwise mixture bound** (`thm:zero-mixture-convexity` at the target child-pair
 mixture): the restricted summand against the mixture is at most the mixture of the
@@ -391,14 +391,14 @@ lemma ite_pair_zero_le (j : I × I) (h : ℕ) (x : FullLab (I × V) h × FullLab
         else 0)
       ≤ (if M.deg j.1 h x.1 = 0 then 1 else 0) + (if M.deg j.2 h x.2 = 0 then 1 else 0) := by
   by_cases hr : rE (prodPMF (M.rho j.1 h) (M.rho j.2 h)) (SquareRel (M.sim h)) x = 0
-  · rw [if_pos hr]
+  · rw [ite_eq_left hr]
     have h' := ((rE_square_eq_zero_iff (M.rho j.1 h) (M.rho j.2 h) (M.sim h) x.1 x.2).mp hr).1
     rcases mul_eq_zero.mp h' with h1 | h2
-    · rw [if_pos (show M.deg j.1 h x.1 = 0 from h1)]
+    · rw [ite_eq_left (show M.deg j.1 h x.1 = 0 from h1)]
       exact le_add_right le_rfl
-    · rw [if_pos (show M.deg j.2 h x.2 = 0 from h2)]
+    · rw [ite_eq_left (show M.deg j.2 h x.2 = 0 from h2)]
       exact le_add_left le_rfl
-  · rw [if_neg hr]
+  · rw [ite_eq_right hr]
     exact zero_le
 
 /-- **The averaged transition at a fixed source pair** (`sec:averaging`): the restricted
@@ -652,7 +652,7 @@ theorem childPair_le_of_delta_zero (hc : M.IsCompat) (hδ : M.delta = 0) {α : �
               rcases mul_eq_zero.mp h' with h1 | h2
               · exact M.deg_ne_zero_of_delta_zero hc hδ h j₀.1 j.1 x.1 hx1 h1
               · exact M.deg_ne_zero_of_delta_zero hc hδ h j₀.2 j.2 x.2 hx2 h2
-            rw [if_neg hr, mul_zero]
+            rw [ite_eq_right hr, mul_zero]
           refine mul_le_mul' le_rfl ?_
           have key := M.pointwise_childMix_le hα t h x
           rw [hzero, mul_zero, zero_mul, add_zero] at key

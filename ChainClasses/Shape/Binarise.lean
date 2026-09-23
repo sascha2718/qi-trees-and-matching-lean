@@ -95,18 +95,18 @@ lemma length_cutForest_le (s : ℕ) : ∀ t : Tri, (cutForest s t).length ≤ re
   induction t with
   | leaf =>
       by_cases h : IsCut s (.leaf : Tri)
-      · rw [cutForest_leaf, if_pos h]; simp
-      · rw [cutForest_leaf, if_neg h]; simp
+      · rw [cutForest_leaf, ite_eq_left h]; simp
+      · rw [cutForest_leaf, ite_eq_right h]; simp
   | one t ih =>
       by_cases h : IsCut s (.one t)
-      · rw [cutForest_one, if_pos h]; simp
-      · rw [cutForest_one, if_neg h, remSize_of_not_isCut h]
+      · rw [cutForest_one, ite_eq_left h]; simp
+      · rw [cutForest_one, ite_eq_right h, remSize_of_not_isCut h]
         simp only [rawSize]
         omega
   | two l r ihl ihr =>
       by_cases h : IsCut s (.two l r)
-      · rw [cutForest_two, if_pos h]; simp
-      · rw [cutForest_two, if_neg h, remSize_of_not_isCut h]
+      · rw [cutForest_two, ite_eq_left h]; simp
+      · rw [cutForest_two, ite_eq_right h, remSize_of_not_isCut h]
         simp only [rawSize, List.length_append]
         omega
 
@@ -776,14 +776,14 @@ lemma part_append : ∀ (T : Tri) (p v : Word),
       have hcons : (a :: p) ++ v = a :: (p ++ v) := by simp
       rw [hcons, part_cons, hIH]
       by_cases hX : part s (subAt T (a :: p)) v = []
-      · simp only [if_pos hX]
+      · simp only [ite_eq_left hX]
         exact (part_cons T a p).symm
-      · simp only [if_neg hX]
+      · simp only [ite_eq_right hX]
         have hne : p ++ part s (subAt T (a :: p)) v ≠ [] := by
           intro h
           simp only [List.append_eq_nil_iff] at h
           exact hX h.2
-        rw [if_neg hne]
+        rw [ite_eq_right hne]
         simp
 
 /-- The part of a vertex below a part root is the part root exactly when the
@@ -794,13 +794,13 @@ lemma part_append_eq_self_iff {T : Tri} {p : Word} (hp : part s T p = p) (v : Wo
   constructor
   · intro h
     by_contra hX
-    rw [if_neg hX] at h
+    rw [ite_eq_right hX] at h
     have hlen := congrArg List.length h
     simp only [List.length_append] at hlen
     have : part s (subAt T p) v = [] := List.length_eq_zero_iff.mp (by omega)
     exact hX this
   · intro hX
-    rw [if_pos hX]
+    rw [ite_eq_left hX]
 
 /-! ### The vertices of one part -/
 
@@ -829,9 +829,9 @@ tops no part below and the child is not cut. -/
 private lemma branch_eq_nil_iff (a : Bool) (X : Word) (c : Prop) [Decidable c] :
     (if X = [] then (if c then [a] else ([] : Word)) else a :: X) = [] ↔ X = [] ∧ ¬ c := by
   by_cases hX : X = []
-  · rw [if_pos hX]
+  · rw [ite_eq_left hX]
     by_cases hc : c <;> simp [hc, hX]
-  · rw [if_neg hX]
+  · rw [ite_eq_right hX]
     simp [hX]
 
 /-- Membership in one branch of the list, with the cut condition read off. -/
@@ -839,8 +839,8 @@ private lemma mem_cond_map {c : Prop} [Decidable c] (a b : Bool) (L : List Word)
     (b :: v) ∈ (if c then ([] : List Word) else L.map (fun w => a :: w))
       ↔ ¬ c ∧ b = a ∧ v ∈ L := by
   by_cases h : c
-  · rw [if_pos h]; simp [h]
-  · rw [if_neg h]
+  · rw [ite_eq_left h]; simp [h]
+  · rw [ite_eq_right h]
     simp only [List.mem_map, h, not_false_iff, true_and]
     constructor
     · rintro ⟨w, hw, heq⟩
@@ -856,8 +856,8 @@ private lemma length_cond_map {c : Prop} [Decidable c] (a : Bool) (L : List Word
     (hL : L.length = n) :
     ((if c then ([] : List Word) else L.map (fun w => a :: w))).length = if c then 0 else n := by
   by_cases h : c
-  · rw [if_pos h, if_pos h]; simp
-  · rw [if_neg h, if_neg h, List.length_map, hL]
+  · rw [ite_eq_left h, ite_eq_left h]; simp
+  · rw [ite_eq_right h, ite_eq_right h, List.length_map, hL]
 
 /-- **The size of a part**: the vertices of the part topped by the root are
 counted by the remainder the root accumulates. -/
@@ -1064,7 +1064,7 @@ decreasing_by
 
 lemma binAddr_of_ne_nil {T : Tri} {q : Word} (hq : q ≠ []) :
     binAddr s T q = binAddr s T (pparent s T q) ++ blk (childIdx s T q) := by
-  rw [binAddr, dif_neg hq]
+  rw [binAddr, dite_eq_right hq]
 
 /-- A part root other than the root is one of the children of its
 part-parent. -/
@@ -1572,7 +1572,7 @@ lemma triOfList_of_not_mem {L : List Word} (h : PrefixClosedList L) (n : ℕ) {w
   | succ n =>
       have h1 : w ++ [true] ∉ L := fun hc => hw (h _ _ (List.prefix_append w [true]) hc)
       have h2 : w ++ [false] ∉ L := fun hc => hw (h _ _ (List.prefix_append w [false]) hc)
-      rw [triOfList, if_neg h1, if_neg h2]
+      rw [triOfList, ite_eq_right h1, ite_eq_right h2]
 
 /-- Every listed address is an address of the tree. -/
 lemma isAddr_triOfList {L : List Word} (h : PrefixClosedList L) :
@@ -1596,15 +1596,15 @@ lemma isAddr_triOfList {L : List Word} (h : PrefixClosedList L) :
               have hf : w ++ [false] ∈ L :=
                 h _ _ (List.prefix_append _ _) hv
               by_cases ht : w ++ [true] ∈ L
-              · rw [triOfList, if_pos ht, isAddr_two_false]
+              · rw [triOfList, ite_eq_left ht, isAddr_two_false]
                 exact ih _ _ hv (by simpa using hlen)
-              · rw [triOfList, if_neg ht, if_pos hf, isAddr_one_false]
+              · rw [triOfList, ite_eq_right ht, ite_eq_left hf, isAddr_one_false]
                 exact ih _ _ hv (by simpa using hlen)
           | true =>
               have hsplit : w ++ true :: v = (w ++ [true]) ++ v := by simp
               rw [hsplit] at hv
               have ht : w ++ [true] ∈ L := h _ _ (List.prefix_append _ _) hv
-              rw [triOfList, if_pos ht, isAddr_two_true]
+              rw [triOfList, ite_eq_left ht, isAddr_two_true]
               exact ih _ _ hv (by simpa using hlen)
 
 /-- Every address of the tree is listed, or is a leaf filling an absent
@@ -1622,7 +1622,7 @@ lemma mem_or_dummy_triOfList {L : List Word} (h : PrefixClosedList L) :
   | succ n ih =>
       intro w v hw hv
       by_cases ht : w ++ [true] ∈ L
-      · rw [triOfList, if_pos ht] at hv
+      · rw [triOfList, ite_eq_left ht] at hv
         cases v with
         | nil => exact Or.inl (by simpa using hw)
         | cons b v =>
@@ -1643,7 +1643,7 @@ lemma mem_or_dummy_triOfList {L : List Word} (h : PrefixClosedList L) :
                 · exact Or.inl (by simpa using hl)
                 · exact Or.inr ⟨true :: u, by simp, by simpa using hu⟩
       · by_cases hf : w ++ [false] ∈ L
-        · rw [triOfList, if_neg ht, if_pos hf] at hv
+        · rw [triOfList, ite_eq_right ht, ite_eq_left hf] at hv
           cases v with
           | nil => exact Or.inl (by simpa using hw)
           | cons b v =>
@@ -1654,7 +1654,7 @@ lemma mem_or_dummy_triOfList {L : List Word} (h : PrefixClosedList L) :
                   · exact Or.inl (by simpa using hl)
                   · exact Or.inr ⟨false :: u, by simp, by simpa using hu⟩
               | true => exact absurd hv (isAddr_one_true _ v)
-        · rw [triOfList, if_neg ht, if_neg hf] at hv
+        · rw [triOfList, ite_eq_right ht, ite_eq_right hf] at hv
           have : v = [] := eq_nil_of_isAddr_leaf hv
           subst this
           exact Or.inl (by simpa using hw)

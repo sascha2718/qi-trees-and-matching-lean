@@ -99,7 +99,7 @@ lemma gdeg_pairNetS_of_zero (π : PMF (Shape × Shape)) (Dq : ℝ) {v : Shape ×
     rw [rE]
     calc ∑' y : Shape × Shape, (if compat (pairNetS π Dq) v y then π y else 0)
         = ∑' y : Shape × Shape, π y := by
-          refine tsum_congr fun y => if_pos ?_
+          refine tsum_congr fun y => ite_eq_left ?_
           by_cases hy : y = v
           · exact Or.inl hy.symm
           · exact Or.inr ⟨fun h => hy h.symm, Or.inl hv⟩
@@ -223,8 +223,9 @@ lemma single_le_gdeg {V : Type*} (μ : PMF V) (G : SimpleGraph V) {v y : V}
     (h : compat G v y) : (μ y).toReal ≤ gdeg μ G v := by
   have hle : μ y ≤ rE μ (compat G) v := by
     rw [rE]
-    calc (μ y : ℝ≥0∞) = (if compat G v y then μ y else 0) := (if_pos h).symm
-      _ ≤ ∑' z, (if compat G v z then μ z else 0) := ENNReal.le_tsum y
+    calc (μ y : ℝ≥0∞) = (if compat G v y then μ y else 0) := (ite_eq_left h).symm
+      _ ≤ ∑' z, (if compat G v z then μ z else 0) :=
+          ENNReal.le_tsum (f := fun z : V ↦ if compat G v z then μ z else 0) y
   exact ENNReal.toReal_mono (rE_ne_top (μ := μ) (R := compat G) (x := v)) hle
 
 /-- **The tail pairs**: the mass of the pairs with a component above a size threshold is at
@@ -237,14 +238,14 @@ lemma tsum_pair_large_le (π : PMF (Shape × Shape)) (N : ℕ) :
       ≤ (if p.1.size ≤ N then 0 else π p) + (if p.2.size ≤ N then 0 else π p) := by
     intro p
     by_cases h : max p.1.size p.2.size ≤ N
-    · rw [if_pos h]
+    · rw [ite_eq_left h]
       exact zero_le
-    · rw [if_neg h]
+    · rw [ite_eq_right h]
       by_cases h1 : p.1.size ≤ N
       · have h2 : ¬ p.2.size ≤ N := fun hb => h (max_le h1 hb)
-        rw [if_pos h1, if_neg h2]
+        rw [ite_eq_left h1, ite_eq_right h2]
         exact le_add_self
-      · rw [if_neg h1]
+      · rw [ite_eq_right h1]
         exact le_self_add
   calc (∑' p : Shape × Shape, if max p.1.size p.2.size ≤ N then 0 else π p)
       ≤ ∑' p : Shape × Shape,
@@ -259,13 +260,13 @@ lemma tsum_pair_large_le (π : PMF (Shape × Shape)) (N : ℕ) :
           refine tsum_congr fun a => ?_
           by_cases h : a.size ≤ N
           · simp [h]
-          · simp only [h, if_false]
+          · simp only [h, ite_false]
             rfl
         · rw [ENNReal.tsum_prod', ENNReal.tsum_comm]
           refine tsum_congr fun b => ?_
           by_cases h : b.size ≤ N
           · simp [h]
-          · simp only [h, if_false]
+          · simp only [h, ite_false]
             rfl
 
 /-- **A size fibre of the pairs**: the mass of the pairs whose larger component has size
@@ -280,35 +281,35 @@ lemma tsum_pair_fibre_size_le (π : PMF (Shape × Shape)) (n : ℕ) :
       (tsum_congr fun v => ?_)
     by_cases hv : max v.1.size v.2.size = n
     · rw [Set.indicator_of_mem (show v ∈ {v : Shape × Shape | max v.1.size v.2.size = n}
-        from hv) π, if_pos hv]
+        from hv) π, ite_eq_left hv]
     · rw [Set.indicator_of_notMem (show v ∉ {v : Shape × Shape | max v.1.size v.2.size = n}
-        from hv) π, if_neg hv]
+        from hv) π, ite_eq_right hv]
   have hsubA : (∑' a : {a : Shape // a.size = n}, margFst π (a : Shape))
       = ∑' a : Shape, (if a.size = n then margFst π a else 0) := by
     refine (tsum_subtype {a : Shape | a.size = n} (margFst π)).trans
       (tsum_congr fun a => ?_)
     by_cases ha : a.size = n
-    · rw [Set.indicator_of_mem (show a ∈ {a : Shape | a.size = n} from ha), if_pos ha]
-    · rw [Set.indicator_of_notMem (show a ∉ {a : Shape | a.size = n} from ha), if_neg ha]
+    · rw [Set.indicator_of_mem (show a ∈ {a : Shape | a.size = n} from ha), ite_eq_left ha]
+    · rw [Set.indicator_of_notMem (show a ∉ {a : Shape | a.size = n} from ha), ite_eq_right ha]
   have hsubB : (∑' b : {b : Shape // b.size = n}, margSnd π (b : Shape))
       = ∑' b : Shape, (if b.size = n then margSnd π b else 0) := by
     refine (tsum_subtype {b : Shape | b.size = n} (margSnd π)).trans
       (tsum_congr fun b => ?_)
     by_cases hb : b.size = n
-    · rw [Set.indicator_of_mem (show b ∈ {b : Shape | b.size = n} from hb), if_pos hb]
-    · rw [Set.indicator_of_notMem (show b ∉ {b : Shape | b.size = n} from hb), if_neg hb]
+    · rw [Set.indicator_of_mem (show b ∈ {b : Shape | b.size = n} from hb), ite_eq_left hb]
+    · rw [Set.indicator_of_notMem (show b ∉ {b : Shape | b.size = n} from hb), ite_eq_right hb]
   rw [hsub, hsubA, hsubB]
   have hpt : ∀ v : Shape × Shape, (if max v.1.size v.2.size = n then π v else 0)
       ≤ (if v.1.size = n then π v else 0) + (if v.2.size = n then π v else 0) := by
     intro v
     by_cases hv : max v.1.size v.2.size = n
-    · rw [if_pos hv]
+    · rw [ite_eq_left hv]
       rcases max_choice v.1.size v.2.size with h | h
-      · rw [if_pos (h.symm.trans hv)]
+      · rw [ite_eq_left (h.symm.trans hv)]
         exact le_self_add
-      · rw [if_pos (h.symm.trans hv)]
+      · rw [ite_eq_left (h.symm.trans hv)]
         exact le_add_self
-    · rw [if_neg hv]
+    · rw [ite_eq_right hv]
       exact zero_le
   calc ∑' v : Shape × Shape, (if max v.1.size v.2.size = n then π v else 0)
       ≤ ∑' v : Shape × Shape,
@@ -322,13 +323,13 @@ lemma tsum_pair_fibre_size_le (π : PMF (Shape × Shape)) (n : ℕ) :
         · rw [ENNReal.tsum_prod']
           refine tsum_congr fun a => ?_
           by_cases h : a.size = n
-          · simp only [h, if_true]
+          · simp only [h, ite_true]
             rfl
           · simp [h]
         · rw [ENNReal.tsum_prod', ENNReal.tsum_comm]
           refine tsum_congr fun b => ?_
           by_cases h : b.size = n
-          · simp only [h, if_true]
+          · simp only [h, ite_true]
             rfl
           · simp [h]
 

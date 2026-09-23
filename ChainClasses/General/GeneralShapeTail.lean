@@ -170,7 +170,7 @@ lemma bushMeasure_coord_gt (θ : Offspring J) (hJN : J ≤ N) (v : GWord N) :
   have hdecomp : {c : GWord N → ℕ | N < c v}
       = ⋃ j : ℕ, {c : GWord N → ℕ | c v = N + 1 + j} := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iUnion]
+    simp only [Set.mem_ofPred_eq, Set.mem_iUnion]
     constructor
     · intro h
       exact ⟨c v - N - 1, by omega⟩
@@ -188,7 +188,7 @@ lemma bushMeasure_offspring_le_general (θ : Offspring J) (hJN : J ≤ N) :
   have he : {c : GWord N → ℕ | ¬ ∀ v, c v ≤ N}
       = ⋃ v : GWord N, {c : GWord N → ℕ | N < c v} := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iUnion, not_forall, not_le]
+    simp only [Set.mem_ofPred_eq, Set.mem_iUnion, not_forall, not_le]
   rw [he]
   exact measure_iUnion_null fun v ↦ bushMeasure_coord_gt θ hJN v
 
@@ -225,7 +225,7 @@ lemma skeletonWeight_one_eq_genDeriv (θ : Offspring J) (hq : θ.extinction < 1)
     θ.skeletonWeight 1 = genDeriv J θ θ.extinction := by
   rw [BranchingProcess.Offspring.skeletonWeight_of_ne_zero θ one_ne_zero]
   have h : θ.surviveWeight 1 = surviveCoeff J θ θ.extinction 1 := rfl
-  rw [h, ← tilde_one J θ hq, tilde, if_neg one_ne_zero]
+  rw [h, ← tilde_one J θ hq, tilde, ite_eq_right one_ne_zero]
 
 /-- **The mean of the conjugate law is `f'(q)`.** -/
 lemma conjugate_mean_eq (θ : Offspring J) (hq0 : 0 < θ.extinction) :

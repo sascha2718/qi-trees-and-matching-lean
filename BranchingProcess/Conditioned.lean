@@ -125,7 +125,7 @@ theorem mem_survivors_iff_mem_skeleton {c : Word N → ℕ} {i : Fin N} :
 /-- The offspring field of a child subtree is a measurable function of the field. -/
 lemma measurable_shift (i : Fin N) :
     Measurable fun c : Word N → ℕ ↦ (fun w : Word N ↦ c (i :: w)) :=
-  measurable_pi_lambda _ fun _ ↦ measurable_pi_apply _
+  Measurable.of_eval fun _ ↦ measurable_pi_apply _
 
 /-- A single letter belonging to the surviving children is a measurable event: the
 offspring count at the root is a coordinate, and survival of the child subtree is
@@ -137,7 +137,7 @@ lemma measurableSet_mem_survivors (i : Fin N) :
         ∩ ((fun c : Word N → ℕ ↦ fun w : Word N ↦ c (i :: w)) ⁻¹' {c : Word N → ℕ | Survives c})
       := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_inter_iff, Set.mem_preimage, mem_survivors, coord]
+    simp only [Set.mem_ofPred_eq, Set.mem_inter_iff, Set.mem_preimage, mem_survivors, coord]
   rw [h]
   exact (measurable_coord _ MeasurableSet.of_discrete).inter
     (measurable_shift i measurableSet_survives)
@@ -151,28 +151,28 @@ theorem measurableSet_survivors_eq (S : Finset (Fin N)) :
       = ⋂ i : Fin N, (if i ∈ S then {c : Word N → ℕ | i ∈ survivors c}
           else {c : Word N → ℕ | i ∈ survivors c}ᶜ) := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iInter]
+    simp only [Set.mem_ofPred_eq, Set.mem_iInter]
     constructor
     · rintro rfl i
       by_cases hi : i ∈ survivors c
-      · rw [if_pos hi]; exact hi
-      · rw [if_neg hi]; exact hi
+      · rw [ite_eq_left hi]; exact hi
+      · rw [ite_eq_right hi]; exact hi
     · intro h
       ext i
       by_cases hi : i ∈ S
       · have hc := h i
-        rw [if_pos hi] at hc
-        simp only [Set.mem_setOf_eq] at hc
+        rw [ite_eq_left hi] at hc
+        simp only [Set.mem_ofPred_eq] at hc
         simp [hi, hc]
       · have hc := h i
-        rw [if_neg hi] at hc
-        simp only [Set.mem_compl_iff, Set.mem_setOf_eq] at hc
+        rw [ite_eq_right hi] at hc
+        simp only [Set.mem_compl_iff, Set.mem_ofPred_eq] at hc
         simp [hi, hc]
   rw [h]
   refine MeasurableSet.iInter fun i ↦ ?_
   by_cases hi : i ∈ S
-  · rw [if_pos hi]; exact measurableSet_mem_survivors i
-  · rw [if_neg hi]; exact (measurableSet_mem_survivors i).compl
+  · rw [ite_eq_left hi]; exact measurableSet_mem_survivors i
+  · rw [ite_eq_right hi]; exact (measurableSet_mem_survivors i).compl
 
 /-- **The skeleton degree is measurable at each value**: the event is the union, over
 the finitely many candidate sets of surviving children, of the events of
@@ -182,7 +182,7 @@ theorem measurableSet_skeletonDegree_eq (k : ℕ) :
   have h : {c : Word N → ℕ | skeletonDegree c = k}
       = ⋃ S ∈ {S : Finset (Fin N) | S.card = k}, {c : Word N → ℕ | survivors c = S} := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iUnion, exists_prop]
+    simp only [Set.mem_ofPred_eq, Set.mem_iUnion, exists_prop]
     constructor
     · intro hc
       exact ⟨survivors c, hc, rfl⟩
@@ -234,18 +234,18 @@ lemma prod_ite_survivors {j : ℕ} (hj : j ≤ N) {S : Finset (Fin N)} (hS : S �
       (if i ∈ S then A else if (i : ℕ) < j then B else 1) = 1 := by
     refine Finset.prod_eq_one fun i hi ↦ ?_
     rw [Finset.mem_sdiff, mem_childSet] at hi
-    rw [if_neg fun hc ↦ hi.2 (mem_childSet.mp (hS hc)), if_neg hi.2]
+    rw [ite_eq_right fun hc ↦ hi.2 (mem_childSet.mp (hS hc)), ite_eq_right hi.2]
   have hdying : ∏ i ∈ childSet N j \ S,
       (if i ∈ S then A else if (i : ℕ) < j then B else 1) = B ^ (j - S.card) := by
     have hfac : ∀ i ∈ childSet N j \ S,
         (if i ∈ S then A else if (i : ℕ) < j then B else 1) = B := by
       intro i hi
       rw [Finset.mem_sdiff, mem_childSet] at hi
-      rw [if_neg hi.2, if_pos hi.1]
+      rw [ite_eq_right hi.2, ite_eq_left hi.1]
     rw [Finset.prod_congr rfl hfac, Finset.prod_const, Finset.card_sdiff_of_subset hS,
       card_childSet hj]
   have hsurviving : ∏ i ∈ S, (if i ∈ S then A else if (i : ℕ) < j then B else 1) = A ^ S.card := by
-    rw [Finset.prod_congr rfl fun i hi ↦ if_pos hi, Finset.prod_const]
+    rw [Finset.prod_congr rfl fun i hi ↦ ite_eq_left hi, Finset.prod_const]
   rw [← Finset.prod_sdiff (Finset.subset_univ (childSet N j)), houter, one_mul,
     ← Finset.prod_sdiff hS, hdying, hsurviving, mul_comm]
 
@@ -288,7 +288,7 @@ lemma split_preimage_skelBox (j : ℕ) (S : Finset (Fin N)) (hS : S ⊆ childSet
       = {c : Word N → ℕ | c [] = j} ∩ {c : Word N → ℕ | survivors c = S} := by
   ext c
   simp only [Set.mem_preimage, Set.mem_pi, Set.mem_univ, forall_const, Set.mem_inter_iff,
-    Set.mem_setOf_eq]
+    Set.mem_ofPred_eq]
   constructor
   · intro h
     have hroot : c [] = j := h none
@@ -299,12 +299,12 @@ lemma split_preimage_skelBox (j : ℕ) (S : Finset (Fin N)) (hS : S ⊆ childSet
     · rintro ⟨hij, hsurv⟩
       by_contra hiS
       have hchild := h (some i)
-      rw [skelBox_some, if_neg hiS, if_pos hij] at hchild
+      rw [skelBox_some, ite_eq_right hiS, ite_eq_left hij] at hchild
       exact hchild hsurv
     · intro hiS
       refine ⟨mem_childSet.mp (hS hiS), ?_⟩
       have hchild := h (some i)
-      rw [skelBox_some, if_pos hiS] at hchild
+      rw [skelBox_some, ite_eq_left hiS] at hchild
       exact hchild
   · rintro ⟨hroot, hsurv⟩ i
     cases i with
@@ -312,17 +312,17 @@ lemma split_preimage_skelBox (j : ℕ) (S : Finset (Fin N)) (hS : S ⊆ childSet
     | some i =>
         rw [skelBox_some]
         by_cases hiS : i ∈ S
-        · rw [if_pos hiS]
+        · rw [ite_eq_left hiS]
           have hmem : i ∈ survivors c := by rw [hsurv]; exact hiS
           exact (mem_survivors.mp hmem).2
-        · rw [if_neg hiS]
+        · rw [ite_eq_right hiS]
           by_cases hij : (i : ℕ) < j
-          · rw [if_pos hij]
+          · rw [ite_eq_left hij]
             intro hc
             refine hiS ?_
             rw [← hsurv]
             exact mem_survivors.mpr ⟨by rw [hroot]; exact hij, hc⟩
-          · rw [if_neg hij]
+          · rw [ite_eq_right hij]
             exact Set.mem_univ _
 
 /-- The root factor of the product: the offspring count at the root has the offspring
@@ -352,13 +352,13 @@ theorem sampleMeasure_root_survivors (θ : Offspring J) (hJN : J ≤ N) {j : ℕ
     refine Finset.prod_congr rfl fun i _ ↦ ?_
     rw [skelBox_some]
     by_cases hiS : i ∈ S
-    · rw [if_pos hiS, if_pos hiS]
+    · rw [ite_eq_left hiS, ite_eq_left hiS]
       exact (infinitePi_branch_some θ i _).trans (sampleMeasure_survives θ hJN)
-    · rw [if_neg hiS, if_neg hiS]
+    · rw [ite_eq_right hiS, ite_eq_right hiS]
       by_cases hij : (i : ℕ) < j
-      · rw [if_pos hij, if_pos hij]
+      · rw [ite_eq_left hij, ite_eq_left hij]
         exact (infinitePi_branch_some θ i _).trans (sampleMeasure_not_survives θ hJN)
-      · rw [if_neg hij, if_neg hij]
+      · rw [ite_eq_right hij, ite_eq_right hij]
         exact (infinitePi_branch_some θ i Set.univ).trans measure_univ
 
 /-! ### The binomial count over the surviving children -/
@@ -397,10 +397,10 @@ noncomputable def skeletonWeight (θ : Offspring J) (k : ℕ) : ℝ :=
 /-- Off zero the skeleton law is the quotient. -/
 lemma skeletonWeight_of_ne_zero (θ : Offspring J) {k : ℕ} (hk : k ≠ 0) :
     θ.skeletonWeight k = θ.surviveWeight k / (1 - θ.extinction) := by
-  rw [skeletonWeight, if_neg hk]
+  rw [skeletonWeight, ite_eq_right hk]
 
 @[simp] lemma skeletonWeight_zero (θ : Offspring J) : θ.skeletonWeight 0 = 0 := by
-  rw [skeletonWeight, if_pos rfl]
+  rw [skeletonWeight, ite_eq_left rfl]
 
 end Offspring
 
@@ -426,7 +426,7 @@ lemma measure_root_skeletonDegree_eq_sum (μ : MeasureTheory.Measure (Word N →
       = ⋃ S ∈ (childSet N j).powersetCard k,
           (({c : Word N → ℕ | c [] = j} ∩ {c : Word N → ℕ | survivors c = S}) ∩ Q S) := by
     ext c
-    simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_iUnion, Finset.mem_powersetCard,
+    simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, Set.mem_iUnion, Finset.mem_powersetCard,
       exists_prop]
     constructor
     · rintro ⟨⟨hroot, hk⟩, hXc⟩
@@ -583,7 +583,7 @@ theorem survivalMeasure_skeletonDegree (θ : Offspring J) (hJN : J ≤ N)
     have hempty : {c : Word N → ℕ | Survives c} ∩ {c : Word N → ℕ | skeletonDegree c = 0}
         = (∅ : Set (Word N → ℕ)) := by
       ext c
-      simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false, not_and]
+      simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false, not_and]
       exact fun h ↦ survives_iff_skeletonDegree_ne_zero.mp h
     rw [hempty, measure_empty, mul_zero, Offspring.skeletonWeight_zero, ENNReal.ofReal_zero]
   · rw [survivalMeasure_apply]
@@ -616,7 +616,7 @@ theorem bushMeasure_root (θ : Offspring J) (hJN : J ≤ N) (hq : 0 < θ.extinct
   have hinter : {c : Word N → ℕ | ¬ Survives c} ∩ {c : Word N → ℕ | c [] = j}
       = {c : Word N → ℕ | c [] = j} ∩ {c : Word N → ℕ | survivors c = ∅} := by
     ext c
-    simp only [Set.mem_inter_iff, Set.mem_setOf_eq, not_survives_iff_survivors_eq_empty]
+    simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, not_survives_iff_survivors_eq_empty]
     exact And.comm
   rw [hinter, sampleMeasure_root_survivors θ hJN hj (Finset.empty_subset _),
     sampleMeasure_not_survives θ hJN, Finset.card_empty, pow_zero, mul_one, Nat.sub_zero,

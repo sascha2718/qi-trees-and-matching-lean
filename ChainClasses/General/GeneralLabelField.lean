@@ -101,9 +101,9 @@ noncomputable def gLab (D : ℝ) {θ' : Offspring J'} (π : GCouplings θ')
 lemma measurableSet_gDraw_fibre {θ' : Offspring J'} (π : GCouplings θ') (κ : ℕ)
     (σ τ : GShape) : MeasurableSet {r : ℝ | gDraw π κ σ r = τ} := by
   by_cases h : 2 ≤ κ ∧ 0 < reducedWeight θ' κ
-  · simp only [gDraw, dif_pos h]
+  · simp only [gDraw, dite_eq_left h]
     exact measurableSet_condDraw_fibre _ σ τ
-  · simp only [gDraw, dif_neg h]
+  · simp only [gDraw, dite_eq_right h]
     exact MeasurableSet.const _
 
 /-- The partner field is measurable on the labelled space. -/
@@ -115,7 +115,7 @@ lemma measurableSet_gPartner_fibre {θ' : Offspring J'} (π : GCouplings θ') (u
           ({c : GWord N' → ℕ | gShapeAt c u = p.1} ∩ {c : GWord N' → ℕ | gArityAt c u = p.2})
             ×ˢ {U : GWord N' → ℝ | gDraw π p.2 p.1 (U u) = τ} := by
     ext ⟨c, U⟩
-    simp only [Set.mem_setOf_eq, Set.mem_iUnion, Set.mem_prod, Set.mem_inter_iff, gPartner,
+    simp only [Set.mem_ofPred_eq, Set.mem_iUnion, Set.mem_prod, Set.mem_inter_iff, gPartner,
       Prod.exists]
     constructor
     · intro h
@@ -136,7 +136,7 @@ lemma measurableSet_gLab_fibre (D : ℝ) {θ' : Offspring J'} (π : GCouplings �
       = ⋃ τ : {τ : GShape // gNetLab D τ = a},
           {ω : (GWord N' → ℕ) × (GWord N' → ℝ) | gPartner π ω u = τ} := by
     ext ω
-    simp only [Set.mem_setOf_eq, Set.mem_iUnion, gLab, Subtype.exists, exists_prop]
+    simp only [Set.mem_ofPred_eq, Set.mem_iUnion, gLab, Subtype.exists, exists_prop]
     exact ⟨fun h ↦ ⟨_, h, rfl⟩, by rintro ⟨τ, hτ, rfl⟩; exact hτ⟩
   rw [hset]
   exact MeasurableSet.iUnion fun τ ↦ measurableSet_gPartner_fibre π u τ
@@ -178,7 +178,7 @@ theorem labelMeasure_partner_pattern (θ : Offspring J) (hJN : J ≤ N)
         ∩ {ω : (GWord N' → ℕ) × (GWord N' → ℝ) | gArityAt ω.1 u = k u}))
       = ⋂ u ∈ F, {ω : (GWord N' → ℕ) × (GWord N' → ℝ) | lab u (X ω.1 u) (ω.2 u) = a u} := by
     ext ω
-    simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_setOf_eq, hlab, hX, ha, gPartner,
+    simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_ofPred_eq, hlab, hX, ha, gPartner,
       Prod.mk.injEq]
   have hXm : ∀ u (t : GShape × ℕ), MeasurableSet {c : GWord N' → ℕ | X c u = t} := by
     intro u t
@@ -240,7 +240,7 @@ theorem labelMeasure_partner_pattern (θ : Offspring J) (hJN : J ≤ N)
     fun g u ↦ if h : u ∈ F then g ⟨u, h⟩ else gOne with hgext
   have hgext_apply : ∀ (g : ↥F → GShape) (u : ↥F), gext g u = g u := by
     intro g u
-    simp only [hgext, dif_pos u.2]
+    simp only [hgext, dite_eq_left u.2]
   have hterm : ∀ g : ↥F → GShape, G (emb g)
       = survivalMeasure (N := N') θ' (⋂ u ∈ F, {c : GWord N' → ℕ | gArityAt c u = k u})
           * ∏ u : ↥F, (π (k u) (hk2 u u.2) (hν u)) (g u, τ u) := by
@@ -249,7 +249,7 @@ theorem labelMeasure_partner_pattern (θ : Offspring J) (hJN : J ≤ N)
         = ⋂ u ∈ F, ({c : GWord N' → ℕ | gShapeAt c u = gext g u}
             ∩ {c : GWord N' → ℕ | gArityAt c u = k u}) := by
       ext c
-      simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_setOf_eq, hX, hemb, Prod.mk.injEq]
+      simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_ofPred_eq, hX, hemb, Prod.mk.injEq]
       constructor
       · intro h u hu
         obtain ⟨h1, h2⟩ := h ⟨u, hu⟩
@@ -263,8 +263,8 @@ theorem labelMeasure_partner_pattern (θ : Offspring J) (hJN : J ≤ N)
       intro u
       congr 1
       ext r
-      simp only [Set.mem_setOf_eq, hlab, hemb, ha, Prod.mk.injEq, and_true, gDraw,
-        dif_pos (And.intro (hk2 u u.2) (hν u))]
+      simp only [Set.mem_ofPred_eq, hlab, hemb, ha, Prod.mk.injEq, and_true, gDraw,
+        dite_eq_left (And.intro (hk2 u u.2) (hν u))]
     have hfac : ∀ u : ↥F, gCondMass (N := N') θ' (k u) (g u)
         * volume {r ∈ Set.Ico (0 : ℝ) 1 |
             condDraw (π (k u) (hk2 u u.2) (hν u)) (g u) r = τ u}
@@ -333,7 +333,7 @@ theorem labelMeasure_label_pattern (θ : Offspring J) (hJN : J ≤ N)
     fun g u ↦ if h : u ∈ F then g ⟨u, h⟩ else gOne with hgext
   have hgext_apply : ∀ (g : ↥F → GShape) (u : ↥F), gext g u = g u := by
     intro g u
-    simp only [hgext, dif_pos u.2]
+    simp only [hgext, dite_eq_left u.2]
   set S : Set (↥F → GShape) := {g | ∀ u : ↥F, gNetLab D (g u) = a u} with hS
   set E : (↥F → GShape) → Set ((GWord N' → ℕ) × (GWord N' → ℝ)) := fun g ↦
     ⋂ u ∈ F, ({ω : (GWord N' → ℕ) × (GWord N' → ℝ) | gPartner π ω u = gext g u}
@@ -342,22 +342,22 @@ theorem labelMeasure_label_pattern (θ : Offspring J) (hJN : J ≤ N)
         ∩ {ω : (GWord N' → ℕ) × (GWord N' → ℝ) | gArityAt ω.1 u = k u}))
       = ⋃ g : ↥S, E g := by
     ext ω
-    simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_iUnion, gLab, hE,
+    simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_ofPred_eq, Set.mem_iUnion, gLab, hE,
       hS, Subtype.exists, exists_prop]
     constructor
     · intro h
       refine ⟨fun u ↦ gPartner π ω u, fun u ↦ (h u u.2).1, fun u hu ↦ ⟨?_, (h u hu).2⟩⟩
-      simp only [hgext, dif_pos hu]
+      simp only [hgext, dite_eq_left hu]
     · rintro ⟨g, hgS, hg⟩ u hu
       obtain ⟨h1, h2⟩ := hg u hu
       refine ⟨?_, h2⟩
       rw [h1]
-      simp only [hgext, dif_pos hu]
+      simp only [hgext, dite_eq_left hu]
       exact hgS ⟨u, hu⟩
   have hdisj : Pairwise (Function.onFun Disjoint fun g : ↥S ↦ E g) := by
     intro g g' hne
     refine Set.disjoint_left.mpr fun ω hω hω' ↦ hne (Subtype.ext (funext fun u ↦ ?_))
-    simp only [hE, Set.mem_iInter, Set.mem_inter_iff, Set.mem_setOf_eq] at hω hω'
+    simp only [hE, Set.mem_iInter, Set.mem_inter_iff, Set.mem_ofPred_eq] at hω hω'
     have e1 := (hω u u.2).1
     have e2 := (hω' u u.2).1
     rw [hgext_apply] at e1 e2
@@ -381,7 +381,7 @@ theorem labelMeasure_label_pattern (θ : Offspring J) (hJN : J ≤ N)
           then gMixMass (N := N) θ ((g : ↥F → GShape) u) else 0) := by
     intro g
     rw [h1]
-    exact Finset.prod_congr rfl fun u _ ↦ by rw [if_pos (g.2 u)]
+    exact Finset.prod_congr rfl fun u _ ↦ by rw [ite_eq_left (g.2 u)]
   rw [tsum_congr h2]
   rw [tsum_subtype_eq_of_support_subset (s := S) (f := fun g : ↥F → GShape ↦
     ∏ u : ↥F, if gNetLab D (g u) = a u then gMixMass (N := N) θ (g u) else 0) ?_]
@@ -391,9 +391,9 @@ theorem labelMeasure_label_pattern (θ : Offspring J) (hJN : J ≤ N)
   · intro g hg
     by_contra hgS
     apply hg
-    simp only [hS, Set.mem_setOf_eq, not_forall] at hgS
+    simp only [hS, Set.mem_ofPred_eq, not_forall] at hgS
     obtain ⟨u, hu⟩ := hgS
-    exact Finset.prod_eq_zero (Finset.mem_univ u) (if_neg hu)
+    exact Finset.prod_eq_zero (Finset.mem_univ u) (ite_eq_right hu)
 
 /-! ### The marginal at the root -/
 
@@ -427,8 +427,8 @@ lemma labelMeasure_root_arity_null (θ' : Offspring J') (hJN' : J' ≤ N')
       simp [gArityAt]
     rw [labelMeasure, hset, Measure.prod_prod, measure_univ, mul_one]
     refine measure_mono_null (t := {c : GWord N' → ℕ | 2 ≤ gArity c}ᶜ) (fun c hc ↦ ?_) ?_
-    · simp only [Set.mem_setOf_eq] at hc
-      simp only [Set.mem_compl_iff, Set.mem_setOf_eq, hc]
+    · simp only [Set.mem_ofPred_eq] at hc
+      simp only [Set.mem_compl_iff, Set.mem_ofPred_eq, hc]
       exact h2
     · have hm : MeasurableSet {c : GWord N' → ℕ | 2 ≤ gArity c} :=
         fibreMeasurableG_gArity.preimage {k : ℕ | 2 ≤ k}
@@ -456,7 +456,7 @@ theorem labelMeasure_label_marginal (θ : Offspring J) (hJN : J ≤ N)
   have hAdisj : Pairwise (Function.onFun Disjoint A) := by
     intro κ κ' hne
     refine Set.disjoint_left.mpr fun ω hω hω' ↦ hne ?_
-    simp only [hA, Set.mem_setOf_eq] at hω hω'
+    simp only [hA, Set.mem_ofPred_eq] at hω hω'
     rw [← hω, ← hω']
   have hAcover : (⋃ κ, A κ) = Set.univ := by
     ext ω

@@ -182,9 +182,9 @@ lemma wedge_prefix_left (x y : Word) : wedge x y <+: x := by
       | cons b y =>
           rw [wedge_cons_cons]
           by_cases h : a = b
-          · rw [if_pos h]
+          · rw [ite_eq_left h]
             exact (List.cons_prefix_cons).mpr ⟨rfl, ih y⟩
-          · rw [if_neg h]
+          · rw [ite_eq_right h]
             exact List.nil_prefix
 
 lemma wedge_prefix_right (x y : Word) : wedge x y <+: y := by
@@ -196,9 +196,9 @@ lemma wedge_prefix_right (x y : Word) : wedge x y <+: y := by
       | cons b y =>
           rw [wedge_cons_cons]
           by_cases h : a = b
-          · rw [if_pos h, h]
+          · rw [ite_eq_left h, h]
             exact (List.cons_prefix_cons).mpr ⟨rfl, ih y⟩
-          · rw [if_neg h]
+          · rw [ite_eq_right h]
             exact List.nil_prefix
 
 /-- The wedge is the greatest lower bound for the prefix order. -/
@@ -215,13 +215,13 @@ lemma prefix_wedge {p x y : Word} (hx : p <+: x) (hy : p <+: y) : p <+: wedge x 
               rw [List.cons_prefix_cons] at hx hy
               obtain ⟨rfl, hx⟩ := hx
               obtain ⟨rfl, hy⟩ := hy
-              rw [wedge_cons_cons, if_pos rfl]
+              rw [wedge_cons_cons, ite_eq_left rfl]
               exact (List.cons_prefix_cons).mpr ⟨rfl, ih hx hy⟩
 
 @[simp] lemma wedge_self (x : Word) : wedge x x = x := by
   induction x with
   | nil => rfl
-  | cons a x ih => rw [wedge_cons_cons, if_pos rfl, ih]
+  | cons a x ih => rw [wedge_cons_cons, ite_eq_left rfl, ih]
 
 lemma wedge_comm (x y : Word) : wedge x y = wedge y x := by
   induction x generalizing y with
@@ -233,8 +233,8 @@ lemma wedge_comm (x y : Word) : wedge x y = wedge y x := by
           rw [wedge_cons_cons, wedge_cons_cons]
           by_cases h : a = b
           · subst h
-            rw [if_pos rfl, if_pos rfl, ih]
-          · rw [if_neg h, if_neg (Ne.symm h)]
+            rw [ite_eq_left rfl, ite_eq_left rfl, ih]
+          · rw [ite_eq_right h, ite_eq_right (Ne.symm h)]
 
 lemma wedge_of_prefix {x y : Word} (h : x <+: y) : wedge x y = x := by
   have h1 := prefix_wedge (List.prefix_refl x) h
@@ -344,7 +344,7 @@ lemma wedge_of_diverge {p x y : Word} {a b : Bool} (hab : a ≠ b)
     treeDist (a :: u) (a :: v) = treeDist u v := by
   have h1 := wedge_length_le_left u v
   have h2 := wedge_length_le_right u v
-  have hw : wedge (a :: u) (a :: v) = a :: wedge u v := by rw [wedge_cons_cons, if_pos rfl]
+  have hw : wedge (a :: u) (a :: v) = a :: wedge u v := by rw [wedge_cons_cons, ite_eq_left rfl]
   simp only [treeDist, hw, List.length_cons]
   omega
 
@@ -352,7 +352,7 @@ lemma wedge_of_diverge {p x y : Word} {a b : Bool} (hab : a ≠ b)
 @[simp] lemma treeDist_false_true (u v : Word) :
     treeDist (false :: u) (true :: v) = u.length + v.length + 2 := by
   have hw : wedge (false :: u) (true :: v) = [] := by
-    rw [wedge_cons_cons, if_neg (by simp)]
+    rw [wedge_cons_cons, ite_eq_right (by simp)]
   simp only [treeDist, hw, List.length_cons, List.length_nil]
   omega
 
@@ -360,7 +360,7 @@ lemma wedge_of_diverge {p x y : Word} {a b : Bool} (hab : a ≠ b)
 @[simp] lemma treeDist_true_false (u v : Word) :
     treeDist (true :: u) (false :: v) = u.length + v.length + 2 := by
   have hw : wedge (true :: u) (false :: v) = [] := by
-    rw [wedge_cons_cons, if_neg (by simp)]
+    rw [wedge_cons_cons, ite_eq_right (by simp)]
   simp only [treeDist, hw, List.length_cons, List.length_nil]
   omega
 

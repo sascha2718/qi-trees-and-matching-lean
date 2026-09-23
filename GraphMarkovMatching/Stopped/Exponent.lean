@@ -15,7 +15,7 @@ lemma phiE_mono_exponent {α α' t : ℝ} (hα : α ≤ α') (ht : 0 ≤ t) : ph
     unfold phi
     refine div_le_div_of_nonneg_left ht (rpow_denom_pos α' h1) ?_
     exact Real.rpow_le_rpow_of_exponent_ge (by linarith) (by linarith) hα
-  · have h : phiE α' t = ⊤ := if_neg h1
+  · have h : phiE α' t = ⊤ := ite_eq_right h1
     rw [h]
     exact le_top
 

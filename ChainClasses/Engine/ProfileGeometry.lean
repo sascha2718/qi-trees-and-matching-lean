@@ -88,9 +88,9 @@ lemma cChild_range (exc : Family) {t : RawType}
   have h3' : servedK (stepKind exc off (0, t)).1 + servedK (stepKind exc off (0, t)).2
       = servedC t := h3
   cases b
-  · simp only [cChild, cond_false]
+  · simp only [cChild, Bool.cond_false]
     exact ⟨h1.ge, by omega, h4, fun _ => h1, fun h => absurd h (by decide)⟩
-  · simp only [cChild, cond_true]
+  · simp only [cChild, Bool.cond_true]
     exact ⟨by omega, by omega, h5, fun h => absurd h (by decide), fun _ => h2⟩
 
 /-- **The range of a slot reached by a descent**: a valid type serving the slots from
@@ -153,11 +153,11 @@ lemma walk_atSlot_unique (exc : Family) :
         cases b <;> cases b' <;> simp at hb
         · have e1 := hl rfl
           have e2 := hr' rfl
-          simp only [cChild, cond_false, cond_true] at h1 h2 e1 e2
+          simp only [cChild, Bool.cond_false, Bool.cond_true] at h1 h2 e1 e2
           omega
         · have e1 := hr rfl
           have e2 := hl' rfl
-          simp only [cChild, cond_false, cond_true] at h1 h2 e1 e2
+          simp only [cChild, Bool.cond_false, Bool.cond_true] at h1 h2 e1 e2
           omega
 
 /-- **The path to a slot**, with a fuel: descend into the child whose slot range
@@ -400,11 +400,11 @@ lemma labelAt_encSub (exc : Family) (lab ar : GWord N → ℕ) (v0 : ℕ) :
       rw [encAt_cons]
       cases b
       · have e : cChild exc off s.2 false = (stepKind exc off s).1 := by
-          rw [cChild, cond_false, ← stepKind_eq_zero]
+          rw [cChild, Bool.cond_false, ← stepKind_eq_zero]
         rw [e]
         exact labelAt_encSub exc lab ar v0 n p hp _ _ _
       · have e : cChild exc off s.2 true = (stepKind exc off s).2 := by
-          rw [cChild, cond_true, ← stepKind_eq_zero]
+          rw [cChild, Bool.cond_true, ← stepKind_eq_zero]
         rw [e]
         exact labelAt_encSub exc lab ar v0 n p hp _ _ _
 
@@ -672,7 +672,7 @@ lemma skeletonDegree_zero_field : skeletonDegree (fun _ : GWord N => 0) = 0 := b
 lemma bushAt_of_le {d : GWord N → ℕ} {m : ℕ} (h : skeletonDegree d ≤ m) :
     bushAt d m = fun _ => 0 := by
   have h' : ¬ m < (BranchingProcess.survivors d).card := not_lt.mpr h
-  rw [bushAt, BranchingProcess.bushOf, dif_neg h']
+  rw [bushAt, BranchingProcess.bushOf, dite_eq_right h']
 
 lemma neckIter_zero_field : ∀ n : ℕ, neckIter (fun _ : GWord N => 0) n = fun _ => 0
   | 0 => rfl
@@ -832,7 +832,7 @@ lemma treeStep_child_height_lt (C : Family) (off : ℕ) {τ : MTree}
   cases τ with
   | leaf => exact (hne rfl).elim
   | node l r | gnode l r =>
-      cases b <;> simp only [treeStep, cond_false, cond_true, childHeight_subtreeKind,
+      cases b <;> simp only [treeStep, Bool.cond_false, Bool.cond_true, childHeight_subtreeKind,
         MTree.height] <;> omega
 
 lemma cChild_height_lt (C : Family) {t : RawType} (ht : validS (0, t))

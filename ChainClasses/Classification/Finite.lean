@@ -141,9 +141,9 @@ theorem quasiIsometric_sample_of_not_survives {N N' : ℕ} {c : BranchingProcess
     {c' : BranchingProcess.Word N' → ℕ} (hc : ¬ Survives c) (hc' : ¬ Survives c') :
     QuasiIsometric (wordGraphN (fun w => w ∈ sample c))
       (wordGraphN (fun w => w ∈ sample c')) := by
-  haveI : Nonempty {w : BranchingProcess.Word N // w ∈ sample c} :=
+  have : Nonempty {w : BranchingProcess.Word N // w ∈ sample c} :=
     ⟨⟨[], nil_mem_sample c⟩⟩
-  haveI : Nonempty {w : BranchingProcess.Word N' // w ∈ sample c'} :=
+  have : Nonempty {w : BranchingProcess.Word N' // w ∈ sample c'} :=
     ⟨⟨[], nil_mem_sample c'⟩⟩
   exact quasiIsometric_of_bounded (isBoundedGraph_sample_of_not_survives hc)
     (isBoundedGraph_sample_of_not_survives hc')

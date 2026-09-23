@@ -287,6 +287,7 @@ lemma dropLast_mem_addrList (t : RTree) : ∀ w ∈ addrList t, w.dropLast ∈ a
         · rw [addrList_node]; exact List.mem_cons_of_mem _ h
 
 /-- A vertex of a rose tree: an address. -/
+@[implicit_reducible]
 def Vert (t : RTree) : Type := {w : List ℕ // w ∈ addrList t}
 
 /-- **The parent-child graph of a rose tree**, read on addresses: a vertex is
@@ -330,7 +331,7 @@ theorem rtreeGraph_connected (t : RTree) : (rtreeGraph t).Connected := by
             omega
           exact (ih y (by simp only [hy]; omega)).trans
             (Adj.reachable ⟨hne, Or.inl rfl⟩)
-  haveI : Nonempty (Vert t) := ⟨rootVert t⟩
+  have : Nonempty (Vert t) := ⟨rootVert t⟩
   exact ⟨fun x y => (key x.1.length x le_rfl).symm.trans (key y.1.length y le_rfl)⟩
 
 /-- **The metric of a rose tree** read on addresses. -/
@@ -403,13 +404,13 @@ lemma pairList_eq (t : Tri) : pairList s t = ([], []) :: rootPairs s t := by
 lemma cutPairs_of_isCut {t : Tri} (h : IsCut s t) :
     cutPairs s t = (pairList s t).map (Prod.map id (fun y => 0 :: y)) := by
   simp only [cutPairs, pairList]
-  rw [cutForest_eq, if_pos h, cutAddrs_eq, if_pos h, addrListF_cons,
+  rw [cutForest_eq, ite_eq_left h, cutAddrs_eq, ite_eq_left h, addrListF_cons,
     addrListF_nil, List.map_nil, List.append_nil, partList_eq, List.zip_map_right]
 
 /-- An uncut root passes up the parts below it unchanged. -/
 lemma cutPairs_of_not_isCut {t : Tri} (h : ¬ IsCut s t) : cutPairs s t = rootPairs s t := by
   simp only [cutPairs, rootPairs]
-  rw [cutForest_eq, if_neg h, cutAddrs_eq, if_neg h]
+  rw [cutForest_eq, ite_eq_right h, cutAddrs_eq, ite_eq_right h]
 
 @[simp] lemma rootPairs_leaf : rootPairs s Tri.leaf = [] := by
   rw [rootPairs, rootAddrs_leaf, List.zip_nil_left]
@@ -512,14 +513,14 @@ lemma part_dropLast_step (s : ℕ) (t u : Tri) (a : Bool) (g : List ℕ → List
     · have hqa : (if part s u z.dropLast = [] then (if IsCut s u then [a] else [])
           else a :: part s u z.dropLast) = a :: part s u z.dropLast := by
         by_cases hq : part s u z.dropLast = []
-        · rw [if_pos hq, hq]
+        · rw [ite_eq_left hq, hq]
           rw [hq] at hmem
-          rw [if_pos (isCut_of_nil_mem_cutPairs hmem)]
-        · rw [if_neg hq]
+          rw [ite_eq_left (isCut_of_nil_mem_cutPairs hmem)]
+        · rw [ite_eq_right hq]
       rw [hqa]
       exact List.mem_cons_of_mem _
         (List.mem_map.mpr ⟨(part s u z.dropLast, y₀.dropLast), hmem, rfl⟩)
-    · rw [hq, if_pos rfl, if_neg hnc, hy, hgnil]
+    · rw [hq, ite_eq_left rfl, ite_eq_right hnc, hy, hgnil]
       exact List.mem_cons_self
 
 /-- **`thm:dilution`, the pairing is a map of part trees.**  The part-parent of
@@ -604,7 +605,7 @@ lemma mem_zip_iff_getD {α β : Type*} [BEq α] [LawfulBEq α] (d : β) :
               exact Or.inl rfl
           · have hidx : (a :: l).idxOf x = l.idxOf x + 1 := by
               have hax : (a == x) = false := beq_eq_false_iff_ne.mpr (Ne.symm hxa)
-              rw [List.idxOf_cons, hax, cond_false]
+              rw [List.idxOf_cons, hax, ite_eq_right Bool.false_ne_true]
             rw [hidx, List.getD_cons_succ, ih hnd' hlen']
             constructor
             · rintro (heq | hmem)
@@ -882,12 +883,12 @@ lemma isCut_one (t : Tri) : IsCut 1 t := one_le_rawSize t
 
 lemma contractTree_one_one (t : Tri) :
     contractTree 1 (Tri.one t) = RTree.node [contractTree 1 t] := by
-  rw [contractTree_eq, rootForest_one, cutForest_eq, if_pos (isCut_one t)]
+  rw [contractTree_eq, rootForest_one, cutForest_eq, ite_eq_left (isCut_one t)]
 
 lemma contractTree_one_two (l r : Tri) :
     contractTree 1 (Tri.two l r) = RTree.node [contractTree 1 l, contractTree 1 r] := by
   rw [contractTree_eq, rootForest_two, cutForest_eq, cutForest_eq,
-    if_pos (isCut_one l), if_pos (isCut_one r)]
+    ite_eq_left (isCut_one l), ite_eq_left (isCut_one r)]
   rfl
 
 /-- At scale one the contraction is the realisation itself, read as a rose

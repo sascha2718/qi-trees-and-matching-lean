@@ -90,7 +90,7 @@ noncomputable def live : Finset PType :=
             (σ, some τ)
 
 /-- The live types as a finite type. -/
-def Live : Type := {t : PType // t ∈ P.live}
+@[implicit_reducible] def Live : Type := {t : PType // t ∈ P.live}
 
 noncomputable instance : Fintype P.Live := by
   unfold Live; infer_instance
@@ -236,7 +236,7 @@ lemma rawKernel_forced_ne_zero_iff (σ : Bool) (τ : MTree) (p : PType × PType)
   by_cases h : p = rootPair σ τ <;> simp [h]
 
 /-- The coercion is the identity on live types. -/
-lemma toLive_of_mem {t : PType} (h : t ∈ P.live) : P.toLive t = ⟨t, h⟩ := dif_pos h
+lemma toLive_of_mem {t : PType} (h : t ∈ P.live) : P.toLive t = ⟨t, h⟩ := dite_eq_left h
 
 /-- The children of a live type in a charged transition are live. -/
 lemma rawKernel_live (t : P.Live) (p : PType × PType) (hp : P.rawKernel t.1 p ≠ 0) :
@@ -314,9 +314,9 @@ lemma rootLaw_typeOf (σ : Bool) (τ : MTree) (h : typeOf σ τ ∈ P.live) :
     (P.toModel R zero μ).rootLaw ⟨typeOf σ τ, h⟩
       = if τ = MTree.leaf then μ else PMF.pure zero := by
   by_cases hτ : τ = MTree.leaf
-  · rw [if_pos hτ]
+  · rw [ite_eq_left hτ]
     exact Model.rootLaw_fresh _ ((P.fresh_typeOf_iff R zero μ σ τ h).mpr hτ)
-  · rw [if_neg hτ]
+  · rw [ite_eq_right hτ]
     exact Model.rootLaw_forced _ fun hf => hτ ((P.fresh_typeOf_iff R zero μ σ τ h).mp hf)
 
 /-- The root law of a forced type is the point mass at `0`. -/
@@ -334,13 +334,13 @@ lemma eq_zero_of_rootLaw_ne_zero {σ : Bool} {τ : MTree} (h : (σ, some τ) ∈
     (hv : (P.toModel R zero μ).rootLaw ⟨(σ, some τ), h⟩ v ≠ 0) : v = zero := by
   rw [P.rootLaw_forced' R zero μ, PMF.pure_apply] at hv
   by_contra hc
-  rw [if_neg hc] at hv
+  rw [ite_eq_right hc] at hv
   exact hv rfl
 
 /-- The state `0` is charged at a forced type. -/
 lemma rootLaw_forced_zero_ne_zero {σ : Bool} {τ : MTree} (h : (σ, some τ) ∈ P.live) :
     (P.toModel R zero μ).rootLaw ⟨(σ, some τ), h⟩ zero ≠ 0 := by
-  rw [P.rootLaw_forced' R zero μ, PMF.pure_apply, if_pos rfl]
+  rw [P.rootLaw_forced' R zero μ, PMF.pure_apply, ite_eq_left rfl]
   exact one_ne_zero
 
 /-- A state charged by `μ` is charged at a fresh type. -/
@@ -355,7 +355,7 @@ lemma eq_of_kernelL_forced_ne_zero {σ : Bool} {τ : MTree} (h : (σ, some τ) �
     j = (P.toLive (rootPair σ τ).1, P.toLive (rootPair σ τ).2) := by
   rw [P.kernelL_forced, PMF.pure_apply] at hj
   by_contra hc
-  rw [if_neg hc] at hj
+  rw [ite_eq_right hc] at hj
   exact hj rfl
 
 /-- The core transition at a fresh type has positive mass: it is the root pair of the core
@@ -434,7 +434,6 @@ lemma forced_children {σ : Bool} {τ l r : MTree}
     rw [P.eq_of_kernelL_forced_ne_zero hτ hj, hτr]
     show (P.toLive (typeOf σ l), P.toLive (typeOf σ r)) = _
     rw [P.toLive_of_mem hl, P.toLive_of_mem hr]
-    rfl
   subst hjeq
   exact ⟨P.eq_zero_of_rootLaw_ne_zero R zero μ hτ hy2, hj1, hj2⟩
 
@@ -454,7 +453,7 @@ lemma rho_forced_branch_ne_zero {σ : Bool} {τ l r : MTree}
   show P.kernelL ⟨(σ, some τ), hτ⟩ _ ≠ 0
   rw [P.kernelL_forced, hτr]
   show PMF.pure (P.toLive (typeOf σ l), P.toLive (typeOf σ r)) _ ≠ 0
-  rw [P.toLive_of_mem hl, P.toLive_of_mem hr, PMF.pure_apply, if_pos rfl]
+  rw [P.toLive_of_mem hl, P.toLive_of_mem hr, PMF.pure_apply, ite_eq_left rfl]
   exact one_ne_zero
 
 /-- A branch with a charged fresh root state over charged realisations of the child types
@@ -709,7 +708,7 @@ theorem side_change (hc : (P.toModel R zero μ).IsCompat) (hb0 : rE μ R zero �
             hz hx π hmz)
         hx1 hx2 hm1 hm2
       have hroot' : μ y.1.2 ≠ 0 := by
-        rw [P.rootLaw_typeOf R zero μ, if_pos rfl] at hroot
+        rw [P.rootLaw_typeOf R zero μ, ite_eq_left rfl] at hroot
         exact hroot
       refine ⟨branch (⟨typeOf σ' MTree.leaf, hτ'⟩, y.1.2) (y₁', y₂'), ?_, ?_⟩
       · exact P.rho_fresh_branch_ne_zero R zero μ hτ' ha hDa hl'' hr'' hy₁' hy₂' hroot'
@@ -810,7 +809,7 @@ noncomputable def selection (hc : (P.toModel R zero μ).IsCompat) (hb0 : rE μ R
         Finset.mem_singleton.mp hj
       subst hj'
       show P.kernelL ⟨(σ, some τ), ht⟩ _ ≠ 0
-      rw [P.kernelL_forced, PMF.pure_apply, if_pos rfl]
+      rw [P.kernelL_forced, PMF.pure_apply, ite_eq_left rfl]
       exact one_ne_zero
   positive := by
     intro t h p hp1 hp2 hr
@@ -853,7 +852,6 @@ noncomputable def selection (hc : (P.toModel R zero μ).IsCompat) (hb0 : rE μ R
         rw [hCa]
         show (P.toLive (typeOf σ l.flatten), P.toLive (typeOf σ r.flatten)) = _
         rw [P.toLive_of_mem hl', P.toLive_of_mem hr']
-        rfl
       refine ⟨_, hsel, ?_⟩
       rw [rE_ne_zero_iff']
       rcases hsq with ⟨⟨π1, hm1⟩, ⟨π2, hm2⟩⟩ | ⟨⟨π1, hm1⟩, ⟨π2, hm2⟩⟩
@@ -902,7 +900,7 @@ theorem inverseSum_le (hc : (P.toModel R zero μ).IsCompat) (hb0 : rE μ R zero 
     have h1 : (P.toModel R zero μ).π ⟨(σ, some τ), ht⟩
         (P.toLive (rootPair σ τ).1, P.toLive (rootPair σ τ).2) = 1 := by
       show P.kernelL ⟨(σ, some τ), ht⟩ _ = 1
-      rw [P.kernelL_forced, PMF.pure_apply, if_pos rfl]
+      rw [P.kernelL_forced, PMF.pure_apply, ite_eq_left rfl]
     rw [h1, ENNReal.one_rpow]
     exact (hone σ).trans (hmax σ)
   | none =>
@@ -920,7 +918,7 @@ theorem inverseSum_le (hc : (P.toModel R zero μ).IsCompat) (hb0 : rE μ R zero 
     rw [P.toLive_of_mem h1, P.toLive_of_mem h2, P.kernelL_apply_of_live, rawKernel_fresh,
       PMF.map_apply]
     refine le_trans ?_ (ENNReal.le_tsum a)
-    rw [if_pos rfl]
+    rw [ite_eq_left rfl]
 
 /-- The subtrees other than leaves of a tree number at most its leaves minus one: a full
 binary tree with `k` leaves has `k - 1` internal vertices (`eq:type-count`). -/

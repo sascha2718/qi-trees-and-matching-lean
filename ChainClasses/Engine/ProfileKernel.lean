@@ -81,7 +81,7 @@ noncomputable def freshRaw {V : Type} (μ : PMF V) (ν : PMF ℕ) : PMF (RawStat
 @[simp] theorem freshRaw_rem_apply {V : Type} (μ : PMF V) (ν : PMF ℕ) (v : V) (τ : MTree) :
     freshRaw μ ν (v, RawType.rem τ) = 0 := by
   rw [freshRaw, PMF.map_apply]
-  exact ENNReal.tsum_eq_zero.mpr fun s => if_neg (by intro h; cases congrArg Prod.snd h)
+  exact ENNReal.tsum_eq_zero.mpr fun s => ite_eq_right (by intro h; cases congrArg Prod.snd h)
 
 inductive ChildK where
   | internal (off : ℕ) (t : RawType)

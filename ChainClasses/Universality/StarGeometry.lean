@@ -177,7 +177,7 @@ theorem geoPt_unique {w z x : GWord N}
     have hqle := hqx.length_le
     have hd : BranchingProcess.treeDist w x = w.length - x.length := by
       rw [BranchingProcess.treeDist_comm, BranchingProcess.treeDist_of_prefix hxw]
-    rw [hd, geoPt, if_pos (by omega)]
+    rw [hd, geoPt, ite_eq_left (by omega)]
     have hxx : w.length - (w.length - x.length) = x.length := by omega
     rw [hxx]
     exact List.prefix_iff_eq_take.mp hxw
@@ -201,13 +201,13 @@ theorem geoPt_unique {w z x : GWord N}
     · -- forces `x = wedge w z`, which is also a climbing vertex
       have hxlen : x.length = (BranchingProcess.wedge w z).length := by omega
       have hxeq : x = BranchingProcess.wedge w z := (hqx.eq_of_length hxlen.symm).symm
-      rw [geoPt, if_pos hcase, hd]
+      rw [geoPt, ite_eq_left hcase, hd]
       have hxx : w.length - (w.length + x.length
           - 2 * (BranchingProcess.wedge w z).length) = x.length := by omega
       nth_rewrite 1 [hxeq]
       rw [hxx, hxeq]
       exact List.prefix_iff_eq_take.mp (BranchingProcess.wedge_prefix_left w z)
-    · rw [geoPt, if_neg hcase]
+    · rw [geoPt, ite_eq_right hcase]
       have hxx : (BranchingProcess.wedge w z).length + (BranchingProcess.treeDist w x
           - (w.length - (BranchingProcess.wedge w z).length)) = x.length := by omega
       rw [hxx]
@@ -749,7 +749,7 @@ lemma eq_twd {w x y : GWord N'}
   · -- `y` is a child of `x`
     by_cases hp : x ++ [j] <+: w
     · have hxp : x <+: w := (List.prefix_append x [j]).trans hp
-      rw [twd, if_pos hxp]
+      rw [twd, ite_eq_left hxp]
       have := List.prefix_iff_eq_take.mp hp
       rw [this]
       congr 1
@@ -761,7 +761,7 @@ lemma eq_twd {w x y : GWord N'}
     · have := dist_append_of_prefix (hj ▸ hp)
       rw [← hj] at this
       omega
-    · rw [twd, if_neg hp, hj]
+    · rw [twd, ite_eq_right hp, hj]
       simp
 /-! #### Neighbour sets and the sphere recursion -/
 
@@ -801,7 +801,7 @@ lemma mem_nbrFinset {x y : GWord N'} :
   · rintro (h | ⟨hx, rfl⟩)
     · exact Or.inl h
     · refine Or.inr ?_
-      rw [if_neg hx, Finset.mem_singleton]
+      rw [ite_eq_right hx, Finset.mem_singleton]
 
 /-- The number of `j : Fin N'` below `k`. -/
 lemma card_fin_filter_lt {k : ℕ} (hk : k ≤ N') :
@@ -831,11 +831,11 @@ lemma card_childFinset {x : GWord N'} (hbdd : c x ≤ N') :
 lemma card_nbrFinset {x : GWord N'} (hbdd : c x ≤ N') (hx : x ≠ []) :
     (nbrFinset c x).card = c x + 1 := by
   rw [nbrFinset, Finset.card_union_of_disjoint, card_childFinset hbdd, parentFinset,
-    if_neg hx, Finset.card_singleton]
+    ite_eq_right hx, Finset.card_singleton]
   refine Finset.disjoint_left.mpr fun y hy hy' => ?_
   rw [mem_childFinset] at hy
   obtain ⟨j, -, rfl⟩ := hy
-  rw [parentFinset, if_neg hx, Finset.mem_singleton] at hy'
+  rw [parentFinset, ite_eq_right hx, Finset.mem_singleton] at hy'
   have h1 : (x ++ [j]).length = x.length + 1 := by simp
   have h2 : x.dropLast.length = x.length - 1 := by simp
   have h3 : 1 ≤ x.length := by

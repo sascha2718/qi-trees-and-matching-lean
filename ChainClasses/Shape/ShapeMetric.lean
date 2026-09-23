@@ -117,6 +117,7 @@ lemma Tri.isAddr_of_prefix : ∀ (t : Tri) {p w : Word}, p <+: w → t.IsAddr w 
               | true => exact ihr hp hw
 
 /-- The vertex set of a tree: the words that address its vertices. -/
+@[implicit_reducible]
 def Tri.Vert (t : Tri) : Type := {w : Word // t.IsAddr w}
 
 /-- The graph metric of a tree, restricted from the ambient tree along the
@@ -187,6 +188,7 @@ lemma Shape.isAddr_neckAddr (l : List (Option Tri)) :
 
 /-- **`def:shape`**: the realisation of a decorated neck as a marked space, the
 entry at the root and the exit at the far end of the neck. -/
+@[implicit_reducible]
 def listSpace (l : List (Option Tri)) : MarkedSpace where
   carrier := (realiseAux l).Vert
   entry := ⟨[], by simp⟩
@@ -825,8 +827,8 @@ instance : Infinite Shape := by
   omega
 
 /-- One key occurs for each of the infinitely many shapes. -/
-lemma shapeKey_range_infinite : (setOf (fun k => k ∈ Set.range shapeKey)).Infinite := by
-  rw [Set.setOf_mem_eq]
+lemma shapeKey_range_infinite : (Set.ofPred (fun k => k ∈ Set.range shapeKey)).Infinite := by
+  rw [Set.ofPred_mem_eq]
   exact Set.infinite_range_of_injective shapeKey_injective
 
 /-- **`def:shape-net`**: the enumeration of `𝒮` by size, the ties broken by the

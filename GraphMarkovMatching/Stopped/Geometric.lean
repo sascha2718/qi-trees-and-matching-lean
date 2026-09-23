@@ -219,7 +219,7 @@ theorem chainLaw_q_zero_le {a : ℝ} (ha0 : 0 < a) (ha1 : a < 1) {D : ℕ} (hD :
   have hsum : μ 0 + μ 1 ≤ rE μ pathRelNat 0 := by
     have h := ENNReal.sum_le_tsum (f := fun y => if pathRelNat 0 y then μ y else 0) {0, 1}
     rw [Finset.sum_pair (by norm_num : (0 : ℕ) ≠ 1)] at h
-    simp only [if_pos (pathRelNat_refl 0), if_pos pathRelNat_zero_one] at h
+    simp only [ite_eq_left (pathRelNat_refl 0), ite_eq_left pathRelNat_zero_one] at h
     exact h
   have hreal : (μ 0 + μ 1).toReal = 1 - a ^ (D ^ 2 - 1) := by
     rw [ENNReal.toReal_add (PMF.apply_ne_top _ _) (PMF.apply_ne_top _ _), hμ, chainLaw_apply,
@@ -264,8 +264,9 @@ theorem eta_chainLaw_le {a : ℝ} (ha0 : 0 < a) (ha1 : a < 1) {D : ℕ} (hD : 2 
     have hr : μ j ≤ rE μ pathRelNat (j + 1) := by
       rw [rE]
       calc μ j = if pathRelNat (j + 1) j then μ j else 0 := by
-            rw [if_pos (pathRelNat_succ_left j)]
-        _ ≤ ∑' y, if pathRelNat (j + 1) y then μ y else 0 := ENNReal.le_tsum j
+            rw [ite_eq_left (pathRelNat_succ_left j)]
+        _ ≤ ∑' y, if pathRelNat (j + 1) y then μ y else 0 :=
+            ENNReal.le_tsum (f := fun y => if pathRelNat (j + 1) y then μ y else 0) j
     have hr' : chainMass a D j ≤ 1 - q μ pathRelNat (j + 1) := by
       rw [← toReal_rE_eq]
       calc chainMass a D j = (μ j).toReal := by
@@ -424,11 +425,11 @@ theorem bushy_other_terms_le {V : Type} (μ : PMF V) (R : V → V → Prop) (N :
   rw [← ENNReal.tsum_mul_left]
   refine ENNReal.tsum_le_tsum fun v => ?_
   by_cases hv : v = v0
-  · rw [if_pos hv]; exact zero_le
-  rw [if_neg hv]
+  · rw [ite_eq_left hv]; exact zero_le
+  rw [ite_eq_right hv]
   by_cases h0 : μ v = 0
   · rw [h0, zero_mul]; exact zero_le
-  rw [if_pos (hN v h0 hv)]
+  rw [ite_eq_left (hN v h0 hv)]
   set e := Real.exp (-(C₀ * ((N v : ℝ) / Real.sqrt D + 1))) with he
   have he0 : 0 < e := Real.exp_pos _
   have hbe : e ≤ (rE μ R v).toReal := by
@@ -493,7 +494,7 @@ theorem bushy_moment_le {V : Type} (μ : PMF V) (N : V → ℕ) (D : ℕ) {A₀ 
     refine tsum_congr fun v => ?_
     by_cases hn : n = N v
     · subst hn
-      simp only [hF, if_true]
+      simp only [hF, ite_true]
       split_ifs <;> ring
     · simp [hn]
   have step4 : ∀ n : ℕ, D ^ 2 < n →
@@ -515,7 +516,7 @@ theorem bushy_moment_le {V : Type} (μ : PMF V) (N : V → ℕ) (D : ℕ) {A₀ 
     intro n
     rw [step3 n]
     by_cases hn : D ^ 2 < n
-    · rw [if_pos hn, if_pos hn]
+    · rw [ite_eq_left hn, ite_eq_left hn]
       calc ENNReal.ofReal (Real.exp (c₀ / 2 * n)) * ∑' v, (if n = N v then μ v else 0)
           ≤ ENNReal.ofReal (Real.exp (c₀ / 2 * n))
             * ENNReal.ofReal (A₀ * Real.exp (-(c₀ * ((n : ℝ) - 1)))) := by
@@ -530,7 +531,7 @@ theorem bushy_moment_le {V : Type} (μ : PMF V) (N : V → ℕ) (D : ℕ) {A₀ 
               congr 1
               ring
             linear_combination A₀ * hex
-    · rw [if_neg hn, if_neg hn, zero_mul, ENNReal.ofReal_zero]
+    · rw [ite_eq_right hn, ite_eq_right hn, zero_mul, ENNReal.ofReal_zero]
   -- the geometric tail
   have hsum : Summable fun n : ℕ => if D ^ 2 < n then K * r ^ n else 0 := by
     refine Summable.of_nonneg_of_le (fun n => ?_) (fun n => ?_)
@@ -547,13 +548,13 @@ theorem bushy_moment_le {V : Type} (μ : PMF V) (N : V → ℕ) (D : ℕ) {A₀ 
       rw [Function.mem_support] at hn
       have : D ^ 2 < n := by
         by_contra h
-        exact hn (if_neg h)
+        exact hn (ite_eq_right h)
       exact ⟨n - (D ^ 2 + 1), by simp only; omega⟩
     rw [← hg.tsum_eq hsupp]
     have h2 : ∀ k : ℕ, (if D ^ 2 < k + (D ^ 2 + 1) then K * r ^ (k + (D ^ 2 + 1)) else 0)
         = K * r ^ (D ^ 2 + 1) * r ^ k := by
       intro k
-      rw [if_pos (by omega), pow_add]
+      rw [ite_eq_left (by omega), pow_add]
       ring
     simp_rw [h2]
     rw [tsum_mul_left, tsum_geometric_of_lt_one hr0.le hr1, div_eq_mul_inv]
@@ -594,10 +595,10 @@ theorem bushy_v0_mass_le {V : Type} (μ : PMF V) (N : V → ℕ) (v0 : V) (D : �
   calc ∑' v, (if v = v0 then 0 else μ v) ≤ ∑' v, (if D ^ 2 < N v then μ v else 0) := by
         refine ENNReal.tsum_le_tsum fun v => ?_
         by_cases hv : v = v0
-        · rw [if_pos hv]; exact zero_le
+        · rw [ite_eq_left hv]; exact zero_le
         by_cases h0 : μ v = 0
-        · rw [if_neg hv, h0]; exact zero_le
-        rw [if_neg hv, if_pos (hN v h0 hv)]
+        · rw [ite_eq_right hv, h0]; exact zero_le
+        rw [ite_eq_right hv, ite_eq_left (hN v h0 hv)]
     _ ≤ ENNReal.ofReal (A₀ * Real.exp (-(c₀ * ((D ^ 2 : ℕ) : ℝ)))) := htail (D ^ 2)
     _ = _ := by push_cast; rfl
 

@@ -37,7 +37,7 @@ lemma measurableSet_directCrossLab_fibre (a b : ℝ) (D : ℕ) (u : GWord N) (k 
       = ⋃ n : ℕ, {c : GWord N → ℕ | neckAt c u = n}
           ×ˢ {U : GWord N → ℝ | ellQ a b D (n + 1) (U u) = k} := by
     ext ⟨c, U⟩
-    simp only [Set.mem_setOf_eq, Set.mem_iUnion, Set.mem_prod, directCrossLab]
+    simp only [Set.mem_ofPred_eq, Set.mem_iUnion, Set.mem_prod, directCrossLab]
     exact ⟨fun h => ⟨_, rfl, h⟩, by rintro ⟨n, h1, h2⟩; rw [h1]; exact h2⟩
   rw [hset]
   exact MeasurableSet.iUnion fun n => (fibreMeasurableG_neckAt u n).prod
@@ -75,9 +75,9 @@ lemma direct_chain_class_tsum {a : ℝ} (ha : 0 ≤ a) (ha1 : a < 1) {D : ℕ} (
       = ENNReal.ofReal (qF a D k) / ENNReal.ofReal (1 - a) := by
   have hpos : 0 < 1 - a := by linarith
   rw [tsum_eq_sum (s := Finset.Ico (D ^ k - 1) (D ^ (k + 1) - 1))
-      (fun n hn ↦ by rw [if_neg fun h ↦ hn ((direct_level_succ_eq_iff hD).mp h)]),
+      (fun n hn ↦ by rw [ite_eq_right fun h ↦ hn ((direct_level_succ_eq_iff hD).mp h)]),
     Finset.sum_congr rfl (fun n hn ↦ by
-      rw [if_pos ((direct_level_succ_eq_iff hD).mpr hn), ← ENNReal.ofReal_pow ha]),
+      rw [ite_eq_left ((direct_level_succ_eq_iff hD).mpr hn), ← ENNReal.ofReal_pow ha]),
     ← ENNReal.ofReal_sum_of_nonneg (fun n _ ↦ pow_nonneg ha n), direct_chain_class_sum ha ha1 hD k,
     ENNReal.ofReal_div_of_pos hpos]
 
@@ -113,7 +113,7 @@ lemma direct_cross_class_tsum {a b : ℝ} (ha : 0 < a) (ha1 : a < 1) (hb : 0 < b
     have e3 : ¬(DQ a b D k < n + 1 ∧ n + 1 < DQ a b D (k + 1)) := by omega
     have hz : uWeight a b D k (n + 1) = 0 := by
       unfold uWeight
-      rw [if_neg e1, if_neg e2, if_neg e3]
+      rw [ite_eq_right e1, ite_eq_right e2, ite_eq_right e3]
     rw [hz, ENNReal.ofReal_zero, mul_zero]
   rw [tsum_eq_sum hvan, Finset.sum_congr rfl (fun n _ ↦ by
       rw [← ENNReal.ofReal_pow hb.le, ← ENNReal.ofReal_mul (pow_nonneg hb.le n)]),
@@ -141,7 +141,7 @@ theorem directChainPattern_of_two_le (θ : Offspring J) (hJN : J ≤ N) (hθ0 : 
     fun g u ↦ if h : u ∈ F then g ⟨u, h⟩ else 0 with hrext
   have hrext_apply : ∀ (g : ↥F → ℕ) (u : ↥F), rext g u = g u := by
     intro g u
-    simp only [hrext, dif_pos u.2]
+    simp only [hrext, dite_eq_left u.2]
   set S : Set (↥F → ℕ) := {g | ∀ u : ↥F, levelMap D (g u + 1) = a u} with hS
   set E : (↥F → ℕ) → Set (GWord N → ℕ) := fun g ↦
     ⋂ u ∈ F, ({ω : GWord N → ℕ | neckAt ω u = rext g u}
@@ -150,22 +150,22 @@ theorem directChainPattern_of_two_le (θ : Offspring J) (hJN : J ≤ N) (hθ0 : 
         ∩ {ω : GWord N → ℕ | gArityAt ω u = j u}))
       = ⋃ g : ↥S, E g := by
     ext ω
-    simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_iUnion, directChainLab,
+    simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_ofPred_eq, Set.mem_iUnion, directChainLab,
       hE, hS, Subtype.exists, exists_prop]
     constructor
     · intro h
       refine ⟨fun u ↦ neckAt ω u, fun u ↦ (h u u.2).1, fun u hu ↦ ⟨?_, (h u hu).2⟩⟩
-      simp only [hrext, dif_pos hu]
+      simp only [hrext, dite_eq_left hu]
     · rintro ⟨g, hgS, hg⟩ u hu
       obtain ⟨h1, h2⟩ := hg u hu
       refine ⟨?_, h2⟩
       rw [h1]
-      simp only [hrext, dif_pos hu]
+      simp only [hrext, dite_eq_left hu]
       exact hgS ⟨u, hu⟩
   have hdisj : Pairwise (Function.onFun Disjoint fun g : ↥S ↦ E g) := by
     intro g g' hne
     refine Set.disjoint_left.mpr fun ω hω hω' ↦ hne (Subtype.ext (funext fun u ↦ ?_))
-    simp only [hE, Set.mem_iInter, Set.mem_inter_iff, Set.mem_setOf_eq] at hω hω'
+    simp only [hE, Set.mem_iInter, Set.mem_inter_iff, Set.mem_ofPred_eq] at hω hω'
     have e1 := (hω u u.2).1
     have e2 := (hω' u u.2).1
     rw [hrext_apply] at e1 e2
@@ -192,7 +192,7 @@ theorem directChainPattern_of_two_le (θ : Offspring J) (hJN : J ≤ N) (hθ0 : 
           * ENNReal.ofReal (θ.skeletonWeight (j u)) := by
     intro g
     rw [h1]
-    exact Finset.prod_congr rfl fun u _ ↦ by rw [if_pos (g.2 u)]
+    exact Finset.prod_congr rfl fun u _ ↦ by rw [ite_eq_left (g.2 u)]
   rw [tsum_congr h2]
   rw [tsum_subtype_eq_of_support_subset (s := S) (f := fun g : ↥F → ℕ ↦
     ∏ u : ↥F, (if levelMap D (g u + 1) = a u then ENNReal.ofReal (θ 1) ^ (g u) else 0)
@@ -207,9 +207,9 @@ theorem directChainPattern_of_two_le (θ : Offspring J) (hJN : J ≤ N) (hθ0 : 
   · intro g hg
     by_contra hgS
     apply hg
-    simp only [hS, Set.mem_setOf_eq, not_forall] at hgS
+    simp only [hS, Set.mem_ofPred_eq, not_forall] at hgS
     obtain ⟨u, hu⟩ := hgS
-    exact Finset.prod_eq_zero (Finset.mem_univ u) (by rw [if_neg hu, zero_mul])
+    exact Finset.prod_eq_zero (Finset.mem_univ u) (by rw [ite_eq_right hu, zero_mul])
 
 
 /-- Coupled labels have the first law's quantised class law and the second law's
@@ -243,7 +243,7 @@ theorem directCrossPattern_of_two_le (θ' : Offspring J) (hJN' : J ≤ N) (hθ0'
       = ⋂ u ∈ F, {ω : (GWord N → ℕ) × (GWord N → ℝ) |
           lab u (X ω.1 u) (ω.2 u) = v u} := by
     ext ω
-    simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_setOf_eq, hlab, hX, hv, directCrossLab,
+    simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_ofPred_eq, hlab, hX, hv, directCrossLab,
       Prod.mk.injEq]
   have hXm : ∀ u (t : ℕ × ℕ),
       MeasurableSet {ω : GWord N → ℕ | X ω u = t} := by
@@ -308,7 +308,7 @@ theorem directCrossPattern_of_two_le (θ' : Offspring J) (hJN' : J ≤ N) (hθ0'
     fun g u ↦ if h : u ∈ F then g ⟨u, h⟩ else 0 with hrext
   have hrext_apply : ∀ (g : ↥F → ℕ) (u : ↥F), rext g u = g u := by
     intro g u
-    simp only [hrext, dif_pos u.2]
+    simp only [hrext, dite_eq_left u.2]
   have hterm : ∀ g : ↥F → ℕ, G (emb g)
       = ∏ u : ↥F, ENNReal.ofReal (θ' 1) ^ (g u)
           * (ENNReal.ofReal (θ'.skeletonWeight (j u)))
@@ -318,7 +318,7 @@ theorem directCrossPattern_of_two_le (θ' : Offspring J) (hJN' : J ≤ N) (hθ0'
         = ⋂ u ∈ F, ({ω : GWord N → ℕ | neckAt ω u = rext g u}
             ∩ {ω : GWord N → ℕ | gArityAt ω u = j u}) := by
       ext ω
-      simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_setOf_eq, hX, hemb, Prod.mk.injEq]
+      simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_ofPred_eq, hX, hemb, Prod.mk.injEq]
       constructor
       · intro h u hu
         obtain ⟨h1, h2⟩ := h ⟨u, hu⟩
@@ -333,7 +333,7 @@ theorem directCrossPattern_of_two_le (θ' : Offspring J) (hJN' : J ≤ N) (hθ0'
         Measure.restrict_apply (ellQ_section_measurable a (θ' 1) D (g u + 1) (x u))]
       congr 1
       ext r
-      simp only [Set.mem_setOf_eq, Set.mem_inter_iff, hlab, hemb, hv, Prod.mk.injEq, and_true]
+      simp only [Set.mem_ofPred_eq, Set.mem_inter_iff, hlab, hemb, hv, Prod.mk.injEq, and_true]
       exact and_comm
     simp only [hG]
     rw [hXset, survivalMeasure_neckArity θ' hJN' hq F hpc (rext g) j hj2 hcomp,
@@ -378,7 +378,7 @@ theorem directChainPattern (θ : Offspring J) (hJN : J ≤ N) (hθ0 : θ 0 = 0)
     refine measure_mono_null ?_ (survivalMeasure_compat_bad_null θ hJN
       (extinction_lt_one_of_chain θ hθ0) (chain_hs1 θ hθ0 hθ1) hJ2 t)
     intro c hc
-    simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_setOf_eq] at hc
+    simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_ofPred_eq] at hc
     refine ⟨?_, ?_⟩
     · rw [gCompat_iff]
       intro p i hpi
@@ -414,7 +414,7 @@ theorem directCrossPattern (θ' : Offspring J) (hJN' : J ≤ N) (hθ0' : θ' 0 =
     refine measure_mono_null ?_ (labelMeasure_compat_bad_null θ' hJN'
       (extinction_lt_one_of_chain θ' hθ0') (chain_hs1 θ' hθ0' hθ1'') hJ2 t)
     intro ω hω
-    simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_setOf_eq] at hω
+    simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_ofPred_eq] at hω
     refine ⟨?_, ?_⟩
     · rw [gCompat_iff]
       intro p i hpi

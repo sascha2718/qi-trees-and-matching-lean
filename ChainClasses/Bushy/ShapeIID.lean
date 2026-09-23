@@ -45,8 +45,7 @@ noncomputable def subTree (j : Bool) (s : Finset Word) : Finset Word :=
   s.preimage (fun w ↦ j :: w) (fun a _ b _ h ↦ by simpa using h)
 
 @[simp] lemma mem_subTree {j : Bool} {s : Finset Word} {w : Word} :
-    w ∈ subTree j s ↔ j :: w ∈ s := by
-  simp [subTree]
+    w ∈ subTree j s ↔ j :: w ∈ s := Finset.mem_preimage
 
 /-- Prefix closure passes to the copies below a letter. -/
 lemma prefixClosed_subTree {s : Finset Word} (hs : ∀ w ∈ s, ∀ p, p <+: w → p ∈ s)
@@ -179,7 +178,7 @@ theorem survivalMeasure_shapes_aux (θ : Offspring 2) (hq : θ.extinction < 1)
               ∩ ({c : Amb → ℕ | splitBush c 0 ∈ E₀} ∩ {c : Amb → ℕ | splitBush c 1 ∈ E₁}))
             ∩ {c : Amb → ℕ | IsBushySample c} := by
         ext c
-        simp only [Set.mem_inter_iff, Set.mem_iInter, Set.mem_setOf_eq, hE₀, hE₁]
+        simp only [Set.mem_inter_iff, Set.mem_iInter, Set.mem_ofPred_eq, hE₀, hE₁]
         constructor
         · rintro ⟨hall, hc⟩
           refine ⟨⟨hall [] hnil, fun w hw ↦ ?_, fun w hw ↦ ?_⟩, hc⟩

@@ -29,14 +29,14 @@ lemma prodPMF_map_prodMap {A B C D : Type u} (p : PMF A) (q : PMF B)
         (fun b => if z.2 = g b then q b else 0)).symm]
   refine tsum_congr fun ab => ?_
   by_cases h1 : z.1 = f ab.1 <;> by_cases h2 : z.2 = g ab.2
-  · rw [if_pos (show z = Prod.map f g ab from Prod.ext h1 h2), if_pos h1, if_pos h2,
+  · rw [ite_eq_left (show z = Prod.map f g ab from Prod.ext h1 h2), ite_eq_left h1, ite_eq_left h2,
       prodPMF_apply]
-  · rw [if_neg (show ¬ z = Prod.map f g ab from fun hc => h2 (congrArg Prod.snd hc)),
-      if_pos h1, if_neg h2, mul_zero]
-  · rw [if_neg (show ¬ z = Prod.map f g ab from fun hc => h1 (congrArg Prod.fst hc)),
-      if_neg h1, zero_mul]
-  · rw [if_neg (show ¬ z = Prod.map f g ab from fun hc => h1 (congrArg Prod.fst hc)),
-      if_neg h1, zero_mul]
+  · rw [ite_eq_right (show ¬ z = Prod.map f g ab from fun hc => h2 (congrArg Prod.snd hc)),
+      ite_eq_left h1, ite_eq_right h2, mul_zero]
+  · rw [ite_eq_right (show ¬ z = Prod.map f g ab from fun hc => h1 (congrArg Prod.fst hc)),
+      ite_eq_right h1, zero_mul]
+  · rw [ite_eq_right (show ¬ z = Prod.map f g ab from fun hc => h1 (congrArg Prod.fst hc)),
+      ite_eq_right h1, zero_mul]
 
 /-- **Marginal consistency**: restricting a height-`(n+1)` Markov sample to
 height `n` recovers the height-`n` law. -/
@@ -54,13 +54,13 @@ lemma muM_map_restrictLab (P : S → PMF (S × S)) (s : S) :
       intro x
       rw [PMF.map_apply, PMF.pure_apply]
       by_cases hx : x = leaf s
-      · rw [if_pos hx]
+      · rw [ite_eq_left hx]
         calc (∑' p, if x = leaf s then pairMix P s 0 p else 0)
-            = ∑' p, pairMix P s 0 p := tsum_congr fun p => by rw [if_pos hx]
+            = ∑' p, pairMix P s 0 p := tsum_congr fun p => by rw [ite_eq_left hx]
           _ = 1 := PMF.tsum_coe _
-      · rw [if_neg hx]
+      · rw [ite_eq_right hx]
         refine ENNReal.tsum_eq_zero.mpr fun p => ?_
-        rw [if_neg hx]
+        rw [ite_eq_right hx]
   | succ n ih =>
       rw [muM_succ, PMF.map_comp]
       have h : (restrictLab (n + 1) ∘ branch (n := n + 1) s)

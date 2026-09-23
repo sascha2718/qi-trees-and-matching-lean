@@ -122,7 +122,7 @@ theorem chainMeasure_level_marginal (ht : 0 < t) (ht1 : t ≤ 1) {D : ℕ} (hD :
     obtain ⟨m, hm, hχm⟩ := Set.mem_iUnion₂.mp hχ
     have hmem := Finset.mem_Ico.mp hm
     have : labAux χ w = m := hχm
-    rw [Set.mem_setOf_eq, this]
+    rw [Set.mem_ofPred_eq, this]
     exact (level_eq_iff hD (hone m hm)).mpr ⟨hmem.1, hmem.2⟩
   have hsub2 : {χ : Word → Bool | levelMap D (labAux χ w) = k}
       ⊆ N ∪ {χ : Word → Bool | labAux χ w = 0} := by
@@ -199,12 +199,12 @@ lemma measurable_qXY (D h : ℕ) :
     Measurable fun ω : (Word → Bool) × (Word → Bool) ↦ (qX D h ω, qY D h ω) := by
   have hfst : Measurable fun ω : (Word → Bool) × (Word → Bool) ↦
       fun s : Word ↦ levelMap D (labAux ω.1 s) :=
-    measurable_pi_lambda _ fun s ↦
+    Measurable.of_eval fun s ↦
       (measurable_from_top (f := levelMap D)).comp
         ((measurable_chain_labAux s).comp measurable_fst)
   have hsnd : Measurable fun ω : (Word → Bool) × (Word → Bool) ↦
       fun s : Word ↦ levelMap D (labAux ω.2 s) :=
-    measurable_pi_lambda _ fun s ↦
+    Measurable.of_eval fun s ↦
       (measurable_from_top (f := levelMap D)).comp
         ((measurable_chain_labAux s).comp measurable_snd)
   exact ((measurable_readLab h).comp hfst).prodMk ((measurable_readLab h).comp hsnd)
@@ -219,7 +219,7 @@ lemma chainMeasure_readLab (ht : 0 < t) (ht1 : t ≤ 1) {D : ℕ} (hD : 2 ≤ D)
   have hset : {χ : Word → Bool | readLab (fun s ↦ levelMap D (labAux χ s)) h = x}
       = ⋂ s ∈ Vtx h, {χ : Word → Bool | levelMap D (labAux χ s) = GraphMatching.coord h x s} := by
     ext χ
-    simp only [Set.mem_setOf_eq, Set.mem_iInter]
+    simp only [Set.mem_ofPred_eq, Set.mem_iInter]
     exact readLab_eq_iff h _ x
   rw [hset, chainMeasure_level_prod ht ht1 hD (Vtx h) (fun s ↦ GraphMatching.coord h x s),
     fullMu_apply_prod]
@@ -238,7 +238,7 @@ lemma twoSampleMeasure_map (ht : 0 < t) (ht1 : t ≤ 1) {D : ℕ} (hD : 2 ≤ D)
       = {χ : Word → Bool | readLab (fun s ↦ levelMap D (labAux χ s)) h = x}
         ×ˢ {χ : Word → Bool | readLab (fun s ↦ levelMap D (labAux χ s)) h = y} := by
     ext ω
-    simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_prod, Set.mem_setOf_eq,
+    simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_prod, Set.mem_ofPred_eq,
       Prod.mk.injEq, qX, qY]
   rw [hpre, twoSampleMeasure, Measure.prod_prod, chainMeasure_readLab ht ht1 hD,
     chainMeasure_readLab ht ht1 hD,
@@ -259,7 +259,7 @@ lemma measurableSet_matchEvent (D : ℕ) : MeasurableSet (matchEvent D) := by
       = ⋂ h : ℕ, {ω : (Word → Bool) × (Word → Bool) |
           fullSim (compat pathGraph) h (qX D h ω) (qY D h ω)} := by
     ext ω
-    simp only [matchEvent, Set.mem_setOf_eq, Set.mem_iInter]
+    simp only [matchEvent, Set.mem_ofPred_eq, Set.mem_iInter]
     exact infMatch_iff_forall_level (compat pathGraph) _ _ (fun h ↦ restrictLab_qX D h ω)
       (fun h ↦ restrictLab_qY D h ω)
   rw [hset]
@@ -638,7 +638,7 @@ lemma twoSampleMeasure_not_chains (ht : 0 < t) (ht1 : t ≤ 1) :
       ⊆ ({χ : Word → Bool | ¬ Chains χ} ×ˢ (Set.univ : Set (Word → Bool)))
         ∪ ((Set.univ : Set (Word → Bool)) ×ˢ {χ : Word → Bool | ¬ Chains χ}) := by
     intro ω hω
-    simp only [Set.mem_union, Set.mem_prod, Set.mem_univ, Set.mem_setOf_eq, and_true, true_and]
+    simp only [Set.mem_union, Set.mem_prod, Set.mem_univ, Set.mem_ofPred_eq, and_true, true_and]
     by_cases hc : Chains ω.1
     · exact Or.inr fun hc2 ↦ hω ⟨hc, hc2⟩
     · exact Or.inl hc

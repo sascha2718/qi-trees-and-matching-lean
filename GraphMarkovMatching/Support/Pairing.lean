@@ -81,8 +81,8 @@ lemma qE_square_two (ν₀ ν₁ : PMF X) (R : X → X → Prop) (x₀ x₁ : X)
           + (if ¬ R x₀ p.2 ∧ ¬ R x₁ p.2 then ν₀ p.1 * ν₁ p.2 else 0) := by
     intro p
     by_cases hsq : SquareRel R (x₀, x₁) p
-    · rw [if_pos hsq]; exact zero_le
-    · rw [if_neg hsq]
+    · rw [ite_eq_left hsq]; exact zero_le
+    · rw [ite_eq_right hsq]
       have hcov : (¬ R x₀ p.1 ∧ ¬ R x₀ p.2) ∨ (¬ R x₁ p.1 ∧ ¬ R x₁ p.2)
                 ∨ (¬ R x₀ p.1 ∧ ¬ R x₁ p.1) ∨ (¬ R x₀ p.2 ∧ ¬ R x₁ p.2) := by
         by_contra hc
@@ -93,18 +93,18 @@ lemma qE_square_two (ν₀ ν₁ : PMF X) (R : X → X → Prop) (x₀ x₁ : X)
       set t2 := (if ¬ R x₀ p.1 ∧ ¬ R x₁ p.1 then w else 0)
       set t3 := (if ¬ R x₀ p.2 ∧ ¬ R x₁ p.2 then w else 0)
       rcases hcov with h | h | h | h
-      · calc w = t0 := (if_pos h).symm
+      · calc w = t0 := (ite_eq_left h).symm
           _ ≤ t0 + t1 := le_self_add
           _ ≤ t0 + t1 + t2 := le_self_add
           _ ≤ t0 + t1 + t2 + t3 := le_self_add
-      · calc w = t1 := (if_pos h).symm
+      · calc w = t1 := (ite_eq_left h).symm
           _ ≤ t0 + t1 := le_add_self
           _ ≤ t0 + t1 + t2 := le_self_add
           _ ≤ t0 + t1 + t2 + t3 := le_self_add
-      · calc w = t2 := (if_pos h).symm
+      · calc w = t2 := (ite_eq_left h).symm
           _ ≤ t0 + t1 + t2 := le_add_self
           _ ≤ t0 + t1 + t2 + t3 := le_self_add
-      · calc w = t3 := (if_pos h).symm
+      · calc w = t3 := (ite_eq_left h).symm
           _ ≤ t0 + t1 + t2 + t3 := le_add_self
   have h0 : (∑' p : X × X, if ¬ R x₀ p.1 ∧ ¬ R x₀ p.2 then ν₀ p.1 * ν₁ p.2 else 0)
       = qE ν₀ R x₀ * qE ν₁ R x₀ := by
@@ -238,8 +238,8 @@ lemma rE_square_ge_straight (ν₀ ν₁ : PMF X) (R : X → X → Prop) (x₀ x
     rw [rE]; simp_rw [prodPMF_apply]]
   refine ENNReal.tsum_le_tsum fun p => ?_
   by_cases h : R x₀ p.1 ∧ R x₁ p.2
-  · rw [if_pos h, if_pos (show SquareRel R (x₀, x₁) p from Or.inl h)]
-  · rw [if_neg h]; exact zero_le
+  · rw [ite_eq_left h, ite_eq_left (show SquareRel R (x₀, x₁) p from Or.inl h)]
+  · rw [ite_eq_right h]; exact zero_le
 
 section
 variable {X : Type}

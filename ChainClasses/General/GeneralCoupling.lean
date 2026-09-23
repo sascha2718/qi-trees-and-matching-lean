@@ -60,11 +60,11 @@ noncomputable def margSndT (π : PMF (T × T)) (b : T) : ℝ≥0∞ := ∑' a : 
 
 /-- A pair carries at most the first marginal of its first component. -/
 lemma le_margFstT (π : PMF (T × T)) (a b : T) : π (a, b) ≤ margFstT π a :=
-  ENNReal.le_tsum b
+  ENNReal.le_tsum (f := fun b : T ↦ π (a, b)) b
 
 /-- A pair carries at most the second marginal of its second component. -/
 lemma le_margSndT (π : PMF (T × T)) (a b : T) : π (a, b) ≤ margSndT π b :=
-  ENNReal.le_tsum a
+  ENNReal.le_tsum (f := fun a : T ↦ π (a, b)) a
 
 /-! ### The coupling read off the cascade, at an arbitrary type -/
 
@@ -103,8 +103,8 @@ lemma tsum_fibreT_eq (f : T → ℝ≥0∞) (a : T) :
   refine Eq.trans ?_ (tsum_subtype {τ : T | dm τ ∧ sh τ = a} f).symm
   refine tsum_congr fun b ↦ ?_
   by_cases hb : dm b ∧ sh b = a
-  · rw [if_pos hb, Set.indicator_of_mem (show b ∈ {τ : T | dm τ ∧ sh τ = a} from hb) f]
-  · rw [if_neg hb, Set.indicator_of_notMem (show b ∉ {τ : T | dm τ ∧ sh τ = a} from hb) f]
+  · rw [ite_eq_left hb, Set.indicator_of_mem (show b ∈ {τ : T | dm τ ∧ sh τ = a} from hb) f]
+  · rw [ite_eq_right hb, Set.indicator_of_notMem (show b ∉ {τ : T | dm τ ∧ sh τ = a} from hb) f]
 
 /-- The mass a source atom of the first side sends out, summed over the fibre of `sh₁₂`
 it is the target of. -/
@@ -115,12 +115,12 @@ lemma tsum_cascPairT₂_fst (a : T) :
   rw [ENNReal.tsum_add, ← tsum_fibreT_eq (sh := sh₁₂) out₂ a]
   congr 1
   by_cases ha : dm a
-  · rw [if_pos ha]
+  · rw [ite_eq_left ha]
     refine (tsum_eq_single (sh₂₁ a) fun b hb ↦ ?_).trans ?_
-    · exact if_neg fun h ↦ hb h.2.symm
-    · exact if_pos ⟨ha, rfl⟩
-  · rw [if_neg ha]
-    exact (tsum_congr fun b ↦ if_neg fun h ↦ ha h.1).trans tsum_zero
+    · exact ite_eq_right fun h ↦ hb h.2.symm
+    · exact ite_eq_left ⟨ha, rfl⟩
+  · rw [ite_eq_right ha]
+    exact (tsum_congr fun b ↦ ite_eq_right fun h ↦ ha h.1).trans tsum_zero
 
 /-- The mirror statement on the second component. -/
 lemma tsum_cascPairT₂_snd (b : T) :
@@ -130,12 +130,12 @@ lemma tsum_cascPairT₂_snd (b : T) :
   rw [ENNReal.tsum_add, ← tsum_fibreT_eq (sh := sh₂₁) out₁ b, add_comm]
   congr 1
   by_cases hb : dm b
-  · rw [if_pos hb]
+  · rw [ite_eq_left hb]
     refine (tsum_eq_single (sh₁₂ b) fun a ha ↦ ?_).trans ?_
-    · exact if_neg fun h ↦ ha h.2.symm
-    · exact if_pos ⟨hb, rfl⟩
-  · rw [if_neg hb]
-    exact (tsum_congr fun a ↦ if_neg fun h ↦ hb h.1).trans tsum_zero
+    · exact ite_eq_right fun h ↦ ha h.2.symm
+    · exact ite_eq_left ⟨hb, rfl⟩
+  · rw [ite_eq_right hb]
+    exact (tsum_congr fun a ↦ ite_eq_right fun h ↦ hb h.1).trans tsum_zero
 
 /-- The mass a side carries splits into the part the cascade spends and the leftover. -/
 lemma tsum_split_leftoverT (out : T → ℝ≥0∞) :
@@ -160,12 +160,12 @@ lemma tsum_tsum_fibreT (f : T → ℝ≥0∞) :
     _ = ∑' b : T, (if dm b then f b else 0) := by
         refine tsum_congr fun b ↦ ?_
         by_cases hb : dm b
-        · rw [if_pos hb]
+        · rw [ite_eq_left hb]
           refine (tsum_eq_single (sh b) fun a ha ↦ ?_).trans ?_
-          · exact if_neg fun h ↦ ha h.2.symm
-          · exact if_pos ⟨hb, rfl⟩
-        · rw [if_neg hb]
-          exact (tsum_congr fun a ↦ if_neg fun h ↦ hb h.1).trans tsum_zero
+          · exact ite_eq_right fun h ↦ ha h.2.symm
+          · exact ite_eq_left ⟨hb, rfl⟩
+        · rw [ite_eq_right hb]
+          exact (tsum_congr fun a ↦ ite_eq_right fun h ↦ hb h.1).trans tsum_zero
 
 /-- **The coupling read off the cascade at two shrinkings**: with the two cascade masses
 satisfying `out + in = mass` on either side, the cascade pairs and the normalised product
@@ -254,38 +254,38 @@ theorem exists_couplingT_of_out₂ (q₁ q₂ : PMF T)
     simp only [cascCouplingT₂]
     rw [ENNReal.tsum_add, tsum_cascPairT₂_fst, hclos₁ a, ← hout₁ a, leftoverT]
     by_cases ha : dm a
-    · rw [if_pos ha, if_pos ha, add_zero]
-    · rw [if_neg ha, if_neg ha, zero_add, add_comm]
+    · rw [ite_eq_left ha, ite_eq_left ha, add_zero]
+    · rw [ite_eq_right ha, ite_eq_right ha, zero_add, add_comm]
   have hmarg₂ : ∀ b : T, ∑' a : T, cascCouplingT₂ dm sh₁₂ sh₂₁ out₁ out₂ (a, b) = q₂ b := by
     intro b
     simp only [cascCouplingT₂]
     rw [ENNReal.tsum_add, tsum_cascPairT₂_snd, hclos₂ b, ← hout₂ b, leftoverT]
     by_cases hb : dm b
-    · rw [if_pos hb, if_pos hb, add_zero]
-    · rw [if_neg hb, if_neg hb, zero_add, add_comm]
+    · rw [ite_eq_left hb, ite_eq_left hb, add_zero]
+    · rw [ite_eq_right hb, ite_eq_right hb, zero_add, add_comm]
   have htotal : ∑' p : T × T, cascCouplingT₂ dm sh₁₂ sh₂₁ out₁ out₂ p = 1 := by
     rw [ENNReal.tsum_prod', ← q₁.tsum_coe]
     exact tsum_congr hmarg₁
   refine ⟨⟨cascCouplingT₂ dm sh₁₂ sh₂₁ out₁ out₂, htotal ▸ ENNReal.summable.hasSum⟩, fun a ↦ ?_,
     fun b ↦ ?_, fun p hp ↦ ?_⟩
-  · rw [margFstT]
+  · show ∑' b : T, cascCouplingT₂ dm sh₁₂ sh₂₁ out₁ out₂ (a, b) = q₁ a
     exact hmarg₁ a
-  · rw [margSndT]
+  · show ∑' a : T, cascCouplingT₂ dm sh₁₂ sh₂₁ out₁ out₂ (a, b) = q₂ b
     exact hmarg₂ b
   · by_cases h1 : dm p.1 ∧ sh₂₁ p.1 = p.2
     · exact Or.inl h1
     by_cases h2 : dm p.2 ∧ sh₁₂ p.2 = p.1
     · exact Or.inr (Or.inl h2)
     have hcp : cascPairT₂ dm sh₁₂ sh₂₁ out₁ out₂ p = 0 := by
-      rw [cascPairT₂, if_neg h1, if_neg h2, add_zero]
+      rw [cascPairT₂, ite_eq_right h1, ite_eq_right h2, add_zero]
     have hlft : leftoverT dm out₁ p.1 * leftoverT dm out₂ p.2 / leftoverTotT dm out₁ ≠ 0 := by
       intro h0
       exact hp (show cascCouplingT₂ dm sh₁₂ sh₂₁ out₁ out₂ p = 0 by
         rw [cascCouplingT₂, hcp, h0, zero_add])
     refine Or.inr (Or.inr ⟨fun hd ↦ hlft ?_, fun hd ↦ hlft ?_⟩)
-    · rw [show leftoverT dm out₁ p.1 = 0 by rw [leftoverT, if_pos hd], zero_mul,
+    · rw [show leftoverT dm out₁ p.1 = 0 by rw [leftoverT, ite_eq_left hd], zero_mul,
         ENNReal.zero_div]
-    · rw [show leftoverT dm out₂ p.2 = 0 by rw [leftoverT, if_pos hd], mul_zero,
+    · rw [show leftoverT dm out₂ p.2 = 0 by rw [leftoverT, ite_eq_left hd], mul_zero,
         ENNReal.zero_div]
 
 /-! ### The two-sided cascade -/
@@ -316,8 +316,8 @@ noncomputable def sideMassT (q₁ q₂ : PMF T) (p : Bool × T) : ℝ≥0∞ :=
 lemma sideMassT_ne_top (q₁ q₂ : PMF T) (p : Bool × T) : sideMassT q₁ q₂ p ≠ ⊤ := by
   rw [sideMassT]
   by_cases hp : p.1 = true
-  · rw [if_pos hp]; exact PMF.apply_ne_top _ _
-  · rw [if_neg hp]; exact PMF.apply_ne_top _ _
+  · rw [ite_eq_left hp]; exact PMF.apply_ne_top _ _
+  · rw [ite_eq_right hp]; exact PMF.apply_ne_top _ _
 
 @[simp] lemma sideMassT_false (q₁ q₂ : PMF T) (a : T) :
     sideMassT q₁ q₂ (false, a) = q₁ a := by
@@ -547,7 +547,7 @@ theorem capacity_of_mass_boundsT_const {q₁ q₂ : T → ℝ≥0∞} {size : T 
       (ENNReal.tsum_le_tsum fun y ↦ ?_)
     by_cases hy : Ncut < size y ∧ sh y = a
     · rw [Set.indicator_of_mem (show y ∈ {τ : T | Ncut < size τ ∧ sh τ = a} from hy),
-        if_neg (by have := hfibsize y hy.1 hy.2; omega)]
+        ite_eq_right (by have := hfibsize y hy.1 hy.2; omega)]
     · rw [Set.indicator_of_notMem
         (show y ∉ {τ : T | Ncut < size τ ∧ sh τ = a} from hy)]
       exact bot_le

@@ -86,10 +86,10 @@ lemma survivalMeasure_gArity_bad_null (θ' : Offspring J') (hJN' : J' ≤ N')
     rw [survivalMeasure_gArity_eq θ' hJN' hq' hs1' (by omega),
       reducedWeight_eq_zero_of_gt θ' (by omega), ENNReal.ofReal_zero]
   refine measure_mono_null (fun c hc => ?_) (measure_union_null h1 h2)
-  simp only [Set.mem_setOf_eq] at hc
+  simp only [Set.mem_ofPred_eq] at hc
   by_cases h2' : 2 ≤ gArity c
   · right
-    simp only [Set.mem_iUnion, Set.mem_setOf_eq]
+    simp only [Set.mem_iUnion, Set.mem_ofPred_eq]
     exact ⟨gArity c - J' - 1, by omega⟩
   · left
     exact h2'
@@ -125,18 +125,18 @@ theorem survivalMeasure_compat_bad_null (θ' : Offspring J') (hJN' : J' ≤ N')
         · by_cases hκ2 : 2 ≤ κ
           · rw [survivalMeasure_gArityPair θ' hJN' hq' hs1' hκ2 hAm,
               Finset.prod_eq_zero (Finset.mem_range.mpr hiκ) (by
-                simp only [hA, if_pos rfl]
+                simp only [hA, ite_eq_left rfl]
                 exact ih), mul_zero]
           · refine measure_mono_null (fun c hc => ?_) hroot
-            simp only [Set.mem_inter_iff, Set.mem_setOf_eq] at hc ⊢
+            simp only [Set.mem_inter_iff, Set.mem_ofPred_eq] at hc ⊢
             omega
         · exact measure_empty
       refine measure_mono_null (fun c hc => ?_) (measure_iUnion_null hBnull)
-      simp only [Set.mem_setOf_eq, GCompat, gArityAt_cons] at hc
+      simp only [Set.mem_ofPred_eq, GCompat, gArityAt_cons] at hc
       obtain ⟨⟨hi, hcomp⟩, hbad⟩ := hc
       simp only [Set.mem_iUnion]
       refine ⟨gArity c, ?_⟩
-      simp only [hB, if_pos hi, Set.mem_inter_iff, Set.mem_setOf_eq]
+      simp only [hB, ite_eq_left hi, Set.mem_inter_iff, Set.mem_ofPred_eq]
       refine ⟨by trivial, fun m _ => ?_⟩
       simp only [hA]
       split_ifs with hmi
@@ -184,7 +184,7 @@ theorem labelMeasure_label_pattern' (θ : Offspring J) (hJN : J ≤ N)
     rw [Finset.prod_eq_zero ht (by rw [reducedPMF_eq_zero θ' hq' hs1' hJ2' hbad, mul_zero])]
     refine measure_mono_null ?_ (labelMeasure_compat_bad_null θ' hJN' hq' hs1' hJ2' t)
     intro ω hω
-    simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_setOf_eq] at hω
+    simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_ofPred_eq] at hω
     refine ⟨?_, ?_⟩
     · rw [gCompat_iff]
       intro p i hpi

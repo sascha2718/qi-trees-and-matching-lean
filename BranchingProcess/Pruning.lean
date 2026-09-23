@@ -202,14 +202,14 @@ lemma measurableSet_coord_eq (v : Word N) (k : ℕ) :
 theorem measurableSet_retained :
     ∀ (n : ℕ) (v : Word N), MeasurableSet {c : Word N → ℕ | Retained J m c n v}
   | 0, _ => by
-      simp only [retained_zero, Set.setOf_true]
+      simp only [retained_zero, Set.ofPred_true]
       exact MeasurableSet.univ
   | n + 1, v => by
       have h : {c : Word N → ℕ | Retained J m c (n + 1) v}
           = {c | c v = J} ∩ ⋃ S : Finset (Fin N), ⋃ (_ : m ≤ S.card),
               ⋂ j ∈ S, {c | (j : ℕ) < J ∧ Retained J m c n (v ++ [j])} := by
         ext c
-        simp only [Set.mem_setOf_eq, Set.mem_inter_iff, Set.mem_iUnion, Set.mem_iInter,
+        simp only [Set.mem_ofPred_eq, Set.mem_inter_iff, Set.mem_iUnion, Set.mem_iInter,
           exists_prop]
         rw [retained_succ_iff, retainedChildren, le_card_filter_iff]
       rw [h]
@@ -218,7 +218,7 @@ theorem measurableSet_retained :
       by_cases hj : (j : ℕ) < J
       · simp only [hj, true_and]
         exact measurableSet_retained n (v ++ [j])
-      · simp only [hj, false_and, Set.setOf_false]
+      · simp only [hj, false_and, Set.ofPred_false]
         exact MeasurableSet.empty
 
 theorem measurableSet_retainedInf (v : Word N) :
@@ -268,12 +268,12 @@ lemma split_preimage_pruneBox (n : ℕ) (S : Finset (Fin N)) :
       = {c : Word N → ℕ | c [] = J}
         ∩ {c | ∀ j ∈ childSet N J \ S, ¬ Retained J m c n [j]} := by
   ext c
-  simp only [Set.mem_preimage, Set.mem_univ_pi, Set.mem_inter_iff, Set.mem_setOf_eq]
+  simp only [Set.mem_preimage, Set.mem_univ_pi, Set.mem_inter_iff, Set.mem_ofPred_eq]
   constructor
   · intro h
     refine ⟨h none, fun j hj ↦ ?_⟩
     have hj' := h (some j)
-    simp only [pruneBox, if_pos hj] at hj'
+    simp only [pruneBox, ite_eq_left hj] at hj'
     have hj'' : ¬ Retained J m (split c (some j)) n [] := hj'
     rwa [retained_split_some] at hj''
   · rintro ⟨hroot, h⟩ i
@@ -281,11 +281,11 @@ lemma split_preimage_pruneBox (n : ℕ) (S : Finset (Fin N)) :
     | none => exact hroot
     | some j =>
         by_cases hj : j ∈ childSet N J \ S
-        · simp only [pruneBox, if_pos hj]
+        · simp only [pruneBox, ite_eq_left hj]
           show ¬ Retained J m (split c (some j)) n []
           rw [retained_split_some]
           exact h j hj
-        · simp only [pruneBox, if_neg hj]
+        · simp only [pruneBox, ite_eq_right hj]
           exact Set.mem_univ _
 
 /-- **The mass of a pruning pattern.** The root has `J` children and no child outside
@@ -329,7 +329,7 @@ theorem sampleMeasure_bad_le (hJN : J ≤ N) (n : ℕ) :
       ⊆ ⋃ S ∈ T, ({c : Word N → ℕ | c [] = J}
           ∩ {c | ∀ j ∈ childSet N J \ S, ¬ Retained J m c n [j]}) := by
     rintro c ⟨hc, hcard⟩
-    simp only [Set.mem_iUnion, Set.mem_inter_iff, Set.mem_setOf_eq, exists_prop]
+    simp only [Set.mem_iUnion, Set.mem_inter_iff, Set.mem_ofPred_eq, exists_prop]
     refine ⟨retainedChildren J m c n [], Finset.mem_filter.2 ⟨Finset.mem_powerset.2
       fun j hj ↦ mem_childSet.2 (mem_retainedChildren.1 hj).1, not_le.1 hcard⟩, hc,
       fun j hj hr ↦ ?_⟩
@@ -539,14 +539,14 @@ theorem wedge_embedFrom : ∀ (u w : Word k) (x : {v : Word N // R v}),
       rw [embedFrom_cons, embedFrom_cons, wedge_cons_cons]
       by_cases hab : a = b
       · subst hab
-        rw [if_pos rfl, embedFrom_cons]
+        rw [ite_eq_left rfl, embedFrom_cons]
         exact wedge_embedFrom u w (f.step x a)
-      · rw [if_neg hab, embedFrom_nil]
+      · rw [ite_eq_right hab, embedFrom_nil]
         obtain ⟨t, ht⟩ := f.prefix_embedFrom u (f.step x a)
         obtain ⟨t', ht'⟩ := f.prefix_embedFrom w (f.step x b)
         rw [← ht, ← ht']
         simp only [step, List.append_assoc, List.singleton_append]
-        rw [wedge_append_append, wedge_cons_cons, if_neg (f.child_ne x hab), List.append_nil]
+        rw [wedge_append_append, wedge_cons_cons, ite_eq_right (f.child_ne x hab), List.append_nil]
 
 /-- **The embedding is isometric.** -/
 theorem treeDist_embedFrom (u w : Word k) (x : {v : Word N // R v}) :

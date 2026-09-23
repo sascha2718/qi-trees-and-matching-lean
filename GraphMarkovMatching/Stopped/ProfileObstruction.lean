@@ -99,7 +99,7 @@ noncomputable def muT (t : ℝ) (h0 : 0 < t) (h1 : t < 1 / 2) : PMF (Fin 3) :=
       else if v = 1 then ENNReal.ofReal (1 / 2 - t) else ENNReal.ofReal t)
     (by
       rw [Fin.sum_univ_three]
-      simp only [if_true, Fin.isValue, one_ne_zero, if_false, Fin.reduceEq]
+      simp only [ite_true, Fin.isValue, one_ne_zero, ite_false, Fin.reduceEq]
       rw [← ENNReal.ofReal_add (by norm_num) (by linarith), ← ENNReal.ofReal_add
         (by linarith) h0.le]
       rw [show (1 : ℝ) / 2 + (1 / 2 - t) + t = 1 by ring, ENNReal.ofReal_one])
@@ -117,7 +117,7 @@ noncomputable def muT' (t : ℝ) : PMF (Fin 3) :=
   if h : 0 < t ∧ t < 1 / 2 then muT t h.1 h.2 else PMF.pure 0
 
 lemma muT'_of {t : ℝ} (h0 : 0 < t) (h1 : t < 1 / 2) : muT' t = muT t h0 h1 :=
-  dif_pos ⟨h0, h1⟩
+  dite_eq_left ⟨h0, h1⟩
 
 /-! ### The one-site potential of `μ_t` (`sec:profile-obstruction`) -/
 
@@ -252,7 +252,7 @@ lemma exists_of_map_branch_ne_zero {h : ℕ}
 lemma freshQ_nuFour_ne_zero {s : V × ℕ} (hs : freshQ μ nuFour s ≠ 0) : s.2 = 4 := by
   rw [freshQ, prodPMF_apply, nuFour] at hs
   by_contra h
-  rw [PMF.pure_apply, if_neg h, mul_zero] at hs
+  rw [PMF.pure_apply, ite_eq_right h, mul_zero] at hs
   exact hs rfl
 
 /-- The invariant of the left process: below a fresh counter-`4` root at even depth and
@@ -272,7 +272,7 @@ lemma left_invariant : ∀ (h : ℕ) (d : ℕ),
       by_cases hxs : x = leaf (v0, 2)
       · rw [hxs]
         rfl
-      · rw [if_neg hxs] at hx
+      · rw [ite_eq_right hxs] at hx
         exact absurd rfl hx
   | succ h ih =>
       intro d
@@ -408,7 +408,7 @@ lemma tsum_nuFourSeven (B : ℕ → ℝ≥0∞) :
     ∑' k, nuFourSeven k * B k = 2⁻¹ * (B 4 + B 7) := by
   rw [nuFourSeven, tsum_map_mul, tsum_fintype, Fintype.sum_bool]
   simp only [PMF.uniformOfFintype_apply, Fintype.card_bool, Nat.cast_ofNat, Bool.false_eq_true,
-    if_true, if_false]
+    ite_true, ite_false]
   ring
 
 /-- The fresh law of the right process is the state mixture of the two arity laws. -/
@@ -547,7 +547,7 @@ lemma Spine_iff : ∀ (n d h : ℕ), 3 * n ≤ h → ∀ (y : FullLab (Fin 3 × 
       rw [Spine_succ, forall_pos_le_succ_iff]
       split_ifs with hk
       · rw [ih (d + 2) (h' + 1) (by omega)]
-        simp only [spineAddr_succ, if_pos hk, spineAddr_zero, List.length_cons,
+        simp only [spineAddr_succ, ite_eq_left hk, spineAddr_zero, List.length_cons,
           List.length_nil, coordLab_cons_false, coordLab_nil, Nat.odd_iff]
         constructor
         · rintro ⟨h0, hrest⟩
@@ -555,7 +555,7 @@ lemma Spine_iff : ∀ (n d h : ℕ), 3 * n ≤ h → ∀ (y : FullLab (Fin 3 × 
         · rintro ⟨h0, hrest⟩
           exact ⟨fun hodd => h0 (by omega), fun i hi hin hodd => hrest i hi hin (by omega)⟩
       · rw [ih (d + 3) h' (by omega)]
-        simp only [spineAddr_succ, if_neg hk, spineAddr_zero, List.length_cons,
+        simp only [spineAddr_succ, ite_eq_right hk, spineAddr_zero, List.length_cons,
           List.length_nil, coordLab_cons_false, coordLab_cons_true, coordLab_nil, Nat.odd_iff]
         constructor
         · rintro ⟨h0, hrest⟩
@@ -572,7 +572,7 @@ noncomputable def spineMass (n d h : ℕ) : ℝ≥0∞ :=
   ∑' y, Tlaw μ nuFourSeven 0 h y * (if Spine n d h y then 1 else 0)
 
 lemma spineMass_zero (d h : ℕ) : spineMass μ 0 d h = 1 := by
-  simp only [spineMass, Spine_zero, if_true, mul_one]
+  simp only [spineMass, Spine_zero, ite_true, mul_one]
   exact PMF.tsum_coe _
 
 /-- The mass of the spine event below a fixed counter does not depend on the root state. -/
@@ -581,7 +581,7 @@ lemma tsum_muM_spine_indep (n d h : ℕ) (v v' : Fin 3) (k : ℕ) :
       = ∑' y, muM (varyK μ nuFourSeven 0) (v', k) h y * (if Spine n d h y then 1 else 0) := by
   cases h with
   | zero =>
-      simp only [Spine_height_zero, if_true, mul_one]
+      simp only [Spine_height_zero, ite_true, mul_one]
       rw [PMF.tsum_coe, PMF.tsum_coe]
   | succ h =>
       rw [muM_varyK_succ, muM_varyK_succ, tsum_map_mul, tsum_map_mul]
@@ -593,8 +593,8 @@ lemma tsum_ne_two : ∑' v : Fin 3, μ v * (if v ≠ 2 then 1 else 0) = 1 - μ 2
   have hsum : μ 0 + μ 1 + μ 2 = 1 := by
     rw [← PMF.tsum_coe μ, tsum_fintype, Fin.sum_univ_three]
   rw [tsum_fintype, Fin.sum_univ_three]
-  simp only [ne_eq, Fin.isValue, Fin.reduceEq, not_false_eq_true, if_true, mul_one,
-    not_true_eq_false, if_false, mul_zero, add_zero]
+  simp only [ne_eq, Fin.isValue, Fin.reduceEq, not_false_eq_true, ite_true, mul_one,
+    not_true_eq_false, ite_false, mul_zero, add_zero]
   exact ENNReal.eq_sub_of_add_eq (PMF.apply_ne_top _ _) hsum
 
 /-- The spine event together with a root state other than `2` has mass `(1 - μ(2)) P(E_n)`:
@@ -644,10 +644,10 @@ lemma tsum_Tlaw_step (n d' h : ℕ) :
         * (if (Odd d' → (rootLab h z).1 ≠ 2) ∧ Spine n d' h z then 1 else 0)
       = (if Odd d' then 1 - μ 2 else 1) * spineMass μ n d' h := by
   by_cases hd : Odd d'
-  · rw [if_pos hd, ← tsum_Tlaw_root_filter]
+  · rw [ite_eq_left hd, ← tsum_Tlaw_root_filter]
     refine tsum_congr fun z => ?_
     simp [hd]
-  · rw [if_neg hd, one_mul, spineMass]
+  · rw [ite_eq_right hd, one_mul, spineMass]
     refine tsum_congr fun z => ?_
     simp [hd]
 
@@ -666,7 +666,7 @@ lemma spineMass_succ (n d h : ℕ) :
     refine tsum_congr fun x => ?_
     by_cases hx : muM (varyK μ nuFourSeven 0) (v, 4) (h + 3) x = 0
     · rw [hx, zero_mul, zero_mul]
-    · rw [Spine_succ, rootLab_of_ne_zero _ _ _ x hx, if_pos (rfl : (4 : ℕ) = 4)]
+    · rw [Spine_succ, rootLab_of_ne_zero _ _ _ x hx, ite_eq_left (rfl : (4 : ℕ) = 4)]
       split_ifs <;> rfl
   have h7 : ∀ v : Fin 3, ∑' x, muM (varyK μ nuFourSeven 0) (v, 7) (h + 3) x
         * (if Spine (n + 1) d (h + 3) x then 1 else 0)
@@ -677,7 +677,7 @@ lemma spineMass_succ (n d h : ℕ) :
     by_cases hx : muM (varyK μ nuFourSeven 0) (v, 7) (h + 3) x = 0
     · rw [hx, zero_mul, zero_mul]
     · rw [Spine_succ, rootLab_of_ne_zero _ _ _ x hx,
-        if_neg (show ¬ ((7 : ℕ) = 4) by norm_num)]
+        ite_eq_right (show ¬ ((7 : ℕ) = 4) by norm_num)]
       split_ifs <;> rfl
   rw [spineMass, tsum_Tlaw_fourSeven]
   simp only [h4, h7]
@@ -718,13 +718,13 @@ lemma spineMass_le {a : ℝ} (ha0 : 0 ≤ a) (ha1 : a ≤ 1) (hμ : μ 2 = ENNRe
         have hd3 : Odd (d + 3) := by
           rw [show d + 3 = d + 2 + 1 by ring]
           exact (hd.add (by decide : Even 2)).add_one
-        rw [if_neg hd2, if_pos hd3, one_mul]
+        rw [ite_eq_right hd2, ite_eq_left hd3, one_mul]
         gcongr
       · have hd2 : Odd (d + 2) := hd.add_even (by decide)
         have hd3 : ¬ Odd (d + 3) := by
           rw [Nat.not_odd_iff_even, show d + 3 = d + 2 + 1 by ring]
           exact (hd.add_even (by decide : Even 2)).add_one
-        rw [if_pos hd2, if_neg hd3, one_mul, add_comm]
+        rw [ite_eq_left hd2, ite_eq_right hd3, one_mul, add_comm]
         gcongr
 
 end SpineMass
@@ -925,7 +925,7 @@ theorem infMatch_eq_zero {t : ℝ} (h0 : 0 < t) (h1 : t < 1 / 2) :
       trajPairLab_map_consLab, PMF.toMeasure_apply _ (hmeas n)]
     refine le_trans (le_of_eq ?_) (match_le h0 h1 n)
     refine tsum_congr fun p => ?_
-    simp only [Set.indicator_apply, Set.mem_setOf_eq]
+    simp only [Set.indicator_apply, Set.mem_ofPred_eq]
     split_ifs <;> simp
   refine le_antisymm ?_ zero_le
   have hb : Filter.Tendsto (fun n : ℕ => ENNReal.ofReal ((1 - t / 2) ^ n))
@@ -943,7 +943,7 @@ noncomputable def muTwoOne (t : ℝ) (h0 : 0 ≤ t) (h1 : t ≤ 1) : PMF (Fin 3)
     (fun v => if v = 0 then 0 else if v = 1 then ENNReal.ofReal t else ENNReal.ofReal (1 - t))
     (by
       rw [Fin.sum_univ_three]
-      simp only [if_true, Fin.isValue, one_ne_zero, if_false, Fin.reduceEq, zero_add]
+      simp only [ite_true, Fin.isValue, one_ne_zero, ite_false, Fin.reduceEq, zero_add]
       rw [← ENNReal.ofReal_add h0 (by linarith), show t + (1 - t) = 1 by ring,
         ENNReal.ofReal_one])
 

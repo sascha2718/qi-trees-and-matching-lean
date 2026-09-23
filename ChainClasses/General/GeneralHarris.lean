@@ -157,7 +157,7 @@ law. -/
 lemma tilde_one (J : ℕ) (θ : ℕ → ℝ) {q : ℝ} (hq1 : q < 1) :
     tilde J θ q 1 = genDeriv J θ q := by
   have h : (1 : ℝ) - q ≠ 0 := by linarith
-  rw [tilde, if_neg one_ne_zero, surviveCoeff_one]
+  rw [tilde, ite_eq_right one_ne_zero, surviveCoeff_one]
   field_simp
 
 /-- Every skeleton arity `1 ≤ k ≤ J` has positive probability in the bushy
@@ -165,7 +165,7 @@ regime. -/
 lemma tilde_pos (J : ℕ) (θ : ℕ → ℝ) {q : ℝ} (hnn : ∀ j, 0 ≤ θ j) (hJ : 0 < θ J)
     (hq0 : 0 < q) (hq1 : q < 1) {k : ℕ} (hk1 : 1 ≤ k) (hkb : k ≤ J) :
     0 < tilde J θ q k := by
-  rw [tilde, if_neg (by omega : k ≠ 0)]
+  rw [tilde, ite_eq_right (by omega : k ≠ 0)]
   exact div_pos (surviveCoeff_pos J θ hnn hJ hq0 hq1 hkb) (by linarith)
 
 /-- **The transform is a law**: `∑_{k=1}^{J} θ̃_k = 1`, from
@@ -190,7 +190,7 @@ theorem tilde_sum (J : ℕ) (θ : ℕ → ℝ) {q : ℝ}
   have hnz : ∀ i ∈ Finset.range J,
       tilde J θ q (i + 1) = surviveCoeff J θ q (i + 1) / (1 - q) := by
     intro i _
-    rw [tilde, if_neg (Nat.succ_ne_zero i)]
+    rw [tilde, ite_eq_right (Nat.succ_ne_zero i)]
   rw [Finset.sum_congr rfl hnz, ← Finset.sum_div, htail, div_self hne]
 
 /-! ### `eq:reduced-law`, the law of the reduced skeleton -/
@@ -334,7 +334,7 @@ theorem tilde_bushy (h : IsBushy θ₀ θ₁ θ₂) :
       rw [Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_one]
       simp only [bushyLaw]
       norm_num
-    rw [tilde, if_neg (by norm_num : (2 : ℕ) ≠ 0), hs2]
+    rw [tilde, ite_eq_right (by norm_num : (2 : ℕ) ≠ 0), hs2]
     have hne : (1 : ℝ) - θ₀ / θ₂ ≠ 0 := by linarith
     have hcalc : θ₂ * (1 - θ₀ / θ₂) ^ 2 / (1 - θ₀ / θ₂) = θ₂ * (1 - θ₀ / θ₂) := by
       rw [sq]

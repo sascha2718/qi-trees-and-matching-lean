@@ -386,7 +386,7 @@ lemma Hnn_le (hα : 1 ≤ α) (μ : PMF X) (R : X → X → Prop) (hsymm : ∀ a
     intro x
     by_cases h : R x y
     · simp [h]
-    · simp only [if_pos h]
+    · simp only [ite_eq_left h]
       calc μ x * Wnn α μ R x
           ≤ μ x * (1 + ENNReal.ofReal α * ENNReal.ofReal (phiA α (q μ R x))) := by
             gcongr; exact Wnn_le hα μ R x

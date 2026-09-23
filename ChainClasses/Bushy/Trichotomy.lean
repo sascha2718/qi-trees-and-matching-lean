@@ -87,12 +87,12 @@ theorem isQIWith_of_isSampleQI {c c' : Amb → ℕ} {L : ℝ}
   have hLK : L ≤ (K : ℝ) := Nat.le_ceil L
   refine ⟨K, fun a ↦ if h : sampleWord c a then unletters (F ⟨letters a, h⟩).1 else a, ?_, ?_, ?_, ?_⟩
   · intro a ha
-    rw [dif_pos ha]
+    rw [dite_eq_left ha]
     show letters (unletters _) ∈ sample c'
     rw [letters_unletters]
     exact (F ⟨letters a, ha⟩).2
   · intro a b ha hb
-    rw [dif_pos ha, dif_pos hb]
+    rw [dite_eq_left ha, dite_eq_left hb]
     have hd : treeDist (unletters (F ⟨letters a, ha⟩).1) (unletters (F ⟨letters b, hb⟩).1)
         = BranchingProcess.treeDist (F ⟨letters a, ha⟩).1 (F ⟨letters b, hb⟩).1 := by
       rw [← letters_treeDist, letters_unletters, letters_unletters]
@@ -108,7 +108,7 @@ theorem isQIWith_of_isSampleQI {c c' : Amb → ℕ} {L : ℝ}
       linarith
     exact_mod_cast hcast
   · intro a b ha hb
-    rw [dif_pos ha, dif_pos hb]
+    rw [dite_eq_left ha, dite_eq_left hb]
     have hd : treeDist (unletters (F ⟨letters a, ha⟩).1) (unletters (F ⟨letters b, hb⟩).1)
         = BranchingProcess.treeDist (F ⟨letters a, ha⟩).1 (F ⟨letters b, hb⟩).1 := by
       rw [← letters_treeDist, letters_unletters, letters_unletters]
@@ -142,7 +142,7 @@ theorem isQIWith_of_isSampleQI {c c' : Amb → ℕ} {L : ℝ}
     · have hxm : sampleWord c (unletters x.1) := by
         show letters (unletters x.1) ∈ sample c
         rw [letters_unletters]; exact x.2
-      rw [dif_pos hxm]
+      rw [dite_eq_left hxm]
       have hxe : (⟨letters (unletters x.1), hxm⟩ : {v : Amb // v ∈ sample c}) = x :=
         Subtype.ext (letters_unletters x.1)
       rw [hxe]
@@ -177,16 +177,16 @@ lemma isLine_of {V : Type*} {G : SimpleGraph V} {r s : ℕ → V} (hr : IsRay G 
     IsLine G (fun k : ℤ ↦ if 0 ≤ k then r k.toNat else s (-k).toNat) := by
   intro m n
   rcases le_or_gt 0 m with hm | hm <;> rcases le_or_gt 0 n with hn | hn
-  · simp only [if_pos hm, if_pos hn]
+  · simp only [ite_eq_left hm, ite_eq_left hn]
     rw [hr]
     unfold Nat.dist
     omega
-  · simp only [if_pos hm, if_neg (not_le.mpr hn), hcross]
+  · simp only [ite_eq_left hm, ite_eq_right (not_le.mpr hn), hcross]
     omega
-  · simp only [if_neg (not_le.mpr hm), if_pos hn]
+  · simp only [ite_eq_right (not_le.mpr hm), ite_eq_left hn]
     rw [SimpleGraph.dist_comm, hcross]
     omega
-  · simp only [if_neg (not_le.mpr hm), if_neg (not_le.mpr hn)]
+  · simp only [ite_eq_right (not_le.mpr hm), ite_eq_right (not_le.mpr hn)]
     rw [hs]
     unfold Nat.dist
     omega
@@ -227,11 +227,11 @@ def upWord (b v : Word) (a : Bool) (n : ℕ) : Word :=
 variable {b v : Word} {a : Bool}
 
 lemma upWord_le {n : ℕ} (hn : n ≤ v.length - b.length) :
-    upWord b v a n = v.take (v.length - n) := if_pos hn
+    upWord b v a n = v.take (v.length - n) := ite_eq_left hn
 
 lemma upWord_gt {n : ℕ} (hn : ¬ n ≤ v.length - b.length) :
     upWord b v a n = (b ++ [a]) ++ List.replicate (n - (v.length - b.length) - 1) false :=
-  if_neg hn
+  ite_eq_right hn
 
 @[simp] lemma upWord_zero : upWord b v a 0 = v := by
   rw [upWord_le (Nat.zero_le _)]
@@ -1118,17 +1118,17 @@ noncomputable def upRay (c : Amb → ℕ) (u v : Amb) (k n : ℕ) : Amb :=
   if n ≤ k + 1 then v.take (v.length - n) else neckRay c (u ++ [0]) (n - k - 2)
 
 @[simp] lemma upRay_zero (c : Amb → ℕ) (u v : Amb) (k : ℕ) : upRay c u v k 0 = v := by
-  rw [upRay, if_pos (Nat.zero_le _)]
+  rw [upRay, ite_eq_left (Nat.zero_le _)]
   simp
 
 section BushyRays
 
 variable {u v : Amb} {k : ℕ}
 
-lemma upRay_le {n : ℕ} (hn : n ≤ k + 1) : upRay c u v k n = v.take (v.length - n) := if_pos hn
+lemma upRay_le {n : ℕ} (hn : n ≤ k + 1) : upRay c u v k n = v.take (v.length - n) := ite_eq_left hn
 
 lemma upRay_gt {n : ℕ} (hn : ¬ n ≤ k + 1) :
-    upRay c u v k n = neckRay c (u ++ [0]) (n - k - 2) := if_neg hn
+    upRay c u v k n = neckRay c (u ++ [0]) (n - k - 2) := ite_eq_right hn
 
 variable (hlen : v.length = u.length + 1 + k) (hpre : u ++ [1] <+: v)
 include hlen
@@ -1150,7 +1150,7 @@ lemma wedge_upRay (j : ℕ) : BranchingProcess.wedge v (neckRay c (u ++ [0]) j) 
   obtain ⟨s', hs'⟩ := prefix_neckRay c (u ++ [0]) j
   rw [← hs, ← hs', List.append_assoc, List.append_assoc,
     BranchingProcess.wedge_append_append]
-  simp only [List.singleton_append, BranchingProcess.wedge_cons_cons, if_neg (by decide :
+  simp only [List.singleton_append, BranchingProcess.wedge_cons_cons, ite_eq_right (by decide :
     ¬ ((1 : Fin 2) = 0))]
   simp
 

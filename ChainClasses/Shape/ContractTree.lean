@@ -132,26 +132,26 @@ lemma sizeF_cutForest (t : Tri) : RTree.sizeF (cutForest s t) = cutCount s t := 
   | leaf =>
       rw [cutForest_leaf, cutCount]
       by_cases h : s ≤ 1
-      · rw [if_pos (isCut_leaf_iff.mpr h), if_pos h]
+      · rw [ite_eq_left (isCut_leaf_iff.mpr h), ite_eq_left h]
         simp
-      · rw [if_neg (fun hc => h (isCut_leaf_iff.mp hc)), if_neg h]
+      · rw [ite_eq_right (fun hc => h (isCut_leaf_iff.mp hc)), ite_eq_right h]
         simp
   | one t ih =>
       rw [cutForest_one, cutCount]
       by_cases h : s ≤ 1 + remSize s t
-      · rw [if_pos ((isCut_one_iff t).mpr h), if_pos h]
+      · rw [ite_eq_left ((isCut_one_iff t).mpr h), ite_eq_left h]
         simp only [RTree.sizeF_cons, RTree.sizeF_nil, RTree.size_node, ih]
         omega
-      · rw [if_neg (fun hc => h ((isCut_one_iff t).mp hc)), if_neg h, ih]
+      · rw [ite_eq_right (fun hc => h ((isCut_one_iff t).mp hc)), ite_eq_right h, ih]
         omega
   | two l r ihl ihr =>
       rw [cutForest_two, cutCount]
       by_cases h : s ≤ 1 + remSize s l + remSize s r
-      · rw [if_pos ((isCut_two_iff l r).mpr h), if_pos h]
+      · rw [ite_eq_left ((isCut_two_iff l r).mpr h), ite_eq_left h]
         simp only [RTree.sizeF_cons, RTree.sizeF_nil, RTree.size_node, RTree.sizeF_append,
           ihl, ihr]
         omega
-      · rw [if_neg (fun hc => h ((isCut_two_iff l r).mp hc)), if_neg h]
+      · rw [ite_eq_right (fun hc => h ((isCut_two_iff l r).mp hc)), ite_eq_right h]
         simp only [RTree.sizeF_append, ihl, ihr]
         omega
 
@@ -202,9 +202,9 @@ lemma part_cons (T : Tri) (a : Bool) (w : Word) :
         rw [show (a :: u) ++ [b] = [a] ++ (u ++ [b]) by simp, subAt_append]
       rw [hcons, part_concat, hsub, part_concat]
       by_cases hcut : IsCut s (subAt (subAt T [a]) (u ++ [b]))
-      · rw [if_pos hcut, if_pos hcut]
+      · rw [ite_eq_left hcut, ite_eq_left hcut]
         simp
-      · rw [if_neg hcut, if_neg hcut, ih]
+      · rw [ite_eq_right hcut, ite_eq_right hcut, ih]
 
 /-- The step rule below a vertex with one child. -/
 lemma part_one_false (t : Tri) (w : Word) :
@@ -280,25 +280,25 @@ lemma length_cutAddrs (t : Tri) : (cutAddrs s t).length = RTree.sizeF (cutForest
   induction t with
   | leaf =>
       by_cases h : IsCut s leaf
-      · rw [cutAddrs_leaf, cutForest_leaf, if_pos h, if_pos h]
+      · rw [cutAddrs_leaf, cutForest_leaf, ite_eq_left h, ite_eq_left h]
         simp
-      · rw [cutAddrs_leaf, cutForest_leaf, if_neg h, if_neg h]
+      · rw [cutAddrs_leaf, cutForest_leaf, ite_eq_right h, ite_eq_right h]
         simp
   | one t ih =>
       by_cases h : IsCut s (one t)
-      · rw [cutAddrs_one, cutForest_one, if_pos h, if_pos h]
+      · rw [cutAddrs_one, cutForest_one, ite_eq_left h, ite_eq_left h]
         simp only [List.length_cons, List.length_map, RTree.sizeF_cons, RTree.sizeF_nil,
           RTree.size_node, ih]
         omega
-      · rw [cutAddrs_one, cutForest_one, if_neg h, if_neg h]
+      · rw [cutAddrs_one, cutForest_one, ite_eq_right h, ite_eq_right h]
         simp only [List.length_map, ih]
   | two l r ihl ihr =>
       by_cases h : IsCut s (two l r)
-      · rw [cutAddrs_two, cutForest_two, if_pos h, if_pos h]
+      · rw [cutAddrs_two, cutForest_two, ite_eq_left h, ite_eq_left h]
         simp only [List.length_cons, List.length_append, List.length_map, RTree.sizeF_cons,
           RTree.sizeF_nil, RTree.size_node, RTree.sizeF_append, ihl, ihr]
         omega
-      · rw [cutAddrs_two, cutForest_two, if_neg h, if_neg h]
+      · rw [cutAddrs_two, cutForest_two, ite_eq_right h, ite_eq_right h]
         simp only [List.length_append, List.length_map, RTree.sizeF_append, ihl, ihr]
 
 /-- **`thm:dilution`**, the vertices of the contraction listed by address: the
@@ -338,12 +338,12 @@ lemma ne_nil_of_mem_rootAddrs {t : Tri} {x : Word} (h : x ∈ rootAddrs s t) : x
 /-- The root of a subtree is listed exactly when the subtree is cut. -/
 lemma isCut_of_nil_mem_cutAddrs {t : Tri} (h : ([] : Word) ∈ cutAddrs s t) : IsCut s t := by
   by_contra hc
-  rw [cutAddrs_eq, if_neg hc] at h
+  rw [cutAddrs_eq, ite_eq_right hc] at h
   exact ne_nil_of_mem_rootAddrs h rfl
 
 /-- A cut subtree lists its own root. -/
 lemma nil_mem_cutAddrs {t : Tri} (h : IsCut s t) : ([] : Word) ∈ cutAddrs s t := by
-  rw [cutAddrs_eq, if_pos h]
+  rw [cutAddrs_eq, ite_eq_left h]
   exact List.mem_cons_self
 
 /-- A part root of the subtree below a vertex with one child is one of the
@@ -393,13 +393,13 @@ lemma part_eq_nil_or_mem_cutAddrs : ∀ (t : Tri) (w : Word), t.IsAddr w →
           | false =>
               rw [part_one_false]
               by_cases hp : part s t w = []
-              · rw [if_pos hp]
+              · rw [ite_eq_left hp]
                 by_cases hc : IsCut s t
-                · rw [if_pos hc]
+                · rw [ite_eq_left hc]
                   exact Or.inr (mem_cutAddrs_one (List.mem_map_of_mem (nil_mem_cutAddrs hc)))
-                · rw [if_neg hc]
+                · rw [ite_eq_right hc]
                   exact Or.inl rfl
-              · rw [if_neg hp]
+              · rw [ite_eq_right hp]
                 rcases ih w hw with h | h
                 · exact absurd h hp
                 · exact Or.inr (mem_cutAddrs_one (List.mem_map_of_mem h))
@@ -412,28 +412,28 @@ lemma part_eq_nil_or_mem_cutAddrs : ∀ (t : Tri) (w : Word), t.IsAddr w →
           | false =>
               rw [part_two_false]
               by_cases hp : part s l w = []
-              · rw [if_pos hp]
+              · rw [ite_eq_left hp]
                 by_cases hc : IsCut s l
-                · rw [if_pos hc]
+                · rw [ite_eq_left hc]
                   exact Or.inr (mem_cutAddrs_two_left
                     (List.mem_map_of_mem (nil_mem_cutAddrs hc)))
-                · rw [if_neg hc]
+                · rw [ite_eq_right hc]
                   exact Or.inl rfl
-              · rw [if_neg hp]
+              · rw [ite_eq_right hp]
                 rcases ihl w hw with h | h
                 · exact absurd h hp
                 · exact Or.inr (mem_cutAddrs_two_left (List.mem_map_of_mem h))
           | true =>
               rw [part_two_true]
               by_cases hp : part s r w = []
-              · rw [if_pos hp]
+              · rw [ite_eq_left hp]
                 by_cases hc : IsCut s r
-                · rw [if_pos hc]
+                · rw [ite_eq_left hc]
                   exact Or.inr (mem_cutAddrs_two_right
                     (List.mem_map_of_mem (nil_mem_cutAddrs hc)))
-                · rw [if_neg hc]
+                · rw [ite_eq_right hc]
                   exact Or.inl rfl
-              · rw [if_neg hp]
+              · rw [ite_eq_right hp]
                 rcases ihr w hw with h | h
                 · exact absurd h hp
                 · exact Or.inr (mem_cutAddrs_two_right (List.mem_map_of_mem h))
@@ -476,8 +476,8 @@ lemma isAddr_and_part_eq_of_mem_cutAddrs : ∀ (t : Tri) (x : Word), x ∈ cutAd
         rw [part_one_false]
         by_cases hzn : z = []
         · subst hzn
-          rw [if_pos hz2, if_pos (isCut_of_nil_mem_cutAddrs hz)]
-        · rw [if_neg (by rw [hz2]; exact hzn), hz2]
+          rw [ite_eq_left hz2, ite_eq_left (isCut_of_nil_mem_cutAddrs hz)]
+        · rw [ite_eq_right (by rw [hz2]; exact hzn), hz2]
       split at hx
       · rcases List.mem_cons.mp hx with rfl | hx'
         · exact ⟨isAddr_nil _, part_nil _⟩
@@ -496,8 +496,8 @@ lemma isAddr_and_part_eq_of_mem_cutAddrs : ∀ (t : Tri) (x : Word), x ∈ cutAd
         rw [part_two_false]
         by_cases hzn : z = []
         · subst hzn
-          rw [if_pos hz2, if_pos (isCut_of_nil_mem_cutAddrs hz)]
-        · rw [if_neg (by rw [hz2]; exact hzn), hz2]
+          rw [ite_eq_left hz2, ite_eq_left (isCut_of_nil_mem_cutAddrs hz)]
+        · rw [ite_eq_right (by rw [hz2]; exact hzn), hz2]
       have hright : ∀ y ∈ (cutAddrs s r).map (fun w => true :: w),
           (two l r).IsAddr y ∧ part s (two l r) y = y := by
         intro y hy
@@ -508,8 +508,8 @@ lemma isAddr_and_part_eq_of_mem_cutAddrs : ∀ (t : Tri) (x : Word), x ∈ cutAd
         rw [part_two_true]
         by_cases hzn : z = []
         · subst hzn
-          rw [if_pos hz2, if_pos (isCut_of_nil_mem_cutAddrs hz)]
-        · rw [if_neg (by rw [hz2]; exact hzn), hz2]
+          rw [ite_eq_left hz2, ite_eq_left (isCut_of_nil_mem_cutAddrs hz)]
+        · rw [ite_eq_right (by rw [hz2]; exact hzn), hz2]
       have hforest : ∀ y ∈ rootAddrs s (two l r),
           (two l r).IsAddr y ∧ part s (two l r) y = y := by
         intro y hy

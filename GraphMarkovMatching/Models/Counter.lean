@@ -51,21 +51,21 @@ lemma varyK_of_four_le {k : ℕ} (hk : 4 ≤ k) (v : V) :
   show (if 4 ≤ k then PMF.pure ((v0, k / 2), (v0, k - k / 2))
     else if k = 3 then (freshQ μ ν).map fun f => ((v0, 2), f)
     else prodPMF (freshQ μ ν) (freshQ μ ν)) = _
-  rw [if_pos hk]
+  rw [ite_eq_left hk]
 
 lemma varyK_three (v : V) :
     varyK μ ν v0 (v, 3) = (freshQ μ ν).map fun f => ((v0, 2), f) := by
   show (if 4 ≤ 3 then PMF.pure ((v0, 3 / 2), (v0, 3 - 3 / 2))
     else if 3 = 3 then (freshQ μ ν).map fun f => ((v0, 2), f)
     else prodPMF (freshQ μ ν) (freshQ μ ν)) = _
-  rw [if_neg (by omega), if_pos rfl]
+  rw [ite_eq_right (by omega), ite_eq_left rfl]
 
 lemma varyK_of_le_two {k : ℕ} (hk : k ≤ 2) (v : V) :
     varyK μ ν v0 (v, k) = prodPMF (freshQ μ ν) (freshQ μ ν) := by
   show (if 4 ≤ k then PMF.pure ((v0, k / 2), (v0, k - k / 2))
     else if k = 3 then (freshQ μ ν).map fun f => ((v0, 2), f)
     else prodPMF (freshQ μ ν) (freshQ μ ν)) = _
-  rw [if_neg (by omega), if_neg (by omega)]
+  rw [ite_eq_right (by omega), ite_eq_right (by omega)]
 
 lemma Xi_of_four_le {k : ℕ} (hk : 4 ≤ k) (h : ℕ) :
     Xi μ ν v0 k h

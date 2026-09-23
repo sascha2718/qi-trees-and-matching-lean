@@ -60,11 +60,11 @@ lemma shapePMF_eq_tsum (θ : Offspring 2) (hq : θ.extinction < 1) (hq0 : 0 < θ
   · have hset : {u : ℝ | shapeLabel τ u = x} = Set.univ := by
       ext u
       simp [h]
-    rw [hset, measure_univ, mul_one, if_pos h]
+    rw [hset, measure_univ, mul_one, ite_eq_left h]
   · have hset : {u : ℝ | shapeLabel τ u = x} = (∅ : Set ℝ) := by
       ext u
       simp [h]
-    rw [hset, measure_empty, mul_zero, if_neg h]
+    rw [hset, measure_empty, mul_zero, ite_eq_right h]
 
 /-- The fix is the identity on the support, so the pushforward only adds mass there. -/
 lemma shapeMass_le_shapePMF (θ : Offspring 2) (hq : θ.extinction < 1)
@@ -72,9 +72,10 @@ lemma shapeMass_le_shapePMF (θ : Offspring 2) (hq : θ.extinction < 1)
     shapeMass θ σ ≤ shapePMF θ hq hq0 h2 σ := by
   rw [shapePMF_eq_tsum θ hq hq0 h2]
   have hterm : (if σ.fix = σ then shapeMass θ σ else 0) = shapeMass θ σ :=
-    if_pos (fix_eq_self hσ)
+    ite_eq_left (fix_eq_self hσ)
   calc shapeMass θ σ = if σ.fix = σ then shapeMass θ σ else 0 := hterm.symm
-    _ ≤ ∑' τ : Shape, if τ.fix = σ then shapeMass θ τ else 0 := ENNReal.le_tsum σ
+    _ ≤ ∑' τ : Shape, if τ.fix = σ then shapeMass θ τ else 0 :=
+        ENNReal.le_tsum (f := fun τ : Shape ↦ if τ.fix = σ then shapeMass θ τ else 0) σ
 
 /-- **The size fibres of the label law**: the labels of a given size carry the mass of the
 shapes whose fix has that size, which is the law `fixSizeMass`. -/
@@ -91,11 +92,11 @@ lemma tsum_fibre_size_shapePMF (θ : Offspring 2) (hq : θ.extinction < 1)
     _ = ∑' τ : Shape, (if τ.fix.size = n then shapeMass θ τ else 0) := by
         refine tsum_congr fun τ ↦ ?_
         by_cases hτ : τ.fix.size = n
-        · rw [if_pos hτ]
-          refine (tsum_eq_single ⟨τ.fix, hτ⟩ fun v hv ↦ ?_).trans (if_pos rfl)
-          exact if_neg fun h ↦ hv (Subtype.ext h.symm)
-        · rw [if_neg hτ]
-          refine (tsum_congr fun v ↦ if_neg fun h ↦ hτ ?_).trans tsum_zero
+        · rw [ite_eq_left hτ]
+          refine (tsum_eq_single ⟨τ.fix, hτ⟩ fun v hv ↦ ?_).trans (ite_eq_left rfl)
+          exact ite_eq_right fun h ↦ hv (Subtype.ext h.symm)
+        · rw [ite_eq_right hτ]
+          refine (tsum_congr fun v ↦ ite_eq_right fun h ↦ hτ ?_).trans tsum_zero
           rw [h]
           exact v.2
     _ = shapeStatMassE θ (fun σ ↦ σ.fix.size) n := rfl
@@ -355,9 +356,10 @@ theorem pow_le_gdeg_shapeNet (θ : Offspring 2) (hq : θ.extinction < 1)
     rw [rE]
     calc (shapePMF θ hq hq0 h2 σ₀ : ℝ≥0∞)
         = if compat (shapeNet Dq) σ σ₀ then shapePMF θ hq hq0 h2 σ₀ else 0 :=
-          (if_pos hcompat).symm
+          (ite_eq_left hcompat).symm
       _ ≤ ∑' y, if compat (shapeNet Dq) σ y then shapePMF θ hq hq0 h2 y else 0 :=
-          ENNReal.le_tsum σ₀
+          ENNReal.le_tsum
+            (f := fun y : Shape ↦ if compat (shapeNet Dq) σ y then shapePMF θ hq hq0 h2 y else 0) σ₀
   have htoReal := ENNReal.toReal_mono
     (rE_ne_top (μ := shapePMF θ hq hq0 h2) (R := compat (shapeNet Dq)) (x := σ))
     (hmass.trans hle)
@@ -385,8 +387,8 @@ lemma one_sub_le_gdeg_of_small {V : Type*} (μ : PMF V) (G : SimpleGraph V) (sz 
     rw [rE]
     refine ENNReal.tsum_le_tsum fun y ↦ ?_
     by_cases hy : sz y ≤ N
-    · rw [if_pos hy, if_pos (hv y hy)]
-    · rw [if_neg hy]
+    · rw [ite_eq_left hy, ite_eq_left (hv y hy)]
+    · rw [ite_eq_right hy]
       exact zero_le
   have hA : (∑' y, if sz y ≤ N then μ y else 0) ≠ ⊤ :=
     ne_top_of_le_ne_top ENNReal.one_ne_top (hsplit ▸ le_self_add)
@@ -457,16 +459,16 @@ theorem tsum_shapePMF_large_le (θ : Offspring 2) (hq : θ.extinction < 1)
         · have hzero : ∀ y : {y : Shape // y.size = n},
               (if (y : Shape).size ≤ N then 0 else shapePMF θ hq hq0 h2 y) = 0 := by
             intro y
-            rw [if_pos (by rw [y.2]; exact hn)]
+            rw [ite_eq_left (by rw [y.2]; exact hn)]
           rw [tsum_congr hzero, tsum_zero, hhdef]
           simp [hn]
         · have hterm : ∀ y : {y : Shape // y.size = n},
               (if (y : Shape).size ≤ N then 0 else shapePMF θ hq hq0 h2 y)
                 = shapePMF θ hq hq0 h2 y := by
             intro y
-            rw [if_neg (by rw [y.2]; exact hn)]
+            rw [ite_eq_right (by rw [y.2]; exact hn)]
           rw [tsum_congr hterm, tsum_fibre_size_shapePMF θ hq hq0 h2 n, hhdef]
-          simp only [hn, if_false]
+          simp only [hn, ite_false]
           exact (ofReal_shapeStatMass θ hq hq0 h2 (fun σ ↦ σ.fix.size) n).symm
     _ = ENNReal.ofReal (∑' n : ℕ, hh n) := (ENNReal.ofReal_tsum_of_nonneg hh0 hhsum).symm
     _ ≤ ENNReal.ofReal (Real.exp (-c * (N : ℝ))) := ENNReal.ofReal_le_ofReal hkey

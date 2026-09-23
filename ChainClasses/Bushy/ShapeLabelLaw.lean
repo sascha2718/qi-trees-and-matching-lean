@@ -105,7 +105,7 @@ noncomputable def shapeExt (S : Finset Word) (f : ↥S → Shape) (w : Word) : S
 
 lemma shapeExt_mem {S : Finset Word} (f : ↥S → Shape) (w : ↥S) :
     shapeExt S f w.1 = f w := by
-  rw [shapeExt, dif_pos w.2]
+  rw [shapeExt, dite_eq_left w.2]
 
 /-- **The shape field on a finite set of copies**: the samples whose shapes at the copies
 of `S` are the prescribed ones. -/
@@ -115,7 +115,7 @@ def shapeEvent (S : Finset Word) (f : ↥S → Shape) : Set (Amb → ℕ) :=
 lemma shapeEvent_eq_iInter (S : Finset Word) (f : ↥S → Shape) :
     shapeEvent S f = ⋂ w ∈ S, {c : Amb → ℕ | shapeAt c w = shapeExt S f w} := by
   ext c
-  simp only [shapeEvent, Set.mem_setOf_eq, Set.mem_iInter]
+  simp only [shapeEvent, Set.mem_ofPred_eq, Set.mem_iInter]
   constructor
   · intro h w hw
     have := h ⟨w, hw⟩
@@ -255,7 +255,7 @@ theorem bushyMeasure_shapeLab_prod [MeasurableSpace V] (θ : Offspring 2)
   have hdecomp : (⋂ w ∈ S, {ω : BushySample | shapeLab ℓ ω w = v w})
       = ⋃ f : ↥S → Shape, shapeEvent S f ×ˢ B f := by
     ext ω
-    simp only [Set.mem_iInter, Set.mem_setOf_eq, Set.mem_iUnion, Set.mem_prod, hB, hA,
+    simp only [Set.mem_iInter, Set.mem_ofPred_eq, Set.mem_iUnion, Set.mem_prod, hB, hA,
       shapeEvent, Set.mem_preimage, BranchingProcess.coord]
     constructor
     · intro hω

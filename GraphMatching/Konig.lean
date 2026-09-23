@@ -29,7 +29,7 @@ def restrictAut : (h : ℕ) → Aut (h + 1) → Aut h
 instance instFiniteAut (h : ℕ) : Finite (Aut h) := by
   induction h with
   | zero => exact inferInstanceAs (Finite Unit)
-  | succ h ih => haveI := ih; show Finite (Bool × Aut h × Aut h); infer_instance
+  | succ h ih => have := ih; show Finite (Bool × Aut h × Aut h); infer_instance
 
 /-- The `i ≤ j` projection `Aut j → Aut i`, iterating `restrictAut`. -/
 def projAut {i : ℕ} : ∀ {j : ℕ}, i ≤ j → Aut j → Aut i :=
@@ -67,7 +67,7 @@ theorem exists_compat_branch (Good : (h : ℕ) → Aut h → Prop)
     induction hij with
     | refl => intro π hπ; rw [projAut_refl]; exact hπ
     | step hij ih => intro π hπ; rw [projAut_succ hij]; exact ih _ (hcompat _ π hπ)
-  haveI : ∀ h, Nonempty {π : Aut h // Good h π} := fun h => (hne h).elim fun π hπ => ⟨π, hπ⟩
+  have : ∀ h, Nonempty {π : Aut h // Good h π} := fun h => (hne h).elim fun π hπ => ⟨π, hπ⟩
   let proj : ∀ {i j : ℕ}, i ≤ j → {π : Aut j // Good j π} → {π : Aut i // Good i π} :=
     fun {i j} hij π => ⟨projAut hij π.1, hgood hij π.1 π.2⟩
   obtain ⟨f, hf⟩ := exists_seq_forall_proj_of_forall_finite

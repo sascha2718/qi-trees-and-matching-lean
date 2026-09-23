@@ -75,7 +75,7 @@ lemma gDecEvent_eq (k : ℕ) (β : List RTree) :
     ({c : GWord N → ℕ | skeletonDegree c = k} ∩ {c : GWord N → ℕ | gDecList c = β})
       = decorationEvent (N := N) (k + β.length) k (listSets (N := N) β) := by
   ext c
-  simp only [Set.mem_inter_iff, Set.mem_setOf_eq, decorationEvent]
+  simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, decorationEvent]
   constructor
   · rintro ⟨hdeg, hdec⟩
     obtain ⟨hlen, hval⟩ := gDecList_eq_iff.mp hdec
@@ -84,13 +84,13 @@ lemma gDecEvent_eq (k : ℕ) (β : List RTree) :
     refine ⟨⟨hroot, hdeg⟩, ?_⟩
     intro m hm
     have hm' : m < β.length := by omega
-    rw [listSets, dif_pos hm']
+    rw [listSets, dite_eq_left hm']
     exact hval m hm'
   · rintro ⟨⟨hroot, hdeg⟩, hdy⟩
     refine ⟨hdeg, gDecList_eq_iff.mpr ⟨by omega, ?_⟩⟩
     intro m hm
     have hmem := hdy m (by omega)
-    rwa [listSets, dif_pos hm] at hmem
+    rwa [listSets, dite_eq_left hm] at hmem
 
 /-! ### The decorated step -/
 
@@ -116,7 +116,7 @@ theorem survivalMeasure_gDec_step (θ : Offspring J) (hJN : J ≤ N) (hq : θ.ex
       refine measure_mono_null (fun c hc ↦ ?_)
         (BranchingProcess.survivalMeasure_coord_gt θ hJN [])
       have hroot : c [] = k + β.length := hc.1.1.1
-      rw [Set.mem_setOf_eq, hroot]
+      rw [Set.mem_ofPred_eq, hroot]
       omega
     have hmass : decorationMass (N := N) θ (k + β.length) k (listSets β) = 0 := by
       rw [decorationMass, θ.vanishing (k + β.length) (by omega)]
@@ -163,7 +163,7 @@ lemma measurableSet_gSplitBush_box {κ : ℕ} {A : ℕ → Set (GWord N → ℕ)
   have he : {c : GWord N → ℕ | ∀ m : ℕ, m < κ → gSplitBush c m ∈ A m}
       = ⋂ m ∈ Finset.range κ, (fun c : GWord N → ℕ ↦ gSplitBush c m) ⁻¹' (A m) := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.mem_preimage, Finset.mem_range]
+    simp only [Set.mem_ofPred_eq, Set.mem_iInter, Set.mem_preimage, Finset.mem_range]
   rw [he]
   exact MeasurableSet.biInter (Set.to_countable _)
     fun m _ ↦ measurable_gSplitBush m (hA m)
@@ -193,7 +193,7 @@ theorem survivalMeasure_gShapeSplit (θ : Offspring J) (hJN : J ≤ N)
               ∩ {c : GWord N → ℕ | gDecList c = β})
             ∩ {c : GWord N → ℕ | ∀ m : ℕ, m < κ → bushAt c m ∈ A m}) := by
         ext c
-        simp only [List.nil_append, Set.mem_inter_iff, Set.mem_setOf_eq]
+        simp only [List.nil_append, Set.mem_inter_iff, Set.mem_ofPred_eq]
         constructor
         · rintro ⟨⟨hdecs, harity⟩, hbush⟩
           obtain ⟨hdeg, hdec⟩ := (gShapeRoot_split_iff hκ).mp ⟨hdecs, harity⟩
@@ -236,7 +236,7 @@ theorem survivalMeasure_gShapeSplit (θ : Offspring J) (hJN : J ≤ N)
                   ∈ (if m = 0 then E else Set.univ)})
             ∩ {c : GWord N → ℕ | Survives c}) := by
         ext c
-        simp only [List.cons_append, Set.mem_inter_iff, Set.mem_setOf_eq]
+        simp only [List.cons_append, Set.mem_inter_iff, Set.mem_ofPred_eq]
         constructor
         · rintro ⟨⟨⟨hdecs, harity⟩, hbush⟩, hsurv⟩
           obtain ⟨hdeg, hdec, hin⟩ := (gShapeRoot_neck_iff hsurv hM hκ A).mp
@@ -245,18 +245,18 @@ theorem survivalMeasure_gShapeSplit (θ : Offspring J) (hJN : J ≤ N)
           intro m hm
           have hm0 : m = 0 := by omega
           subst hm0
-          rw [if_pos rfl, hE]
+          rw [ite_eq_left rfl, hE]
           exact ⟨⟨hin.1, hin.2.1⟩, hin.2.2⟩
         · rintro ⟨⟨⟨hdeg, hdec⟩, hbush⟩, hsurv⟩
           have hmem := hbush 0 (by omega)
-          rw [if_pos rfl, hE] at hmem
+          rw [ite_eq_left rfl, hE] at hmem
           obtain ⟨⟨hdecs', harity'⟩, hbush'⟩ := hmem
           obtain ⟨hdecs, harity, hbushA⟩ := (gShapeRoot_neck_iff hsurv hM hκ A).mpr
             ⟨hdeg, hdec, hdecs', harity', hbush'⟩
           exact ⟨⟨⟨hdecs, harity⟩, hbushA⟩, hsurv⟩
       rw [measure_eq_of_inter_ae hnull hset,
         survivalMeasure_gDec_step θ hJN hq hq0 one_ne_zero β' hAmeas,
-        Finset.prod_range_one, if_pos rfl, hE, ih, List.map_cons, List.prod_cons,
+        Finset.prod_range_one, ite_eq_left rfl, hE, ih, List.map_cons, List.prod_cons,
         ← gDecMass_def]
       ring
 

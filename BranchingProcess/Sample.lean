@@ -124,7 +124,7 @@ theorem coe_sample (c : Word N → ℕ) :
       have hsplit : (j :: u : Word N) = [j] ++ u := rfl
       rw [SetLike.mem_coe, hsplit, append_mem_sample_iff, singleton_mem_sample_iff]
       simp only [Set.mem_union, Set.mem_singleton_iff, Set.mem_iUnion, Set.mem_image,
-        Set.mem_setOf_eq, SetLike.mem_coe]
+        Set.mem_ofPred_eq, SetLike.mem_coe]
       constructor
       · rintro ⟨hj, hu⟩
         exact Or.inr ⟨j, hj, u, hu, rfl⟩

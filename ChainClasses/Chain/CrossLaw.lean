@@ -114,7 +114,7 @@ lemma measurableSet_markLab_fibre (a b : ℝ) (D : ℕ) (w : Word) (k : ℕ) :
       = ⋃ m : ℕ, {χ : Word → Bool | labAux χ w = m}
           ×ˢ {u : Word → ℝ | ellQ a b D m (u w) = k} := by
     ext p
-    simp only [Set.mem_setOf_eq, Set.mem_iUnion, Set.mem_prod, markLab]
+    simp only [Set.mem_ofPred_eq, Set.mem_iUnion, Set.mem_prod, markLab]
     constructor
     · intro h
       exact ⟨labAux p.1 w, rfl, h⟩
@@ -138,7 +138,7 @@ lemma measurableSet_ellQ_pair (a b : ℝ) (D k : ℕ) :
   have hset : {p : ℕ × ℝ | ellQ a b D p.1 p.2 = k}
       = ⋃ n : ℕ, ({n} : Set ℕ) ×ˢ {u : ℝ | ellQ a b D n u = k} := by
     ext p
-    simp only [Set.mem_setOf_eq, Set.mem_iUnion, Set.mem_prod, Set.mem_singleton_iff]
+    simp only [Set.mem_ofPred_eq, Set.mem_iUnion, Set.mem_prod, Set.mem_singleton_iff]
     constructor
     · intro h
       exact ⟨p.1, rfl, h⟩
@@ -167,7 +167,7 @@ lemma chainMeasure_label_map (ht' : 0 < t') (ht1' : t' ≤ 1) (hb : (0 : ℝ) < 
   · rw [chainMeasure_label_marginal ht' ht1' w hm]
     congr 1
     unfold gmass
-    rw [if_neg (by omega : ¬ m = 0)]
+    rw [ite_eq_right (by omega : ¬ m = 0)]
     ring
 
 /-- **Clause (ii) of `thm:chain-coupling` at one vertex**: averaging the
@@ -215,7 +215,7 @@ theorem markedMeasure_class_prod (ht' : 0 < t') (ht1' : t' ≤ 1) (ha : (0 : ℝ
         = ⋂ w ∈ S, (BranchingProcess.coord w : (Word → ℝ) → ℝ) ⁻¹'
             {u : ℝ | ellQ (1 - t) (1 - t') D (labAux χ w) u = n w} := by
       ext u
-      simp only [Set.mem_preimage, Set.mem_iInter, Set.mem_setOf_eq, markLab,
+      simp only [Set.mem_preimage, Set.mem_iInter, Set.mem_ofPred_eq, markLab,
         BranchingProcess.coord]
     rw [hslice, uniField_iInter S _
       fun w _ ↦ ellQ_section_measurable (1 - t) (1 - t') D (labAux χ w) (n w)]
@@ -341,12 +341,12 @@ lemma measurable_cqXY (a b : ℝ) (D h : ℕ) :
       (cqX D h ω, cqY a b D h ω) := by
   have hfst : Measurable fun ω : (Word → Bool) × (Word → Bool) × (Word → ℝ) ↦
       fun s : Word ↦ levelMap D (labAux ω.1 s) :=
-    measurable_pi_lambda _ fun s ↦
+    Measurable.of_eval fun s ↦
       (measurable_from_top (f := levelMap D)).comp
         ((measurable_chain_labAux s).comp measurable_fst)
   have hsnd : Measurable fun ω : (Word → Bool) × (Word → Bool) × (Word → ℝ) ↦
       fun s : Word ↦ markLab a b D ω.2 s :=
-    measurable_pi_lambda _ fun s ↦ (measurable_markLab a b D s).comp measurable_snd
+    Measurable.of_eval fun s ↦ (measurable_markLab a b D s).comp measurable_snd
   exact ((measurable_readLab h).comp hfst).prodMk ((measurable_readLab h).comp hsnd)
 
 /-- The level-`h` projection of the coupled class field has the i.i.d. law
@@ -363,7 +363,7 @@ lemma markedMeasure_readLab (ht : 0 < t) (ht1 : t ≤ 1) (ht' : 0 < t') (ht1' : 
       = ⋂ s ∈ Vtx h, {p : (Word → Bool) × (Word → ℝ) |
           markLab (1 - t) (1 - t') D p s = GraphMatching.coord h y s} := by
     ext p
-    simp only [Set.mem_setOf_eq, Set.mem_iInter]
+    simp only [Set.mem_ofPred_eq, Set.mem_iInter]
     exact readLab_eq_iff h _ y
   rw [hset, markedMeasure_class_prod ht' ht1' ha ha1 hb hb1 hD hgD (Vtx h)
       (fun s ↦ GraphMatching.coord h y s), fullMu_apply_prod]
@@ -389,7 +389,7 @@ lemma crossMeasure_map (ht : 0 < t) (ht1 : t ≤ 1) (ht' : 0 < t') (ht1' : t' �
         ×ˢ {p : (Word → Bool) × (Word → ℝ) |
           readLab (fun s ↦ markLab (1 - t) (1 - t') D p s) h = y} := by
     ext ω
-    simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_prod, Set.mem_setOf_eq,
+    simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_prod, Set.mem_ofPred_eq,
       Prod.mk.injEq, cqX, cqY]
   rw [hpre, crossMeasure, Measure.prod_prod, chainMeasure_readLab ht ht1 hD,
     markedMeasure_readLab ht ht1 ht' ht1' ha ha1 hb hb1 hD hgD,
@@ -412,7 +412,7 @@ lemma measurableSet_crossMatchEvent (a b : ℝ) (D : ℕ) :
       = ⋂ h : ℕ, {ω : (Word → Bool) × (Word → Bool) × (Word → ℝ) |
           fullSim (compat pathGraph) h (cqX D h ω) (cqY a b D h ω)} := by
     ext ω
-    simp only [crossMatchEvent, Set.mem_setOf_eq, Set.mem_iInter]
+    simp only [crossMatchEvent, Set.mem_ofPred_eq, Set.mem_iInter]
     exact infMatch_iff_forall_level (compat pathGraph) _ _ (fun h ↦ restrictLab_cqX D h ω)
       (fun h ↦ restrictLab_cqY a b D h ω)
   rw [hset]
@@ -664,7 +664,7 @@ lemma crossMeasure_not_chains (ht : 0 < t) (ht1 : t ≤ 1) (ht' : 0 < t') (ht1' 
         ∪ ((Set.univ : Set (Word → Bool)) ×ˢ
             ({χ : Word → Bool | ¬ Chains χ} ×ˢ (Set.univ : Set (Word → ℝ)))) := by
     intro ω hω
-    simp only [Set.mem_union, Set.mem_prod, Set.mem_univ, Set.mem_setOf_eq, and_true, true_and]
+    simp only [Set.mem_union, Set.mem_prod, Set.mem_univ, Set.mem_ofPred_eq, and_true, true_and]
     by_cases hc : Chains ω.1
     · exact Or.inr fun hc2 ↦ hω ⟨hc, hc2⟩
     · exact Or.inl hc

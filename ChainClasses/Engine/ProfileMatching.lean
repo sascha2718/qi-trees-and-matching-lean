@@ -27,7 +27,7 @@ noncomputable def presentationFamily (P : Presentation) (σ : Bool) : Family whe
     · exact ⟨_, _, Or.inl rfl⟩
 
 lemma presentationFamily_tree (P : Presentation) (σ : Bool) {k : ℕ} (hk : k ∈ P.supp σ) :
-    (presentationFamily P σ).tree k = P.C σ k := if_pos hk
+    (presentationFamily P σ).tree k = P.C σ k := ite_eq_left hk
 
 noncomputable def encodedStates (C : Family) (lab ar : GWord N → ℕ) (v0 n : ℕ) : FullLab ℕ n :=
   statesOf n (encLab C lab ar v0 n)
@@ -54,7 +54,7 @@ lemma measurableSet_infMatch (R : ℕ → ℕ → Prop)
   have heq : {ω | InfMatch R (fun n => X n ω) (fun n => Y n ω)} =
       ⋂ n, (fun ω => (X n ω, Y n ω)) ⁻¹' {p | fullSimK R 1 0 n p.1 p.2} := by
     ext ω
-    simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.mem_preimage]
+    simp only [Set.mem_ofPred_eq, Set.mem_iInter, Set.mem_preimage]
     exact infMatchK_iff_forall_level R 1 0 _ _ (fun n => hX n ω) (fun n => hY n ω)
   rw [heq]
   exact MeasurableSet.iInter fun n => (hM n) (Set.to_countable _).measurableSet

@@ -470,18 +470,18 @@ lemma coupling_sum (ha : 0 < a) (ha1 : a < 1) (hb : 0 < b) (hb1 : b < 1) (hD : 2
     have e3 : DQ a b D k < n ∧ n < DQ a b D (k + 1) := by omega
     have e4 : ¬n = 0 := by omega
     unfold uWeight gmass
-    rw [if_neg e1, if_neg e2, if_pos e3, if_neg e4, one_mul]
+    rw [ite_eq_right e1, ite_eq_right e2, ite_eq_left e3, ite_eq_right e4, one_mul]
   have hend1 : uWeight a b D k (DQ a b D k) * gmass b (DQ a b D k)
       = (1 - betaQ a b D k) * (b ^ (DQ a b D k - 1) * (1 - b)) := by
     have e5 : ¬DQ a b D k = 0 := by omega
     unfold uWeight gmass
-    rw [if_pos rfl, if_neg e5]
+    rw [ite_eq_left rfl, ite_eq_right e5]
   have hend2 : uWeight a b D k (DQ a b D (k + 1)) * gmass b (DQ a b D (k + 1))
       = betaQ a b D (k + 1) * (b ^ (DQ a b D (k + 1) - 1) * (1 - b)) := by
     have e6 : ¬DQ a b D (k + 1) = DQ a b D k := by omega
     have e7 : ¬DQ a b D (k + 1) = 0 := by omega
     unfold uWeight gmass
-    rw [if_neg e6, if_pos rfl, if_neg e7]
+    rw [ite_eq_right e6, ite_eq_left rfl, ite_eq_right e7]
   rw [hint, hend1, hend2,
     geom_block_sum b (A := DQ a b D k + 1) (B := DQ a b D (k + 1)) (by omega) (by omega)]
   have hgm : b ^ (DQ a b D k - 1) * (1 - b) = b ^ (DQ a b D k - 1) - b ^ DQ a b D k := by
@@ -542,10 +542,10 @@ lemma ellQ_section_volume (ha : 0 < a) (ha1 : a < 1) (hb : 0 < b) (hb1 : b < 1)
           simp [hall u]
         rw [hset, Measure.restrict_apply_univ, Real.volume_Ico]
         unfold uWeight
-        rw [if_pos (by omega : (1 : ℕ) = DQ a b D 0), betaQ_zero]
+        rw [ite_eq_left (by omega : (1 : ℕ) = DQ a b D 0), betaQ_zero]
       · have hset : {u : ℝ | ellQ a b D 1 u = k} = ∅ := by
           ext u
-          simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false, hall u]
+          simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false, hall u]
           omega
         rw [hset, measure_empty]
         have h1 := succ_le_DQ ha ha1 hb hb1 hD hgD k
@@ -554,7 +554,7 @@ lemma ellQ_section_volume (ha : 0 < a) (ha1 : a < 1) (hb : 0 < b) (hb1 : b < 1)
         have e2 : ¬(1 : ℕ) = DQ a b D (k + 1) := by omega
         have e3 : ¬(DQ a b D k < 1 ∧ 1 < DQ a b D (k + 1)) := by omega
         unfold uWeight
-        rw [if_neg e1, if_neg e2, if_neg e3, ENNReal.ofReal_zero]
+        rw [ite_eq_right e1, ite_eq_right e2, ite_eq_right e3, ENNReal.ofReal_zero]
     · -- `j = i + 1`: the split endpoint between classes `i` and `i + 1`
       have hβ0 := betaQ_nonneg ha ha1 hb hb1 hD (i + 1)
       have hβ1 := betaQ_lt_one ha ha1 hb hb1 hD (i + 1)
@@ -563,7 +563,7 @@ lemma ellQ_section_volume (ha : 0 < a) (ha1 : a < 1) (hb : 0 < b) (hb1 : b < 1)
       · subst hk1
         have hset : {u : ℝ | ellQ a b D n u = i + 1} = Set.Ici (betaQ a b D (i + 1)) := by
           ext u
-          simp only [Set.mem_setOf_eq, Set.mem_Ici]
+          simp only [Set.mem_ofPred_eq, Set.mem_Ici]
           constructor
           · intro h
             by_contra hcon
@@ -582,12 +582,12 @@ lemma ellQ_section_volume (ha : 0 < a) (ha1 : a < 1) (hb : 0 < b) (hb1 : b < 1)
             exact ⟨h1, le_trans hβ0 h1, h2⟩
         rw [hins, Real.volume_Ico]
         unfold uWeight
-        rw [if_pos heq.symm]
+        rw [ite_eq_left heq.symm]
       · by_cases hk2 : k = i
         · subst hk2
           have hset : {u : ℝ | ellQ a b D n u = k} = Set.Iio (betaQ a b D (k + 1)) := by
             ext u
-            simp only [Set.mem_setOf_eq, Set.mem_Iio]
+            simp only [Set.mem_ofPred_eq, Set.mem_Iio]
             constructor
             · intro h
               by_contra hcon
@@ -607,10 +607,10 @@ lemma ellQ_section_volume (ha : 0 < a) (ha1 : a < 1) (hb : 0 < b) (hb1 : b < 1)
           rw [hins, Real.volume_Ico, sub_zero]
           have e1 : ¬n = DQ a b D k := by omega
           unfold uWeight
-          rw [if_neg e1, if_pos heq.symm]
+          rw [ite_eq_right e1, ite_eq_left heq.symm]
         · have hset : {u : ℝ | ellQ a b D n u = k} = ∅ := by
             ext u
-            simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+            simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
             intro h
             by_cases hu : betaQ a b D (i + 1) ≤ u
             · have := (ellQ_endpoint ha ha1 hb hb1 hD hgD u heq).2 hu
@@ -633,7 +633,7 @@ lemma ellQ_section_volume (ha : 0 < a) (ha1 : a < 1) (hb : 0 < b) (hb1 : b < 1)
             have h2' := hmono.lt_iff_lt.mp hc2
             omega
           unfold uWeight
-          rw [if_neg e1, if_neg e2, if_neg e3, ENNReal.ofReal_zero]
+          rw [ite_eq_right e1, ite_eq_right e2, ite_eq_right e3, ENNReal.ofReal_zero]
   · -- `n` lies strictly between cut points: the class is forced
     have hall : ∀ u : ℝ, ellQ a b D n u = j :=
       fun u => ellQ_interior ha ha1 hb hb1 hD hgD u hlt hj2
@@ -646,11 +646,11 @@ lemma ellQ_section_volume (ha : 0 < a) (ha1 : a < 1) (hb : 0 < b) (hb1 : b < 1)
       have e1 : ¬n = DQ a b D j := by omega
       have e2 : ¬n = DQ a b D (j + 1) := by omega
       unfold uWeight
-      rw [if_neg e1, if_neg e2, if_pos ⟨hlt, hj2⟩]
+      rw [ite_eq_right e1, ite_eq_right e2, ite_eq_left ⟨hlt, hj2⟩]
       norm_num
     · have hset : {u : ℝ | ellQ a b D n u = k} = ∅ := by
         ext u
-        simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false, hall u]
+        simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false, hall u]
         omega
       rw [hset, measure_empty]
       have e1 : ¬n = DQ a b D k := by
@@ -671,7 +671,7 @@ lemma ellQ_section_volume (ha : 0 < a) (ha1 : a < 1) (hb : 0 < b) (hb1 : b < 1)
         have h2' := hmono.lt_iff_lt.mp (lt_trans hlt hc2)
         omega
       unfold uWeight
-      rw [if_neg e1, if_neg e2, if_neg e3, ENNReal.ofReal_zero]
+      rw [ite_eq_right e1, ite_eq_right e2, ite_eq_right e3, ENNReal.ofReal_zero]
 
 /-- Clause (ii) of **`thm:chain-coupling`**: under the product of the second
 law and the uniform variable `U` on `[0,1)`, the coupled class has the law `p^{(D)}`
@@ -684,7 +684,7 @@ theorem coupling_law (ha : 0 < a) (ha1 : a < 1) (hb : 0 < b) (hb1 : b < 1) (hD :
     have hset : {p : ℕ × ℝ | ellQ a b D p.1 p.2 = k}
         = ⋃ n : ℕ, ({n} : Set ℕ) ×ˢ {u : ℝ | ellQ a b D n u = k} := by
       ext p
-      simp only [Set.mem_setOf_eq, Set.mem_iUnion, Set.mem_prod, Set.mem_singleton_iff]
+      simp only [Set.mem_ofPred_eq, Set.mem_iUnion, Set.mem_prod, Set.mem_singleton_iff]
       constructor
       · intro h
         exact ⟨p.1, rfl, h⟩
@@ -724,7 +724,7 @@ theorem coupling_law (ha : 0 < a) (ha1 : a < 1) (hb : 0 < b) (hb1 : b < 1) (hD :
         have e3 : ¬(DQ a b D k < n ∧ n < DQ a b D (k + 1)) := by omega
         have hz : uWeight a b D k n = 0 := by
           unfold uWeight
-          rw [if_neg e1, if_neg e2, if_neg e3]
+          rw [ite_eq_right e1, ite_eq_right e2, ite_eq_right e3]
         rw [hz, zero_mul, ENNReal.ofReal_zero]
     _ = ENNReal.ofReal (∑ n ∈ Finset.Ico (DQ a b D k) (DQ a b D (k + 1) + 1),
           uWeight a b D k n * gmass b n) :=

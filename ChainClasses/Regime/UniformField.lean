@@ -141,7 +141,7 @@ lemma drawNat_fibre {p : ℕ → ℝ≥0∞} (hp : ∑' n, p n = 1) (n : ℕ) :
     {u ∈ Set.Ico (0 : ℝ) 1 | drawNat p u = n}
       = Set.Ico (cumMass p n) (cumMass p (n + 1)) := by
   ext u
-  simp only [Set.mem_setOf_eq, Set.mem_Ico]
+  simp only [Set.mem_ofPred_eq, Set.mem_Ico]
   constructor
   · rintro ⟨hu, h⟩
     exact (drawNat_eq_iff hp hu).mp h
@@ -222,7 +222,7 @@ lemma volume_drawBy_fibre (ν : PMF T) (t : T) :
   have : {u ∈ Set.Ico (0 : ℝ) 1 | drawBy ν u = t}
       = {u ∈ Set.Ico (0 : ℝ) 1 | drawNat (encMass ν) u = Encodable.encode t} := by
     ext u
-    simp only [Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq]
     exact and_congr_right fun hu ↦ drawBy_eq_iff ν hu t
   rw [this, volume_drawNat_fibre (tsum_encMass ν), encMass_encode]
 
@@ -255,7 +255,7 @@ noncomputable def condDraw (π : PMF (T × T)) (σ : T) (u : ℝ) : T :=
 /-- **The conditional draw has the conditional law.** -/
 lemma volume_condDraw_fibre (π : PMF (T × T)) {σ : T} (h : margFstT π σ ≠ 0) (τ : T) :
     volume {u ∈ Set.Ico (0 : ℝ) 1 | condDraw π σ u = τ} = π (σ, τ) / margFstT π σ := by
-  simp only [condDraw, dif_pos h]
+  simp only [condDraw, dite_eq_left h]
   exact volume_drawBy_fibre (condPMF π σ h) τ
 
 /-- The conditional law against the mass of its condition is the coupling mass, the
@@ -271,9 +271,9 @@ lemma margFstT_mul_volume_condDraw_fibre (π : PMF (T × T)) (σ τ : T) :
 lemma measurableSet_condDraw_fibre (π : PMF (T × T)) (σ τ : T) :
     MeasurableSet {u : ℝ | condDraw π σ u = τ} := by
   by_cases h : margFstT π σ ≠ 0
-  · simp only [condDraw, dif_pos h]
+  · simp only [condDraw, dite_eq_left h]
     exact measurableSet_drawBy_fibre _ τ
-  · simp only [condDraw, dif_neg h]
+  · simp only [condDraw, dite_eq_right h]
     exact MeasurableSet.const _
 
 /-! ### A sum over patterns of a product -/
@@ -325,7 +325,7 @@ theorem prod_uniformField_pattern {Ω ι T V : Type*} [MeasurableSpace Ω] [Coun
   have hcover : (⋂ u ∈ F, {ω : Ω × (ι → ℝ) | lab u (X ω.1 u) (ω.2 u) = a u})
       = ⋃ f : ↥F → T, CPart f ×ˢ UPart f := by
     ext ⟨c, U⟩
-    simp only [Set.mem_iInter, Set.mem_setOf_eq, Set.mem_iUnion, Set.mem_prod, hCPart,
+    simp only [Set.mem_iInter, Set.mem_ofPred_eq, Set.mem_iUnion, Set.mem_prod, hCPart,
       hUPart]
     constructor
     · intro h
@@ -340,7 +340,7 @@ theorem prod_uniformField_pattern {Ω ι T V : Type*} [MeasurableSpace Ω] [Coun
     funext u
     have h1 := hω.1
     have h2 := hω'.1
-    simp only [hCPart, Set.mem_iInter, Set.mem_setOf_eq] at h1 h2
+    simp only [hCPart, Set.mem_iInter, Set.mem_ofPred_eq] at h1 h2
     rw [← h1 u, ← h2 u]
   have hmeas : ∀ f : ↥F → T, MeasurableSet (CPart f ×ˢ UPart f) := fun f ↦
     (MeasurableSet.iInter fun u : ↥F ↦ hX u (f u)).prod
@@ -354,20 +354,20 @@ theorem prod_uniformField_pattern {Ω ι T V : Type*} [MeasurableSpace Ω] [Coun
   have hAeq : ∀ u (hu : u ∈ F), A u = {r : ℝ | lab u (f ⟨u, hu⟩) r = a u} := by
     intro u hu
     ext r
-    simp only [hA, Set.mem_setOf_eq]
+    simp only [hA, Set.mem_ofPred_eq]
     exact ⟨fun h ↦ h hu, fun h _ ↦ h⟩
   have hAmeas : ∀ u ∈ F, MeasurableSet (A u) := fun u hu ↦ by
     rw [hAeq u hu]
     exact hlab u _ (a u)
   have hU : UPart f = ⋂ u ∈ F, {U : ι → ℝ | U u ∈ A u} := by
     ext U
-    simp only [hUPart, hA, Set.mem_iInter, Set.mem_setOf_eq]
+    simp only [hUPart, hA, Set.mem_iInter, Set.mem_ofPred_eq]
     exact ⟨fun h u hu hu' ↦ h ⟨u, hu'⟩, fun h u ↦ h u u.2 u.2⟩
   rw [hU, uniformField_pattern F A hAmeas, ← Finset.prod_coe_sort]
   refine Finset.prod_congr rfl fun u _ ↦ ?_
   congr 1
   ext r
-  simp only [hAeq u u.2, Set.mem_inter_iff, Set.mem_setOf_eq]
+  simp only [hAeq u u.2, Set.mem_inter_iff, Set.mem_ofPred_eq]
   exact and_comm
 
 end ChainClasses

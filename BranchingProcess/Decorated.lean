@@ -57,11 +57,11 @@ lemma split_preimage_dyingOnly (j : ℕ) (S : Finset (Fin N)) (B : ℕ → Set (
       = {c : Word N → ℕ | ∀ i : Fin N, i ∉ S → (i : ℕ) < j →
           (fun w : Word N ↦ c (i :: w)) ∈ B (i : ℕ)} := by
   ext c
-  simp only [Set.mem_preimage, Set.mem_pi, Set.mem_univ, forall_const, Set.mem_setOf_eq]
+  simp only [Set.mem_preimage, Set.mem_pi, Set.mem_univ, forall_const, Set.mem_ofPred_eq]
   constructor
   · intro h i hiS hij
     have hval := h (some i)
-    rw [dyingOnly_some, if_neg hiS, if_pos hij] at hval
+    rw [dyingOnly_some, ite_eq_right hiS, ite_eq_left hij] at hval
     exact hval
   · intro h i
     cases i with
@@ -69,13 +69,13 @@ lemma split_preimage_dyingOnly (j : ℕ) (S : Finset (Fin N)) (B : ℕ → Set (
     | some i =>
         rw [dyingOnly_some]
         by_cases hiS : i ∈ S
-        · rw [if_pos hiS]
+        · rw [ite_eq_left hiS]
           exact Set.mem_univ _
-        · rw [if_neg hiS]
+        · rw [ite_eq_right hiS]
           by_cases hij : (i : ℕ) < j
-          · rw [if_pos hij]
+          · rw [ite_eq_left hij]
             exact h i hiS hij
-          · rw [if_neg hij]
+          · rw [ite_eq_right hij]
             exact Set.mem_univ _
 
 /-- **The joint product event**: the root has `j` children, those named by `S` found
@@ -144,7 +144,7 @@ lemma split_preimage_jointBox {j : ℕ} {S : Finset (Fin N)} (hS : S ⊆ childSe
   rw [hbox, Set.preimage_inter, Set.preimage_inter, split_preimage_skelBox j S hS,
     split_preimage_bushesOnly, split_preimage_dyingOnly]
   ext c
-  simp only [Set.mem_inter_iff, Set.mem_setOf_eq, forall_bushOf_iff S A c]
+  simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, forall_bushOf_iff S A c]
 
 /-- **The product over the children of a root with `j` children** of a factor indexed by
 the rank at a surviving child, by the letter at a dying one, and trivial at a letter
@@ -162,19 +162,19 @@ lemma prod_ite_joint {j : ℕ} {S : Finset (Fin N)} (hS : S ⊆ childSet N j)
     have hiS : i ∉ S := fun hc ↦ hi.2 (mem_childSet.mp (hS hc))
     rw [hf]
     simp only
-    rw [if_neg hiS, if_neg hi.2]
+    rw [ite_eq_right hiS, ite_eq_right hi.2]
   have hdying : ∏ i ∈ childSet N j \ S, f i = ∏ i ∈ childSet N j \ S, Y i := by
     refine Finset.prod_congr rfl fun i hi ↦ ?_
     rw [Finset.mem_sdiff, mem_childSet] at hi
     rw [hf]
     simp only
-    rw [if_neg hi.2, if_pos hi.1]
+    rw [ite_eq_right hi.2, ite_eq_left hi.1]
   have hsurv : ∏ i ∈ S, f i = ∏ m ∈ Finset.range S.card, X m := by
     have hfac : ∀ i ∈ S, f i = X (rankOf S i) := by
       intro i hi
       rw [hf]
       simp only
-      rw [if_pos hi]
+      rw [ite_eq_left hi]
     rw [Finset.prod_congr rfl hfac, prod_rankOf]
   rw [← Finset.prod_sdiff (Finset.subset_univ (childSet N j)), houter, one_mul,
     ← Finset.prod_sdiff hS, hdying, hsurv]
@@ -211,15 +211,15 @@ theorem sampleMeasure_root_joint (θ : Offspring J) (hJN : J ≤ N) (hq : θ.ext
       intro i
       rw [jointBox_some]
       by_cases hiS : i ∈ S
-      · rw [if_pos hiS, if_pos hiS]
+      · rw [ite_eq_left hiS, ite_eq_left hiS]
         exact (infinitePi_branch_some θ i _).trans
           (sampleMeasure_survives_inter θ hJN hq (A (rankOf S i)))
-      · rw [if_neg hiS, if_neg hiS]
+      · rw [ite_eq_right hiS, ite_eq_right hiS]
         by_cases hij : (i : ℕ) < j
-        · rw [if_pos hij, if_pos hij]
+        · rw [ite_eq_left hij, ite_eq_left hij]
           exact (infinitePi_branch_some θ i _).trans
             (sampleMeasure_notSurvives_inter θ hJN hq0 (B (i : ℕ)))
-        · rw [if_neg hij, if_neg hij]
+        · rw [ite_eq_right hij, ite_eq_right hij]
           exact (infinitePi_branch_some θ i Set.univ).trans measure_univ
     rw [Finset.prod_congr rfl fun i _ ↦ hfac i,
       prod_ite_joint hS
@@ -246,7 +246,7 @@ lemma measurableSet_forall_dying (j : ℕ) (S : Finset (Fin N)) {B : Set (Word N
       = ⋂ i : Fin N, ⋂ _ : i ∉ S, ⋂ _ : (i : ℕ) < j,
           (fun c : Word N → ℕ ↦ (fun w : Word N ↦ c (i :: w))) ⁻¹' B := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.mem_preimage]
+    simp only [Set.mem_ofPred_eq, Set.mem_iInter, Set.mem_preimage]
   rw [h]
   exact MeasurableSet.iInter fun i ↦ MeasurableSet.iInter fun _ ↦
     MeasurableSet.iInter fun _ ↦ measurable_shift i hB
@@ -275,7 +275,7 @@ theorem sampleMeasure_root_one_survivor (θ : Offspring J) (hJN : J ≤ N)
             ∩ {c : Word N → ℕ | ∀ i : Fin N, i ∉ S → (i : ℕ) < j →
                 (fun w : Word N ↦ c (i :: w)) ∈ B}) := by
     ext c
-    simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_iUnion, Finset.mem_powersetCard,
+    simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, Set.mem_iUnion, Finset.mem_powersetCard,
       exists_prop]
     constructor
     · rintro ⟨⟨⟨hroot, hdeg⟩, hbush⟩, hdying⟩

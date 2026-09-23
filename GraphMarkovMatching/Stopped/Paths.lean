@@ -98,8 +98,8 @@ lemma zeroMass_mono {s : I} {D D' : Set I} (hD : D ⊆ D') (h : ℕ) :
   refine ENNReal.tsum_le_tsum fun x => mul_le_mul_right ?_ _
   by_cases hx : M.ZeroEv D' h x
   · have hx' : M.ZeroEv D h x := fun t ht => hx t (hD ht)
-    rw [if_pos hx, if_pos hx']
-  · rw [if_neg hx]
+    rw [ite_eq_left hx, ite_eq_left hx']
+  · rw [ite_eq_right hx]
     exact zero_le
 
 /-- Enlarging the target set enlarges the union of zero events (`sec:unweighted`). -/
@@ -109,8 +109,8 @@ lemma unionMass_mono {s : I} {D D' : Set I} (hD : D ⊆ D') (h : ℕ) :
   by_cases hx : M.UnionEv D h x
   · obtain ⟨t, ht, h0⟩ := hx
     have hx' : M.UnionEv D' h x := ⟨t, hD ht, h0⟩
-    rw [if_pos ⟨t, ht, h0⟩, if_pos hx']
-  · rw [if_neg hx]
+    rw [ite_eq_left ⟨t, ht, h0⟩, ite_eq_left hx']
+  · rw [ite_eq_right hx]
     exact zero_le
 
 /-- The weighted zero integral is antitone in the target set (`sec:unweighted`). -/
@@ -119,8 +119,8 @@ lemma wZero_mono {α : ℝ} {s u : I} {D D' : Set I} (hD : D ⊆ D') (h : ℕ) :
   refine ENNReal.tsum_le_tsum fun x => mul_le_mul_right ?_ _
   by_cases hx : M.ZeroEv D' h x
   · have hx' : M.ZeroEv D h x := fun t ht => hx t (hD ht)
-    rw [if_pos hx, if_pos hx']
-  · rw [if_neg hx]
+    rw [ite_eq_left hx, ite_eq_left hx']
+  · rw [ite_eq_right hx]
     exact zero_le
 
 /-- The weighted union integral is monotone in the target set (`eq:zero-union-moment`). -/
@@ -130,8 +130,8 @@ lemma wUnion_mono {α : ℝ} {s u : I} {D D' : Set I} (hD : D ⊆ D') (h : ℕ) 
   by_cases hx : M.UnionEv D h x
   · obtain ⟨t, ht, h0⟩ := hx
     have hx' : M.UnionEv D' h x := ⟨t, hD ht, h0⟩
-    rw [if_pos ⟨t, ht, h0⟩, if_pos hx']
-  · rw [if_neg hx]
+    rw [ite_eq_left ⟨t, ht, h0⟩, ite_eq_left hx']
+  · rw [ite_eq_right hx]
     exact zero_le
 
 /-- The mass of a finite union of zero events is at most the sum of the zero masses. -/
@@ -147,7 +147,7 @@ lemma unionMass_le_sum (s : I) (D : Finset I) (h : ℕ) :
     rw [← mul_add]
     refine mul_le_mul_right ?_ _
     by_cases hx : M.UnionEv (↑(insert a D)) h x
-    · rw [if_pos hx]
+    · rw [ite_eq_left hx]
       obtain ⟨t, ht, h0⟩ := hx
       rw [Finset.coe_insert, Set.mem_insert_iff, Finset.mem_coe] at ht
       rcases ht with rfl | ht
@@ -155,12 +155,12 @@ lemma unionMass_le_sum (s : I) (D : Finset I) (h : ℕ) :
           rw [Set.mem_singleton_iff] at ht'
           rw [ht']
           exact h0
-        rw [if_pos hz]
+        rw [ite_eq_left hz]
         exact le_add_right le_rfl
       · have hu : M.UnionEv (↑D) h x := ⟨t, ht, h0⟩
-        rw [if_pos hu]
+        rw [ite_eq_left hu]
         exact le_add_left le_rfl
-    · rw [if_neg hx]
+    · rw [ite_eq_right hx]
       exact zero_le
 
 /-- The mass of a union of at most `T` zero events, each of mass at most `Z`, is at most
@@ -244,7 +244,7 @@ lemma wZero_eq_zero_of_fresh {α : ℝ} (hFP : M.FreshPositive) {s f : I} (hs : 
   by_cases hx : M.rho s h x = 0
   · rw [hx, zero_mul]
   · have hne : ¬ M.ZeroEv D h x := fun hz => hFP h s f x hs hf hx (hz f hfD)
-    rw [if_neg hne, mul_zero]
+    rw [ite_eq_right hne, mul_zero]
 
 /-- The zero mass against a fresh target is zero for a fresh source under fresh
 positivity. -/
@@ -255,7 +255,7 @@ lemma zeroMass_eq_zero_of_fresh (hFP : M.FreshPositive) {s f : I} (hs : M.fresh 
   by_cases hx : M.rho s h x = 0
   · rw [hx, zero_mul]
   · have hne : ¬ M.ZeroEv D h x := fun hz => hFP h s f x hs hf hx (hz f hfD)
-    rw [if_neg hne, mul_zero]
+    rw [ite_eq_right hne, mul_zero]
 
 /-- A nonempty set of types has a possible child, since every kernel `π_t` is charged
 somewhere (`sec:finite-hypotheses`). -/

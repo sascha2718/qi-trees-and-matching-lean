@@ -58,7 +58,7 @@ lemma measurable_shift_of_fibreMeasurable {g : (Amb → ℕ) → Amb} (hg : Fibr
   have he : (fun c ↦ shift c (g c)) ⁻¹' T
       = ⋃ v : Amb, ({c : Amb → ℕ | g c = v} ∩ (fun c : Amb → ℕ ↦ shift c v) ⁻¹' T) := by
     ext c
-    simp only [Set.mem_preimage, Set.mem_iUnion, Set.mem_inter_iff, Set.mem_setOf_eq]
+    simp only [Set.mem_preimage, Set.mem_iUnion, Set.mem_inter_iff, Set.mem_ofPred_eq]
     exact ⟨fun h ↦ ⟨g c, rfl, h⟩, by rintro ⟨v, rfl, h⟩; exact h⟩
   rw [he]
   exact MeasurableSet.iUnion fun v ↦ (hg v).inter (measurable_shiftMap v hT)
@@ -102,7 +102,7 @@ lemma splitDepth_eq_zero_iff {c : Amb → ℕ} (hc : IsBushySample c) :
     omega
   · intro h
     have hmem : (0 : ℕ) ∈ {k | 2 ≤ skeletonDegree (shift c (neckRay c [] k))} := by
-      simp only [Set.mem_setOf_eq, neckRay_zero, shift_nil, h]
+      simp only [Set.mem_ofPred_eq, neckRay_zero, shift_nil, h]
       omega
     exact Nat.le_zero.mp (Nat.sInf_le hmem)
 
@@ -142,19 +142,19 @@ theorem survivalMeasure_shapeSplitEvent (θ : Offspring 2) (hq : θ.extinction <
         intro m
         rw [hAdef]
         by_cases h0 : m = 0
-        · simp only [if_pos h0]
+        · simp only [ite_eq_left h0]
           exact hA₀
         · by_cases h1 : m = 1
-          · simp only [if_neg h0, if_pos h1]
+          · simp only [ite_eq_right h0, ite_eq_left h1]
             exact hA₁
-          · simp only [if_neg h0, if_neg h1]
+          · simp only [ite_eq_right h0, ite_eq_right h1]
             exact MeasurableSet.univ
       have hset : shapeSplitEvent A₀ A₁ [] ∩ {c : Amb → ℕ | IsBushySample c}
           = ({c : Amb → ℕ | skeletonDegree c = 2}
               ∩ {c : Amb → ℕ | ∀ m : ℕ, m < 2 → bushAt c m ∈ A m})
             ∩ {c : Amb → ℕ | IsBushySample c} := by
         ext c
-        simp only [shapeSplitEvent, Set.mem_inter_iff, Set.mem_setOf_eq]
+        simp only [shapeSplitEvent, Set.mem_inter_iff, Set.mem_ofPred_eq]
         constructor
         · rintro ⟨⟨hdecs, hb₀, hb₁⟩, hc⟩
           have hzero : splitDepth c [] = 0 := by
@@ -199,7 +199,7 @@ theorem survivalMeasure_shapeSplitEvent (θ : Offspring 2) (hq : θ.extinction <
               ∩ {c : Amb → ℕ | bushAt c 0 ∈ shapeSplitEvent A₀ A₁ l})
             ∩ {c : Amb → ℕ | IsBushySample c} := by
         ext c
-        simp only [shapeSplitEvent, Set.mem_inter_iff, Set.mem_setOf_eq]
+        simp only [shapeSplitEvent, Set.mem_inter_iff, Set.mem_ofPred_eq]
         constructor
         · rintro ⟨⟨hdecs, hb₀, hb₁⟩, hc⟩
           obtain ⟨hdeg, hdec, htail⟩ := (decs_shapeAt_nil_cons hc o l).mp hdecs
@@ -226,7 +226,7 @@ theorem survivalMeasure_shapeAt_nil_split (θ : Offspring 2) (hq : θ.extinction
           * survivalMeasure (N := 2) θ A₀ * survivalMeasure (N := 2) θ A₁ := by
   have he : {c : Amb → ℕ | shapeAt c [] = σ} = {c : Amb → ℕ | (shapeAt c []).decs = σ.decs} := by
     ext c
-    simp only [Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq]
     exact ⟨fun h ↦ by rw [h], fun h ↦ Shape.eq_of_decs h⟩
   rw [he]
   exact survivalMeasure_shapeSplitEvent θ hq hq0 h2 hA₀ hA₁ σ.decs
@@ -239,7 +239,7 @@ lemma splitDepth_shift (c : Amb → ℕ) (u v : Amb) :
   have hset : {k | 2 ≤ skeletonDegree (shift c (neckRay c (u ++ v) k))}
       = {k | 2 ≤ skeletonDegree (shift (shift c u) (neckRay (shift c u) v k))} := by
     ext k
-    simp only [Set.mem_setOf_eq, ← neckRay_shift_base c u v k, shift_shift]
+    simp only [Set.mem_ofPred_eq, ← neckRay_shift_base c u v k, shift_shift]
   rw [splitDepth, splitDepth, hset]
 
 lemma splitDepth_shift_nil (c : Amb → ℕ) (u : Amb) :

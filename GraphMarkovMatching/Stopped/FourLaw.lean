@@ -358,17 +358,17 @@ private lemma dpInd_le_one {X : Type} (τ₁ τ₂ : PMF X) (R : X → X → Pro
 /-- Off `{r_{τ₁} > 0}` the indicator of `F` vanishes. -/
 private lemma dpInd_eq_zero_left {X : Type} {τ₁ τ₂ : PMF X} {R : X → X → Prop} {x : X}
     (h : rE τ₁ R x = 0) : dpInd τ₁ τ₂ R x = 0 := by
-  unfold dpInd; rw [if_pos (Or.inl h)]
+  unfold dpInd; rw [ite_eq_left (Or.inl h)]
 
 /-- Off `{r_{τ₂} > 0}` the indicator of `F` vanishes. -/
 private lemma dpInd_eq_zero_right {X : Type} {τ₁ τ₂ : PMF X} {R : X → X → Prop} {x : X}
     (h : rE τ₂ R x = 0) : dpInd τ₁ τ₂ R x = 0 := by
-  unfold dpInd; rw [if_pos (Or.inr h)]
+  unfold dpInd; rw [ite_eq_left (Or.inr h)]
 
 /-- On `F` the indicator is one. -/
 private lemma dpInd_eq_one {X : Type} {τ₁ τ₂ : PMF X} {R : X → X → Prop} {x : X}
     (h₁ : rE τ₁ R x ≠ 0) (h₂ : rE τ₂ R x ≠ 0) : dpInd τ₁ τ₂ R x = 1 := by
-  unfold dpInd; rw [if_neg (not_or.mpr ⟨h₁, h₂⟩)]
+  unfold dpInd; rw [ite_eq_right (not_or.mpr ⟨h₁, h₂⟩)]
 
 /-- `∫_F q_τ dρ ≤ P(ρ,τ)` when `F ⊆ {r_τ > 0}`. -/
 private lemma tsum_resQ_le_PhiDres {X : Type} {α : ℝ} (hα : 0 ≤ α) (ρ τ₁ τ₂ τ : PMF X)
@@ -377,8 +377,8 @@ private lemma tsum_resQ_le_PhiDres {X : Type} {α : ℝ} (hα : 0 ≤ α) (ρ τ
   rw [PhiDres]
   refine ENNReal.tsum_le_tsum fun x => mul_le_mul_right ?_ _
   by_cases h : rE τ R x = 0
-  · rw [resQ, hF x h, zero_mul, if_pos h]
-  · rw [if_neg h, resQ]
+  · rw [resQ, hF x h, zero_mul, ite_eq_left h]
+  · rw [ite_eq_right h, resQ]
     calc dpInd τ₁ τ₂ R x * qE τ R x ≤ 1 * qE τ R x :=
           mul_le_mul_left (dpInd_le_one τ₁ τ₂ R x) _
       _ = qE τ R x := one_mul _
@@ -404,7 +404,7 @@ private lemma resPsi_pt {X : Type} {α β L : ℝ} (hα : 0 ≤ α) (hβ : 0 ≤
     2 * resPsi α τ₁ τ₂ R x + ENNReal.ofReal β * (resQ τ₁ τ₂ τ₁ R x + resQ τ₁ τ₂ τ₂ R x)
       ≤ ENNReal.ofReal L * (resPhi α τ₁ R x + resPhi α τ₂ R x) := by
   by_cases h : rE τ₁ R x = 0 ∨ rE τ₂ R x = 0
-  · have h0 : dpInd τ₁ τ₂ R x = 0 := by unfold dpInd; rw [if_pos h]
+  · have h0 : dpInd τ₁ τ₂ R x = 0 := by unfold dpInd; rw [ite_eq_left h]
     simp only [resPsi, resQ, h0, zero_mul, mul_zero, add_zero]
     exact zero_le
   · push Not at h
@@ -420,7 +420,7 @@ private lemma resPsi_pt {X : Type} {α β L : ℝ} (hα : 0 ≤ α) (hβ : 0 ≤
     have hφp : 0 ≤ phi α (q τ₁ R x * q τ₂ R x) := phi_nonneg (mul_nonneg hn1 hn2) hp
     have hL0 : 0 ≤ L := le_trans hβ (beta_le_of_hL hL)
     have hreal := phi_mul_le_beta hα hβ hL hn1 hq1 hn2 hq2
-    simp only [resPsi, resQ, resPhi, e1, one_mul, if_neg h1, if_neg h2]
+    simp only [resPsi, resQ, resPhi, e1, one_mul, ite_eq_right h1, ite_eq_right h2]
     rw [phiE_of_lt hp, phiE_of_lt hq1, phiE_of_lt hq2, qE_eq_ofReal_q, qE_eq_ofReal_q]
     calc 2 * ENNReal.ofReal (phi α (q τ₁ R x * q τ₂ R x))
           + ENNReal.ofReal β * (ENNReal.ofReal (q τ₁ R x) + ENNReal.ofReal (q τ₂ R x))
@@ -493,8 +493,8 @@ lemma failureD_symm {X : Type} (ρ τ : PMF X) (R : X → X → Prop)
     intro x y
     unfold badInd
     by_cases h : R x y
-    · rw [if_pos h, if_pos (hsymm x y h)]
-    · rw [if_neg h, if_neg (fun h' => h (hsymm y x h'))]
+    · rw [ite_eq_left h, ite_eq_left (hsymm x y h)]
+    · rw [ite_eq_right h, ite_eq_right (fun h' => h (hsymm y x h'))]
   calc failureD ρ τ R = ∑' x, ∑' y, ρ x * (τ y * badInd R x y) := by
         rw [failureD]
         exact tsum_congr fun x => by rw [qE_eq_tsum_mul, ENNReal.tsum_mul_left]
@@ -516,11 +516,11 @@ private lemma failureD_le_resQ {X : Type} (ρ τ₁ τ₂ τ : PMF X) (R : X →
   refine ENNReal.tsum_le_tsum fun x => ?_
   by_cases h : rE τ₁ R x = 0 ∨ rE τ₂ R x = 0
   · rcases h with h | h
-    · rw [if_pos h, mul_one]
+    · rw [ite_eq_left h, mul_one]
       calc ρ x * qE τ R x ≤ ρ x * 1 := mul_le_mul_right qE_le_one _
         _ = ρ x := mul_one _
         _ ≤ _ := le_add_self.trans le_self_add
-    · rw [if_pos h, mul_one]
+    · rw [ite_eq_left h, mul_one]
       calc ρ x * qE τ R x ≤ ρ x * 1 := mul_le_mul_right qE_le_one _
         _ = ρ x := mul_one _
         _ ≤ _ := le_add_self
@@ -545,11 +545,11 @@ private lemma tsum_qE_sq_le {X : Type} {α β K : ℝ} (hα : 0 ≤ α) (hβ0 : 
   · have hq1 : qE ρ R y = 1 := by
       have := rE_add_qE ρ R y
       rwa [h, zero_add] at this
-    rw [if_pos h, if_pos h, hq1]
+    rw [ite_eq_left h, ite_eq_left h, hq1]
     simp only [mul_zero, mul_one, zero_add, one_pow]
     rw [← add_mul, ← ENNReal.ofReal_add hβ0 (by linarith),
       show β + (1 - β) = (1 : ℝ) from by ring, ENNReal.ofReal_one, one_mul]
-  · rw [if_neg h, if_neg h, mul_zero, mul_zero, add_zero]
+  · rw [ite_eq_right h, ite_eq_right h, mul_zero, mul_zero, add_zero]
     have hq : q ρ R y < 1 := q_lt_one_of_rE_ne_zero h
     have hn : 0 ≤ q ρ R y := q_nonneg
     have hφ : 0 ≤ phi α (q ρ R y) := phi_nonneg hn hq
@@ -660,9 +660,9 @@ private lemma PhiDres_square_split {X : Type} {α : ℝ} (hα : 0 < α) (ρ₁ �
           * (WresD α τ₂ R p.1 * (if rE τ₂ R p.2 = 0 then WresD α τ₁ R p.2 else 0)) := by
     rintro ⟨x₁, x₂⟩
     by_cases hsq : rE (prodPMF τ₁ τ₂) (SquareRel R) (x₁, x₂) = 0
-    · rw [if_pos hsq, mul_zero]
+    · rw [ite_eq_left hsq, mul_zero]
       exact zero_le
-    · rw [if_neg hsq]
+    · rw [ite_eq_right hsq]
       by_cases hd : rE τ₁ R x₁ = 0 ∨ rE τ₂ R x₁ = 0 ∨ rE τ₁ R x₂ = 0 ∨ rE τ₂ R x₂ = 0
       · rcases hd with h | h | h | h
         · -- `r_{τ₁}(x₁) = 0`: the straight pairing is blocked, the crossed survives
@@ -674,7 +674,7 @@ private lemma PhiDres_square_split {X : Type} {α : ℝ} (hα : 0 < α) (ρ₁ �
             mul_comm] at hb
           refine le_trans (le_trans (mul_le_mul_right hb _) ?_)
             (le_add_self.trans (le_self_add.trans (le_self_add.trans le_self_add)))
-          rw [if_pos h]
+          rw [ite_eq_left h]
         · -- `r_{τ₂}(x₁) = 0`: the crossed pairing is blocked, the straight survives
           have hst : rE τ₁ R x₁ * rE τ₂ R x₂ ≠ 0 := fun hc =>
             hsq ((rE_square_eq_zero_iff τ₁ τ₂ R x₁ x₂).mpr ⟨hc, by rw [h, mul_zero]⟩)
@@ -683,7 +683,7 @@ private lemma PhiDres_square_split {X : Type} {α : ℝ} (hα : 0 < α) (ρ₁ �
           rw [rE_rpow_neg_eq_WresD τ₁ R x₁ hc0, rE_rpow_neg_eq_WresD τ₂ R x₂ hd1] at hb
           refine le_trans (le_trans (mul_le_mul_right hb _) ?_)
             (le_add_self.trans (le_self_add.trans le_self_add))
-          rw [if_pos h]
+          rw [ite_eq_left h]
         · -- `r_{τ₁}(x₂) = 0`: the crossed pairing is blocked, the straight survives
           have hst : rE τ₁ R x₁ * rE τ₂ R x₂ ≠ 0 := fun hc =>
             hsq ((rE_square_eq_zero_iff τ₁ τ₂ R x₁ x₂).mpr ⟨hc, by rw [h, zero_mul]⟩)
@@ -692,7 +692,7 @@ private lemma PhiDres_square_split {X : Type} {α : ℝ} (hα : 0 < α) (ρ₁ �
           rw [rE_rpow_neg_eq_WresD τ₁ R x₁ hc0, rE_rpow_neg_eq_WresD τ₂ R x₂ hd1] at hb
           refine le_trans (le_trans (mul_le_mul_right hb _) ?_)
             (le_add_self.trans le_self_add)
-          rw [if_pos h]
+          rw [ite_eq_left h]
         · -- `r_{τ₂}(x₂) = 0`: the straight pairing is blocked, the crossed survives
           have hcr : rE τ₁ R x₂ * rE τ₂ R x₁ ≠ 0 := fun hc =>
             hsq ((rE_square_eq_zero_iff τ₁ τ₂ R x₁ x₂).mpr ⟨by rw [h, mul_zero], hc⟩)
@@ -701,7 +701,7 @@ private lemma PhiDres_square_split {X : Type} {α : ℝ} (hα : 0 < α) (ρ₁ �
           rw [rE_rpow_neg_eq_WresD τ₁ R x₂ hc1, rE_rpow_neg_eq_WresD τ₂ R x₁ hd0,
             mul_comm] at hb
           refine le_trans (le_trans (mul_le_mul_right hb _) ?_) le_add_self
-          rw [if_pos h]
+          rw [ite_eq_left h]
       · push Not at hd
         obtain ⟨hn11, hn12, hn21, hn22⟩ := hd
         refine le_trans (le_of_eq ?_)
@@ -782,11 +782,11 @@ private lemma main_sum_le {X : Type} {α u : ℝ} (hα : 1 ≤ α) (hu0 : 0 < u)
           * (cOverlap τ₂ R p.1 p.2 * (WresD α τ₂ R p.1 * WresD α τ₁ R p.2)) := by
     rintro ⟨x₁, x₂⟩
     by_cases h1 : rE τ₁ R x₁ = 0 ∨ rE τ₂ R x₁ = 0
-    · have h0 : dpInd τ₁ τ₂ R x₁ = 0 := by unfold dpInd; rw [if_pos h1]
+    · have h0 : dpInd τ₁ τ₂ R x₁ = 0 := by unfold dpInd; rw [ite_eq_left h1]
       simp only [h0, zero_mul, mul_zero]
       exact zero_le
     by_cases h2 : rE τ₁ R x₂ = 0 ∨ rE τ₂ R x₂ = 0
-    · have h0 : dpInd τ₁ τ₂ R x₂ = 0 := by unfold dpInd; rw [if_pos h2]
+    · have h0 : dpInd τ₁ τ₂ R x₂ = 0 := by unfold dpInd; rw [ite_eq_left h2]
       simp only [h0, zero_mul, mul_zero]
       exact zero_le
     push Not at h1 h2
@@ -805,10 +805,10 @@ private lemma main_sum_le {X : Type} {α u : ℝ} (hα : 1 ≤ α) (hu0 : 0 < u)
     have g2 : chordFac (ENNReal.ofReal (chordSlope α u)) τ₁ τ₂ R x₂
         = 1 + ENNReal.ofReal (chordSlope α u) * (qE τ₁ R x₂ + qE τ₂ R x₂) := by
       rw [chordFac, resQ, resQ, e2, one_mul, one_mul]
-    have p11 : resPhi α τ₁ R x₁ = phiE α (q τ₁ R x₁) := by rw [resPhi, if_neg h11]
-    have p12 : resPhi α τ₂ R x₁ = phiE α (q τ₂ R x₁) := by rw [resPhi, if_neg h12]
-    have p21 : resPhi α τ₁ R x₂ = phiE α (q τ₁ R x₂) := by rw [resPhi, if_neg h21]
-    have p22 : resPhi α τ₂ R x₂ = phiE α (q τ₂ R x₂) := by rw [resPhi, if_neg h22]
+    have p11 : resPhi α τ₁ R x₁ = phiE α (q τ₁ R x₁) := by rw [resPhi, ite_eq_right h11]
+    have p12 : resPhi α τ₂ R x₁ = phiE α (q τ₂ R x₁) := by rw [resPhi, ite_eq_right h12]
+    have p21 : resPhi α τ₁ R x₂ = phiE α (q τ₁ R x₂) := by rw [resPhi, ite_eq_right h21]
+    have p22 : resPhi α τ₂ R x₂ = phiE α (q τ₂ R x₂) := by rw [resPhi, ite_eq_right h22]
     have w1 : weightFac (ENNReal.ofReal (1 / u) + ENNReal.ofReal α) α τ₁ τ₂ R x₁
         = (ENNReal.ofReal (1 / u) + ENNReal.ofReal α)
           * (phiE α (q τ₁ R x₁) + phiE α (q τ₂ R x₁)) := by

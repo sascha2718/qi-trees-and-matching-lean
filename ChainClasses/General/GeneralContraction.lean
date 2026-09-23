@@ -94,7 +94,7 @@ lemma remSize_eq (t : RTree) : remSize s t = if IsCut s t then 0 else rawSize s 
 
 /-- An uncut vertex passes up everything it has accumulated. -/
 lemma remSize_of_not_isCut {t : RTree} (h : ¬ IsCut s t) : remSize s t = rawSize s t := by
-  rw [remSize_eq, if_neg h]
+  rw [remSize_eq, ite_eq_right h]
 
 /-- The remainder of an uncut vertex is below `s`. -/
 lemma rawSize_lt_of_not_isCut {t : RTree} (h : ¬ IsCut s t) : rawSize s t < s :=
@@ -173,10 +173,10 @@ lemma part_concat (T : RTree) (u : List ℕ) (a : ℕ) :
     List.nil_append, List.singleton_append, partRev, List.reverse_reverse]
 
 lemma part_of_isCut {T : RTree} {u : List ℕ} {a : ℕ} (h : IsCut s (subAt T (u ++ [a]))) :
-    part s T (u ++ [a]) = u ++ [a] := by rw [part_concat, if_pos h]
+    part s T (u ++ [a]) = u ++ [a] := by rw [part_concat, ite_eq_left h]
 
 lemma part_of_not_isCut {T : RTree} {u : List ℕ} {a : ℕ} (h : ¬ IsCut s (subAt T (u ++ [a]))) :
-    part s T (u ++ [a]) = part s T u := by rw [part_concat, if_neg h]
+    part s T (u ++ [a]) = part s T u := by rw [part_concat, ite_eq_right h]
 
 /-- The part root is an ancestor. -/
 lemma part_prefix (T : RTree) : ∀ w : List ℕ, part s T w <+: w := by
@@ -411,7 +411,7 @@ theorem gPartGraph_connected : (gPartGraph s t).Connected := by
             simp only [gContract_val]
             omega
           exact (ih _ hlen).trans (Adj.reachable (adj_gContract_dropLast hua' hu))
-  haveI : Nonempty (GPartVert s t) := ⟨gRootPart⟩
+  have : Nonempty (GPartVert s t) := ⟨gRootPart⟩
   exact ⟨fun p q => (key p.1.length p le_rfl).symm.trans (key q.1.length q le_rfl)⟩
 
 /-- The metric of the contracted tree. -/
@@ -614,13 +614,14 @@ theorem rtree_dist_le_gContract (hs : 1 ≤ s) (x y : Vert t) :
 
 /-- The contracted tree as a marked metric space: the root part is the entry and the
 part of the exit, when the exit is an address, is the mark. -/
+@[implicit_reducible]
 noncomputable def gPartSpace (s : ℕ) (t : RTree) (e : List ℕ) : MarkedSpace where
   carrier := GPartVert s t
   entry := gRootPart
   exit := if he : e ∈ addrList t then gContract (s := s) he else gRootPart
 
 lemma exit_gPartSpace_of_mem {e : List ℕ} (he : e ∈ addrList t) :
-    (gPartSpace s t e).exit = gContract (s := s) he := dif_pos he
+    (gPartSpace s t e).exit = gContract (s := s) he := dite_eq_left he
 
 /-- **`thm:general-dilution`, the contraction.**  Contracting every part of the greedy
 cut to a point is a `2s`-marked quasi-isometry of a rose tree with a marked address
@@ -747,10 +748,10 @@ lemma sizeF_cutForest (t : RTree) : sizeF (cutForest s t) = cutCount s t := by
       have hF := sizeF_cutForestF_of cs ih
       rw [cutForest_node, cutCount]
       by_cases h : IsCut s (.node cs)
-      · rw [if_pos h, if_pos ((isCut_node_iff cs).mp h)]
+      · rw [ite_eq_left h, ite_eq_left ((isCut_node_iff cs).mp h)]
         simp only [sizeF_cons, sizeF_nil, size_node, hF]
         omega
-      · rw [if_neg h, if_neg (fun hc => h ((isCut_node_iff cs).mpr hc)), hF, Nat.add_zero]
+      · rw [ite_eq_right h, ite_eq_right (fun hc => h ((isCut_node_iff cs).mpr hc)), hF, Nat.add_zero]
 
 /-- The forest of parts of a forest is counted by the cut. -/
 lemma sizeF_cutForestF (cs : List RTree) : sizeF (cutForestF s cs) = cutCountF s cs :=
@@ -792,9 +793,9 @@ lemma part_cons (T : RTree) (a : ℕ) (w : List ℕ) :
         rw [show (a :: u) ++ [b] = [a] ++ (u ++ [b]) by simp, subAt_append]
       rw [hcons, part_concat, hsub, part_concat]
       by_cases hcut : IsCut s (subAt (subAt T [a]) (u ++ [b]))
-      · rw [if_pos hcut, if_pos hcut]
+      · rw [ite_eq_left hcut, ite_eq_left hcut]
         simp
-      · rw [if_neg hcut, if_neg hcut, ih]
+      · rw [ite_eq_right hcut, ite_eq_right hcut, ih]
 
 /-- The step rule below the first child. -/
 lemma part_node_cons_zero (c : RTree) (cs : List RTree) (w : List ℕ) :
@@ -890,12 +891,12 @@ lemma ne_nil_of_mem_rootAddrs {t : RTree} {x : List ℕ} (h : x ∈ rootAddrs s 
 /-- The root of a subtree is listed exactly when the subtree is cut. -/
 lemma isCut_of_nil_mem_cutAddrs {t : RTree} (h : ([] : List ℕ) ∈ cutAddrs s t) : IsCut s t := by
   by_contra hc
-  rw [cutAddrs_eq, if_neg hc] at h
+  rw [cutAddrs_eq, ite_eq_right hc] at h
   exact ne_nil_of_mem_rootAddrs h rfl
 
 /-- A cut subtree lists its own root. -/
 lemma nil_mem_cutAddrs {t : RTree} (h : IsCut s t) : ([] : List ℕ) ∈ cutAddrs s t := by
-  rw [cutAddrs_eq, if_pos h]
+  rw [cutAddrs_eq, ite_eq_left h]
   exact List.mem_cons_self
 
 /-- A part root below the root is one of the tree's. -/
@@ -922,13 +923,13 @@ lemma part_eq_nil_or_mem_cutAddrs : ∀ (t : RTree) (w : List ℕ), IsAddr t w �
           have hmem : ∀ v ∈ cutAddrs s cs[i], i :: v ∈ cutAddrs s (.node cs) := fun v hv =>
             mem_cutAddrs_of_mem_cutAddrsF (mem_cutAddrsF_iff.mpr ⟨i, hi, v, hv, rfl⟩)
           by_cases hp : part s cs[i] w = []
-          · rw [if_pos hp]
+          · rw [ite_eq_left hp]
             by_cases hc : IsCut s cs[i]
-            · rw [if_pos hc]
+            · rw [ite_eq_left hc]
               exact Or.inr (hmem [] (nil_mem_cutAddrs hc))
-            · rw [if_neg hc]
+            · rw [ite_eq_right hc]
               exact Or.inl rfl
-          · rw [if_neg hp]
+          · rw [ite_eq_right hp]
             rcases ih cs[i] (List.getElem_mem hi) w hw with h | h
             · exact absurd h hp
             · exact Or.inr (hmem _ h)
@@ -967,8 +968,8 @@ lemma isAddr_and_part_eq_of_mem_cutAddrs : ∀ (t : RTree) (x : List ℕ), x ∈
         rw [part_cons, hsub]
         by_cases hvn : v = []
         · subst hvn
-          rw [if_pos hv2, if_pos (isCut_of_nil_mem_cutAddrs hv)]
-        · rw [if_neg (by rw [hv2]; exact hvn), hv2]
+          rw [ite_eq_left hv2, ite_eq_left (isCut_of_nil_mem_cutAddrs hv)]
+        · rw [ite_eq_right (by rw [hv2]; exact hvn), hv2]
       rw [cutAddrs_node] at hx
       split at hx
       · rcases List.mem_cons.mp hx with rfl | hx'
@@ -1139,13 +1140,13 @@ lemma gPairList_eq (t : RTree) : gPairList s t = ([], []) :: gRootPairs s t := b
 lemma gCutPairs_of_isCut {t : RTree} (h : IsCut s t) :
     gCutPairs s t = (gPairList s t).map (Prod.map id (fun y => 0 :: y)) := by
   simp only [gCutPairs, gPairList]
-  rw [cutForest_eq, if_pos h, cutAddrs_eq, if_pos h, addrListF_cons,
+  rw [cutForest_eq, ite_eq_left h, cutAddrs_eq, ite_eq_left h, addrListF_cons,
     addrListF_nil, List.map_nil, List.append_nil, partList_eq, List.zip_map_right]
 
 /-- An uncut root passes up the parts below it unchanged. -/
 lemma gCutPairs_of_not_isCut {t : RTree} (h : ¬ IsCut s t) : gCutPairs s t = gRootPairs s t := by
   simp only [gCutPairs, gRootPairs]
-  rw [cutForest_eq, if_neg h, cutAddrs_eq, if_neg h]
+  rw [cutForest_eq, ite_eq_right h, cutAddrs_eq, ite_eq_right h]
 
 @[simp] lemma gCutPairsF_nil : gCutPairsF s [] = [] := by
   rw [gCutPairsF, cutAddrsF_nil, List.zip_nil_left]
@@ -1250,14 +1251,14 @@ lemma part_dropLast_gStep (s : ℕ) (t u : RTree) (a : ℕ) (g : List ℕ → Li
     · have hqa : (if part s u z.dropLast = [] then (if IsCut s u then [a] else [])
           else a :: part s u z.dropLast) = a :: part s u z.dropLast := by
         by_cases hq : part s u z.dropLast = []
-        · rw [if_pos hq, hq]
+        · rw [ite_eq_left hq, hq]
           rw [hq] at hmem
-          rw [if_pos (isCut_of_nil_mem_gCutPairs hmem)]
-        · rw [if_neg hq]
+          rw [ite_eq_left (isCut_of_nil_mem_gCutPairs hmem)]
+        · rw [ite_eq_right hq]
       rw [hqa]
       exact List.mem_cons_of_mem _
         (List.mem_map.mpr ⟨(part s u z.dropLast, y₀.dropLast), hmem, rfl⟩)
-    · rw [hq, if_pos rfl, if_neg hnc, hy, hgnil]
+    · rw [hq, ite_eq_left rfl, ite_eq_right hnc, hy, hgnil]
       exact List.mem_cons_self
 
 /-- **The step of the recursion over a forest.**  The pairing of a forest is a map of
@@ -1577,9 +1578,9 @@ lemma length_cutForest_le {J : ℕ} : ∀ t : RTree, DegLe J t →
       have hF := length_cutForestF_le cs fun c hc => ih c hc (hall c hc)
       rw [cutForest_node]
       by_cases h : IsCut s (.node cs)
-      · rw [if_pos h, if_pos h]
+      · rw [ite_eq_left h, ite_eq_left h]
         simp
-      · rw [if_neg h, if_neg h, remSize_of_not_isCut h, rawSize_node, Nat.mul_add, Nat.mul_one]
+      · rw [ite_eq_right h, ite_eq_right h, remSize_of_not_isCut h, rawSize_node, Nat.mul_add, Nat.mul_one]
         have := Nat.mul_le_mul_right (remSizeF s cs) hlen
         omega
 
@@ -1718,7 +1719,7 @@ lemma cutForestF_one_of : ∀ cs : List RTree, (∀ c ∈ cs, gContractTree 1 c 
     cutForestF 1 cs = cs
   | [], _ => by simp
   | c :: cs, h => by
-      rw [cutForestF_cons, cutForest_eq, if_pos (RTree.isCut_one c), h c (by simp),
+      rw [cutForestF_cons, cutForest_eq, ite_eq_left (RTree.isCut_one c), h c (by simp),
         cutForestF_one_of cs fun d hd => h d (by simp [hd])]
       rfl
 

@@ -17,7 +17,9 @@ projections are two independent `fullMu`-labellings.
 -/
 import GraphMatching.Konig
 import GraphMatching.Reduction
-import Mathlib.MeasureTheory.Measure.MeasureSpace
+import Mathlib.Algebra.Order.Module.Field
+import Mathlib.Data.EReal.Inv
+import Mathlib.Tactic.Measurability
 import Mathlib.MeasureTheory.Measure.Typeclasses.Probability
 import Mathlib.Probability.ProbabilityMassFunction.Constructions
 
@@ -89,7 +91,7 @@ theorem infinite_tree_matching_ge {Ω : Type*} [MeasurableSpace Ω] (P : Measure
     exact hr
   have hM : {ω | InfMatch R₀ (fun h => X h ω) (fun h => Y h ω)} = ⋂ h, E h := by
     ext ω
-    simp only [Set.mem_iInter, hE, Set.mem_setOf_eq]
+    simp only [Set.mem_iInter, hE, Set.mem_ofPred_eq]
     exact infMatch_iff_forall_level R₀ (fun h => X h ω) (fun h => Y h ω)
       (fun h => hX h ω) (fun h => hY h ω)
   rw [hM]
@@ -114,7 +116,7 @@ theorem infinite_tree_matching_prob {Ω : Type*} [MeasurableSpace Ω] (P : Measu
   refine infinite_tree_matching_ge P R₀ X Y hX hY hmeas (1 - 16 * Phi μ R₀) (fun h => ?_)
   set s : Set Ω := {ω | fullSim R₀ h (X h ω) (Y h ω)} with hs
   have hsmeas : MeasurableSet s := hmeas h
-  have hcompl : sᶜ = {ω | ¬ fullSim R₀ h (X h ω) (Y h ω)} := by rw [hs, Set.compl_setOf]
+  have hcompl : sᶜ = {ω | ¬ fullSim R₀ h (X h ω) (Y h ω)} := by rw [hs, Set.compl_ofPred]
   have h2 : P sᶜ ≤ 16 * Phi μ R₀ := by
     rw [hcompl, hfail h]; exact full_matching_bound μ R₀ hrefl hsymm hη h
   have h3 : (1 : ℝ≥0∞) - P sᶜ = P s := by
@@ -142,13 +144,13 @@ lemma prodPMF_toMeasure_not_rel {W : Type*} [MeasurableSpace W] [MeasurableSingl
   refine tsum_congr fun y => ?_
   rw [Set.indicator_apply]
   by_cases h : R x y
-  · simp [Set.mem_setOf_eq, h]
-  · simp [Set.mem_setOf_eq, prodPMF_apply, h]
+  · simp [Set.mem_ofPred_eq, h]
+  · simp [Set.mem_ofPred_eq, prodPMF_apply, h]
 
 instance instCountableFullLab [Countable V] : (h : ℕ) → Countable (FullLab V h)
   | 0 => ‹Countable V›
   | h + 1 => by
-      haveI := instCountableFullLab h
+      have := instCountableFullLab h
       exact inferInstanceAs (Countable (V × (FullLab V h × FullLab V h)))
 
 instance instMeasurableFullLab [MeasurableSpace V] : (h : ℕ) → MeasurableSpace (FullLab V h)
@@ -161,7 +163,7 @@ instance instMeasurableSingletonFullLab [MeasurableSpace V] [MeasurableSingleton
     (h : ℕ) → MeasurableSingletonClass (FullLab V h)
   | 0 => ‹MeasurableSingletonClass V›
   | h + 1 => by
-      haveI : MeasurableSingletonClass (FullLab V h) := instMeasurableSingletonFullLab h
+      have : MeasurableSingletonClass (FullLab V h) := instMeasurableSingletonFullLab h
       exact inferInstanceAs (MeasurableSingletonClass (V × (FullLab V h × FullLab V h)))
 
 /-- **`thm:matching`, infinite-tree statement, from the product law.** If the level-`h`

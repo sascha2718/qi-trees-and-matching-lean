@@ -47,12 +47,12 @@ decreasing_by all_goals omega
 
 /-- `balanced n` is a leaf for `n ≤ 1`. -/
 lemma balanced_of_le {n : ℕ} (hn : n ≤ 1) : balanced n = MTree.leaf := by
-  rw [balanced, dif_pos hn]
+  rw [balanced, dite_eq_left hn]
 
 /-- `balanced n` splits the leaves for `n ≥ 2`. -/
 lemma balanced_of_lt {n : ℕ} (hn : 1 < n) :
     balanced n = MTree.node (balanced ((n + 1) / 2)) (balanced (n / 2)) := by
-  rw [balanced, dif_neg (by omega)]
+  rw [balanced, dite_eq_right (by omega)]
 
 /-- The balanced tree with `n ≥ 1` leaves has `n` leaves (`sec:profile-depths`). -/
 lemma leaves_balanced (n : ℕ) : 1 ≤ n → (balanced n).leaves = n := by
@@ -900,16 +900,16 @@ lemma canonicalExpr_spec {A : Finset ℕ} {n : ℕ} (h : n ∈ AddSubmonoid.clos
     (∀ a ∈ canonicalExpr A n, a ∈ A) ∧ (canonicalExpr A n).sum = n := by
   unfold canonicalExpr
   by_cases h1 : n ∈ A
-  · rw [if_pos h1]
+  · rw [ite_eq_left h1]
     simp [h1]
-  · rw [if_neg h1, dif_pos h]
+  · rw [ite_eq_right h1, dite_eq_left h]
     obtain ⟨hmem, hsum⟩ := Classical.choose_spec (AddSubmonoid.exists_list_of_mem_closure h)
     exact ⟨fun a ha => Finset.mem_coe.mp (hmem a ha), hsum⟩
 
 /-- An atom has the one-term expression. -/
 lemma canonicalExpr_of_mem {A : Finset ℕ} {n : ℕ} (h : n ∈ A) : canonicalExpr A n = [n] := by
   unfold canonicalExpr
-  rw [if_pos h]
+  rw [ite_eq_left h]
 
 /-- The supported arities of the two sides are at least `2` with shifted arity in the
 generated semigroup. -/

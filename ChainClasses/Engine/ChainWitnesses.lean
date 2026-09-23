@@ -12,13 +12,13 @@ open scoped ENNReal Classical
 noncomputable def theta2 : Offspring 2 where
   mass := fun k => if k = 1 ∨ k = 2 then 1 / 2 else 0
   nonneg := by intro k; split_ifs <;> norm_num
-  vanishing := by intro k hk; rw [if_neg (by omega)]
+  vanishing := by intro k hk; rw [ite_eq_right (by omega)]
   total := by norm_num [Finset.sum_range_succ]
 
 noncomputable def theta3 : Offspring 3 where
   mass := fun k => if k = 1 ∨ k = 3 then 1 / 2 else 0
   nonneg := by intro k; split_ifs <;> norm_num
-  vanishing := by intro k hk; rw [if_neg (by omega)]
+  vanishing := by intro k hk; rw [ite_eq_right (by omega)]
   total := by norm_num [Finset.sum_range_succ]
 
 @[simp] lemma theta2_apply (k : ℕ) : theta2 k = if k = 1 ∨ k = 2 then 1 / 2 else 0 := rfl
@@ -44,7 +44,7 @@ lemma theta3_one_lt_one : theta3 1 < 1 := by norm_num
   · subst x; norm_num
   · by_cases hz : x = 0
     · subst x; norm_num
-    · rw [if_neg (by omega)]
+    · rw [ite_eq_right (by omega)]
       simp [hx]
 
 @[simp] lemma shiftSupp_theta3 : shiftSupp theta3 = {2} := by
@@ -55,7 +55,7 @@ lemma theta3_one_lt_one : theta3 1 < 1 := by norm_num
   · subst x; norm_num
   · by_cases hz : x = 0
     · subst x; norm_num
-    · rw [if_neg (by omega)]
+    · rw [ite_eq_right (by omega)]
       simp [hx]
 
 /-- The reduced binary and ternary arities generate different additive semigroups. -/
@@ -77,18 +77,18 @@ theorem reducedPMF_theta2 (hq : theta2.extinction < 1) (hs1 : theta2.skeletonWei
   rw [reducedPMF_apply, PMF.pure_apply]
   by_cases hk : k = 2
   · subst k
-    rw [if_pos (by omega), if_pos rfl, reducedWeight_def,
+    rw [ite_eq_left (by omega), ite_eq_left rfl, reducedWeight_def,
       skeletonWeight_eq_of_chain theta2 theta2_zero,
       skeletonWeight_eq_of_chain theta2 theta2_zero]
     norm_num
-  · rw [if_neg hk]
+  · rw [ite_eq_right hk]
     by_cases h2 : 2 ≤ k
-    · rw [if_pos h2, reducedWeight_def,
+    · rw [ite_eq_left h2, reducedWeight_def,
         skeletonWeight_eq_of_chain theta2 theta2_zero,
         skeletonWeight_eq_of_chain theta2 theta2_zero, theta2_apply,
-        if_neg (by omega)]
+        ite_eq_right (by omega)]
       simp
-    · rw [if_neg h2]
+    · rw [ite_eq_right h2]
 
 /-- Suppressing unary vertices leaves the deterministic ternary arity law. -/
 theorem reducedPMF_theta3 (hq : theta3.extinction < 1) (hs1 : theta3.skeletonWeight 1 < 1)
@@ -97,17 +97,17 @@ theorem reducedPMF_theta3 (hq : theta3.extinction < 1) (hs1 : theta3.skeletonWei
   rw [reducedPMF_apply, PMF.pure_apply]
   by_cases hk : k = 3
   · subst k
-    rw [if_pos (by omega), if_pos rfl, reducedWeight_def,
+    rw [ite_eq_left (by omega), ite_eq_left rfl, reducedWeight_def,
       skeletonWeight_eq_of_chain theta3 theta3_zero,
       skeletonWeight_eq_of_chain theta3 theta3_zero]
     norm_num
-  · rw [if_neg hk]
+  · rw [ite_eq_right hk]
     by_cases h2 : 2 ≤ k
-    · rw [if_pos h2, reducedWeight_def,
+    · rw [ite_eq_left h2, reducedWeight_def,
         skeletonWeight_eq_of_chain theta3 theta3_zero,
         skeletonWeight_eq_of_chain theta3 theta3_zero, theta3_apply,
-        if_neg (by omega)]
+        ite_eq_right (by omega)]
       simp
-    · rw [if_neg h2]
+    · rw [ite_eq_right h2]
 
 end ChainClasses.ChainWitnesses

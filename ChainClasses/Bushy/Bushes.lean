@@ -341,22 +341,22 @@ theorem survivalMeasure_shapes_avoid (θ : Offspring 2) (hq : θ.extinction < 1)
     by_cases hf : ∀ w : ↥S, f w ≠ σ₀
     · have hsub : shapeEvent S f ⊆ E := by
         intro c hc
-        simp only [hE, Set.mem_iInter, Set.mem_setOf_eq]
+        simp only [hE, Set.mem_iInter, Set.mem_ofPred_eq]
         intro w hw
         rw [show shapeAt c w = f ⟨w, hw⟩ from hc ⟨w, hw⟩]
         exact hf ⟨w, hw⟩
       rw [Set.inter_eq_self_of_subset_right hsub, survivalMeasure_shapeEvent θ hq hq0 h2 S hS f]
-      exact Finset.prod_congr rfl fun w _ ↦ (if_neg (hf w)).symm
+      exact Finset.prod_congr rfl fun w _ ↦ (ite_eq_right (hf w)).symm
     · push Not at hf
       obtain ⟨w₀, hw₀⟩ := hf
       have hempty : E ∩ shapeEvent S f = ∅ := by
         ext c
         simp only [Set.mem_inter_iff, Set.mem_empty_iff_false, iff_false, not_and, hE,
-          Set.mem_iInter, Set.mem_setOf_eq]
+          Set.mem_iInter, Set.mem_ofPred_eq]
         intro hcE hcev
         exact hcE w₀.1 w₀.2 (by rw [hcev w₀, hw₀])
       rw [hempty, measure_empty]
-      exact (Finset.prod_eq_zero (Finset.mem_attach S w₀) (by rw [if_pos hw₀])).symm
+      exact (Finset.prod_eq_zero (Finset.mem_attach S w₀) (by rw [ite_eq_left hw₀])).symm
   calc survivalMeasure (N := 2) θ E
       = ∑' f : ↥S → Shape, ∏ w ∈ S.attach, (if f w = σ₀ then 0 else shapeMass θ (f w)) := by
         rw [hdecomp]; exact tsum_congr hsummand
@@ -403,8 +403,8 @@ theorem ae_exists_shapeAt (θ : Offspring 2) (hq : θ.extinction < 1)
     have hsub : {c : Amb → ℕ | ¬ ∃ k, shapeAt c (List.replicate k false) = σ₀}
         ⊆ ⋂ w ∈ rayWords n, {c : Amb → ℕ | shapeAt c w ≠ σ₀} := by
       intro c hc
-      simp only [Set.mem_setOf_eq, not_exists] at hc
-      simp only [Set.mem_iInter, Set.mem_setOf_eq]
+      simp only [Set.mem_ofPred_eq, not_exists] at hc
+      simp only [Set.mem_iInter, Set.mem_ofPred_eq]
       intro w hw
       obtain ⟨k, _, rfl⟩ := mem_rayWords.mp hw
       exact hc k
@@ -445,11 +445,11 @@ theorem deep_cone_of_shapeAt {c : Amb → ℕ} (hc : IsBushySample c) {w : Word}
     exact (Option.some.inj h0).symm
   have h2u : c (entryV c w) = 2 := by
     by_contra h
-    rw [decAt, if_neg h] at hdec
+    rw [decAt, ite_eq_right h] at hdec
     simp at hdec
   have hbush : bushTri (shift c (entryV c w ++ [bushLetter c (entryV c w)]))
       = Tri.complete n := by
-    rw [decAt, if_pos h2u] at hdec
+    rw [decAt, ite_eq_left h2u] at hdec
     exact Option.some.inj hdec
   -- the second child dies
   have hdeg : BranchingProcess.skeletonDegree (shift c (entryV c w)) = 1 := by

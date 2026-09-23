@@ -253,12 +253,12 @@ lemma prodPMF_eq {X Y : Type*} (μ : PMF X) (ν : PMF Y) :
   · rw [PMF.map_apply, tsum_eq_single p.2]
     · simp
     · intro b hb
-      exact if_neg (by simp [Prod.ext_iff, Ne.symm hb])
+      exact ite_eq_right (by simp [Prod.ext_iff, Ne.symm hb])
   · intro a ha
     rw [PMF.map_apply]
     refine mul_eq_zero_of_right _ ?_
     refine (tsum_congr fun y => ?_).trans tsum_zero
-    exact if_neg (by simp [Prod.ext_iff]; intro h; exact absurd h.symm ha)
+    exact ite_eq_right (by simp [Prod.ext_iff]; intro h; exact absurd h.symm ha)
 
 
 /-- The challenge's labelling type is the library's, coordinatewise. -/
@@ -349,6 +349,7 @@ lemma restrictLab_toLib_process {S : Type u} :
       obtain ⟨a, l, r⟩ := x
       simp [restrictLab, GraphMarkovMatching.Support.restrictLab,
         restrictLab_toLib_process n]
+      rfl
 
 /-- The transport of Markov full labellings and its inverse are measurable. -/
 lemma measurable_toLib_process {S : Type u} [MeasurableSpace S] :
@@ -532,12 +533,12 @@ lemma prodPMF_eq_iid {X Y : Type*} (μ : PMF X) (ν : PMF Y) :
   · rw [PMF.map_apply, tsum_eq_single p.2]
     · simp
     · intro b hb
-      exact if_neg (by simp [Prod.ext_iff, Ne.symm hb])
+      exact ite_eq_right (by simp [Prod.ext_iff, Ne.symm hb])
   · intro a ha
     rw [PMF.map_apply]
     refine mul_eq_zero_of_right _ ?_
     refine (tsum_congr fun y => ?_).trans tsum_zero
-    exact if_neg (by simp [Prod.ext_iff]; intro h; exact absurd h.symm ha)
+    exact ite_eq_right (by simp [Prod.ext_iff]; intro h; exact absurd h.symm ha)
 
 lemma leafMu_eq {V : Type u} (μ : PMF V) :
     ∀ n, (leafMu μ n).map (leafToLib V n) = GraphMatching.leafMu μ n
@@ -569,7 +570,7 @@ lemma map_equiv_apply {α β : Type*} (e : α ≃ β) (p : PMF α) (x : α) :
   rw [PMF.map_apply, tsum_eq_single x]
   · simp
   · intro b hb
-    exact if_neg fun hh => hb (e.injective hh.symm)
+    exact ite_eq_right fun hh => hb (e.injective hh.symm)
 
 lemma etaGraph_eq : @etaGraph = @GraphMatching.etaG := rfl
 lemma PhiIid_eq : @PhiIid = @GraphMatching.Phi := rfl
@@ -602,6 +603,7 @@ lemma restrictLab_toLib {V : Type u} :
   | n + 1, x => by
       obtain ⟨a, l, r⟩ := x
       simp [restrictLab, GraphMatching.restrictLab, restrictLab_toLib n]
+      rfl
 
 /-- The coordinate map commutes with the transport. -/
 lemma coord_toLib {V : Type u} :
@@ -707,7 +709,7 @@ single vertex. -/
 theorem audit_bounded_graph_qi_point {V : Type u} (G : SimpleGraph V) (hconn : G.Connected)
     (hbdd : ∃ D : ℕ, ∀ x y, G.dist x y ≤ D) :
     GraphQuasiIsometric G (⊥ : SimpleGraph Unit) := by
-  haveI : Nonempty V := hconn.nonempty
+  have : Nonempty V := hconn.nonempty
   exact (graphQuasiIsometric_iff G _).2 (BranchingProcess.quasiIsometric_unit_of_bounded hbdd)
 
 /-- A law with mean at most one dies out almost surely, unless it is the deterministic
@@ -739,9 +741,13 @@ theorem audit_full_classification_ae_iff {J J' N N' : ℕ}
   rw [gwField_eq, gwField_eq]
   filter_upwards [ChainClasses.full_classification_rooted_ae_iff (offspringToLib theta) hJN
     (offspringToLib theta') hJN'] with omega homega
-  simp only [gwTreeGraph_eq, graphQuasiIsometric_iff, gwSurvives_iff, sameInfiniteClass_iff,
-    GraphQuasiIsometricRooted, graphQIWith_iff]
-  exact homega
+  simp only [gwTreeGraph_eq, gwSurvives_iff, sameInfiniteClass_iff, GraphQuasiIsometricRooted]
+  refine ⟨Iff.trans ?_ homega.1, fun h => homega.2 ((graphQuasiIsometric_iff _ _).1 h)⟩
+  constructor
+  · rintro ⟨D, f, hf, hroot⟩
+    exact ⟨D, f, (graphQIWith_iff D _ _ f).1 hf, hroot⟩
+  · rintro ⟨D, f, hf, hroot⟩
+    exact ⟨D, f, (graphQIWith_iff D _ _ f).2 hf, hroot⟩
 
 /-! ## Mutual embeddability -/
 
@@ -755,8 +761,9 @@ theorem audit_mutual_embeddability {J N : ℕ} (theta : Offspring J) (hJN : J �
   rw [gwField_eq]
   filter_upwards [ChainClasses.embedding_hierarchy_ae (offspringToLib theta) hJN
     ((offspringSupercritical_iff theta).1 hsup)] with c hc
-  simp only [gwTreeGraph_eq, wordGraph_eq_wordGraphN, graphQIEmbeddable_iff, gwSurvives_iff]
-  exact hc
+  simp only [gwTreeGraph_eq, wordGraph_eq_wordGraphN, gwSurvives_iff]
+  intro hs
+  exact ⟨(graphQIEmbeddable_iff _ _).2 (hc hs).1, (graphQIEmbeddable_iff _ _).2 (hc hs).2⟩
 
 /-! ## Bridge for the two-value block -/
 
@@ -813,7 +820,7 @@ theorem audit_twovalue_ae_tree_family {t : ℝ} (ht0 : 0 ≤ t) (ht1 : t ≤ 1) 
   refine Eq.trans ?_ (ChainClasses.twovalue_ae_tree_family ht0 ht1)
   congr 1
   ext ω
-  simp only [Set.mem_setOf_eq, inTree_eq, isQIWith_eq]
+  simp only [Set.mem_ofPred_eq, inTree_eq, isQIWith_eq]
 
 /-- The rate (1.1) of Theorem 1.4: above a threshold, failure of a root-preserving
 `(D²+3)`-quasi-isometry has probability at most the explicit rate. -/
@@ -1032,8 +1039,8 @@ lemma rE_map_equiv {X Y : Type*} (e : X ≃ Y) (μ : PMF X) (R : X → X → Pro
   refine tsum_congr fun y => ?_
   rw [← map_equiv_apply e μ y]
   by_cases h : R x y
-  · rw [if_pos h, if_pos ((hR x y).1 h)]
-  · rw [if_neg h, if_neg fun h' => h ((hR x y).2 h')]
+  · rw [ite_eq_left h, ite_eq_left ((hR x y).1 h)]
+  · rw [ite_eq_right h, ite_eq_right fun h' => h ((hR x y).2 h')]
 
 /-- Transporting the bad degree along an equivalence. -/
 lemma qE_map_equiv {X Y : Type*} (e : X ≃ Y) (μ : PMF X) (R : X → X → Prop)
@@ -1043,8 +1050,8 @@ lemma qE_map_equiv {X Y : Type*} (e : X ≃ Y) (μ : PMF X) (R : X → X → Pro
   refine tsum_congr fun y => ?_
   rw [← map_equiv_apply e μ y]
   by_cases h : R x y
-  · rw [if_pos h, if_pos ((hR x y).1 h)]
-  · rw [if_neg h, if_neg fun h' => h ((hR x y).2 h')]
+  · rw [ite_eq_left h, ite_eq_left ((hR x y).1 h)]
+  · rw [ite_eq_right h, ite_eq_right fun h' => h ((hR x y).2 h')]
 
 namespace Model
 

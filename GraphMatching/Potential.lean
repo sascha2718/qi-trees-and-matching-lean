@@ -52,7 +52,8 @@ is the observation of `sec:contraction` that makes `q < 1` on the support. -/
 lemma le_rE_of_refl (hrefl : R x x) : μ x ≤ rE μ R x := by
   rw [rE]
   calc (μ x : ℝ≥0∞) = if R x x then μ x else 0 := by simp [hrefl]
-    _ ≤ ∑' y, if R x y then μ y else 0 := ENNReal.le_tsum x
+    _ ≤ ∑' y, if R x y then μ y else 0 :=
+        ENNReal.le_tsum (f := fun y => if R x y then μ y else 0) x
 
 /-! ### The potential, `eq:iid-potential`
 
@@ -144,7 +145,7 @@ lemma tsum_not_rel_eq_qE (hsymm : ∀ a b, R a b → R b a) (μ : PMF X) (y : X)
   rw [qE]
   exact tsum_congr fun x => by
     by_cases h : R x y
-    · rw [if_pos h, if_pos (hsymm x y h)]
-    · rw [if_neg h, if_neg (fun hc => h (hsymm y x hc))]
+    · rw [ite_eq_left h, ite_eq_left (hsymm x y h)]
+    · rw [ite_eq_right h, ite_eq_right (fun hc => h (hsymm y x hc))]
 
 end GraphMatching

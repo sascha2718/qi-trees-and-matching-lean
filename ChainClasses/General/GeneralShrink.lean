@@ -426,7 +426,7 @@ lemma gExitAddr_gNeckList : ∀ (t : RTree) (e : List ℕ), IsAddr t e →
         cases h : gNeckList (cs.getD j (.node [])) v with
         | nil => exact absurd h (gNeckList_ne_nil _ _)
         | cons r rest => exact ⟨r, rest, rfl⟩
-      rw [hr, gExitAddr_cons₂, ← hr, gNeckMap_cons_cons, if_pos rfl, List.cons_append,
+      rw [hr, gExitAddr_cons₂, ← hr, gNeckMap_cons_cons, ite_eq_left rfl, List.cons_append,
         List.length_eraseIdx_of_lt hj, getD_eq_getElem_of_lt hj,
         gExitAddr_gNeckList cs[j] v hv]
 
@@ -490,13 +490,13 @@ lemma isAddr_gNeckMap : ∀ (t : RTree) (e : List ℕ), IsAddr t e → ∀ w, Is
       simp only [gNeckMap_cons_cons, getD_eq_getElem_of_lt hj]
       by_cases hkj : k = j
       · subst hkj
-        rw [if_pos rfl, isAddr_neck_iff hj]
+        rw [ite_eq_left rfl, isAddr_neck_iff hj]
         exact Or.inr (Or.inr ⟨rfl, isAddr_gNeckMap cs[k] v hv z hz⟩)
-      · rw [if_neg hkj]
+      · rw [ite_eq_right hkj]
         by_cases hlt : k < j
-        · rw [if_pos hlt, isAddr_neck_iff hj]
+        · rw [ite_eq_left hlt, isAddr_neck_iff hj]
           exact Or.inl ⟨hlt, hz⟩
-        · rw [if_neg hlt, isAddr_neck_iff hj]
+        · rw [ite_eq_right hlt, isAddr_neck_iff hj]
           refine Or.inr (Or.inl ⟨⟨by omega, by omega⟩, ?_⟩)
           have : k - 1 + 1 = k := by omega
           simp only [this]
@@ -510,8 +510,8 @@ lemma isAddr_gNeckInv : ∀ (t : RTree) (e : List ℕ), IsAddr t e → ∀ y,
       rw [gNeckList_nil, isAddr_mark_iff] at hy
       rw [gNeckInv_nil_cons]
       rcases hy with ⟨rfl, hz⟩ | ⟨rfl, rfl⟩
-      · rw [if_pos rfl]; exact hz
-      · rw [if_neg (by norm_num)]; exact isAddr_nil _
+      · rw [ite_eq_left rfl]; exact hz
+      · rw [ite_eq_right (by norm_num)]; exact isAddr_nil _
   | .node cs, j :: v, _, [], _ => by rw [gNeckInv_cons_nil]; exact isAddr_nil _
   | .node cs, j :: v, he, k :: z, hy => by
       rw [isAddr_cons] at he
@@ -519,18 +519,18 @@ lemma isAddr_gNeckInv : ∀ (t : RTree) (e : List ℕ), IsAddr t e → ∀ y,
       rw [isAddr_neck_iff hj] at hy
       simp only [gNeckInv_cons_cons, getD_eq_getElem_of_lt hj]
       rcases hy with ⟨hk, hz⟩ | ⟨⟨hk, hk'⟩, hz⟩ | ⟨hk, hz⟩
-      · rw [if_neg (by omega), if_pos hk, isAddr_cons]
+      · rw [ite_eq_right (by omega), ite_eq_left hk, isAddr_cons]
         exact ⟨by omega, hz⟩
-      · rw [if_neg (by omega), if_neg (by omega), isAddr_cons]
+      · rw [ite_eq_right (by omega), ite_eq_right (by omega), isAddr_cons]
         exact ⟨hk', hz⟩
-      · rw [if_pos hk, isAddr_cons]
+      · rw [ite_eq_left hk, isAddr_cons]
         exact ⟨hj, isAddr_gNeckInv cs[j] v hv z hz⟩
 
 /-- The retraction inverts the address map. -/
 lemma gNeckInv_gNeckMap : ∀ (t : RTree) (e : List ℕ), IsAddr t e → ∀ w, IsAddr t w →
     gNeckInv t e (gNeckMap t e w) = w
   | .node cs, [], _, [], _ => rfl
-  | .node cs, [], _, k :: z, _ => by rw [gNeckMap_nil_cons, gNeckInv_nil_cons, if_pos rfl]
+  | .node cs, [], _, k :: z, _ => by rw [gNeckMap_nil_cons, gNeckInv_nil_cons, ite_eq_left rfl]
   | .node cs, j :: v, _, [], _ => by rw [gNeckMap_cons_nil, gNeckInv_cons_nil]
   | .node cs, j :: v, he, k :: z, hw => by
       rw [isAddr_cons] at he hw
@@ -539,12 +539,12 @@ lemma gNeckInv_gNeckMap : ∀ (t : RTree) (e : List ℕ), IsAddr t e → ∀ w, 
       simp only [gNeckMap_cons_cons, getD_eq_getElem_of_lt hj]
       by_cases hkj : k = j
       · subst hkj
-        rw [if_pos rfl, gNeckInv_cons_cons, if_pos rfl, getD_eq_getElem_of_lt hj,
+        rw [ite_eq_left rfl, gNeckInv_cons_cons, ite_eq_left rfl, getD_eq_getElem_of_lt hj,
           gNeckInv_gNeckMap cs[k] v hv z hz]
-      · rw [if_neg hkj]
+      · rw [ite_eq_right hkj]
         by_cases hlt : k < j
-        · rw [if_pos hlt, gNeckInv_cons_cons, if_neg (by omega), if_pos hlt]
-        · rw [if_neg hlt, gNeckInv_cons_cons, if_neg (by omega), if_neg (by omega)]
+        · rw [ite_eq_left hlt, gNeckInv_cons_cons, ite_eq_right (by omega), ite_eq_left hlt]
+        · rw [ite_eq_right hlt, gNeckInv_cons_cons, ite_eq_right (by omega), ite_eq_right (by omega)]
           congr 1
           omega
 
@@ -565,9 +565,9 @@ lemma addrDist_gNeckMap_append : ∀ (t : RTree) (e : List ℕ), IsAddr t e → 
       simp only [List.cons_append, gNeckMap_cons_cons, getD_eq_getElem_of_lt hj]
       by_cases hkj : k = j
       · subst hkj
-        rw [if_pos rfl, if_pos rfl, addrDist_cons_cons_self]
+        rw [ite_eq_left rfl, ite_eq_left rfl, addrDist_cons_cons_self]
         exact addrDist_gNeckMap_append cs[k] v hv u a hz
-      · simp only [if_neg hkj]
+      · simp only [ite_eq_right hkj]
         split_ifs <;> simp
 
 /-- The retraction moves parent-child pairs by at most one. -/
@@ -593,10 +593,10 @@ lemma addrDist_gNeckInv_append : ∀ (t : RTree) (e : List ℕ), IsAddr t e → 
       rw [List.cons_append, isAddr_neck_iff hj] at hy
       simp only [List.cons_append, gNeckInv_cons_cons, getD_eq_getElem_of_lt hj]
       rcases hy with ⟨hk, -⟩ | ⟨⟨hk, hk'⟩, -⟩ | ⟨hk, hz⟩
-      · simp only [if_neg (show ¬ k = cs.length - 1 by omega), if_pos hk]; simp
-      · simp only [if_neg (show ¬ k = cs.length - 1 by omega), if_neg (show ¬ k < j by omega)]
+      · simp only [ite_eq_right (show ¬ k = cs.length - 1 by omega), ite_eq_left hk]; simp
+      · simp only [ite_eq_right (show ¬ k = cs.length - 1 by omega), ite_eq_right (show ¬ k < j by omega)]
         simp
-      · simp only [if_pos hk, addrDist_cons_cons_self]
+      · simp only [ite_eq_left hk, addrDist_cons_cons_self]
         exact addrDist_gNeckInv_append cs[j] v hv y b hz
 
 /-- The image is `1`-dense: the joint vertex and the exit are one step below the
@@ -609,9 +609,9 @@ lemma addrDist_gNeckMap_gNeckInv : ∀ (t : RTree) (e : List ℕ), IsAddr t e �
       rw [gNeckList_nil, isAddr_mark_iff] at hy
       rw [gNeckInv_nil_cons]
       rcases hy with ⟨rfl, -⟩ | ⟨rfl, rfl⟩
-      · rw [if_pos rfl]
+      · rw [ite_eq_left rfl]
         cases z <;> simp
-      · rw [if_neg (by norm_num)]
+      · rw [ite_eq_right (by norm_num)]
         simp
   | .node cs, j :: v, _, [], _ => by simp
   | .node cs, j :: v, he, k :: z, hy => by
@@ -620,12 +620,12 @@ lemma addrDist_gNeckMap_gNeckInv : ∀ (t : RTree) (e : List ℕ), IsAddr t e �
       rw [isAddr_neck_iff hj] at hy
       simp only [gNeckInv_cons_cons, getD_eq_getElem_of_lt hj]
       rcases hy with ⟨hk, -⟩ | ⟨⟨hk, hk'⟩, -⟩ | ⟨hk, hz⟩
-      · rw [if_neg (by omega), if_pos hk, gNeckMap_cons_cons, if_neg (by omega), if_pos hk]
+      · rw [ite_eq_right (by omega), ite_eq_left hk, gNeckMap_cons_cons, ite_eq_right (by omega), ite_eq_left hk]
         simp
-      · rw [if_neg (by omega), if_neg (by omega), gNeckMap_cons_cons, if_neg (by omega),
-          if_neg (by omega)]
+      · rw [ite_eq_right (by omega), ite_eq_right (by omega), gNeckMap_cons_cons, ite_eq_right (by omega),
+          ite_eq_right (by omega)]
         simp
-      · rw [if_pos hk, gNeckMap_cons_cons, if_pos rfl, getD_eq_getElem_of_lt hj, hk,
+      · rw [ite_eq_left hk, gNeckMap_cons_cons, ite_eq_left rfl, getD_eq_getElem_of_lt hj, hk,
           addrDist_cons_cons_self]
         exact addrDist_gNeckMap_gNeckInv cs[j] v hv z hz
 
@@ -933,9 +933,9 @@ lemma isAddr_padInv (k : ℕ) (t : RTree) : ∀ y, IsAddr (padT k t) y → IsAdd
           rw [isAddr_padT_cons_iff] at hy
           rw [padInv_cons]
           rcases hy with ⟨hi, hz⟩ | ⟨-, hi, -, -⟩
-          · rw [if_pos hi, getD_eq_getElem_of_lt hi, isAddr_cons]
+          · rw [ite_eq_left hi, getD_eq_getElem_of_lt hi, isAddr_cons]
             exact ⟨hi, ih _ (List.getElem_mem hi) z hz⟩
-          · rw [if_neg (by omega)]
+          · rw [ite_eq_right (by omega)]
             exact isAddr_nil _
 
 /-- The retraction fixes the old addresses. -/
@@ -948,7 +948,7 @@ lemma padInv_of_isAddr (t : RTree) : ∀ w, IsAddr t w → padInv t w = w := by
       | cons i z =>
           rw [isAddr_cons] at hw
           obtain ⟨hi, hz⟩ := hw
-          rw [padInv_cons, if_pos hi, getD_eq_getElem_of_lt hi, ih _ (List.getElem_mem hi) z hz]
+          rw [padInv_cons, ite_eq_left hi, getD_eq_getElem_of_lt hi, ih _ (List.getElem_mem hi) z hz]
 
 /-- The retraction moves parent-child pairs by at most one. -/
 lemma addrDist_padInv_append (k : ℕ) (t : RTree) : ∀ y b, IsAddr (padT k t) (y ++ [b]) →
@@ -964,7 +964,7 @@ lemma addrDist_padInv_append (k : ℕ) (t : RTree) : ∀ y b, IsAddr (padT k t) 
           rw [List.cons_append, isAddr_padT_cons_iff] at hy
           rw [List.cons_append, padInv_cons, padInv_cons]
           rcases hy with ⟨hi, hz⟩ | ⟨-, hi, -, h⟩
-          · rw [if_pos hi, if_pos hi, getD_eq_getElem_of_lt hi, addrDist_cons_cons_self]
+          · rw [ite_eq_left hi, ite_eq_left hi, getD_eq_getElem_of_lt hi, addrDist_cons_cons_self]
             exact ih _ (List.getElem_mem hi) z b hz
           · simp at h
 
@@ -980,9 +980,9 @@ lemma addrDist_padInv_self (k : ℕ) (t : RTree) : ∀ y, IsAddr (padT k t) y �
           rw [isAddr_padT_cons_iff] at hy
           rw [padInv_cons]
           rcases hy with ⟨hi, hz⟩ | ⟨-, hi, -, rfl⟩
-          · rw [if_pos hi, getD_eq_getElem_of_lt hi, addrDist_cons_cons_self]
+          · rw [ite_eq_left hi, getD_eq_getElem_of_lt hi, addrDist_cons_cons_self]
             exact ih _ (List.getElem_mem hi) z hz
-          · rw [if_neg (by omega)]
+          · rw [ite_eq_right (by omega)]
             simp
 
 /-! ### The address map of the padding -/
@@ -1042,7 +1042,7 @@ lemma gExitAddr_padDecs (k : ℕ) : ∀ L : List (List RTree),
   | [] => rfl
   | [β] => rfl
   | β :: r :: rest => by
-      rw [padDecs_cons_cons, gExitAddr_cons₂, gPadMap_cons_cons_cons, if_pos rfl]
+      rw [padDecs_cons_cons, gExitAddr_cons₂, gPadMap_cons_cons_cons, ite_eq_left rfl]
       obtain ⟨r', rest', hr⟩ : ∃ r' rest', padDecs k (r :: rest) = r' :: rest' := by
         cases h : padDecs k (r :: rest) with
         | nil => exact absurd h (padDecs_ne_nil k (by simp))
@@ -1062,9 +1062,9 @@ lemma isAddr_gPadMap (k : ℕ) : ∀ L : List (List RTree), ∀ w, IsAddr (GShap
       rcases hw with hw | ⟨rfl, hz⟩
       · rw [isAddr_cons] at hw
         obtain ⟨hi, hz⟩ := hw
-        rw [if_neg (by omega), isAddr_node_append_single', isAddr_node_padList_iff]
+        rw [ite_eq_right (by omega), isAddr_node_append_single', isAddr_node_padList_iff]
         exact Or.inl (Or.inl ⟨hi, isAddr_padT k _ z hz⟩)
-      · rw [if_pos rfl, isAddr_node_append_single']
+      · rw [ite_eq_left rfl, isAddr_node_append_single']
         exact Or.inr ⟨rfl, isAddr_gPadMap k (r :: rest) z hz⟩
 
 /-- The retraction lands in the realisation. -/
@@ -1079,12 +1079,12 @@ lemma isAddr_gPadInv (k : ℕ) : ∀ L : List (List RTree), ∀ y,
       rw [realiseAux_cons_of_ne_nil _ (by simp), gPadInv_cons_cons_cons]
       have hle := length_le_length_padList k β
       rcases hy with (⟨hi, hz⟩ | ⟨hi, hi', -⟩) | ⟨rfl, hz⟩
-      · rw [if_neg (by omega), if_pos hi, getD_eq_getElem_of_lt hi, isAddr_node_append_single',
+      · rw [ite_eq_right (by omega), ite_eq_left hi, getD_eq_getElem_of_lt hi, isAddr_node_append_single',
           isAddr_cons]
         exact Or.inl ⟨hi, isAddr_padInv k _ z hz⟩
-      · rw [if_neg (by omega), if_neg (by omega)]
+      · rw [ite_eq_right (by omega), ite_eq_right (by omega)]
         exact isAddr_nil _
-      · rw [if_pos rfl, isAddr_node_append_single']
+      · rw [ite_eq_left rfl, isAddr_node_append_single']
         exact Or.inr ⟨rfl, isAddr_gPadInv k (r :: rest) z hz⟩
 
 /-- The retraction inverts the address map. -/
@@ -1100,9 +1100,9 @@ lemma gPadInv_gPadMap (k : ℕ) : ∀ L : List (List RTree), ∀ w, IsAddr (GSha
       rcases hw with hw | ⟨rfl, hz⟩
       · rw [isAddr_cons] at hw
         obtain ⟨hi, hz⟩ := hw
-        rw [if_neg (by omega), gPadInv_cons_cons_cons, if_neg (by omega), if_pos hi,
+        rw [ite_eq_right (by omega), gPadInv_cons_cons_cons, ite_eq_right (by omega), ite_eq_left hi,
           getD_eq_getElem_of_lt hi, padInv_of_isAddr _ z hz]
-      · rw [if_pos rfl, gPadInv_cons_cons_cons, if_pos rfl, gPadInv_gPadMap k (r :: rest) z hz]
+      · rw [ite_eq_left rfl, gPadInv_cons_cons_cons, ite_eq_left rfl, gPadInv_gPadMap k (r :: rest) z hz]
 
 /-- The address map sends parent-child pairs to parent-child pairs. -/
 lemma addrDist_gPadMap_append (k : ℕ) : ∀ L : List (List RTree), ∀ u a,
@@ -1112,8 +1112,8 @@ lemma addrDist_gPadMap_append (k : ℕ) : ∀ L : List (List RTree), ∀ u a,
   | β :: r :: rest, [], a, _ => by
       rw [List.nil_append, gPadMap_cons_cons_cons, gPadMap_cons_cons_nil]
       by_cases h : a = β.length
-      · rw [if_pos h, gPadMap_nil]; simp
-      · rw [if_neg h]; simp
+      · rw [ite_eq_left h, gPadMap_nil]; simp
+      · rw [ite_eq_right h]; simp
   | β :: r :: rest, i :: u, a, hw => by
       rw [List.cons_append, realiseAux_cons_of_ne_nil _ (by simp),
         isAddr_node_append_single'] at hw
@@ -1121,9 +1121,9 @@ lemma addrDist_gPadMap_append (k : ℕ) : ∀ L : List (List RTree), ∀ u a,
       rcases hw with hw | ⟨rfl, hz⟩
       · rw [isAddr_cons] at hw
         obtain ⟨hi, -⟩ := hw
-        rw [if_neg (by omega), if_neg (by omega)]
+        rw [ite_eq_right (by omega), ite_eq_right (by omega)]
         simp
-      · rw [if_pos rfl, if_pos rfl, addrDist_cons_cons_self]
+      · rw [ite_eq_left rfl, ite_eq_left rfl, addrDist_cons_cons_self]
         exact addrDist_gPadMap_append k (r :: rest) u a hz
 
 /-- The retraction moves parent-child pairs by at most one. -/
@@ -1135,11 +1135,11 @@ lemma addrDist_gPadInv_append (k : ℕ) : ∀ L : List (List RTree), ∀ y b,
   | β :: r :: rest, [], b, _ => by
       rw [List.nil_append, gPadInv_cons_cons_cons, gPadInv_cons_cons_nil]
       by_cases h : b = (padList k β).length
-      · rw [if_pos h, gPadInv_nil]; simp
-      · rw [if_neg h]
+      · rw [ite_eq_left h, gPadInv_nil]; simp
+      · rw [ite_eq_right h]
         by_cases h' : b < β.length
-        · rw [if_pos h', padInv_nil']; simp
-        · rw [if_neg h']; simp
+        · rw [ite_eq_left h', padInv_nil']; simp
+        · rw [ite_eq_right h']; simp
   | β :: r :: rest, i :: y, b, hy => by
       rw [List.cons_append, padDecs_cons_cons,
         realiseAux_cons_of_ne_nil _ (padDecs_ne_nil k (by simp)),
@@ -1147,11 +1147,11 @@ lemma addrDist_gPadInv_append (k : ℕ) : ∀ L : List (List RTree), ∀ y b,
       rw [List.cons_append, gPadInv_cons_cons_cons, gPadInv_cons_cons_cons]
       have hle := length_le_length_padList k β
       rcases hy with (⟨hi, hz⟩ | ⟨-, -, h⟩) | ⟨rfl, hz⟩
-      · simp only [if_neg (show ¬ i = (padList k β).length by omega), if_pos hi,
+      · simp only [ite_eq_right (show ¬ i = (padList k β).length by omega), ite_eq_left hi,
           getD_eq_getElem_of_lt hi, addrDist_cons_cons_self]
         exact addrDist_padInv_append k _ y b hz
       · exact absurd h (by simp)
-      · rw [if_pos rfl, if_pos rfl, addrDist_cons_cons_self]
+      · rw [ite_eq_left rfl, ite_eq_left rfl, addrDist_cons_cons_self]
         exact addrDist_gPadInv_append k (r :: rest) y b hz
 
 /-- The image is `1`-dense: every added leaf is one step from its parent. -/
@@ -1166,13 +1166,13 @@ lemma addrDist_gPadMap_gPadInv (k : ℕ) : ∀ L : List (List RTree), ∀ y,
       rw [gPadInv_cons_cons_cons]
       have hle := length_le_length_padList k β
       rcases hy with (⟨hi, hz⟩ | ⟨hi, hi', rfl⟩) | ⟨rfl, hz⟩
-      · rw [if_neg (show ¬ i = (padList k β).length by omega), if_pos hi, getD_eq_getElem_of_lt hi,
-          gPadMap_cons_cons_cons, if_neg (show ¬ i = β.length by omega), addrDist_cons_cons_self]
+      · rw [ite_eq_right (show ¬ i = (padList k β).length by omega), ite_eq_left hi, getD_eq_getElem_of_lt hi,
+          gPadMap_cons_cons_cons, ite_eq_right (show ¬ i = β.length by omega), addrDist_cons_cons_self]
         exact addrDist_padInv_self k _ z hz
-      · rw [if_neg (show ¬ i = (padList k β).length by omega), if_neg (show ¬ i < β.length by omega),
+      · rw [ite_eq_right (show ¬ i = (padList k β).length by omega), ite_eq_right (show ¬ i < β.length by omega),
           gPadMap_cons_cons_nil]
         simp
-      · rw [if_pos rfl, gPadMap_cons_cons_cons, if_pos rfl, addrDist_cons_cons_self]
+      · rw [ite_eq_left rfl, gPadMap_cons_cons_cons, ite_eq_left rfl, addrDist_cons_cons_self]
         exact addrDist_gPadMap_gPadInv k (r :: rest) z hz
 
 /-- **The padding is a `1`-marked quasi-isometry**: the address map is an embedding
@@ -1551,19 +1551,19 @@ noncomputable def lcrsDec (t : RTree) (y : List ℕ) : List ℕ :=
 
 lemma isAddr_lcrsDec (t : RTree) {y : List ℕ} (hy : IsAddr (lcrs t) y) :
     IsAddr t (lcrsDec t y) := by
-  rw [lcrsDec, dif_pos (mem_addrList_iff.mpr hy)]
+  rw [lcrsDec, dite_eq_left (mem_addrList_iff.mpr hy)]
   exact mem_addrList_iff.mp (Subtype.prop _)
 
 lemma lcrsAddr_lcrsDec (t : RTree) {y : List ℕ} (hy : IsAddr (lcrs t) y) :
     lcrsAddr t (lcrsDec t y) = y := by
-  rw [lcrsDec, dif_pos (mem_addrList_iff.mpr hy)]
+  rw [lcrsDec, dite_eq_left (mem_addrList_iff.mpr hy)]
   have := (Equiv.ofBijective _ (lcrsVert_bijective t)).apply_symm_apply ⟨y, mem_addrList_iff.mpr hy⟩
   exact congrArg Subtype.val this
 
 lemma lcrsDec_lcrsAddr (t : RTree) {w : List ℕ} (hw : IsAddr t w) :
     lcrsDec t (lcrsAddr t w) = w := by
   have hmem : lcrsAddr t w ∈ addrList (lcrs t) := mem_addrList_iff.mpr (isAddr_lcrsAddr t w hw)
-  rw [lcrsDec, dif_pos hmem]
+  rw [lcrsDec, dite_eq_left hmem]
   have := (Equiv.ofBijective _ (lcrsVert_bijective t)).symm_apply_apply ⟨w, mem_addrList_iff.mpr hw⟩
   exact congrArg Subtype.val this
 

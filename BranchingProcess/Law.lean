@@ -272,7 +272,7 @@ theorem measurableSet_survives : MeasurableSet {c : Word N → ℕ | Survives c}
 /-- The index of the splitting of the ambient tree at the root: `none` names the
 root, which carries a single coordinate, and `some j` the copy of the tree
 hanging under the letter `j`. -/
-def Branch (N : ℕ) : Option (Fin N) → Type
+@[implicit_reducible] def Branch (N : ℕ) : Option (Fin N) → Type
   | none => Unit
   | some _ => Word N
 
@@ -303,7 +303,7 @@ lemma injective_rootSplit :
   · rfl
   · exact absurd h (by simp)
   · exact absurd h (by simp)
-  · simp only [rootSplit_some, List.cons.injEq] at h
+  · simp only [rootSplit_some] at h
     obtain ⟨rfl, rfl⟩ := h
     rfl
 
@@ -318,7 +318,7 @@ def split (c : Word N → ℕ) : (i : Option (Fin N)) → Branch N i → ℕ :=
     split c (some j) w = c (j :: w) := rfl
 
 lemma measurable_split : Measurable (split : (Word N → ℕ) → ∀ i, Branch N i → ℕ) :=
-  measurable_pi_lambda _ fun _ ↦ measurable_pi_lambda _ fun _ ↦ measurable_pi_apply _
+  Measurable.of_eval fun _ ↦ Measurable.of_eval fun _ ↦ measurable_pi_apply _
 
 /-- **The branching property of the law.** Under the splitting the field becomes
 the offspring count at the root together with `N` independent copies of itself,
@@ -339,7 +339,7 @@ theorem map_split (θ : Offspring J) :
         ∘ (fun c (p : (i : Option (Fin N)) × Branch N i) ↦ c (rootSplit p.1 p.2)) := rfl
   show (Measure.infinitePi (fun _ : Word N ↦ θ.law)).map split = _
   rw [hcomp, ← Measure.map_map (MeasurableEquiv.piCurry _).measurable
-    (measurable_pi_lambda _ fun _ ↦ measurable_pi_apply _), h1, h2]
+    (Measurable.of_eval fun _ ↦ measurable_pi_apply _), h1, h2]
 
 /-! ### One step of the recursion -/
 
@@ -374,7 +374,7 @@ lemma split_preimage_levelBox (n k : ℕ) :
       = {c : Word N → ℕ | c [] = k} ∩ noLevel (n + 1) := by
   ext c
   simp only [Set.mem_preimage, Set.mem_pi, Set.mem_univ, forall_const, Set.mem_inter_iff,
-    Set.mem_setOf_eq]
+    Set.mem_ofPred_eq]
   constructor
   · intro h
     have hroot : c [] = k := h none
@@ -389,7 +389,7 @@ lemma split_preimage_levelBox (n k : ℕ) :
           rw [← hroot]
           exact singleton_mem_sample_iff.mp hsplit.1
         have hchild := h (some j)
-        rw [levelBox_some, if_pos hj] at hchild
+        rw [levelBox_some, ite_eq_left hj] at hchild
         exact hchild u hu hsplit.2
   · rintro ⟨hroot, hlev⟩ i
     cases i with
@@ -397,12 +397,12 @@ lemma split_preimage_levelBox (n k : ℕ) :
     | some j =>
         rw [levelBox_some]
         by_cases hj : (j : ℕ) < k
-        · rw [if_pos hj]
+        · rw [ite_eq_left hj]
           intro u hu hmem
           refine hlev (j :: u) (by simp [hu]) ?_
           exact (append_mem_sample_iff c [j] u).mpr
             ⟨singleton_mem_sample_iff.mpr (hroot ▸ hj), hmem⟩
-        · rw [if_neg hj]
+        · rw [ite_eq_right hj]
           exact Set.mem_univ _
 
 /-- The root factor of the product: the offspring count at the root has the
@@ -429,9 +429,9 @@ lemma prod_ite_lt (x : ℝ≥0∞) {k : ℕ} (hk : k ≤ N) :
   have h1 : ∏ i ∈ Finset.range N \ Finset.range k, (if i < k then x else 1) = 1 := by
     refine Finset.prod_eq_one fun i hi ↦ ?_
     simp only [Finset.mem_sdiff, Finset.mem_range] at hi
-    exact if_neg hi.2
+    exact ite_eq_right hi.2
   have h2 : ∏ i ∈ Finset.range k, (if i < k then x else 1) = x ^ k := by
-    rw [Finset.prod_congr rfl (fun i hi ↦ if_pos (Finset.mem_range.mp hi)), Finset.prod_const,
+    rw [Finset.prod_congr rfl (fun i hi ↦ ite_eq_left (Finset.mem_range.mp hi)), Finset.prod_const,
       Finset.card_range]
   rw [h1, h2, one_mul]
 
@@ -449,9 +449,9 @@ theorem sampleMeasure_root_noLevel (θ : Offspring J) (n : ℕ) {k : ℕ} (hk : 
     refine Finset.prod_congr rfl fun j _ ↦ ?_
     rw [levelBox_some]
     by_cases hj : (j : ℕ) < k
-    · rw [if_pos hj, if_pos hj]
+    · rw [ite_eq_left hj, ite_eq_left hj]
       exact infinitePi_branch_some θ j (noLevel n)
-    · rw [if_neg hj, if_neg hj]
+    · rw [ite_eq_right hj, ite_eq_right hj]
       exact (infinitePi_branch_some θ j Set.univ).trans measure_univ
 
 /-! ### The law of extinction -/

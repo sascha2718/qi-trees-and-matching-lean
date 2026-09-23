@@ -58,7 +58,7 @@ lemma measurable_dyingAt (m : ℕ) : Measurable (fun c : Word N → ℕ ↦ dyin
           (({c : Word N → ℕ | c [] = j} ∩ {c : Word N → ℕ | survivors c = S})
             ∩ (fun c : Word N → ℕ ↦ bushOf (childSet N j \ S) m c) ⁻¹' t) := by
     ext c
-    simp only [Set.mem_preimage, Set.mem_iUnion, Set.mem_inter_iff, Set.mem_setOf_eq]
+    simp only [Set.mem_preimage, Set.mem_iUnion, Set.mem_inter_iff, Set.mem_ofPred_eq]
     constructor
     · intro hc
       exact ⟨c [], survivors c, ⟨rfl, rfl⟩, hc⟩
@@ -78,7 +78,7 @@ lemma measurableSet_forall_dyingAt (k : ℕ) {B : ℕ → Set (Word N → ℕ)}
   have h : {c : Word N → ℕ | ∀ m : ℕ, m < k → dyingAt c m ∈ B m}
       = ⋂ m : ℕ, ⋂ _ : m < k, (fun c : Word N → ℕ ↦ dyingAt c m) ⁻¹' (B m) := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.mem_preimage]
+    simp only [Set.mem_ofPred_eq, Set.mem_iInter, Set.mem_preimage]
   rw [h]
   exact MeasurableSet.iInter fun m ↦ MeasurableSet.iInter fun _ ↦ measurable_dyingAt m (hB m)
 
@@ -97,7 +97,7 @@ lemma measurableSet_rankSets (D : Finset (Fin N)) {B : ℕ → Set (Word N → �
 /-- At a letter of the alphabet the rank-indexed family reads the rank. -/
 lemma rankSets_coe (D : Finset (Fin N)) (B : ℕ → Set (Word N → ℕ)) (i : Fin N) :
     rankSets D B (i : ℕ) = B (rankOf D i) := by
-  rw [rankSets, dif_pos i.isLt, Fin.eta]
+  rw [rankSets, dite_eq_left i.isLt, Fin.eta]
 
 /-! ### The decoration of one skeleton vertex -/
 
@@ -170,7 +170,7 @@ theorem sampleMeasure_root_decorated (θ : Offspring J) (hJN : J ≤ N)
           ∩ {c : Word N → ℕ | ∀ i : Fin N, i ∉ S → (i : ℕ) < j →
               (fun w : Word N ↦ c (i :: w)) ∈ rankSets (childSet N j \ S) B (i : ℕ)}) := by
       ext c
-      simp only [Set.mem_inter_iff, Set.mem_setOf_eq, and_congr_right_iff]
+      simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, and_congr_right_iff]
       rintro ⟨⟨hroot, hS⟩, -⟩
       have hdyeq : ∀ m : ℕ, dyingAt c m = bushOf (childSet N j \ S) m c := by
         intro m
@@ -224,7 +224,7 @@ theorem survivalMeasure_root_decorated (θ : Offspring J) (hJN : J ≤ N)
         ∩ {c : Word N → ℕ | ∀ m : ℕ, m < j - k → dyingAt c m ∈ B m}) := by
     rw [decorationEvent]
     ext c
-    simp only [Set.mem_inter_iff, Set.mem_setOf_eq]
+    simp only [Set.mem_inter_iff, Set.mem_ofPred_eq]
     tauto
   have hsurv : {c : Word N → ℕ | Survives c}
         ∩ ((({c : Word N → ℕ | c [] = j} ∩ {c : Word N → ℕ | skeletonDegree c = k})
@@ -385,14 +385,14 @@ theorem survivalMeasure_decorations (θ : Offspring J) (hJN : J ≤ N)
             = decorationEvent (j []) (k []) (B [])
               ∩ {c : Word N → ℕ | ∀ m : ℕ, m < k [] → bushAt c m ∈ A m} := by
           ext c
-          simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_setOf_eq]
+          simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_ofPred_eq]
           constructor
           · intro h
             refine ⟨by simpa [skelSub_nil] using h [] hroot, fun m hm ↦ ?_⟩
             simp only [hA]
             split
             · rename_i hmN
-              simp only [hE, Set.mem_iInter, Set.mem_setOf_eq]
+              simp only [hE, Set.mem_iInter, Set.mem_ofPred_eq]
               intro u hu
               have := h (⟨m, hmN⟩ :: u) (mem_consSub.mp hu)
               rwa [skelSub_cons] at this
@@ -405,8 +405,8 @@ theorem survivalMeasure_decorations (θ : Offspring J) (hJN : J ≤ N)
                 by_cases hik : (i : ℕ) < k []
                 · have hm := hrest (i : ℕ) hik
                   simp only [hA] at hm
-                  rw [dif_pos i.isLt, Fin.eta] at hm
-                  simp only [hE, Set.mem_iInter, Set.mem_setOf_eq] at hm
+                  rw [dite_eq_left i.isLt, Fin.eta] at hm
+                  simp only [hE, Set.mem_iInter, Set.mem_ofPred_eq] at hm
                   exact hm u (mem_consSub.mpr hu)
                 · exact absurd (mem_consSub.mpr hu)
                     (by rw [hconsEmpty i (not_lt.mp hik)]; exact Finset.notMem_empty u)
@@ -438,7 +438,7 @@ theorem survivalMeasure_decorations (θ : Offspring J) (hJN : J ≤ N)
             ∏ u ∈ consSub i F, decorationMass θ (j (i :: u)) (k (i :: u)) (B (i :: u))
               = G (i : ℕ) := by
           intro i
-          simp only [hGdef, dif_pos i.isLt, Fin.eta]
+          simp only [hGdef, dite_eq_left i.isLt, Fin.eta]
         have hGone : ∀ m : ℕ, k [] ≤ m → G m = 1 := by
           intro m hm
           simp only [hGdef]
@@ -461,7 +461,7 @@ theorem survivalMeasure_decorations (θ : Offspring J) (hJN : J ≤ N)
           have hone : ∀ m ∈ Finset.range (k []), m ∉ Finset.range N → G m = 1 := by
             intro m _ hm'
             simp only [hGdef]
-            exact dif_neg fun hc ↦ hm' (Finset.mem_range.mpr hc)
+            exact dite_eq_right fun hc ↦ hm' (Finset.mem_range.mpr hc)
           exact (Finset.prod_subset hsub hone).symm
 
 /-! ### The skeleton degree pattern
@@ -483,9 +483,9 @@ lemma skelSub_root_cases (c : Word N → ℕ) :
       rcases ih (bushAt c (j : ℕ)) with ⟨v, hv⟩ | hv
       · rw [hv, bushAt]
         by_cases h : (j : ℕ) < (survivors c).card
-        · rw [bushOf, dif_pos h]
+        · rw [bushOf, dite_eq_left h]
           exact Or.inl ⟨_, rfl⟩
-        · rw [bushOf, dif_neg h]
+        · rw [bushOf, dite_eq_right h]
           exact Or.inr rfl
       · exact Or.inr hv
 
@@ -496,7 +496,7 @@ lemma survivalMeasure_coord_gt (θ : Offspring J) (hJN : J ≤ N) (v : Word N) :
     have hdecomp : {c : Word N → ℕ | N < c v}
         = ⋃ j : ℕ, {c : Word N → ℕ | c v = N + 1 + j} := by
       ext c
-      simp only [Set.mem_setOf_eq, Set.mem_iUnion]
+      simp only [Set.mem_ofPred_eq, Set.mem_iUnion]
       constructor
       · intro h
         exact ⟨c v - N - 1, by omega⟩
@@ -515,8 +515,8 @@ lemma survivalMeasure_skelSub_root_gt (θ : Offspring J) (hJN : J ≤ N) (u : Wo
   refine measure_mono_null (fun c hc ↦ ?_)
     (measure_iUnion_null fun v : Word N ↦ survivalMeasure_coord_gt θ hJN v)
   rcases skelSub_root_cases c u with ⟨v, hv⟩ | hv
-  · exact Set.mem_iUnion.mpr ⟨v, by rw [Set.mem_setOf_eq, ← hv]; exact hc⟩
-  · rw [Set.mem_setOf_eq, hv] at hc
+  · exact Set.mem_iUnion.mpr ⟨v, by rw [Set.mem_ofPred_eq, ← hv]; exact hc⟩
+  · rw [Set.mem_ofPred_eq, hv] at hc
     omega
 
 /-- **The skeleton degree pattern**, `thm:harris-general` in its probabilistic
@@ -551,7 +551,7 @@ theorem survivalMeasure_skelField_pattern (θ : Offspring J) (hJN : J ≤ N)
         ∪ ((⋂ u ∈ F, {c : Word N → ℕ | skeletonDegree (skelSub c u) = k u})
           ∩ ⋃ u ∈ F, {c : Word N → ℕ | N < skelSub c u []}) := by
     ext c
-    simp only [Set.mem_union, Set.mem_iUnion, Set.mem_iInter, Set.mem_setOf_eq,
+    simp only [Set.mem_union, Set.mem_iUnion, Set.mem_iInter, Set.mem_ofPred_eq,
       Set.mem_inter_iff]
     constructor
     · intro h
@@ -562,7 +562,7 @@ theorem survivalMeasure_skelField_pattern (θ : Offspring J) (hJN : J ≤ N)
       · push Not at hbig
         refine Or.inl ⟨fun u ↦ ⟨skelSub c u.1 [], by have := hbig u.1 u.2; omega⟩,
           fun u hu ↦ ?_⟩
-        rw [hdec, dif_pos hu]
+        rw [hdec, dite_eq_left hu]
         exact ⟨rfl, h u hu⟩
     · rintro (⟨f, hf⟩ | ⟨h, -⟩)
       · intro u hu
@@ -598,7 +598,7 @@ theorem survivalMeasure_skelField_pattern (θ : Offspring J) (hJN : J ≤ N)
     funext u
     have h1 := Set.mem_iInter₂.mp hc u.1 u.2
     have h2 := Set.mem_iInter₂.mp hc' u.1 u.2
-    rw [hdec, dif_pos u.2] at h1 h2
+    rw [hdec, dite_eq_left u.2] at h1 h2
     have : ((f u : ℕ)) = ((f' u : ℕ)) := by
       rw [← h1.1, ← h2.1]
     exact Fin.ext this
@@ -624,12 +624,12 @@ theorem survivalMeasure_skelField_pattern (θ : Offspring J) (hJN : J ≤ N)
     have h := survivalMeasure_decorations θ hJN hq hq0 n F hlen hpc
       (fun u ↦ if h : u ∈ F then (f ⟨u, h⟩ : ℕ) else 0) k
       (fun _ _ ↦ Set.univ)
-      (fun u hu ↦ by rw [dif_pos hu]; exact Nat.lt_succ_iff.mp (f ⟨u, hu⟩).isLt)
+      (fun u hu ↦ by rw [dite_eq_left hu]; exact Nat.lt_succ_iff.mp (f ⟨u, hu⟩).isLt)
       hk hcomp (fun _ _ ↦ MeasurableSet.univ)
     rw [h, ← Finset.prod_attach F (fun u ↦ decorationMass (N := N) θ
       (if h : u ∈ F then (f ⟨u, h⟩ : ℕ) else 0) (k u) fun _ ↦ Set.univ)]
     refine Finset.prod_congr rfl fun u _ ↦ ?_
-    rw [decorationMass, dif_pos u.2]
+    rw [decorationMass, dite_eq_left u.2]
     have hbush : ∀ m ∈ Finset.range ((f u : ℕ) - k u.1),
         bushMeasure (N := N) θ Set.univ = 1 := fun m _ ↦ measure_univ
     rw [Finset.prod_congr rfl hbush, Finset.prod_const_one, mul_one]

@@ -128,14 +128,14 @@ noncomputable def bAut (π : Word → Bool ≃ Bool) (w : List ℕ) : List ℕ :
 
 lemma bAut_of_isBin (π : Word → Bool ≃ Bool) {w : List ℕ} (h : IsBin w) :
     bAut π w = bnat (autOf π (unbnat w)) := by
-  rw [bAut, if_pos h]
+  rw [bAut, ite_eq_left h]
 
 lemma bAut_bnat (π : Word → Bool ≃ Bool) (x : Word) : bAut π (bnat x) = bnat (autOf π x) := by
   rw [bAut_of_isBin π (isBin_bnat x), unbnat_bnat]
 
 lemma bAut_of_not_isBin (π : Word → Bool ≃ Bool) {w : List ℕ} (h : ¬ IsBin w) :
     bAut π w = w := by
-  rw [bAut, if_neg h]
+  rw [bAut, ite_eq_right h]
 
 /-- The binary words are prefix-closed. -/
 lemma isBin_of_prefix {u v : List ℕ} (h : u <+: v) (hv : IsBin v) : IsBin u := hv.of_prefix h

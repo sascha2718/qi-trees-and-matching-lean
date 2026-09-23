@@ -64,7 +64,7 @@ lemma aOverlap_le_rE_left (μ : PMF X) (R : X → X → Prop) (x₀ x₁ : X) :
   refine ENNReal.tsum_le_tsum fun y => ?_
   by_cases h : R x₀ y ∧ R x₁ y
   · simp [h]
-  · simp only [h, if_false]; positivity
+  · simp only [h, ite_false]; positivity
 
 /-- `a ≤ r₁`, the other half of `a ≤ min(r₀,r₁)`. -/
 lemma aOverlap_le_rE_right (μ : PMF X) (R : X → X → Prop) (x₀ x₁ : X) :
@@ -73,7 +73,7 @@ lemma aOverlap_le_rE_right (μ : PMF X) (R : X → X → Prop) (x₀ x₁ : X) :
   refine ENNReal.tsum_le_tsum fun y => ?_
   by_cases h : R x₀ y ∧ R x₁ y
   · simp [h]
-  · simp only [h, if_false]; positivity
+  · simp only [h, ite_false]; positivity
 
 /-- `c` is symmetric in its two arguments: the defining condition
 `¬ R x₀ y ∧ ¬ R x₁ y` is unchanged when `x₀` and `x₁` are swapped. This is what
@@ -178,8 +178,8 @@ lemma qE_square_le (μ : PMF X) (R : X → X → Prop) (x₀ x₁ : X) :
           + (if ¬ R x₀ p.2 ∧ ¬ R x₁ p.2 then μ p.1 * μ p.2 else 0) := by
     intro p
     by_cases hsq : SquareRel R (x₀, x₁) p
-    · rw [if_pos hsq]; exact zero_le
-    · rw [if_neg hsq]
+    · rw [ite_eq_left hsq]; exact zero_le
+    · rw [ite_eq_right hsq]
       have hcov : (¬ R x₀ p.1 ∧ ¬ R x₀ p.2) ∨ (¬ R x₁ p.1 ∧ ¬ R x₁ p.2)
                 ∨ (¬ R x₀ p.1 ∧ ¬ R x₁ p.1) ∨ (¬ R x₀ p.2 ∧ ¬ R x₁ p.2) := by
         by_contra hc
@@ -190,18 +190,18 @@ lemma qE_square_le (μ : PMF X) (R : X → X → Prop) (x₀ x₁ : X) :
       set t2 := (if ¬ R x₀ p.1 ∧ ¬ R x₁ p.1 then w else 0)
       set t3 := (if ¬ R x₀ p.2 ∧ ¬ R x₁ p.2 then w else 0)
       rcases hcov with h | h | h | h
-      · calc w = t0 := (if_pos h).symm
+      · calc w = t0 := (ite_eq_left h).symm
           _ ≤ t0 + t1 := le_self_add
           _ ≤ t0 + t1 + t2 := le_self_add
           _ ≤ t0 + t1 + t2 + t3 := le_self_add
-      · calc w = t1 := (if_pos h).symm
+      · calc w = t1 := (ite_eq_left h).symm
           _ ≤ t0 + t1 := le_add_self
           _ ≤ t0 + t1 + t2 := le_self_add
           _ ≤ t0 + t1 + t2 + t3 := le_self_add
-      · calc w = t2 := (if_pos h).symm
+      · calc w = t2 := (ite_eq_left h).symm
           _ ≤ t0 + t1 + t2 := le_add_self
           _ ≤ t0 + t1 + t2 + t3 := le_self_add
-      · calc w = t3 := (if_pos h).symm
+      · calc w = t3 := (ite_eq_left h).symm
           _ ≤ t0 + t1 + t2 + t3 := le_add_self
   -- the four bad-line probabilities
   have h0 : (∑' p : X × X, if ¬ R x₀ p.1 ∧ ¬ R x₀ p.2 then μ p.1 * μ p.2 else 0)

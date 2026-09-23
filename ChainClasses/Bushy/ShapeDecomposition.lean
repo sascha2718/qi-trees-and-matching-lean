@@ -284,7 +284,7 @@ lemma isAddr_triOf : ∀ (n : ℕ) {d : Amb → ℕ}, (∀ v, d v ≤ 2) →
       intro d hd hn a
       rw [triOf]
       by_cases h0 : d [] = 0
-      · rw [if_pos h0]
+      · rw [ite_eq_left h0]
         constructor
         · intro ha
           rw [Tri.eq_nil_of_isAddr_leaf ha]
@@ -295,10 +295,10 @@ lemma isAddr_triOf : ∀ (n : ℕ) {d : Amb → ℕ}, (∀ v, d v ≤ 2) →
           · exfalso
             rw [letters_cons, mem_sample_cons] at ha
             omega
-      · rw [if_neg h0]
+      · rw [ite_eq_right h0]
         have h1 : 1 ≤ d [] := Nat.one_le_iff_ne_zero.mpr h0
         by_cases h1' : d [] = 1
-        · rw [if_pos h1']
+        · rw [ite_eq_left h1']
           have hsub : ∀ u ∈ sample (shift d [(0 : Fin 2)]), u.length ≤ n :=
             height_shift hn 0 (by omega)
           have hIH := ih (d := shift d [(0 : Fin 2)]) (fun v ↦ hd _) hsub
@@ -311,7 +311,7 @@ lemma isAddr_triOf : ∀ (n : ℕ) {d : Amb → ℕ}, (∀ v, d v ≤ 2) →
             | true =>
                 rw [letters_cons, letterOf_true, mem_sample_cons]
                 simp [h1']
-        · rw [if_neg h1']
+        · rw [ite_eq_right h1']
           have h2 : d [] = 2 := by have := hd ([] : Amb); omega
           have hsub0 : ∀ u ∈ sample (shift d [(0 : Fin 2)]), u.length ≤ n :=
             height_shift hn 0 (by omega)
@@ -395,8 +395,8 @@ lemma neckLetter_mem_survivors {v : Amb} (h : Survives (shift c v)) :
     exact fun hc ↦ (BranchingProcess.not_survives_iff_survivors_eq_empty.mpr hc) h
   rw [neckLetter]
   by_cases h0 : (0 : Fin 2) ∈ survivors (shift c v)
-  · rwa [if_pos h0]
-  · rw [if_neg h0]
+  · rwa [ite_eq_left h0]
+  · rw [ite_eq_right h0]
     obtain ⟨i, hi⟩ := hne
     have : i = 1 := by
       fin_cases i
@@ -593,10 +593,10 @@ lemma sampleLetter_injective (c : Amb → ℕ) (v : Amb) :
   intro b b' h
   rw [sampleLetter, sampleLetter] at h
   by_cases hcase : skeletonDegree (shift c v) = 1 ∧ c v = 2
-  · rw [if_pos hcase, if_pos hcase] at h
+  · rw [ite_eq_left hcase, ite_eq_left hcase] at h
     cases b <;> cases b' <;> simp_all [bushLetter_ne_neckLetter c v,
       (bushLetter_ne_neckLetter c v).symm]
-  · rw [if_neg hcase, if_neg hcase] at h
+  · rw [ite_eq_right hcase, ite_eq_right hcase] at h
     exact letterOf_injective h
 
 /-- **The sample read from the index tree**: the address translation along the letter
@@ -729,7 +729,7 @@ lemma sampleLetter_of_not_survives {v : Amb} (h : ¬ Survives (shift c v)) (b : 
   have hdeg : skeletonDegree (shift c v) = 0 := by
     by_contra hne
     exact h (BranchingProcess.survives_iff_skeletonDegree_ne_zero.mpr hne)
-  rw [sampleLetter, if_neg (by rw [hdeg]; simp)]
+  rw [sampleLetter, ite_eq_right (by rw [hdeg]; simp)]
 
 /-- **The translation inside a bush**: below a dying vertex the translation reads the
 letters one for one. -/
@@ -796,13 +796,13 @@ lemma transSample_neck (hc : IsBushySample c) (w : Word)
         ih (by omega)]
       have hletter : sampleLetter c u (decAt c u).isSome = neckLetter c u := by
         by_cases h2 : c u = 2
-        · rw [decAt, if_pos h2]
+        · rw [decAt, ite_eq_left h2]
           simp only [Option.isSome_some]
-          rw [sampleLetter, if_pos ⟨hdeg, h2⟩]
+          rw [sampleLetter, ite_eq_left ⟨hdeg, h2⟩]
           simp
-        · rw [decAt, if_neg h2]
+        · rw [decAt, ite_eq_right h2]
           simp only [Option.isSome_none]
-          rw [sampleLetter, if_neg (by tauto), letterOf_false,
+          rw [sampleLetter, ite_eq_right (by tauto), letterOf_false,
             neckLetter_eq_zero husurv h2 (hc.offspring u)]
       rw [hletter, neckRay_succ]
 
@@ -823,7 +823,7 @@ lemma transSample_copyAddr (hc : IsBushySample c) (w : Word) :
       rw [hfull] at hneck
       have hdeg : skeletonDegree (shift c (neckRay c v n)) = 2 := splitDepth_spec hc hsurv
       rw [copyAddr_concat, transSample_concat, hneck, entryV_concat,
-        sampleLetter, if_neg (by rw [hdeg]; simp)]
+        sampleLetter, ite_eq_right (by rw [hdeg]; simp)]
 
 /-- **The bush of a neck vertex**: the translation carries the bush address of the
 `i`-th neck vertex of the copy `w` to the dying subtree there. -/
@@ -842,7 +842,7 @@ lemma transSample_bush (hc : IsBushySample c) (w : Word) {i : ℕ}
   have hneck := transSample_neck hc w (transSample_copyAddr hc w) i (le_of_lt hi)
   have hstep : transSample c (copyAddr (shapeAt c) w
       ++ Shape.neckAddr ((shapeAt c w).decs.take i) ++ [false]) = u ++ [bushLetter c u] := by
-    rw [transSample_concat, hneck, sampleLetter, if_pos ⟨hdeg, h2⟩]
+    rw [transSample_concat, hneck, sampleLetter, ite_eq_left ⟨hdeg, h2⟩]
     simp [hu]
   have hfin : ¬ Survives (shift c (u ++ [bushLetter c u])) := not_survives_bush husurv hdeg h2
   have := transSample_append_letters hstep hfin z hz
@@ -951,20 +951,20 @@ lemma transSample_code_spec (hc : IsBushySample c) (x : Assembly (shapeAt c)) :
       by_cases h2 : c u = 2
       · have hsome : (shapeAt c w).decs[i]?
             = some (some (bushTri (shift c (u ++ [bushLetter c u])))) := by
-          rw [hgeti, decAt, if_pos h2]
+          rw [hgeti, decAt, ite_eq_left h2]
         have hchild := Shape.isAddr_neckAddr_concat_some (shapeAt c w).decs i _ hsome b
         have hlt2 : (sampleLetter c u b : ℕ) < c u := by
           have := (sampleLetter c u b).isLt
           omega
         simp [hchild, hlt2]
-      · have hnone : (shapeAt c w).decs[i]? = some none := by rw [hgeti, decAt, if_neg h2]
+      · have hnone : (shapeAt c w).decs[i]? = some none := by rw [hgeti, decAt, ite_eq_right h2]
         have hchild := Shape.isAddr_neckAddr_concat_none (shapeAt c w).decs i hnone b
         have h1 : c u = 1 := by
           rcases eq_one_or_two_of_survives hc husurv with h | h
           · exact h
           · exact absurd h h2
         have hletter : sampleLetter c u b = letterOf b := by
-          rw [sampleLetter, if_neg (by tauto)]
+          rw [sampleLetter, ite_eq_right (by tauto)]
         rw [hchild, hletter, h1]
         simp only [hne, false_or]
         cases b <;> simp
@@ -982,10 +982,10 @@ lemma transSample_code_spec (hc : IsBushySample c) (x : Assembly (shapeAt c)) :
       simpa using hget
     have h2 : c u = 2 := by
       by_contra hne
-      rw [decAt, if_neg hne] at hdec
+      rw [decAt, ite_eq_right hne] at hdec
       simp at hdec
     have hteq : t = bushTri (shift c (u ++ [bushLetter c u])) := by
-      rw [decAt, if_pos h2] at hdec
+      rw [decAt, ite_eq_left h2] at hdec
       simpa using hdec.symm
     set y := u ++ [bushLetter c u] with hy
     have hymem : y ∈ sample c :=
@@ -1096,7 +1096,7 @@ lemma FibreMeasurable.congr {X : Type*} {f g : (Amb → ℕ) → X} (hf : FibreM
   intro x
   have he : {c : Amb → ℕ | g c = x} = {c : Amb → ℕ | f c = x} := by
     ext c
-    rw [Set.mem_setOf_eq, Set.mem_setOf_eq, h c]
+    rw [Set.mem_ofPred_eq, Set.mem_ofPred_eq, h c]
   rw [he]
   exact hf x
 
@@ -1115,7 +1115,7 @@ lemma FibreMeasurable.preimage {X : Type*} [Countable X] {f : (Amb → ℕ) → 
     (hf : FibreMeasurable f) (s : Set X) : MeasurableSet {c : Amb → ℕ | f c ∈ s} := by
   have he : {c : Amb → ℕ | f c ∈ s} = ⋃ x ∈ s, {c : Amb → ℕ | f c = x} := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iUnion, exists_prop]
+    simp only [Set.mem_ofPred_eq, Set.mem_iUnion, exists_prop]
     exact ⟨fun hc ↦ ⟨f c, hc, rfl⟩, by rintro ⟨x, hx, rfl⟩; exact hx⟩
   rw [he]
   exact MeasurableSet.biUnion (Set.to_countable _) fun x _ ↦ hf x
@@ -1145,7 +1145,7 @@ lemma FibreMeasurable.comp {X Y : Type*} [Countable X] {g : (Amb → ℕ) → X}
   have he : {c : Amb → ℕ | h (g c) c = y}
       = ⋃ x : X, ({c : Amb → ℕ | g c = x} ∩ {c : Amb → ℕ | h x c = y}) := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iUnion, Set.mem_inter_iff]
+    simp only [Set.mem_ofPred_eq, Set.mem_iUnion, Set.mem_inter_iff]
     exact ⟨fun hc ↦ ⟨g c, rfl, hc⟩, by rintro ⟨x, hx, hc⟩; rw [hx]; exact hc⟩
   rw [he]
   exact MeasurableSet.iUnion fun x ↦ (hg x).inter (hh x y)
@@ -1155,7 +1155,7 @@ lemma FibreMeasurable.pi {X ι : Type*} [Countable ι] {g : ι → (Amb → ℕ)
   intro f
   have he : {c : Amb → ℕ | (fun i ↦ g i c) = f} = ⋂ i, {c : Amb → ℕ | g i c = f i} := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iInter, funext_iff]
+    simp only [Set.mem_ofPred_eq, Set.mem_iInter, funext_iff]
   rw [he]
   exact MeasurableSet.iInter fun i ↦ hg i (f i)
 
@@ -1170,7 +1170,7 @@ lemma measurableSet_sInf_eq {P : ℕ → Set (Amb → ℕ)} (hP : ∀ k, Measura
   rcases Nat.eq_zero_or_pos n with rfl | hn
   · have he : {c : Amb → ℕ | sInf {k | c ∈ P k} = 0} = P 0 ∪ ⋂ k : ℕ, (P k)ᶜ := by
       ext c
-      simp only [Set.mem_setOf_eq, Set.mem_union, Set.mem_iInter, Set.mem_compl_iff]
+      simp only [Set.mem_ofPred_eq, Set.mem_union, Set.mem_iInter, Set.mem_compl_iff]
       constructor
       · intro h
         by_cases hex : ∃ k, c ∈ P k
@@ -1188,7 +1188,7 @@ lemma measurableSet_sInf_eq {P : ℕ → Set (Amb → ℕ)} (hP : ∀ k, Measura
   · have he : {c : Amb → ℕ | sInf {k | c ∈ P k} = n}
         = P n ∩ ⋂ k ∈ Finset.range n, (P k)ᶜ := by
       ext c
-      simp only [Set.mem_setOf_eq, Set.mem_inter_iff, Set.mem_iInter, Set.mem_compl_iff,
+      simp only [Set.mem_ofPred_eq, Set.mem_inter_iff, Set.mem_iInter, Set.mem_compl_iff,
         Finset.mem_range]
       constructor
       · intro h
@@ -1196,7 +1196,7 @@ lemma measurableSet_sInf_eq {P : ℕ → Set (Amb → ℕ)} (hP : ∀ k, Measura
           by_contra hno
           have hempty : {k | c ∈ P k} = ∅ := by
             ext k
-            simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+            simp only [Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
             exact fun hk ↦ hno ⟨k, hk⟩
           rw [hempty, Nat.sInf_empty] at h
           omega
@@ -1214,7 +1214,7 @@ lemma measurableSet_sInf_eq {P : ℕ → Set (Amb → ℕ)} (hP : ∀ k, Measura
 
 /-- The field shifted to a vertex is a measurable function of the field. -/
 lemma measurable_shiftMap (v : Amb) : Measurable (fun c : Amb → ℕ ↦ shift c v) :=
-  measurable_pi_lambda _ fun w ↦ measurable_pi_apply (v ++ w)
+  Measurable.of_eval fun w ↦ measurable_pi_apply (v ++ w)
 
 lemma fibreMeasurable_coord (v : Amb) : FibreMeasurable (fun c : Amb → ℕ ↦ c v) := by
   intro j
@@ -1296,7 +1296,7 @@ lemma fibreMeasurable_treeHeight (y : Amb) :
     have he : {c : Amb → ℕ | ∀ u ∈ sample (shift c y), u.length ≤ n}
         = ⋂ u ∈ {u : Amb | n < u.length}, {c : Amb → ℕ | u ∈ sample (shift c y)}ᶜ := by
       ext c
-      simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.mem_compl_iff]
+      simp only [Set.mem_ofPred_eq, Set.mem_iInter, Set.mem_compl_iff]
       constructor
       · intro h u hu hmem
         have hlen := h u hmem
@@ -1388,7 +1388,7 @@ lemma sampleMeasure_offspring_le (θ : Offspring 2) :
   have he : {c : Amb → ℕ | ¬ ∀ v, c v ≤ 2}
       = ⋃ v : Amb, ⋃ k ∈ {k : ℕ | 2 < k}, {c : Amb → ℕ | c v = k} := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iUnion, exists_prop, not_forall, not_le]
+    simp only [Set.mem_ofPred_eq, Set.mem_iUnion, exists_prop, not_forall, not_le]
     constructor
     · rintro ⟨v, hv⟩
       exact ⟨v, c v, hv, rfl⟩

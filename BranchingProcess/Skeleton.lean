@@ -116,7 +116,7 @@ noncomputable def treeLaw (θ : Offspring J) : Measure (Subtree N) :=
 instance isProbabilityMeasure_treeLaw (θ : Offspring J) :
     IsProbabilityMeasure (treeLaw (N := N) θ) := by
   rw [treeLaw]
-  exact Measure.isProbabilityMeasure_map measurable_sample.aemeasurable
+  infer_instance
 
 /-! ### The reduced law as an offspring law -/
 
@@ -237,7 +237,7 @@ lemma skeletonDegree_eq_card (c : Word N → ℕ) : skeletonDegree c = (survivor
 the letter naming that child. -/
 lemma bushAt_of_lt {c : Word N → ℕ} {m : ℕ} (h : m < (survivors c).card) :
     bushAt c m = fun w ↦ c ((survivors c).orderEmbOfFin rfl ⟨m, h⟩ :: w) := by
-  rw [bushAt, bushOf, dif_pos h]
+  rw [bushAt, bushOf, dite_eq_left h]
 
 /-- The letter naming the `m`-th surviving child is one of the surviving children. -/
 lemma orderEmbOfFin_mem_survivors {c : Word N → ℕ} {m : ℕ} (h : m < (survivors c).card) :
@@ -255,9 +255,9 @@ function of the field: it is a shift, or a constant. -/
 lemma measurable_bushOf (S : Finset (Fin N)) (m : ℕ) :
     Measurable (fun c : Word N → ℕ ↦ bushOf S m c) := by
   by_cases h : m < S.card
-  · simp only [bushOf, dif_pos h]
-    exact measurable_pi_lambda _ fun _ ↦ measurable_pi_apply _
-  · simp only [bushOf, dif_neg h]
+  · simp only [bushOf, dite_eq_left h]
+    exact Measurable.of_eval fun _ ↦ measurable_pi_apply _
+  · simp only [bushOf, dite_eq_right h]
     exact measurable_const
 
 /-- **The surviving subtrees are measurable.**  The pattern of survivors takes finitely
@@ -268,7 +268,7 @@ lemma measurable_bushAt (m : ℕ) : Measurable (fun c : Word N → ℕ ↦ bushA
       = ⋃ S : Finset (Fin N),
           ({c : Word N → ℕ | survivors c = S} ∩ (fun c : Word N → ℕ ↦ bushOf S m c) ⁻¹' t) := by
     ext c
-    simp only [Set.mem_preimage, Set.mem_iUnion, Set.mem_inter_iff, Set.mem_setOf_eq]
+    simp only [Set.mem_preimage, Set.mem_iUnion, Set.mem_inter_iff, Set.mem_ofPred_eq]
     constructor
     · intro hc
       exact ⟨survivors c, rfl, hc⟩
@@ -334,7 +334,7 @@ lemma measurable_skelSub (u : Word N) : Measurable (fun c : Word N → ℕ ↦ s
 
 /-- **The offspring field of the skeleton is measurable.** -/
 lemma measurable_skelField : Measurable (skelField : (Word N → ℕ) → Word N → ℕ) :=
-  measurable_pi_lambda _ fun u ↦ measurable_skeletonDegree.comp (measurable_skelSub u)
+  Measurable.of_eval fun u ↦ measurable_skeletonDegree.comp (measurable_skelSub u)
 
 /-- **The skeleton is a random tree.** -/
 lemma measurable_skelTree : Measurable (skelTree : (Word N → ℕ) → Subtree N) :=
@@ -403,7 +403,7 @@ lemma infinitePi_root_gt (θ : Offspring J) (m : ℕ) :
       = ⋃ k : ℕ, ({u : Branch N none → ℕ | u rootIdx = k}
         ∩ {u : Branch N none → ℕ | m < u rootIdx}) := by
     ext u
-    simp only [Set.mem_setOf_eq, Set.mem_iUnion, Set.mem_inter_iff]
+    simp only [Set.mem_ofPred_eq, Set.mem_iUnion, Set.mem_inter_iff]
     exact ⟨fun h ↦ ⟨u rootIdx, rfl, h⟩, fun ⟨_, _, h⟩ ↦ h⟩
   have hval : ∀ k : ℕ, Measure.infinitePi (fun _ : Branch N none ↦ θ.law)
       ({u : Branch N none → ℕ | u rootIdx = k} ∩ {u : Branch N none → ℕ | m < u rootIdx})
@@ -414,16 +414,16 @@ lemma infinitePi_root_gt (θ : Offspring J) (m : ℕ) :
           ∩ {u : Branch N none → ℕ | m < u rootIdx})
           = {u : Branch N none → ℕ | u rootIdx = k} := by
         refine Set.inter_eq_left.mpr fun u hu ↦ ?_
-        rw [Set.mem_setOf_eq, show u rootIdx = k from hu]
+        rw [Set.mem_ofPred_eq, show u rootIdx = k from hu]
         exact hk
-      rw [hset, infinitePi_root_apply θ k, if_pos hk]
+      rw [hset, infinitePi_root_apply θ k, ite_eq_left hk]
     · have hset : ({u : Branch N none → ℕ | u rootIdx = k}
           ∩ {u : Branch N none → ℕ | m < u rootIdx}) = (∅ : Set (Branch N none → ℕ)) := by
         ext u
-        simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+        simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
         rintro ⟨hu, hlt⟩
         exact hk (hu ▸ hlt)
-      rw [hset, measure_empty, if_neg hk, ENNReal.ofReal_zero]
+      rw [hset, measure_empty, ite_eq_right hk, ENNReal.ofReal_zero]
   have hvanish : ∀ k ∉ Finset.range (J + 1),
       Measure.infinitePi (fun _ : Branch N none ↦ θ.law)
         ({u : Branch N none → ℕ | u rootIdx = k} ∩ {u : Branch N none → ℕ | m < u rootIdx})
@@ -432,8 +432,8 @@ lemma infinitePi_root_gt (θ : Offspring J) (m : ℕ) :
     rw [Finset.mem_range] at hk
     rw [hval k]
     by_cases hmk : m < k
-    · rw [if_pos hmk, θ.vanishing k (by omega), ENNReal.ofReal_zero]
-    · rw [if_neg hmk, ENNReal.ofReal_zero]
+    · rw [ite_eq_left hmk, θ.vanishing k (by omega), ENNReal.ofReal_zero]
+    · rw [ite_eq_right hmk, ENNReal.ofReal_zero]
   have hnn : ∀ k ∈ Finset.range (J + 1), (0 : ℝ) ≤ if m < k then θ k else 0 := by
     intro k _
     split
@@ -506,7 +506,7 @@ lemma bushOf_rankOf {S : Finset (Fin N)} {i : Fin N} (hi : i ∈ S) (c : Word N 
       rw [← hm, rankOf_orderEmbOfFin]
     have hidx : (⟨rankOf S i, hlt⟩ : Fin S.card) = m := Fin.ext hrank
     rw [hidx, hm]
-  rw [bushOf, dif_pos hlt, hemb]
+  rw [bushOf, dite_eq_left hlt, hemb]
 
 /-- **The rank-indexed constraints on the surviving subtrees**, read letter by letter.
 Constraining the `m`-th surviving subtree for every `m` below the number of survivors is
@@ -524,7 +524,7 @@ lemma forall_bushOf_iff (S : Finset (Fin N)) (A : ℕ → Set (Word N → ℕ)) 
       rankOf_orderEmbOfFin S rfl ⟨m, hm⟩
     have hval := h _ hi
     rw [hrank] at hval
-    rw [bushOf, dif_pos hm]
+    rw [bushOf, dite_eq_left hm]
     exact hval
 
 /-! ### Constraining every surviving subtree -/
@@ -545,14 +545,14 @@ lemma prod_ite_survivors_family {j : ℕ} (hj : j ≤ N) {S : Finset (Fin N)}
     have hiS : i ∉ S := fun hc ↦ hi.2 (mem_childSet.mp (hS hc))
     rw [hf]
     simp only
-    rw [if_neg hiS, if_neg hi.2]
+    rw [ite_eq_right hiS, ite_eq_right hi.2]
   have hdying : ∏ i ∈ childSet N j \ S, f i = B ^ (j - S.card) := by
     have hfac : ∀ i ∈ childSet N j \ S, f i = B := by
       intro i hi
       rw [Finset.mem_sdiff, mem_childSet] at hi
       rw [hf]
       simp only
-      rw [if_neg hi.2, if_pos hi.1]
+      rw [ite_eq_right hi.2, ite_eq_left hi.1]
     rw [Finset.prod_congr rfl hfac, Finset.prod_const, Finset.card_sdiff_of_subset hS,
       card_childSet hj]
   have hsurv : ∏ i ∈ S, f i = ∏ m ∈ Finset.range S.card, X m := by
@@ -560,7 +560,7 @@ lemma prod_ite_survivors_family {j : ℕ} (hj : j ≤ N) {S : Finset (Fin N)}
       intro i hi
       rw [hf]
       simp only
-      rw [if_pos hi]
+      rw [ite_eq_left hi]
     rw [Finset.prod_congr rfl hfac, prod_rankOf]
   rw [← Finset.prod_sdiff (Finset.subset_univ (childSet N j)), houter, one_mul,
     ← Finset.prod_sdiff hS, hdying, hsurv]
@@ -624,12 +624,12 @@ lemma split_preimage_bushesOnly (S : Finset (Fin N)) (A : ℕ → Set (Word N �
     split ⁻¹' Set.univ.pi (bushesOnly (N := N) S A)
       = {c : Word N → ℕ | ∀ i ∈ S, (fun w : Word N ↦ c (i :: w)) ∈ A (rankOf S i)} := by
   ext c
-  simp only [Set.mem_preimage, Set.mem_pi, Set.mem_univ, forall_const, Set.mem_setOf_eq]
+  simp only [Set.mem_preimage, Set.mem_pi, Set.mem_univ, forall_const, Set.mem_ofPred_eq]
   constructor
   · intro h i hi
     have hval := h (some i)
     rw [show bushesOnly (N := N) S A (some i) = if i ∈ S then A (rankOf S i) else Set.univ from rfl,
-      if_pos hi] at hval
+      ite_eq_left hi] at hval
     exact hval
   · intro h i
     cases i with
@@ -637,9 +637,9 @@ lemma split_preimage_bushesOnly (S : Finset (Fin N)) (A : ℕ → Set (Word N �
     | some i =>
         show split c (some i) ∈ (if i ∈ S then A (rankOf S i) else Set.univ)
         by_cases hi : i ∈ S
-        · rw [if_pos hi]
+        · rw [ite_eq_left hi]
           exact h i hi
-        · rw [if_neg hi]
+        · rw [ite_eq_right hi]
           exact Set.mem_univ _
 
 /-- **The product event constrains every surviving subtree.** -/
@@ -654,7 +654,7 @@ lemma split_preimage_bushesBox {j : ℕ} {S : Finset (Fin N)} (hS : S ⊆ childS
     exact Set.pi_congr rfl fun i _ ↦ bushesBox_eq_inter j S A i
   rw [hbox, Set.preimage_inter, split_preimage_skelBox j S hS, split_preimage_bushesOnly]
   ext c
-  simp only [Set.mem_inter_iff, Set.mem_setOf_eq, forall_bushOf_iff S A c]
+  simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, forall_bushOf_iff S A c]
 
 namespace Offspring
 
@@ -664,7 +664,7 @@ noncomputable def tailGe (θ : Offspring J) (n : ℕ) : ℝ :=
 
 /-- No demand at all is the whole mass. -/
 @[simp] lemma tailGe_zero (θ : Offspring J) : θ.tailGe 0 = 1 := by
-  rw [tailGe, Finset.sum_congr rfl fun k _ ↦ if_pos (Nat.zero_le k)]
+  rw [tailGe, Finset.sum_congr rfl fun k _ ↦ ite_eq_left (Nat.zero_le k)]
   exact θ.total
 
 /-- The two tails agree off zero. -/
@@ -684,7 +684,7 @@ lemma measurableSet_forall_bushOf (S : Finset (Fin N)) {A : ℕ → Set (Word N 
   have h : {c : Word N → ℕ | ∀ m : ℕ, m < S.card → bushOf S m c ∈ A m}
       = ⋂ m : ℕ, ⋂ _ : m < S.card, (fun c : Word N → ℕ ↦ bushOf S m c) ⁻¹' (A m) := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.mem_preimage]
+    simp only [Set.mem_ofPred_eq, Set.mem_iInter, Set.mem_preimage]
   rw [h]
   exact MeasurableSet.iInter fun m ↦
     MeasurableSet.iInter fun _ ↦ measurable_bushOf S m (hA m)
@@ -696,7 +696,7 @@ lemma measurableSet_forall_bushAt (k : ℕ) {A : ℕ → Set (Word N → ℕ)}
   have h : {c : Word N → ℕ | ∀ m : ℕ, m < k → bushAt c m ∈ A m}
       = ⋂ m : ℕ, ⋂ _ : m < k, (fun c : Word N → ℕ ↦ bushAt c m) ⁻¹' (A m) := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.mem_preimage]
+    simp only [Set.mem_ofPred_eq, Set.mem_iInter, Set.mem_preimage]
   rw [h]
   exact MeasurableSet.iInter fun m ↦ MeasurableSet.iInter fun _ ↦ measurable_bushAt m (hA m)
 
@@ -726,13 +726,13 @@ theorem sampleMeasure_root_survivors_bushes (θ : Offspring J) (hJN : J ≤ N)
       intro i
       rw [bushesBox_some]
       by_cases hiS : i ∈ S
-      · rw [if_pos hiS, if_pos hiS]
+      · rw [ite_eq_left hiS, ite_eq_left hiS]
         exact infinitePi_branch_some θ i _
-      · rw [if_neg hiS, if_neg hiS]
+      · rw [ite_eq_right hiS, ite_eq_right hiS]
         by_cases hij : (i : ℕ) < j
-        · rw [if_pos hij, if_pos hij]
+        · rw [ite_eq_left hij, ite_eq_left hij]
           exact (infinitePi_branch_some θ i _).trans (sampleMeasure_not_survives θ hJN)
-        · rw [if_neg hij, if_neg hij]
+        · rw [ite_eq_right hij, ite_eq_right hij]
           exact (infinitePi_branch_some θ i Set.univ).trans measure_univ
     have hsplit : ∀ m ∈ Finset.range S.card,
         sampleMeasure (N := N) θ ({c : Word N → ℕ | Survives c} ∩ A m)
@@ -805,7 +805,7 @@ theorem sampleMeasure_skeletonDegree_bushes (θ : Offspring J) (hJN : J ≤ N)
       = ⋃ n : ℕ, (({c : Word N → ℕ | c [] = n} ∩ {c : Word N → ℕ | skeletonDegree c = k})
         ∩ {c : Word N → ℕ | ∀ m : ℕ, m < k → bushAt c m ∈ A m}) := by
     ext c
-    simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_iUnion]
+    simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, Set.mem_iUnion]
     constructor
     · rintro ⟨hk, hbush⟩
       exact ⟨c [], ⟨rfl, hk⟩, hbush⟩
@@ -903,7 +903,7 @@ theorem survivalMeasure_bushes (θ : Offspring J) (hJN : J ≤ N) (hq : θ.extin
         ∩ {c : Word N → ℕ | skeletonDegree c = k})
         ∩ {c : Word N → ℕ | ∀ m : ℕ, m < k → bushAt c m ∈ A m}) := by
     ext c
-    simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_iUnion]
+    simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, Set.mem_iUnion]
     constructor
     · rintro ⟨hgec, hbush⟩
       exact ⟨skeletonDegree c, ⟨hgec, rfl⟩, hbush⟩
@@ -933,22 +933,22 @@ theorem survivalMeasure_bushes (θ : Offspring J) (hJN : J ≤ N) (hq : θ.extin
           = {c : Word N → ℕ | skeletonDegree c = k}
             ∩ {c : Word N → ℕ | ∀ m : ℕ, m < k → bushAt c m ∈ A m} := by
         ext c
-        simp only [Set.mem_inter_iff, Set.mem_setOf_eq]
+        simp only [Set.mem_inter_iff, Set.mem_ofPred_eq]
         constructor
         · rintro ⟨⟨-, hd⟩, hbush⟩
           exact ⟨hd, hbush⟩
         · rintro ⟨hd, hbush⟩
           exact ⟨⟨by rw [hd]; exact hk, hd⟩, hbush⟩
-      rw [hset, survivalMeasure_skeletonDegree_bushes θ hJN hq k hA, if_pos hk, hprodeq k hk]
+      rw [hset, survivalMeasure_skeletonDegree_bushes θ hJN hq k hA, ite_eq_left hk, hprodeq k hk]
     · have hset : (({c : Word N → ℕ | n ≤ skeletonDegree c}
           ∩ {c : Word N → ℕ | skeletonDegree c = k})
           ∩ {c : Word N → ℕ | ∀ m : ℕ, m < k → bushAt c m ∈ A m})
           = (∅ : Set (Word N → ℕ)) := by
         ext c
-        simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+        simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
         rintro ⟨⟨hgec, hd⟩, -⟩
         exact hk (hd ▸ hgec)
-      rw [hset, measure_empty, if_neg hk, ENNReal.ofReal_zero, zero_mul]
+      rw [hset, measure_empty, ite_eq_right hk, ENNReal.ofReal_zero, zero_mul]
   have hvanish : ∀ k ∉ Finset.range (J + 1), survivalMeasure (N := N) θ
       (({c : Word N → ℕ | n ≤ skeletonDegree c} ∩ {c : Word N → ℕ | skeletonDegree c = k})
         ∩ {c : Word N → ℕ | ∀ m : ℕ, m < k → bushAt c m ∈ A m}) = 0 := by
@@ -956,8 +956,8 @@ theorem survivalMeasure_bushes (θ : Offspring J) (hJN : J ≤ N) (hq : θ.extin
     rw [Finset.mem_range] at hk
     rw [hval k]
     by_cases hnk : n ≤ k
-    · rw [if_pos hnk, θ.skeletonWeight_vanishing (by omega), ENNReal.ofReal_zero, zero_mul]
-    · rw [if_neg hnk, ENNReal.ofReal_zero, zero_mul]
+    · rw [ite_eq_left hnk, θ.skeletonWeight_vanishing (by omega), ENNReal.ofReal_zero, zero_mul]
+    · rw [ite_eq_right hnk, ENNReal.ofReal_zero, zero_mul]
   have hnn : ∀ k ∈ Finset.range (J + 1),
       (0 : ℝ) ≤ if n ≤ k then θ.skeletonWeight k else 0 := by
     intro k _
@@ -975,10 +975,10 @@ theorem survivalMeasure_bushes (θ : Offspring J) (hJN : J ≤ N) (hq : θ.extin
 private def oneAt (m : ℕ) (A : Set (Word N → ℕ)) (i : ℕ) : Set (Word N → ℕ) :=
   if i = m then A else Set.univ
 
-private lemma oneAt_self (m : ℕ) (A : Set (Word N → ℕ)) : oneAt m A m = A := if_pos rfl
+private lemma oneAt_self (m : ℕ) (A : Set (Word N → ℕ)) : oneAt m A m = A := ite_eq_left rfl
 
 private lemma oneAt_of_ne {m i : ℕ} (hi : i ≠ m) (A : Set (Word N → ℕ)) :
-    oneAt m A i = Set.univ := if_neg hi
+    oneAt m A i = Set.univ := ite_eq_right hi
 
 private lemma measurableSet_oneAt (m : ℕ) {A : Set (Word N → ℕ)} (hA : MeasurableSet A)
     (i : ℕ) : MeasurableSet (oneAt m A i) := by
@@ -1099,7 +1099,7 @@ theorem survivalMeasure_bushAt (θ : Offspring J) (hJN : J ≤ N) (hq : θ.extin
       = ({c : Word N → ℕ | m + 1 ≤ skeletonDegree c}
           ∩ {c : Word N → ℕ | ∀ i : ℕ, i < skeletonDegree c → bushAt c i ∈ oneAt m A i}) := by
     ext c
-    simp only [Set.mem_inter_iff, Set.mem_setOf_eq]
+    simp only [Set.mem_inter_iff, Set.mem_ofPred_eq]
     constructor
     · rintro ⟨hlt, hA'⟩
       exact ⟨hlt, (forall_oneAt_iff hlt A (bushAt c)).mpr hA'⟩
@@ -1230,7 +1230,7 @@ lemma measurableSet_subset_skelTree (G : Set (Word N)) :
   have h : {c : Word N → ℕ | G ⊆ (skelTree c : Set (Word N))}
       = ⋂ v ∈ G, {c : Word N → ℕ | v ∈ skelTree c} := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.subset_def, SetLike.mem_coe]
+    simp only [Set.mem_ofPred_eq, Set.mem_iInter, Set.subset_def, SetLike.mem_coe]
   rw [h]
   exact MeasurableSet.biInter (Set.to_countable G) fun v _ ↦ measurableSet_mem_skelTree v
 
@@ -1240,7 +1240,7 @@ lemma measurableSet_subset_sample (G : Set (Word N)) :
   have h : {c : Word N → ℕ | G ⊆ (sample c : Set (Word N))}
       = ⋂ v ∈ G, {c : Word N → ℕ | v ∈ sample c} := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.subset_def, SetLike.mem_coe]
+    simp only [Set.mem_ofPred_eq, Set.mem_iInter, Set.subset_def, SetLike.mem_coe]
   rw [h]
   exact MeasurableSet.biInter (Set.to_countable G) fun v _ ↦ measurableSet_mem_sample v
 
@@ -1249,7 +1249,7 @@ lemma measurableSet_subset_subtree (G : Set (Word N)) :
     MeasurableSet {T : Subtree N | G ⊆ (T : Set (Word N))} := by
   have h : {T : Subtree N | G ⊆ (T : Set (Word N))} = ⋂ v ∈ G, {T : Subtree N | v ∈ T} := by
     ext T
-    simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.subset_def, SetLike.mem_coe]
+    simp only [Set.mem_ofPred_eq, Set.mem_iInter, Set.subset_def, SetLike.mem_coe]
   rw [h]
   exact MeasurableSet.biInter (Set.to_countable G) fun v _ ↦ measurableSet_mem_subtree v
 
@@ -1269,7 +1269,7 @@ lemma infinitePi_root_ge (θ : Offspring J) (n : ℕ) :
       have hset : {u : Branch N none → ℕ | m + 1 ≤ u rootIdx}
           = {u : Branch N none → ℕ | m < u rootIdx} := by
         ext u
-        simp only [Set.mem_setOf_eq]
+        simp only [Set.mem_ofPred_eq]
         omega
       rw [hset, infinitePi_root_gt θ m, Offspring.tailGe_succ]
 
@@ -1291,7 +1291,7 @@ lemma split_preimage_subsetBox {F : Set (Word N)} (hF : PrefixClosed F) :
     split ⁻¹' Set.univ.pi (subsetBox (N := N) F)
       = {c : Word N → ℕ | F ⊆ (sample c : Set (Word N))} := by
   ext c
-  rw [Set.mem_preimage, Set.mem_setOf_eq, subset_sample_iff hF]
+  rw [Set.mem_preimage, Set.mem_ofPred_eq, subset_sample_iff hF]
   simp only [Set.mem_pi, Set.mem_univ, forall_const]
   constructor
   · intro h
@@ -1339,8 +1339,8 @@ theorem survivalMeasure_subset_skelTree_step (θ : Offspring J) (hJN : J ≤ N)
         ∩ {c : Word N → ℕ | ∀ m : ℕ, m < skeletonDegree c →
             bushAt c m ∈ {d : Word N → ℕ | wordSub F m ⊆ (skelTree d : Set (Word N))}} := by
     ext c
-    rw [Set.mem_setOf_eq, subset_skelTree_iff hF c]
-    simp only [Set.mem_inter_iff, Set.mem_setOf_eq]
+    rw [Set.mem_ofPred_eq, subset_skelTree_iff hF c]
+    simp only [Set.mem_inter_iff, Set.mem_ofPred_eq]
   rw [hset, survivalMeasure_bushes θ hJN hq (rootDeg F) hA hAtop]
 
 /-! ### The pushforward -/
@@ -1365,13 +1365,13 @@ theorem survivalMeasure_subset_skelTree (θ : Offspring J) (hJN : J ≤ N)
         exact List.length_eq_zero_iff.mp (Nat.le_zero.mp (hn v hv))
       have h1 : {c : Word N → ℕ | F ⊆ (skelTree c : Set (Word N))} = Set.univ := by
         ext c
-        simp only [Set.mem_setOf_eq, Set.mem_univ, iff_true]
+        simp only [Set.mem_ofPred_eq, Set.mem_univ, iff_true]
         intro v hv
         rw [hnil v hv]
         exact nil_mem_skelTree c
       have h2 : {c : Word N → ℕ | F ⊆ (sample c : Set (Word N))} = Set.univ := by
         ext c
-        simp only [Set.mem_setOf_eq, Set.mem_univ, iff_true]
+        simp only [Set.mem_ofPred_eq, Set.mem_univ, iff_true]
         intro v hv
         rw [hnil v hv]
         exact nil_mem_sample c
@@ -1420,7 +1420,7 @@ lemma prefixClosed_prefixes (v : Word N) : PrefixClosed {u : Word N | u <+: v} :
 lemma mem_subtree_eq_subset (v : Word N) :
     {T : Subtree N | v ∈ T} = {T : Subtree N | {u : Word N | u <+: v} ⊆ (T : Set (Word N))} := by
   ext T
-  simp only [Set.mem_setOf_eq]
+  simp only [Set.mem_ofPred_eq]
   constructor
   · intro hv u hu
     exact Subtree.mem_of_prefix hu hv
@@ -1441,7 +1441,7 @@ lemma isPiSystem_containmentSets : IsPiSystem (containmentSets N) := by
     · exact Or.inl (hF hv hu)
     · exact Or.inr (hG hv hu)
   · ext T
-    simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Set.union_subset_iff]
+    simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, Set.union_subset_iff]
 
 /-- **The containment events generate the measurable structure on subtrees.** -/
 lemma generateFrom_containmentSets :
@@ -1467,7 +1467,7 @@ theorem skeletonTreeLaw_eq_treeLaw (θ : Offspring J) (hJN : J ≤ N) (hq : θ.e
   have _ := isProbabilityMeasure_survivalMeasure θ hJN hq
   have hprob : IsProbabilityMeasure (skeletonTreeLaw (N := N) θ) := by
     rw [skeletonTreeLaw]
-    exact Measure.isProbabilityMeasure_map measurable_skelTree.aemeasurable
+    infer_instance
   refine ext_of_generate_finite (containmentSets N) generateFrom_containmentSets
     isPiSystem_containmentSets ?_ ?_
   · rintro _ ⟨F, hFfin, hF, rfl⟩
@@ -1577,11 +1577,11 @@ lemma prod_ite_childSet {M : Type*} [CommMonoid M] {j : ℕ} (X Y : Fin N → M)
       (if (i : ℕ) < j then X i else Y i) = 1 := by
     refine Finset.prod_eq_one fun i hi ↦ ?_
     rw [Finset.mem_sdiff, mem_childSet] at hi
-    rw [if_neg hi.2]
+    rw [ite_eq_right hi.2]
     exact hY i hi.2
   have hinner : ∏ i ∈ childSet N j, (if (i : ℕ) < j then X i else Y i)
       = ∏ i ∈ childSet N j, X i :=
-    Finset.prod_congr rfl fun i hi ↦ if_pos (mem_childSet.mp hi)
+    Finset.prod_congr rfl fun i hi ↦ ite_eq_left (mem_childSet.mp hi)
   rw [← Finset.prod_sdiff (Finset.subset_univ (childSet N j)), houter, hinner, one_mul]
 
 /-- Reindexing a product over the letters naming a child by the number they name. -/
@@ -1649,7 +1649,7 @@ lemma split_preimage_dyingBox (j : ℕ) (A : ℕ → Set (Word N → ℕ)) :
   rw [hbox, Set.preimage_inter, split_preimage_skelBox j ∅ (Finset.empty_subset _),
     split_preimage_bushesOnly]
   ext c
-  simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Finset.mem_univ, forall_const, rankOf_univ]
+  simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, Finset.mem_univ, forall_const, rankOf_univ]
 
 /-- **The mass of a dying root with every subtree constrained.**  The root has `j`
 children, all of the subtrees die, and each lies in the set indexed by its letter: the
@@ -1673,10 +1673,10 @@ theorem sampleMeasure_root_dying (θ : Offspring J) (hJN : J ≤ N) (hq0 : 0 < �
       intro i
       rw [dyingBox_some]
       by_cases hij : (i : ℕ) < j
-      · rw [if_pos hij, if_pos hij]
+      · rw [ite_eq_left hij, ite_eq_left hij]
         exact (infinitePi_branch_some θ i _).trans
           (sampleMeasure_notSurvives_inter θ hJN hq0 (A (i : ℕ)))
-      · rw [if_neg hij, if_neg hij, Set.univ_inter, hAtop (i : ℕ) (by omega)]
+      · rw [ite_eq_right hij, ite_eq_right hij, Set.univ_inter, hAtop (i : ℕ) (by omega)]
         exact (infinitePi_branch_some θ i Set.univ).trans measure_univ
     rw [Finset.prod_congr rfl fun i _ ↦ hfac i,
       prod_ite_childSet
@@ -1716,7 +1716,7 @@ theorem bushMeasure_dying (θ : Offspring J) (hJN : J ≤ N) (hq0 : 0 < θ.extin
     have h : {c : Word N → ℕ | ∀ i : Fin N, (fun w : Word N ↦ c (i :: w)) ∈ A (i : ℕ)}
         = ⋂ i : Fin N, (fun c : Word N → ℕ ↦ fun w : Word N ↦ c (i :: w)) ⁻¹' (A (i : ℕ)) := by
       ext c
-      simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.mem_preimage]
+      simp only [Set.mem_ofPred_eq, Set.mem_iInter, Set.mem_preimage]
     rw [h]
     exact MeasurableSet.iInter fun i ↦ measurable_shift i (hA _)
   have hge : MeasurableSet {c : Word N → ℕ | n ≤ c []} := by
@@ -1738,7 +1738,7 @@ theorem bushMeasure_dying (θ : Offspring J) (hJN : J ≤ N) (hq0 : 0 < θ.extin
       = ⋃ j : ℕ, (({c : Word N → ℕ | n ≤ c []} ∩ {c : Word N → ℕ | c [] = j})
         ∩ {c : Word N → ℕ | ∀ i : Fin N, (fun w : Word N ↦ c (i :: w)) ∈ A (i : ℕ)}) := by
     ext c
-    simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_iUnion]
+    simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, Set.mem_iUnion]
     constructor
     · rintro ⟨hgec, hconst⟩
       exact ⟨c [], ⟨hgec, rfl⟩, hconst⟩
@@ -1758,13 +1758,13 @@ theorem bushMeasure_dying (θ : Offspring J) (hJN : J ≤ N) (hq0 : 0 < θ.extin
           = ({c : Word N → ℕ | c [] = j} ∩ {c : Word N → ℕ | survivors c = ∅})
             ∩ {c : Word N → ℕ | ∀ i : Fin N, (fun w : Word N ↦ c (i :: w)) ∈ A (i : ℕ)} := by
         ext c
-        simp only [Set.mem_inter_iff, Set.mem_setOf_eq, not_survives_iff_survivors_eq_empty]
+        simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, not_survives_iff_survivors_eq_empty]
         constructor
         · rintro ⟨hdead, ⟨-, hroot⟩, hconst⟩
           exact ⟨⟨hroot, hdead⟩, hconst⟩
         · rintro ⟨⟨hroot, hdead⟩, hconst⟩
           exact ⟨hdead, ⟨by rw [hroot]; exact hnj, hroot⟩, hconst⟩
-      rw [hset, sampleMeasure_root_dying θ hJN hq0 hjN hnj hA hAtop, if_pos hnj,
+      rw [hset, sampleMeasure_root_dying θ hJN hq0 hjN hnj hA hAtop, ite_eq_left hnj,
         Offspring.conjugateWeight, ENNReal.ofReal_div_of_pos hq0,
         ENNReal.ofReal_mul (θ.nonneg j), ENNReal.ofReal_pow θ.extinction_nonneg,
         ENNReal.div_eq_inv_mul]
@@ -1773,10 +1773,10 @@ theorem bushMeasure_dying (θ : Offspring J) (hJN : J ≤ N) (hq0 : 0 < θ.extin
           ∩ {c : Word N → ℕ | ∀ i : Fin N, (fun w : Word N ↦ c (i :: w)) ∈ A (i : ℕ)})
           = (∅ : Set (Word N → ℕ)) := by
         ext c
-        simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+        simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
         rintro ⟨⟨hgec, hroot⟩, -⟩
         exact hnj (hroot ▸ hgec)
-      rw [hset, measure_empty, if_neg hnj, ENNReal.ofReal_zero, zero_mul]
+      rw [hset, measure_empty, ite_eq_right hnj, ENNReal.ofReal_zero, zero_mul]
   have hvanish : ∀ j ∉ Finset.range (J + 1), bushMeasure (N := N) θ
       (({c : Word N → ℕ | n ≤ c []} ∩ {c : Word N → ℕ | c [] = j})
         ∩ {c : Word N → ℕ | ∀ i : Fin N, (fun w : Word N ↦ c (i :: w)) ∈ A (i : ℕ)}) = 0 := by
@@ -1830,8 +1830,8 @@ theorem bushMeasure_subset_sample_step (θ : Offspring J) (hJN : J ≤ N)
         ∩ {c : Word N → ℕ | ∀ i : Fin N, (fun w : Word N ↦ c (i :: w))
             ∈ {d : Word N → ℕ | wordSub F (i : ℕ) ⊆ (sample d : Set (Word N))}} := by
     ext c
-    rw [Set.mem_setOf_eq, subset_sample_iff hF c]
-    simp only [Set.mem_inter_iff, Set.mem_setOf_eq]
+    rw [Set.mem_ofPred_eq, subset_sample_iff hF c]
+    simp only [Set.mem_inter_iff, Set.mem_ofPred_eq]
   rw [hset, bushMeasure_dying θ hJN hq0 (rootDeg F) hA hAtop]
 
 /-- **The bushes are Galton-Watson trees with the conjugate law, on every finite
@@ -1851,7 +1851,7 @@ theorem bushMeasure_subset_sample (θ : Offspring J) (hJN : J ≤ N) (hq0 : 0 < 
         exact List.length_eq_zero_iff.mp (Nat.le_zero.mp (hn v hv))
       have h1 : {c : Word N → ℕ | F ⊆ (sample c : Set (Word N))} = Set.univ := by
         ext c
-        simp only [Set.mem_setOf_eq, Set.mem_univ, iff_true]
+        simp only [Set.mem_ofPred_eq, Set.mem_univ, iff_true]
         intro v hv
         rw [hnil v hv]
         exact nil_mem_sample c
@@ -1895,7 +1895,7 @@ theorem bushTreeLaw_eq_treeLaw (θ : Offspring J) (hJN : J ≤ N) (hq0 : 0 < θ.
   have _ := isProbabilityMeasure_bushMeasure θ hJN hq0
   have hprob : IsProbabilityMeasure (bushTreeLaw (N := N) θ) := by
     rw [bushTreeLaw]
-    exact Measure.isProbabilityMeasure_map measurable_sample.aemeasurable
+    infer_instance
   refine ext_of_generate_finite (containmentSets N) generateFrom_containmentSets
     isPiSystem_containmentSets ?_ ?_
   · rintro _ ⟨F, hFfin, hF, rfl⟩

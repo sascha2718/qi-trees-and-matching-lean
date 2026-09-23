@@ -80,7 +80,7 @@ theorem ae_isGBushySample (θ : Offspring J) (hJN : J ≤ N) (hq : θ.extinction
   have h2 := ae_survives θ hJN hq
   have hsplit : survivalMeasure (N := N) θ {d | ¬ ∃ n, 2 ≤ skeletonDegree (neckIter d n)} = 0 := by
     refine measure_mono_null (fun d hd => ?_) (ae_iff.mp (ae_gArity_ge_two θ hJN hq hs1))
-    simp only [Set.mem_setOf_eq, not_exists, not_le] at hd ⊢
+    simp only [Set.mem_ofPred_eq, not_exists, not_le] at hd ⊢
     by_contra h2
     obtain ⟨n, hn⟩ := splitSet_nonempty_of_arity (not_lt.mp h2)
     exact absurd hn (not_le.mpr (hd n))
@@ -89,7 +89,7 @@ theorem ae_isGBushySample (θ : Offspring J) (hJN : J ≤ N) (hq : θ.extinction
     refine ae_all_iff.mpr fun v => ?_
     rw [ae_iff]
     have := survivalMeasure_ambSub_null θ hsplit v
-    simpa [Set.mem_setOf_eq, Classical.not_imp] using this
+    simpa [Set.mem_ofPred_eq, Classical.not_imp] using this
   filter_upwards [h1, h2, h3] with c hc1 hc2 hc3
   exact ⟨hc1, hc2, hc3⟩
 
@@ -129,9 +129,9 @@ theorem ae_skeleton_good (θ' : Offspring J') (hJN' : J' ≤ N') (hq' : θ'.exti
   have hA : ∀ g, Good g → survivalMeasure (N := N') θ' (A g) = 0 := by
     intro g hg
     have hext1 : ∀ p : ↥F, (ext g).1 p = (g p).1 := fun p => by
-      simp only [ext, dif_pos p.2]
+      simp only [ext, dite_eq_left p.2]
     have hext2 : ∀ p : ↥F, (ext g).2 p = (g p).2 := fun p => by
-      simp only [ext, dif_pos p.2]
+      simp only [ext, dite_eq_left p.2]
     rw [conditional_iid θ' hJN' hq' hq0' hJ2' hθJ' F hpc (ext g).1 (ext g).2
       (fun p hp => by rw [hext2 ⟨p, hp⟩]; exact (hg.1 ⟨p, hp⟩).1)
       (fun p hp => by rw [hext2 ⟨p, hp⟩]; exact (hg.1 ⟨p, hp⟩).2)
@@ -146,7 +146,7 @@ theorem ae_skeleton_good (θ' : Offspring J') (hJN' : J' ≤ N') (hq' : θ'.exti
   have hN2 : survivalMeasure (N := N') θ' (⋃ (g : ↥F → GShape × ℕ) (_ : Good g), A g) = 0 :=
     measure_iUnion_null fun g => measure_iUnion_null fun hg => hA g hg
   refine measure_mono_null (fun c hc => ?_) (measure_union_null hN1 hN2)
-  simp only [Set.mem_setOf_eq, Classical.not_imp] at hc
+  simp only [Set.mem_ofPred_eq, Classical.not_imp] at hc
   obtain ⟨hu, hbad⟩ := hc
   rw [not_and, not_not] at hbad
   by_cases hrange : ∀ p ∈ F, 2 ≤ gArityAt c p ∧ gArityAt c p ≤ J'
@@ -155,9 +155,9 @@ theorem ae_skeleton_good (θ' : Offspring J') (hJN' : J' ≤ N') (hq' : θ'.exti
       ⟨⟨fun p => hrange p p.2, fun p i hpi => ?_, hbad (hrange u huF)⟩, ?_⟩⟩
     · have := (mem_sample_iff_prefix u).mp hu p i ((hmemF _).mp hpi)
       exact this
-    · simp only [A, Set.mem_iInter, Set.mem_inter_iff, Set.mem_setOf_eq, ext]
+    · simp only [A, Set.mem_iInter, Set.mem_inter_iff, Set.mem_ofPred_eq, ext]
       intro p hp
-      simp only [dif_pos hp, and_self]
+      simp only [dite_eq_left hp, and_self]
   · left
     push Not at hrange
     obtain ⟨p, hp, hpbad⟩ := hrange
@@ -190,7 +190,7 @@ coupling, once the condition carries mass. -/
 lemma condDraw_ne_zero {T : Type*} [Encodable T] (π : PMF (T × T)) {σ : T}
     (h : margFstT π σ ≠ 0) {r : ℝ} (hr : r ∈ Set.Ico (0 : ℝ) 1) :
     π (σ, condDraw π σ r) ≠ 0 := by
-  rw [condDraw, dif_pos h]
+  rw [condDraw, dite_eq_left h]
   have := drawBy_ne_zero (condPMF π σ h) hr
   rw [condPMF_apply] at this
   intro h0
@@ -220,7 +220,7 @@ theorem ae_partner_comparable (θ : Offspring J) (hJN : J ≤ N)
     reducedWeight_pos θ' hq' hq0' hJ2' hθJ' hκ2 hκJ
   have hdraw : gPartner π ω u
       = condDraw (π (gArityAt ω.1 u) hκ2 hν) (gShapeAt ω.1 u) (ω.2 u) := by
-    rw [gPartner, gDraw, dif_pos ⟨hκ2, hν⟩]
+    rw [gPartner, gDraw, dite_eq_left ⟨hκ2, hν⟩]
   have hmarg : margFstT (π (gArityAt ω.1 u) hκ2 hν) (gShapeAt ω.1 u) ≠ 0 := by
     rw [(hπ _ hκ2 hν).marg₁, gCondPMF_apply]
     exact hmass
@@ -253,7 +253,7 @@ lemma measurableSet_engine_match (θ : Offspring J) (θ' : Offspring J') {D : �
             Profile.encodedStates exc2 (gLab D π₂ ω.2) (gArityAt ω.2.1) 0 n)) ⁻¹'
           {p | GraphMarkovMatching.Support.fullSimK R 1 0 n p.1 p.2} := by
     ext ω
-    simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.mem_preimage]
+    simp only [Set.mem_ofPred_eq, Set.mem_iInter, Set.mem_preimage]
     exact GraphMarkovMatching.Support.infMatchK_iff_forall_level R 1 0 _ _
       (fun n => Profile.restrict_encodedStates exc1 _ _ 0 n) (fun n => Profile.restrict_encodedStates exc2 _ _ 0 n)
   rw [hset]
@@ -293,7 +293,7 @@ lemma exists_gCouplings_all (θ : Offspring J) (hJN : J ≤ N)
     have hmem : κ ∈ Finset.Icc 2 J' := Finset.mem_Icc.mpr ⟨hκ, hκJ κ hν⟩
     have := Finset.le_sup (f := f) hmem
     rw [hf] at this
-    simp only [dif_pos (And.intro hκ hν)] at this
+    simp only [dite_eq_left (And.intro hκ hν)] at this
     exact this.trans hD
   choose π hπ using fun κ hκ hν => hthr κ hκ hν D (hD' κ hκ hν)
   exact ⟨π, hπ⟩
@@ -385,7 +385,7 @@ theorem bushy_general_rate (θ : Offspring J) (hJN : J ≤ N)
           (gShapeSpace (gPartner π₂ ω.2 u))))} := by
     intro ω hω
     by_contra hcon
-    simp only [Set.mem_union, Set.mem_compl_iff, Set.mem_setOf_eq, not_or, not_not] at hcon
+    simp only [Set.mem_union, Set.mem_compl_iff, Set.mem_ofPred_eq, not_or, not_not] at hcon
     obtain ⟨hm, ⟨hc, hs, hτ⟩, ⟨hc', hs', hτ'⟩⟩ := hcon
     apply hω
     exact Profile.sample_qi_of_profile_match balancedFamily balancedFamily hc hc' hs hs'

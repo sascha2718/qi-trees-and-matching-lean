@@ -126,7 +126,7 @@ theorem mem_closure_atoms (Λ : AddSubmonoid ℕ) {n : ℕ} (hn : n ∈ Λ) :
 theorem length_le_of_sum_atoms (Λ : AddSubmonoid ℕ) (s₀ : ℕ) (hs₀ : ∀ a ∈ atoms Λ, s₀ ≤ a)
     (hs₀pos : 0 < s₀) (l : List ℕ) (hl : ∀ a ∈ l, a ∈ atoms Λ) : l.length ≤ l.sum / s₀ := by
   rw [Nat.le_div_iff_mul_le hs₀pos]
-  have := List.card_nsmul_le_sum l s₀ (fun a ha => hs₀ a (hl a ha))
+  have := List.length_nsmul_le_sum l s₀ (fun a ha => hs₀ a (hl a ha))
   simpa [smul_eq_mul] using this
 
 /-! ### Finiteness of the atoms -/
@@ -184,7 +184,7 @@ theorem exists_atoms_finset (G : Finset ℕ) :
       AddSubmonoid.closure (↑A : Set ℕ) = AddSubmonoid.closure (↑G : Set ℕ) := by
   refine ⟨G.filter (IsAtom (AddSubmonoid.closure (↑G : Set ℕ))), ?_, ?_⟩
   · ext a
-    simp only [Finset.coe_filter, Set.mem_setOf_eq, mem_atoms]
+    simp only [Finset.coe_filter, Set.mem_ofPred_eq, mem_atoms]
     exact ⟨fun h => h.2, fun h => ⟨isAtom_mem_generators h, h⟩⟩
   · apply le_antisymm
     · exact AddSubmonoid.closure_mono (Finset.coe_subset.mpr (Finset.filter_subset _ _))
@@ -193,7 +193,7 @@ theorem exists_atoms_finset (G : Finset ℕ) :
         (AddSubmonoid.subset_closure hg)
       refine AddSubmonoid.closure_mono ?_ hmem
       intro a ha
-      simp only [Finset.coe_filter, Set.mem_setOf_eq]
+      simp only [Finset.coe_filter, Set.mem_ofPred_eq]
       exact ⟨isAtom_mem_generators ha, ha⟩
 
 /-! ### The example with nonnested supports (`sec:common-presentations`) -/

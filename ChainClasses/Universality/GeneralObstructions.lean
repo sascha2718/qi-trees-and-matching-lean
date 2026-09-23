@@ -127,7 +127,7 @@ lemma wedgeN_mem (hT : PrefixClosedN T) {u v : BranchingProcess.Word N} (hu : T 
 theorem wordGraphN_connected (hT : PrefixClosedN T)
     (hne : Nonempty {w : BranchingProcess.Word N // T w}) : (wordGraphN T).Connected := by
   obtain ⟨v0⟩ := hne
-  haveI : Nonempty {w : BranchingProcess.Word N // T w} := ⟨v0⟩
+  have : Nonempty {w : BranchingProcess.Word N // T w} := ⟨v0⟩
   refine ⟨fun u v => ?_⟩
   have hw : T (BranchingProcess.wedge u.1 v.1) := wedgeN_mem hT u.2
   obtain ⟨p, -⟩ := exists_walkN_of_prefix hT
@@ -501,10 +501,10 @@ section UpChain
 variable {w p : GWord N} {r : ℕ → GWord N} {x y : Fin N}
 
 lemma upChain_le {n : ℕ} (hn : n ≤ w.length - p.length) :
-    upChain w p r n = w.take (w.length - n) := if_pos hn
+    upChain w p r n = w.take (w.length - n) := ite_eq_left hn
 
 lemma upChain_gt {n : ℕ} (hn : ¬ n ≤ w.length - p.length) :
-    upChain w p r n = r (n - (w.length - p.length) - 1) := if_neg hn
+    upChain w p r n = r (n - (w.length - p.length) - 1) := ite_eq_right hn
 
 @[simp] lemma upChain_zero : upChain w p r 0 = w := by
   rw [upChain_le (Nat.zero_le _)]
@@ -1069,7 +1069,7 @@ theorem ae_exists_iterate_mem [IsProbabilityMeasure μ] (hΦ : Measurable Φ)
   rw [ae_iff]
   have hsub : {ω | ¬ ∃ k, Φ^[k] ω ∈ D} ⊆ ⋂ k, iterFail Φ D k := by
     intro ω hω
-    simp only [Set.mem_setOf_eq, not_exists] at hω
+    simp only [Set.mem_ofPred_eq, not_exists] at hω
     refine Set.mem_iInter.mpr fun k ↦ ?_
     by_contra hk
     obtain ⟨i, -, hi⟩ := exists_iterate_mem_of_notMem_iterFail k hk
@@ -1141,8 +1141,8 @@ lemma exists_two_skeleton_children (h2 : 2 ≤ skeletonDegree d) :
     BranchingProcess.mem_survivors_iff_mem_skeleton.mp
       (BranchingProcess.orderEmbOfFin_mem_survivors h1),
     BranchingProcess.bushAt_of_lt h0, BranchingProcess.bushAt_of_lt h1⟩
-  have := ((survivors d).orderEmbOfFin rfl).injective h
-  simp at this
+  have h01 : (0 : ℕ) = 1 := congrArg Fin.val (((survivors d).orderEmbOfFin rfl).injective h)
+  omega
 
 /-- The letter of the first surviving child as a one-letter word, empty when no child
 survives. -/
@@ -1154,7 +1154,7 @@ lemma firstSurvivor_spec (hd : Survives d) :
       bushAt d 0 = ambSub d (firstSurvivor d) := by
   have h0 : 0 < (survivors d).card :=
     Nat.pos_of_ne_zero (BranchingProcess.survives_iff_skeletonDegree_ne_zero.mp hd)
-  rw [firstSurvivor, dif_pos h0]
+  rw [firstSurvivor, dite_eq_left h0]
   exact ⟨BranchingProcess.mem_survivors_iff_mem_skeleton.mp
     (BranchingProcess.orderEmbOfFin_mem_survivors h0), rfl, BranchingProcess.bushAt_of_lt h0⟩
 
@@ -1237,7 +1237,7 @@ lemma exists_dyingAt_zero_eq_ambSub (hdN : d [] ≤ N) (hlt : skeletonDegree d <
   · intro hsurv
     exact hmem.2 (BranchingProcess.mem_survivors.mpr
       ⟨BranchingProcess.mem_childSet.mp hmem.1, hsurv⟩)
-  · rw [dyingAt, BranchingProcess.bushOf, dif_pos hpos]
+  · rw [dyingAt, BranchingProcess.bushOf, dite_eq_left hpos]
     rfl
 
 /-- In a sample all of whose vertices have children, every residual field survives. -/
@@ -1354,7 +1354,7 @@ theorem survivalMeasure_bushAt_zero_preimage (hJN : J ≤ N) (hq : θ.extinction
     {A : Set (GWord N → ℕ)} (hA : MeasurableSet A) :
     survivalMeasure (N := N) θ ((fun c ↦ bushAt c 0) ⁻¹' A) = survivalMeasure (N := N) θ A := by
   classical
-  haveI := BranchingProcess.isProbabilityMeasure_survivalMeasure (N := N) θ hJN hq
+  have := BranchingProcess.isProbabilityMeasure_survivalMeasure (N := N) θ hJN hq
   set A' : ℕ → Set (GWord N → ℕ) := fun m ↦ if m = 0 then A else Set.univ with hA'
   have hA'meas : ∀ m, MeasurableSet (A' m) := by
     intro m
@@ -1366,7 +1366,7 @@ theorem survivalMeasure_bushAt_zero_preimage (hJN : J ≤ N) (hq : θ.extinction
       = ⋃ k ∈ Finset.range (N + 1), ({c : GWord N → ℕ | skeletonDegree c = k}
           ∩ {c : GWord N → ℕ | ∀ m, m < k → bushAt c m ∈ A' m}) := by
     ext c
-    simp only [Set.mem_union, Set.mem_preimage, Set.mem_setOf_eq, Set.mem_iUnion,
+    simp only [Set.mem_union, Set.mem_preimage, Set.mem_ofPred_eq, Set.mem_iUnion,
       Set.mem_inter_iff, Finset.mem_range, exists_prop]
     constructor
     · rintro (h | h)
@@ -1405,7 +1405,7 @@ theorem survivalMeasure_bushAt_zero_preimage (hJN : J ≤ N) (hq : θ.extinction
     have he : {c : GWord N → ℕ | ∀ m, m < k → bushAt c m ∈ A' m}
         = ⋂ m ∈ Finset.range k, (fun c : GWord N → ℕ ↦ bushAt c m) ⁻¹' (A' m) := by
       ext c
-      simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.mem_preimage, Finset.mem_range]
+      simp only [Set.mem_ofPred_eq, Set.mem_iInter, Set.mem_preimage, Finset.mem_range]
     rw [he]
     exact MeasurableSet.biInter (Set.to_countable _) fun m _ ↦
       BranchingProcess.measurable_bushAt m (hA'meas m)
@@ -1457,7 +1457,7 @@ theorem ae_gArity_ge_two (hJN : J ≤ N) (hq : θ.extinction < 1)
   refine measure_mono_null (fun c hc ↦ ?_)
     (measure_union_null (survivalMeasure_gArity_eq_one θ hJN hq hs1)
       (survivalMeasure_compl_survives θ hJN hq))
-  simp only [Set.mem_setOf_eq, not_le] at hc
+  simp only [Set.mem_ofPred_eq, not_le] at hc
   by_cases hs : Survives c
   · left
     have := one_le_gArity_of_survives hs
@@ -1485,13 +1485,13 @@ theorem ae_gArity_gSplitBush_ge_two (hJN : J ≤ N) (hq : θ.extinction < 1)
     intro κ hκ
     rw [survivalMeasure_gArityPair θ hJN hq hs1 hκ hAmeas,
       Finset.prod_eq_zero (Finset.mem_range.mpr (by omega : 1 < κ)), mul_zero]
-    simp only [hA, if_pos rfl]
+    simp only [hA, ite_eq_left rfl]
     exact survivalMeasure_gArity_eq_one θ hJN hq hs1
   rw [ae_iff]
   refine measure_mono_null (fun c hc ↦ ?_)
     (measure_union_null (ae_iff.mp (ae_gArity_ge_two θ hJN hq hs1))
       (measure_iUnion_null fun κ ↦ measure_iUnion_null fun hκ ↦ hnull κ hκ))
-  simp only [Set.mem_setOf_eq, not_le] at hc
+  simp only [Set.mem_ofPred_eq, not_le] at hc
   by_cases h2 : 2 ≤ gArity c
   · right
     have hsurv : Survives (gSplitBush c 1) := survives_gSplitBush (by omega)
@@ -1654,7 +1654,7 @@ theorem ae_exists_neck (hJN : J ≤ N) (hq : θ.extinction < 1)
     (hs1pos : 0 < θ.skeletonWeight 1) :
     ∀ᵐ c ∂survivalMeasure (N := N) θ, ∀ n : ℕ, ∃ k : ℕ,
       ∀ i, i < n → skeletonDegree (neckIter c (k * n + i)) = 1 := by
-  haveI := BranchingProcess.isProbabilityMeasure_survivalMeasure (N := N) θ hJN hq
+  have := BranchingProcess.isProbabilityMeasure_survivalMeasure (N := N) θ hJN hq
   refine ae_all_iff.mpr fun n ↦ ?_
   have hp : ENNReal.ofReal (θ.skeletonWeight 1) ^ n ≠ 0 :=
     pow_ne_zero n (ENNReal.ofReal_pos.mpr hs1pos).ne'
@@ -1757,7 +1757,7 @@ theorem bushMeasure_deepEvent_pos (hJN : J ≤ N) (hq0 : 0 < θ.extinction) (hJ1
     have h := (BranchingProcess.mem_sample_iff'.mp hv) n hlt
     have h0 : e (v.take n) = 0 := by
       simp only [he, List.length_take]
-      rw [if_neg (by omega)]
+      rw [ite_eq_right (by omega)]
     rw [h0] at h
     exact absurd h (Nat.not_lt_zero _)
   have hfin : (sample e : Set (GWord N)).Finite :=
@@ -1774,7 +1774,7 @@ theorem bushMeasure_deepEvent_pos (hJN : J ≤ N) (hq0 : 0 < θ.extinction) (hJ1
     intro i hi
     rw [List.length_replicate] at hi
     simp only [List.getElem_replicate, List.take_replicate, he, List.length_replicate]
-    rw [if_pos (by omega)]
+    rw [ite_eq_left (by omega)]
     exact hJ1
   have hsub : {c : GWord N → ℕ | (sample c : Set (GWord N)) = (sample e : Set (GWord N))}
       ⊆ deepEvent n := by
@@ -1812,7 +1812,7 @@ noncomputable def bushMass (n : ℕ) : ℝ≥0∞ := decorationMass (N := N) θ 
 /-- **The witness decoration has positive mass.** -/
 lemma bushMass_ne_zero (hJN : J ≤ N) (hq : θ.extinction < 1) (hq0 : 0 < θ.extinction)
     (hJ2 : 2 ≤ J) (hθJ : 0 < θ J) (n : ℕ) : bushMass (N := N) θ n ≠ 0 := by
-  haveI := BranchingProcess.isProbabilityMeasure_bushMeasure (N := N) θ hJN hq0
+  have := BranchingProcess.isProbabilityMeasure_bushMeasure (N := N) θ hJN hq0
   rw [bushMass, decorationMass]
   refine mul_ne_zero ?_ ?_
   · have h1q : (0 : ℝ) < 1 - θ.extinction := by linarith
@@ -1870,7 +1870,7 @@ theorem unboundedBushesN_sample (hJN : J ≤ N) (hJ2 : 2 ≤ J) {c : GWord N →
     rwa [ambSub_apply, List.append_nil] at h
   have hdeepdying : dyingAt (ambSub c x) 0 ∈ deepEvent n := by
     have h := hdying 0 (by show 0 < J - 1; omega)
-    rwa [bushSets, if_pos rfl] at h
+    rwa [bushSets, ite_eq_left rfl] at h
   obtain ⟨i, hi, hns, hieq⟩ := exists_dyingAt_zero_eq_ambSub
     (d := ambSub c x) (by show ambSub c x [] ≤ N; rw [hroot]; exact hJN)
     (by show skeletonDegree (ambSub c x) < ambSub c x []; rw [hroot, hdeg]; omega)
@@ -1904,7 +1904,7 @@ almost surely the sample has bushes of unbounded depth. -/
 theorem unbounded_bushes_gSample_ae (hJN : J ≤ N) (hq : θ.extinction < 1)
     (hq0 : 0 < θ.extinction) (hJ2 : 2 ≤ J) (hθJ : 0 < θ J) :
     ∀ᵐ c ∂survivalMeasure (N := N) θ, UnboundedBushesN (fun w : GWord N ↦ w ∈ sample c) := by
-  haveI := BranchingProcess.isProbabilityMeasure_survivalMeasure (N := N) θ hJN hq
+  have := BranchingProcess.isProbabilityMeasure_survivalMeasure (N := N) θ hJN hq
   have hae : ∀ᵐ c ∂survivalMeasure (N := N) θ, ∀ n, ∃ k, neckIter c k ∈ bushEvent (N := N) J n := by
     refine ae_all_iff.mpr fun n ↦ ?_
     filter_upwards [ae_exists_iterate_mem (μ := survivalMeasure (N := N) θ)

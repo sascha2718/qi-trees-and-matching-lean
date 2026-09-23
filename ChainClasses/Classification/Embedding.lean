@@ -47,7 +47,7 @@ noncomputable def concentrate (J₁ : ℕ) (hJ : J ≤ J₁) : Offspring J₁ wh
     have := θ.nonneg k
     split_ifs <;> linarith
   vanishing k hk := by
-    rw [if_neg (by omega), θ.vanishing k (by omega)]
+    rw [ite_eq_right (by omega), θ.vanishing k (by omega)]
     norm_num
   total := by
     have h1 : ∑ k ∈ Finset.range (J₁ + 1), θ k = 1 := by
@@ -55,7 +55,7 @@ noncomputable def concentrate (J₁ : ℕ) (hJ : J ≤ J₁) : Offspring J₁ wh
         (fun k _ hk ↦ θ.vanishing k (by rw [Finset.mem_range] at hk; omega))]
       exact θ.total
     rw [Finset.sum_add_distrib, Finset.sum_ite_eq' (Finset.range (J₁ + 1)) J₁
-      (fun _ ↦ (7 / 8 : ℝ)), if_pos (Finset.mem_range.2 (by omega)), ← Finset.sum_div, h1]
+      (fun _ ↦ (7 / 8 : ℝ)), ite_eq_left (Finset.mem_range.2 (by omega)), ← Finset.sum_div, h1]
     norm_num
 
 variable {J₁ : ℕ} (hJ : J ≤ J₁)
@@ -64,13 +64,13 @@ variable {J₁ : ℕ} (hJ : J ≤ J₁)
     θ.concentrate J₁ hJ k = (if k = J₁ then 7 / 8 else 0) + θ k / 8 := rfl
 
 lemma concentrate_zero (hJ₁ : 1 ≤ J₁) : θ.concentrate J₁ hJ 0 = θ 0 / 8 := by
-  rw [concentrate_apply, if_neg (by omega), zero_add]
+  rw [concentrate_apply, ite_eq_right (by omega), zero_add]
 
 lemma concentrate_one (hJ₁ : 2 ≤ J₁) : θ.concentrate J₁ hJ 1 = θ 1 / 8 := by
-  rw [concentrate_apply, if_neg (by omega), zero_add]
+  rw [concentrate_apply, ite_eq_right (by omega), zero_add]
 
 lemma concentrate_top : 7 / 8 ≤ θ.concentrate J₁ hJ J₁ := by
-  rw [concentrate_apply, if_pos rfl]
+  rw [concentrate_apply, ite_eq_left rfl]
   have := θ.nonneg J₁
   linarith
 
@@ -94,10 +94,10 @@ lemma concentrate_ne_zero_iff (k : ℕ) : θ.concentrate J₁ hJ k ≠ 0 ↔ k =
   · intro h
     by_contra hcon
     push Not at hcon
-    rw [if_neg hcon.1, hcon.2] at h
+    rw [ite_eq_right hcon.1, hcon.2] at h
     norm_num at h
   · rintro (rfl | h)
-    · rw [if_pos rfl]
+    · rw [ite_eq_left rfl]
       positivity
     · split_ifs
       · positivity

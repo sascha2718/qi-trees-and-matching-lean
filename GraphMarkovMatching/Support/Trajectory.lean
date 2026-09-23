@@ -66,8 +66,8 @@ noncomputable def stepPMF (T : (n : ℕ) → PMF (FullLab V n))
       conv_rhs => rw [← hT n, PMF.map_apply]
       refine tsum_congr fun y => ?_
       by_cases h : restrictLab n y = x
-      · rw [if_pos h, if_pos h.symm]
-      · rw [if_neg h, if_neg fun hh => h hh.symm]
+      · rw [ite_eq_left h, ite_eq_left h.symm]
+      · rw [ite_eq_right h, ite_eq_right fun hh => h hh.symm]
     have htotal : ∑' y : FullLab V (n + 1),
         (if restrictLab n y = x then T (n + 1) y / T n x else 0) = 1 := by
       have hsplit : ∀ y : FullLab V (n + 1),
@@ -75,8 +75,8 @@ noncomputable def stepPMF (T : (n : ℕ) → PMF (FullLab V n))
             = (if restrictLab n y = x then T (n + 1) y else 0) * (T n x)⁻¹ := by
         intro y
         by_cases h : restrictLab n y = x
-        · rw [if_pos h, if_pos h, ENNReal.div_eq_inv_mul, mul_comm]
-        · rw [if_neg h, if_neg h, zero_mul]
+        · rw [ite_eq_left h, ite_eq_left h, ENNReal.div_eq_inv_mul, mul_comm]
+        · rw [ite_eq_right h, ite_eq_right h, zero_mul]
       rw [tsum_congr hsplit, ENNReal.tsum_mul_right, hfib,
         ENNReal.mul_inv_cancel hx (PMF.apply_ne_top _ _)]
     exact htotal ▸ ENNReal.summable.hasSum⟩
@@ -88,7 +88,7 @@ omit [Countable V] [MeasurableSpace V] [MeasurableSingletonClass V] in
 lemma stepPMF_apply_of_ne_zero {n : ℕ} {x : FullLab V n} (hx : T n x ≠ 0)
     (y : FullLab V (n + 1)) :
     stepPMF T hT n x y = if restrictLab n y = x then T (n + 1) y / T n x else 0 := by
-  rw [stepPMF, dif_neg hx]
+  rw [show stepPMF T hT n x = _ from dite_eq_right hx]
   rfl
 
 omit [Countable V] [MeasurableSpace V] [MeasurableSingletonClass V] in
@@ -96,15 +96,15 @@ omit [Countable V] [MeasurableSpace V] [MeasurableSingletonClass V] in
 lemma restrictLab_of_stepPMF_ne_zero {n : ℕ} {x : FullLab V n} {y : FullLab V (n + 1)}
     (hy : stepPMF T hT n x y ≠ 0) : restrictLab n y = x := by
   by_cases hx : T n x = 0
-  · rw [stepPMF, dif_pos hx] at hy
+  · rw [show stepPMF T hT n x = _ from dite_eq_left hx] at hy
     have hyx : y = extendLab n x := by
       by_contra hne
-      rw [PMF.pure_apply, if_neg hne] at hy
+      rw [PMF.pure_apply, ite_eq_right hne] at hy
       exact hy rfl
     rw [hyx, restrictLab_extendLab]
   · rw [stepPMF_apply_of_ne_zero T hT hx] at hy
     by_contra h
-    rw [if_neg h] at hy
+    rw [ite_eq_right h] at hy
     exact hy rfl
 
 omit [Countable V] [MeasurableSpace V] [MeasurableSingletonClass V] in
@@ -113,7 +113,8 @@ include hT in
 lemma apply_le_of_restrictLab {n : ℕ} (y : FullLab V (n + 1)) :
     T (n + 1) y ≤ T n (restrictLab n y) := by
   conv_rhs => rw [← hT n, PMF.map_apply]
-  exact le_trans (le_of_eq (if_pos rfl).symm) (ENNReal.le_tsum y)
+  exact le_trans (le_of_eq (ite_eq_left rfl).symm)
+    (ENNReal.le_tsum (f := fun a => if restrictLab n y = restrictLab n a then T (n + 1) a else 0) y)
 
 omit [Countable V] [MeasurableSpace V] [MeasurableSingletonClass V] in
 /-- **The one-step identity**: drawing a level from the level law and one more level from
@@ -130,15 +131,15 @@ lemma stepPMF_bind (n : ℕ) : (T n).bind (stepPMF T hT n) = T (n + 1) := by
     · rw [hx, zero_mul]
     · rw [stepPMF_apply_of_ne_zero T hT hx]
       by_cases hxy : restrictLab n y = x
-      · rw [if_pos hxy, hy1, ENNReal.zero_div, mul_zero]
-      · rw [if_neg hxy, mul_zero]
+      · rw [ite_eq_left hxy, hy1, ENNReal.zero_div, mul_zero]
+      · rw [ite_eq_right hxy, mul_zero]
   · have hsingle : (∑' x : FullLab V n, T n x * stepPMF T hT n x y)
         = T n (restrictLab n y) * stepPMF T hT n (restrictLab n y) y := by
       refine tsum_eq_single _ fun x hx => ?_
       by_cases hx0 : T n x = 0
       · rw [hx0, zero_mul]
-      · rw [stepPMF_apply_of_ne_zero T hT hx0, if_neg fun h => hx h.symm, mul_zero]
-    rw [hsingle, stepPMF_apply_of_ne_zero T hT hy, if_pos rfl,
+      · rw [stepPMF_apply_of_ne_zero T hT hx0, ite_eq_right fun h => hx h.symm, mul_zero]
+    rw [hsingle, stepPMF_apply_of_ne_zero T hT hy, ite_eq_left rfl,
       ENNReal.mul_div_cancel' (fun h0 => absurd h0 hy)
         (fun htop => absurd htop (PMF.apply_ne_top _ _))]
 
@@ -206,7 +207,6 @@ lemma trajLab_map_frestrictLe_zero :
   rw [trajLab, Kernel.trajMeasure,
     Measure.map_comp _ _ (measurable_frestrictLe 0),
     Kernel.traj_map_frestrictLe, Kernel.partialTraj_self, Measure.id_comp]
-  rfl
 
 /-- **The marginals of the trajectory measure**: the height-`n` coordinate has the
 height-`n` level law. -/
@@ -227,8 +227,8 @@ theorem trajLab_map_eval : ∀ n, (trajLab T hT).map (fun ω => ω n) = (T n).to
         (fun i : Finset.Iic 0 => FullLab V (i : ℕ))).apply_symm_apply y
     rw [hid, Measure.map_id]
   | n + 1 => by
-    haveI : IsProbabilityMeasure ((trajLab T hT).map (frestrictLe n)) :=
-      Measure.isProbabilityMeasure_map (measurable_frestrictLe n).aemeasurable
+    have : IsProbabilityMeasure ((trajLab T hT).map (frestrictLe n)) :=
+      inferInstance
     have hpair := Kernel.map_frestrictLe_trajMeasure_compProd_eq_map_trajMeasure
       (μ₀ := (T 0).toMeasure) (κ := histK T hT) (a := n)
     have hsnd : (trajLab T hT).map (fun ω => ω (n + 1))
@@ -257,8 +257,8 @@ theorem trajLab_map_eval : ∀ n, (trajLab T hT).map (fun ω => ω n) = (T n).to
 conditional law charges only the fibre, and the level law charges only its support. -/
 theorem ae_restrictLab_coord (n : ℕ) :
     ∀ᵐ ω ∂(trajLab T hT), restrictLab n (ω (n + 1)) = ω n := by
-  haveI : IsProbabilityMeasure ((trajLab T hT).map (frestrictLe n)) :=
-    Measure.isProbabilityMeasure_map (measurable_frestrictLe n).aemeasurable
+  have : IsProbabilityMeasure ((trajLab T hT).map (frestrictLe n)) :=
+    inferInstance
   rw [ae_iff]
   have hpre : {ω : Π m, FullLab V m | ¬ restrictLab n (ω (n + 1)) = ω n}
       = (fun ω : Π m, FullLab V m => (frestrictLe n ω, ω (n + 1))) ⁻¹'
@@ -282,7 +282,7 @@ theorem ae_restrictLab_coord (n : ℕ) :
             {x : Π i : Finset.Iic n, FullLab V (i : ℕ) |
               restrictLab n y = x ⟨n, Finset.mem_Iic.mpr le_rfl⟩} ×ˢ {y} := by
       ext p
-      simp only [Set.mem_setOf_eq, Set.mem_iUnion, Set.mem_prod, Set.mem_singleton_iff]
+      simp only [Set.mem_ofPred_eq, Set.mem_iUnion, Set.mem_prod, Set.mem_singleton_iff]
       exact ⟨fun h => ⟨p.2, h, rfl⟩, fun ⟨y, hy, h2⟩ => h2 ▸ hy⟩
     rw [hgraph]
     refine MeasurableSet.iUnion fun y => MeasurableSet.prod ?_ (measurableSet_singleton y)
@@ -357,8 +357,8 @@ lemma restrictLab_consLab (n : ℕ) (ω : Π m, FullLab V m) :
   show restrictLab n (if restrictLab n (ω (n + 1)) = consLab n ω then ω (n + 1)
     else extendLab n (consLab n ω)) = consLab n ω
   by_cases h : restrictLab n (ω (n + 1)) = consLab n ω
-  · rw [if_pos h, h]
-  · rw [if_neg h, restrictLab_extendLab]
+  · rw [ite_eq_left h, h]
+  · rw [ite_eq_right h, restrictLab_extendLab]
 
 lemma measurable_consLab : ∀ n, Measurable (consLab (V := V) n)
   | 0 => measurable_pi_apply 0
@@ -378,7 +378,7 @@ theorem consLab_ae_eval : ∀ n, consLab n =ᵐ[trajLab T hT] fun ω => ω n
       filter_upwards [ae_restrictLab_coord T hT n, consLab_ae_eval n] with ω h1 h2
       show (if restrictLab n (ω (n + 1)) = consLab n ω then ω (n + 1)
         else extendLab n (consLab n ω)) = ω (n + 1)
-      rw [if_pos (h1.trans h2.symm)]
+      rw [ite_eq_left (h1.trans h2.symm)]
 
 /-- **The law of the level processes**: at every height the level process has the level
 law. -/

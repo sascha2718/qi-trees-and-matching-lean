@@ -77,7 +77,7 @@ lemma matchEv_eq_preimage (s t : I) (h : ℕ) :
 everywhere consistent level processes. -/
 lemma infMatchEv_eq_iInter (s t : I) : M.InfMatchEv s t = ⋂ h, M.MatchEv s t h := by
   ext ω
-  simp only [InfMatchEv, MatchEv, Set.mem_setOf_eq, Set.mem_iInter]
+  simp only [InfMatchEv, MatchEv, Set.mem_ofPred_eq, Set.mem_iInter]
   exact infMatchK_iff_forall_level M.srel 1 0 (fun n => consLab n ω.1)
     (fun n => consLab n ω.2) (fun n => restrictLab_consLab n ω.1)
     (fun n => restrictLab_consLab n ω.2)
@@ -120,7 +120,7 @@ lemma prodPMF_toMeasure_not_sim (s t : I) (h : ℕ) :
 (`sec:completion`). -/
 lemma trajPair_fail_eq (s t : I) (h : ℕ) :
     M.trajPair s t (M.MatchEv s t h)ᶜ = M.failProb s t h := by
-  rw [matchEv_eq_preimage, ← Set.preimage_compl, Set.compl_setOf,
+  rw [matchEv_eq_preimage, ← Set.preimage_compl, Set.compl_ofPred,
     ← Measure.map_apply (measurable_consLab_pair h) (Set.to_countable _).measurableSet,
     trajPair, trajPairLab_map_consLab, prodPMF_toMeasure_not_sim]
 

@@ -173,31 +173,31 @@ lemma treeDist_rayWord_step (i : Fin 3) (n : ℕ) :
         (if n + 1 = 0 then splitV u k
           else (splitV u k ++ [true]) ++ List.replicate (n + 1 - 1) false) = 1
     rcases Nat.eq_zero_or_pos n with rfl | hn
-    · rw [if_pos rfl, if_neg (by omega)]
+    · rw [ite_eq_left rfl, ite_eq_right (by omega)]
       simp only [Nat.add_sub_cancel, List.replicate_zero, List.append_nil]
       rw [treeDist_of_prefix (List.prefix_append (splitV u k) [true])]
       simp only [List.length_append, List.length_cons, List.length_nil]
       omega
-    · rw [if_neg (by omega), if_neg (by omega)]
+    · rw [ite_eq_right (by omega), ite_eq_right (by omega)]
       rw [treeDist_of_prefix (append_replicate_prefix _ _ (by omega : n - 1 ≤ n + 1 - 1))]
       simp only [List.length_append, List.length_replicate]
       omega
   · show treeDist (if n ≤ k then _ else _) (if n + 1 ≤ k then _ else _) = 1
     rcases Nat.lt_or_ge n k with h | h
-    · rw [if_pos (by omega), if_pos (by omega)]
+    · rw [ite_eq_left (by omega), ite_eq_left (by omega)]
       rw [treeDist_comm, treeDist_of_prefix
         (append_replicate_prefix (u ++ [true]) false (by omega : k - (n + 1) ≤ k - n))]
       simp only [List.length_append, List.length_replicate]
       omega
     · rcases Nat.eq_or_lt_of_le h with h' | h'
-      · rw [if_pos (by omega), if_neg (by omega)]
+      · rw [ite_eq_left (by omega), ite_eq_right (by omega)]
         have e1 : k - n = 0 := by omega
         have e2 : n + 1 - k - 1 = 0 := by omega
         rw [e1, e2]
         simp only [List.replicate_zero, List.append_nil]
         rw [treeDist_comm, treeDist_of_prefix (List.prefix_append u [true])]
         simp
-      · rw [if_neg (by omega), if_neg (by omega)]
+      · rw [ite_eq_right (by omega), ite_eq_right (by omega)]
         rw [treeDist_of_prefix (append_replicate_prefix u false (by omega))]
         simp only [List.length_append, List.length_replicate]
         omega
@@ -217,7 +217,7 @@ lemma prefix_rayWord_zero {n : ℕ} (hn : n ≠ 0) :
 lemma prefix_rayWord_one {n : ℕ} (hn : n ≠ 0) :
     splitV u k ++ [true] <+: rayWord u k 1 n := by
   show splitV u k ++ [true] <+: (if n = 0 then _ else _)
-  rw [if_neg hn]
+  rw [ite_eq_right hn]
   exact List.prefix_append _ _
 
 /-- Past its initial vertex the third ray leaves the subtree below the initial

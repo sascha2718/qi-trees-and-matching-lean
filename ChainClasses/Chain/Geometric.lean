@@ -54,7 +54,7 @@ lemma kappaAux_eq {χ : Word → Bool} (hχ : Chains χ) : kappaAux χ = kappa h
   funext v
   show (if h : ∃ k, χ (v ++ List.replicate k false) = true then Nat.find h + 1 else 0)
       = Nat.find (hχ v) + 1
-  rw [dif_pos (hχ v)]
+  rw [dite_eq_left (hχ v)]
 
 /-- On the good event the totalised projection is the projection. -/
 lemma iotaAux_eq {χ : Word → Bool} (hχ : Chains χ) : iotaAux χ = iota hχ := by
@@ -84,7 +84,7 @@ lemma kappaAux_eq_iff {χ : Word → Bool} {v : Word} {m : ℕ} (hm : 1 ≤ m) :
         ∀ l < m - 1, χ (v ++ List.replicate l false) = false := by
   unfold kappaAux
   by_cases hex : ∃ k, χ (v ++ List.replicate k false) = true
-  · rw [dif_pos hex]
+  · rw [dite_eq_left hex]
     constructor
     · intro h
       have hfind : Nat.find hex = m - 1 := by omega
@@ -95,7 +95,7 @@ lemma kappaAux_eq_iff {χ : Word → Bool} {v : Word} {m : ℕ} (hm : 1 ≤ m) :
       have : Nat.find hex = m - 1 :=
         (Nat.find_eq_iff hex).mpr ⟨h1, fun l hl => by simp [h2 l hl]⟩
       omega
-  · rw [dif_neg hex]
+  · rw [dite_eq_right hex]
     constructor
     · intro h
       omega
@@ -107,7 +107,7 @@ lemma kappaAux_eq_zero_iff {χ : Word → Bool} {v : Word} :
     kappaAux χ v = 0 ↔ ∀ k, χ (v ++ List.replicate k false) = false := by
   unfold kappaAux
   by_cases hex : ∃ k, χ (v ++ List.replicate k false) = true
-  · rw [dif_pos hex]
+  · rw [dite_eq_left hex]
     constructor
     · intro h
       omega
@@ -115,7 +115,7 @@ lemma kappaAux_eq_zero_iff {χ : Word → Bool} {v : Word} :
       obtain ⟨k, hk⟩ := hex
       rw [hall k] at hk
       exact absurd hk Bool.false_ne_true
-  · rw [dif_neg hex]
+  · rw [dite_eq_right hex]
     refine ⟨fun _ k => ?_, fun _ => rfl⟩
     have := not_exists.mp hex k
     simpa using this
@@ -347,7 +347,7 @@ lemma measurableSet_kappaAux (hmeas : ∀ v, Measurable (X v)) (u : Word) (m : �
   · have hset : {ω | kappaAux (fun v => X v ω) u = 0}
         = ⋂ k : ℕ, {ω | X (u ++ List.replicate k false) ω = false} := by
       ext ω
-      simp only [Set.mem_setOf_eq, Set.mem_iInter]
+      simp only [Set.mem_ofPred_eq, Set.mem_iInter]
       exact kappaAux_eq_zero_iff
     rw [hset]
     exact MeasurableSet.iInter fun k => measurableSet_coord X hmeas _ false
@@ -355,7 +355,7 @@ lemma measurableSet_kappaAux (hmeas : ∀ v, Measurable (X v)) (u : Word) (m : �
         = {ω | X (u ++ List.replicate (m - 1) false) ω = true} ∩
             ⋂ (l : ℕ), ⋂ (_ : l < m - 1), {ω | X (u ++ List.replicate l false) ω = false} := by
       ext ω
-      simp only [Set.mem_setOf_eq, Set.mem_inter_iff, Set.mem_iInter]
+      simp only [Set.mem_ofPred_eq, Set.mem_inter_iff, Set.mem_iInter]
       exact kappaAux_eq_iff hm
     rw [hset]
     exact (measurableSet_coord X hmeas _ true).inter
@@ -376,7 +376,7 @@ lemma measurableSet_iotaAux (hmeas : ∀ v, Measurable (X v)) (w u : Word) :
         exact MeasurableSet.univ
       · have hset : {ω | iotaAux (fun v => X v ω) [] = u} = ∅ := by
           ext ω
-          simp only [iotaAux_nil, Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false]
+          simp only [iotaAux_nil, Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false]
           exact fun hcontra => h hcontra.symm
         rw [hset]
         exact MeasurableSet.empty
@@ -387,7 +387,7 @@ lemma measurableSet_iotaAux (hmeas : ∀ v, Measurable (X v)) (w u : Word) :
                 ({ω | iotaAux (fun v => X v ω) w = p} ∩
                   {ω | kappaAux (fun v => X v ω) p = m}) := by
         ext ω
-        simp only [Set.mem_setOf_eq, Set.mem_iUnion, Set.mem_inter_iff, exists_prop]
+        simp only [Set.mem_ofPred_eq, Set.mem_iUnion, Set.mem_inter_iff, exists_prop]
         constructor
         · intro h
           exact ⟨iotaAux (fun v => X v ω) w, labAux (fun v => X v ω) w,
@@ -407,7 +407,7 @@ lemma measurableSet_labAux (hmeas : ∀ v, Measurable (X v)) (w : Word) (m : ℕ
       = ⋃ u : Word, ({ω | iotaAux (fun v => X v ω) w = u} ∩
           {ω | kappaAux (fun v => X v ω) u = m}) := by
     ext ω
-    simp only [Set.mem_setOf_eq, Set.mem_iUnion, Set.mem_inter_iff]
+    simp only [Set.mem_ofPred_eq, Set.mem_iUnion, Set.mem_inter_iff]
     constructor
     · intro h
       exact ⟨iotaAux (fun v => X v ω) w, rfl, h⟩
@@ -451,7 +451,7 @@ private lemma labEvent_eq_coordEvent (s : Finset Word)
     (⋂ w ∈ s, {ω | labAux (fun v => X v ω) w = n w})
       = ⋂ v ∈ coordSet n s, X v ⁻¹' {coordVal n s v} := by
   ext ω
-  simp only [Set.mem_iInter, Set.mem_setOf_eq, Set.mem_preimage, Set.mem_singleton_iff]
+  simp only [Set.mem_iInter, Set.mem_ofPred_eq, Set.mem_preimage, Set.mem_singleton_iff]
   rw [labAux_forall_iff_pattern (fun v => X v ω) s hs n hn]
   constructor
   · intro h v hv
@@ -554,7 +554,7 @@ lemma not_chains_null (hmeas : ∀ v, Measurable (X v)) (hindep : iIndepFun X P)
   have hdecomp : {ω | ¬ Chains (fun v => X v ω)}
       = ⋃ v : Word, ⋂ k : ℕ, X (v ++ List.replicate k false) ⁻¹' {false} := by
     ext ω
-    simp only [Set.mem_setOf_eq, Chains, not_forall, not_exists, Bool.not_eq_true,
+    simp only [Set.mem_ofPred_eq, Chains, not_forall, not_exists, Bool.not_eq_true,
       Set.mem_iUnion, Set.mem_iInter, Set.mem_preimage, Set.mem_singleton_iff]
   rw [hdecomp]
   exact measure_iUnion_null fun v => bad_ray_null P X t hmeas hindep htrue ht v
@@ -564,7 +564,7 @@ theorem chains_ae (hmeas : ∀ v, Measurable (X v)) (hindep : iIndepFun X P)
     (htrue : ∀ v, P {ω | X v ω = true} = ENNReal.ofReal t) (ht : 0 < t) :
     P {ω | Chains (fun v => X v ω)} = 1 := by
   have hae : {ω | Chains (fun v => X v ω)} =ᵐ[P] (Set.univ : Set Ω) := by
-    rw [ae_eq_univ, Set.compl_setOf]
+    rw [ae_eq_univ, Set.compl_ofPred]
     exact not_chains_null P X t hmeas hindep htrue ht
   rw [measure_congr hae, measure_univ]
 
@@ -574,7 +574,7 @@ lemma labAux_zero_null (hmeas : ∀ v, Measurable (X v)) (hindep : iIndepFun X P
     P {ω | labAux (fun v => X v ω) w = 0} = 0 := by
   refine measure_mono_null ?_ (not_chains_null P X t hmeas hindep htrue ht)
   intro ω hω
-  simp only [Set.mem_setOf_eq] at hω ⊢
+  simp only [Set.mem_ofPred_eq] at hω ⊢
   intro hχ
   have := one_le_labAux hχ w
   omega
@@ -644,7 +644,7 @@ theorem label_prod (hmeas : ∀ v, Measurable (X v)) (hindep : iIndepFun X P)
           = ⋃ m : ℕ, ⋂ w ∈ insert p s,
               {ω | labAux (fun v => X v ω) w = Function.update n p m w} := by
         ext ω
-        simp only [Set.mem_iUnion, Set.mem_iInter, Set.mem_setOf_eq]
+        simp only [Set.mem_iUnion, Set.mem_iInter, Set.mem_ofPred_eq]
         constructor
         · intro h
           refine ⟨labAux (fun v => X v ω) p, fun w hw => ?_⟩
@@ -668,7 +668,7 @@ theorem label_prod (hmeas : ∀ v, Measurable (X v)) (hindep : iIndepFun X P)
         intro ω hω hω'
         have h1 := Set.mem_iInter₂.mp hω p (Finset.mem_insert_self p s)
         have h2 := Set.mem_iInter₂.mp hω' p (Finset.mem_insert_self p s)
-        rw [Set.mem_setOf_eq, Function.update_self] at h1 h2
+        rw [Set.mem_ofPred_eq, Function.update_self] at h1 h2
         exact hmm' (h1.symm.trans h2)
       have hterm : ∀ m : ℕ,
           P (⋂ w ∈ insert p s,
@@ -693,7 +693,7 @@ theorem label_prod (hmeas : ∀ v, Measurable (X v)) (hindep : iIndepFun X P)
         refine measure_mono_null (fun ω hω => ?_)
           (labAux_zero_null P X t hmeas hindep htrue ht p)
         have := Set.mem_iInter₂.mp hω p (Finset.mem_insert_self p s)
-        rwa [Set.mem_setOf_eq, Function.update_self] at this
+        rwa [Set.mem_ofPred_eq, Function.update_self] at this
       rw [hpart, measure_iUnion hdisj hmeasF, tsum_eq_zero_add' ENNReal.summable, hzero,
         zero_add, tsum_congr hterm, ENNReal.tsum_mul_right, tsum_geometric_mass t ht ht1,
         one_mul]

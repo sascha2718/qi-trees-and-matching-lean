@@ -64,7 +64,7 @@ lemma measurableSet_missEvent (R : ℕ) {B : Set (GWord N → ℕ)} (hB : Measur
           (fun d : GWord N → ℕ ↦ neckIter d n) ⁻¹'
             {e : GWord N → ℕ | skeletonDegree e = 1} := by
     ext d
-    simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.mem_preimage, Finset.mem_range]
+    simp only [Set.mem_ofPred_eq, Set.mem_iInter, Set.mem_preimage, Finset.mem_range]
   rw [he]
   exact MeasurableSet.biInter (Set.to_countable _) fun n _ ↦
     measurable_neckIter n (fibreMeasurableG_skeletonDegree 1)
@@ -85,7 +85,7 @@ theorem survivalMeasure_missEvent (θ : Offspring J) (hJN : J ≤ N)
             ∩ {c : GWord N → ℕ | ∀ m : ℕ, m < 1 →
                 bushAt c m ∈ (if m = 0 then missEvent (N := N) R B else Set.univ)} := by
         ext d
-        simp only [missEvent, Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_preimage,
+        simp only [missEvent, Set.mem_inter_iff, Set.mem_ofPred_eq, Set.mem_preimage,
           Nat.lt_one_iff]
         constructor
         · rintro ⟨hneck, hres⟩
@@ -94,14 +94,14 @@ theorem survivalMeasure_missEvent (θ : Offspring J) (hJN : J ≤ N)
             rwa [neckIter_zero] at this
           refine ⟨h0, ?_⟩
           rintro m rfl
-          rw [if_pos rfl]
+          rw [ite_eq_left rfl]
           refine ⟨fun n hn ↦ ?_, ?_⟩
           · have := hneck (n + 1) (by omega)
             rwa [neckIter_succ] at this
           · exact hres
         · rintro ⟨h0, hrest⟩
           have hmem := hrest 0 rfl
-          rw [if_pos rfl] at hmem
+          rw [ite_eq_left rfl] at hmem
           obtain ⟨hneck, hres⟩ := hmem
           refine ⟨?_, ?_⟩
           · intro n hn
@@ -119,7 +119,7 @@ theorem survivalMeasure_missEvent (θ : Offspring J) (hJN : J ≤ N)
         · exact measurableSet_missEvent R hB
         · exact MeasurableSet.univ
       rw [hset, BranchingProcess.survivalMeasure_skeletonDegree_bushes θ hJN hq 1 hAmeas,
-        Finset.prod_range_one, if_pos rfl, ih, pow_succ]
+        Finset.prod_range_one, ite_eq_left rfl, ih, pow_succ]
       ring
 
 lemma one_le_gArity_of_survives {c : GWord N → ℕ} (h : Survives c) : 1 ≤ gArity c := by
@@ -148,7 +148,7 @@ theorem survivalMeasure_gArity_eq_one (θ : Offspring J) (hJN : J ≤ N)
       have hne : {m | 2 ≤ skeletonDegree (neckIter c m)}.Nonempty := ⟨k, hk⟩
       have hmem := Nat.sInf_mem hne
       have harity : 2 ≤ gArity c := hmem
-      rw [Set.mem_setOf_eq] at h1
+      rw [Set.mem_ofPred_eq] at h1
       omega
     refine ⟨fun k hk ↦ ?_, Set.mem_univ _⟩
     exact deg_eq_one_of_no_split hsurv (R := n) (fun m _ ↦ hno m) k hk

@@ -280,7 +280,7 @@ theorem etaG_le_size (μ : PMF V) (G : SimpleGraph V) (sz : V → ℕ) (N : ℕ)
             ≤ μ (v : V) * ENNReal.ofReal (wgt (bb n)) := by
         intro w
         have hw : sz (w : V) = n := w.2
-        rw [if_neg (by omega)]
+        rw [ite_eq_right (by omega)]
         gcongr
         refine wgt_le_wgt_of_le (hbb0 n) ?_ (gdeg_le_one μ G (w : V))
         have hb := hball (w : V) (by omega)
@@ -300,7 +300,7 @@ theorem etaG_le_size (μ : PMF V) (G : SimpleGraph V) (sz : V → ℕ) (N : ℕ)
             else μ (v : V) * ENNReal.ofReal (wgt (gdeg μ G (v : V)))) = 0 := by
         intro w
         have hw : sz (w : V) = n := w.2
-        rw [if_pos (by omega)]
+        rw [ite_eq_left (by omega)]
       rw [tsum_congr hzero, tsum_zero]
       exact zero_le
   have htail :

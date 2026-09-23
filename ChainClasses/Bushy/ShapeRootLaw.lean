@@ -46,7 +46,7 @@ open BranchingProcess (sample Survives survivors skeletonDegree Offspring sample
 /-- Two events agreeing on an event of full measure have the same mass. -/
 lemma measure_eq_of_inter_ae {α : Type*} [MeasurableSpace α] {μ : Measure α} {s E E' : Set α}
     (hs : μ sᶜ = 0) (h : E ∩ s = E' ∩ s) : μ E = μ E' := by
-  refine measure_congr (Filter.eventuallyEq_set.mpr ?_)
+  refine measure_congr (Filter.eventuallyEqSet_iff.mpr ?_)
   have hmem : ∀ᵐ x ∂μ, x ∈ s := by
     rw [ae_iff]
     exact hs
@@ -133,12 +133,12 @@ theorem survivalMeasure_neck_step (θ : Offspring 2) (hq : θ.extinction < 1)
                   (fun w : Amb ↦ c (i :: w)) ∈ (Set.univ : Set (Amb → ℕ))})
             ∩ {c : Amb → ℕ | IsBushySample c} := by
         ext c
-        simp only [Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_univ, implies_true, and_true]
+        simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, Set.mem_univ, implies_true, and_true]
         constructor
         · rintro ⟨⟨⟨hdeg, hdec⟩, hbush⟩, hbushy⟩
           have hne : c [] ≠ 2 := by
             by_contra hc
-            rw [decAt, if_pos hc] at hdec
+            rw [decAt, ite_eq_left hc] at hdec
             exact absurd hdec (by simp)
           have hsurv : Survives (shift c []) := by
             simpa using BranchingProcess.survives_iff_skeletonDegree_ne_zero.mpr
@@ -150,7 +150,7 @@ theorem survivalMeasure_neck_step (θ : Offspring 2) (hq : θ.extinction < 1)
           exact ⟨⟨⟨hone, hdeg⟩, hbush⟩, hbushy⟩
         · rintro ⟨⟨⟨hone, hdeg⟩, hbush⟩, hbushy⟩
           refine ⟨⟨⟨hdeg, ?_⟩, hbush⟩, hbushy⟩
-          rw [decAt, if_neg (by rw [hone]; omega)]
+          rw [decAt, ite_eq_right (by rw [hone]; omega)]
       rw [measure_eq_of_inter_ae hnull hset,
         BranchingProcess.survivalMeasure_root_one_survivor θ le_rfl hq hq0 (by norm_num) hA
           MeasurableSet.univ]
@@ -164,14 +164,14 @@ theorem survivalMeasure_neck_step (θ : Offspring 2) (hq : θ.extinction < 1)
                   (fun w : Amb ↦ c (i :: w)) ∈ {d : Amb → ℕ | bushTri d = t}})
             ∩ {c : Amb → ℕ | IsBushySample c} := by
         ext c
-        simp only [Set.mem_inter_iff, Set.mem_setOf_eq]
+        simp only [Set.mem_inter_iff, Set.mem_ofPred_eq]
         constructor
         · rintro ⟨⟨⟨hdeg, hdec⟩, hbush⟩, hbushy⟩
           have hc2 : c [] = 2 := by
             by_contra hc
-            rw [decAt, if_neg hc] at hdec
+            rw [decAt, ite_eq_right hc] at hdec
             exact absurd hdec (by simp)
-          rw [decAt, if_pos hc2] at hdec
+          rw [decAt, ite_eq_left hc2] at hdec
           have htri : bushTri (shift c ([] ++ [bushLetter c []])) = t := by
             simpa using hdec
           refine ⟨⟨⟨⟨hc2, hdeg⟩, hbush⟩, fun i hi _ ↦ ?_⟩, hbushy⟩
@@ -187,7 +187,7 @@ theorem survivalMeasure_neck_step (θ : Offspring 2) (hq : θ.extinction < 1)
           have hnot := bushLetter_notMem_survivors hdeg hc2
           have hlt : (bushLetter c [] : ℕ) < 2 := (bushLetter c []).isLt
           have hval := hdying (bushLetter c []) hnot hlt
-          rw [decAt, if_pos hc2]
+          rw [decAt, ite_eq_left hc2]
           have hshift : (fun w : Amb ↦ c (bushLetter c [] :: w))
               = shift c ([] ++ [bushLetter c []]) := by
             funext w
@@ -318,7 +318,7 @@ lemma measurableSet_decs_shapeAt_nil (l : List (Option Tri)) :
   have he : {c : Amb → ℕ | (shapeAt c []).decs = l}
       = {c : Amb → ℕ | shapeAt c [] = Shape.ofList l} := by
     ext c
-    simp only [Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq]
     constructor
     · intro h
       exact Shape.eq_of_decs (by rw [h, Shape.decs_ofList])
@@ -347,7 +347,7 @@ theorem survivalMeasure_decs_shapeAt_nil (θ : Offspring 2) (hq : θ.extinction 
           rw [Shape.neckLen, shapeAt_necks, entryV_nil]
         have hlen : (shapeAt c []).decs.length = splitDepth c [] := by
           rw [decs_shapeAt_nil, List.length_ofFn]
-        simp only [Set.mem_setOf_eq, hne]
+        simp only [Set.mem_ofPred_eq, hne]
         constructor
         · intro h
           have := congrArg List.length h
@@ -366,7 +366,7 @@ theorem survivalMeasure_decs_shapeAt_nil (θ : Offspring 2) (hq : θ.extinction 
               ∩ {c : Amb → ℕ | bushAt c 0 ∈ {d : Amb → ℕ | (shapeAt d []).decs = l}})
             ∩ {c : Amb → ℕ | IsBushySample c} := by
         ext c
-        simp only [Set.mem_inter_iff, Set.mem_setOf_eq]
+        simp only [Set.mem_inter_iff, Set.mem_ofPred_eq]
         constructor
         · rintro ⟨h, hc⟩
           obtain ⟨h1, h2', h3⟩ := (decs_shapeAt_nil_cons hc o l).mp h
@@ -384,7 +384,7 @@ theorem survivalMeasure_shapeAt_nil (θ : Offspring 2) (hq : θ.extinction < 1)
       = (σ.decs.map (decMass θ)).prod * ENNReal.ofReal (θ.skeletonWeight 2) := by
   have he : {c : Amb → ℕ | shapeAt c [] = σ} = {c : Amb → ℕ | (shapeAt c []).decs = σ.decs} := by
     ext c
-    simp only [Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq]
     exact ⟨fun h ↦ by rw [h], fun h ↦ Shape.eq_of_decs h⟩
   rw [he, survivalMeasure_decs_shapeAt_nil θ hq hq0 h2]
 

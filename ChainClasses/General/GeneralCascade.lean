@@ -153,8 +153,8 @@ lemma wedge_append_of_ne {x y : Word} (hlen : x.length = y.length) (hne : x ≠ 
           simp only [List.cons_append, wedge_cons_cons]
           by_cases hab : a = b
           · subst hab
-            rw [if_pos rfl, if_pos rfl, ih (by simpa using hlen) (fun h => hne (by rw [h]))]
-          · rw [if_neg hab, if_neg hab]
+            rw [ite_eq_left rfl, ite_eq_left rfl, ih (by simpa using hlen) (fun h => hne (by rw [h]))]
+          · rw [ite_eq_right hab, ite_eq_right hab]
 
 /-- **The wedge identity.** Two words leaving a common prefix `p` by distinct letters
 `a ≠ b` encode to words meeting at the encoding of `p` extended by the common prefix of
@@ -169,7 +169,7 @@ lemma wedge_cascWord_diverge (L : ℕ) (hN : N ≤ 2 ^ L) {p u v : BranchingProc
 /-- The wedge of two words leaving a common prefix by distinct letters. -/
 lemma wedgeN_diverge {p u v : BranchingProcess.Word N} {a b : Fin N} (hab : a ≠ b) :
     BranchingProcess.wedge (p ++ a :: u) (p ++ b :: v) = p := by
-  rw [BranchingProcess.wedge_append_append, BranchingProcess.wedge_cons_cons, if_neg hab]
+  rw [BranchingProcess.wedge_append_append, BranchingProcess.wedge_cons_cons, ite_eq_right hab]
   simp
 
 /-- **`thm:bushy` (the coding in its proof), the exact distance of diverging copies**:
@@ -248,7 +248,7 @@ theorem le_treeDist_cascWord {L : ℕ} (hN : N ≤ 2 ^ L) (hL : 1 ≤ L)
       | cons b v' =>
           have hab : a ≠ b := by
             intro h
-            rw [BranchingProcess.wedge_cons_cons, if_pos h] at hw
+            rw [BranchingProcess.wedge_cons_cons, ite_eq_left h] at hw
             exact List.cons_ne_nil _ _ hw
           have h1 := treeDist_cascWord_diverge L hN (p := p) (u := u') (v := v') hab
           have h2 := wedge_bitsL_length_lt hN hab

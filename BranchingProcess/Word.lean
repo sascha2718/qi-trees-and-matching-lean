@@ -55,7 +55,7 @@ theorem wedge_cons_cons (a b : Fin N) (v w : Word N) :
 @[simp] theorem wedge_self (v : Word N) : wedge v v = v := by
   induction v with
   | nil => rfl
-  | cons a v ih => rw [wedge_cons_cons, if_pos rfl, ih]
+  | cons a v ih => rw [wedge_cons_cons, ite_eq_left rfl, ih]
 
 /-- The wedge is symmetric. -/
 theorem wedge_comm (v w : Word N) : wedge v w = wedge w v := by
@@ -67,8 +67,8 @@ theorem wedge_comm (v w : Word N) : wedge v w = wedge w v := by
       | cons b w =>
           rw [wedge_cons_cons, wedge_cons_cons]
           by_cases h : a = b
-          · subst h; rw [if_pos rfl, if_pos rfl, ih]
-          · rw [if_neg h, if_neg (Ne.symm h)]
+          · subst h; rw [ite_eq_left rfl, ite_eq_left rfl, ih]
+          · rw [ite_eq_right h, ite_eq_right (Ne.symm h)]
 
 /-- The wedge is a prefix of its first argument. -/
 theorem wedge_prefix_left (v w : Word N) : wedge v w <+: v := by
@@ -80,9 +80,9 @@ theorem wedge_prefix_left (v w : Word N) : wedge v w <+: v := by
       | cons b w =>
           rw [wedge_cons_cons]
           by_cases h : a = b
-          · rw [if_pos h]
+          · rw [ite_eq_left h]
             exact List.cons_prefix_cons.mpr ⟨rfl, ih w⟩
-          · rw [if_neg h]
+          · rw [ite_eq_right h]
             exact List.nil_prefix
 
 /-- The wedge is a prefix of its second argument. -/
@@ -105,7 +105,7 @@ theorem prefix_wedge_of_prefix {u v w : Word N} (hv : u <+: v) (hw : u <+: w) :
               rw [List.cons_prefix_cons] at hv hw
               obtain ⟨rfl, hv⟩ := hv
               obtain ⟨rfl, hw⟩ := hw
-              rw [wedge_cons_cons, if_pos rfl]
+              rw [wedge_cons_cons, ite_eq_left rfl]
               exact List.cons_prefix_cons.mpr ⟨rfl, ih hv hw⟩
 
 /-- A word wedged with an extension of itself is unchanged. -/

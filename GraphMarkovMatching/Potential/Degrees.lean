@@ -39,7 +39,7 @@ lemma mul_rE_le_rE_bind {A : Type u} (w : PMF A) (f : A → PMF X)
     (R : X → X → Prop) (z : X) (a : A) :
     w a * rE (f a) R z ≤ rE (w.bind f) R z := by
   rw [rE_bind]
-  exact ENNReal.le_tsum a
+  exact ENNReal.le_tsum (f := fun b => w b * rE (f b) R z) a
 
 lemma rE_pure {X : Type u} (b : X) (R : X → X → Prop) (z : X) :
     rE (PMF.pure b) R z = if R z b then 1 else 0 := by

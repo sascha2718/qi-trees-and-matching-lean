@@ -42,7 +42,7 @@ noncomputable def pmfOfWeights [Inhabited X] (w : X → ℝ) : PMF X :=
 
 lemma pmfOfWeights_apply [Inhabited X] {w : X → ℝ} (hw : ∀ i, 0 ≤ w i)
     (hs : ∑ i, w i = 1) (i : X) : pmfOfWeights w i = ENNReal.ofReal (w i) := by
-  rw [pmfOfWeights, dif_pos ⟨hw, hs⟩, PMF.ofFintype_apply]
+  rw [pmfOfWeights, dite_eq_left ⟨hw, hs⟩, PMF.ofFintype_apply]
 
 /-- The bad degree of a law with real weights is the weight of the incompatible points. -/
 lemma qE_eq_ofReal_sum (μ : PMF X) (w : X → ℝ) (hw : ∀ y, 0 ≤ w y)
@@ -103,7 +103,7 @@ lemma PhiDres_eq_ofReal_sum (α : ℝ) (ρs ρt : PMF X) (R : X → X → Prop) 
       le_antisymm (ENNReal.ofReal_eq_zero.mp (by rw [← hρs x]; exact hx)) (hws x)
     rw [hx, hw0, zero_mul, zero_mul, ENNReal.ofReal_zero]
   · have hr := hpos x hx
-    rw [if_neg hr, phiE_of_lt (q_lt_one_of_rE_ne_zero hr), hρs x,
+    rw [ite_eq_right hr, phiE_of_lt (q_lt_one_of_rE_ne_zero hr), hρs x,
       ← ENNReal.ofReal_mul (hws x), hq x]
 
 /-- The directed potential of two laws with real weights, when every charged source point
@@ -117,7 +117,7 @@ lemma PhiD_eq_ofReal_sum (α : ℝ) (μ ν : PMF X) (R : X → X → Prop) (ws w
   refine tsum_congr fun x => ?_
   by_cases hx : μ x = 0
   · rw [hx, zero_mul, zero_mul]
-  · rw [if_neg (hpos x hx)]
+  · rw [ite_eq_right (hpos x hx)]
 
 end FiniteLaws
 
@@ -156,10 +156,10 @@ lemma qE_rootLaw_le_qE_rho (t : I) (h : ℕ) (x : FullLab (I × V) h) :
     _ ≤ ∑' y, if M.sim h x y then 0 else M.rho t h y := by
         refine ENNReal.tsum_le_tsum fun y => ?_
         by_cases hR : M.R (rootLab h x).2 (rootLab h y).2
-        · rw [if_pos hR, mul_zero]
+        · rw [ite_eq_left hR, mul_zero]
           exact zero_le
         · have hs : ¬ M.sim h x y := fun hs => hR (fullSim_root M.srel h x y hs)
-          rw [if_neg hR, if_neg hs, mul_one]
+          rw [ite_eq_right hR, ite_eq_right hs, mul_one]
     _ = qE (M.rho t h) (M.sim h) x := rfl
 
 /-- **Every matching matches the roots**: the failure probability at every height is at
@@ -378,9 +378,9 @@ variable {α p q : ℝ} (hα : 0 < α) (hp0 : 0 < p) (hp1 : p < 1) (hq0 : 0 < q)
 include hα hp0 hp1 hq0 hq1
 
 lemma rt_lt_one : (1 - q) ^ α * (1 - p) ^ α < 1 :=
-  mul_lt_one_of_nonneg_of_lt_one_left (Real.rpow_nonneg (by linarith) α)
+  (mul_le_of_le_one_right (Real.rpow_nonneg (by linarith) α)
+      (Real.rpow_le_one (by linarith) (by linarith) hα.le)).trans_lt
     (Real.rpow_lt_one (by linarith) (by linarith) hα)
-    (Real.rpow_le_one (by linarith) (by linarith) hα.le)
 
 lemma xCoef_pos : 0 < xCoef α p q := by
   unfold xCoef

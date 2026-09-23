@@ -110,7 +110,7 @@ lemma firstSplit_spec (hS : PrefixClosed S) (hM : SplitsWithin S M) {v : Word} (
     S (firstSplit hS hM v) ∧ v <+: firstSplit hS hM v ∧
       (firstSplit hS hM v).length ≤ v.length + M ∧ IsSplit S (firstSplit hS hM v) ∧
       ∀ u, S u → v <+: u → u <+: firstSplit hS hM v ∨ firstSplit hS hM v <+: u := by
-  simp only [firstSplit, dif_pos hv]
+  simp only [firstSplit, dite_eq_left hv]
   exact Classical.choose_spec (exists_minimal_split hS hM hv)
 
 /-- The first split is a choice of splits. -/
@@ -400,7 +400,7 @@ lemma ae_forall_two_le_of_zero (h0 : θ 0 = 0) (h1 : θ 1 = 0) :
     have he : {c : GWord N → ℕ | ¬ 2 ≤ c v}
         = {c : GWord N → ℕ | c v = 0} ∪ {c : GWord N → ℕ | c v = 1} := by
       ext c
-      simp only [Set.mem_setOf_eq, Set.mem_union]
+      simp only [Set.mem_ofPred_eq, Set.mem_union]
       omega
     rw [he]
     refine measure_union_null ?_ ?_

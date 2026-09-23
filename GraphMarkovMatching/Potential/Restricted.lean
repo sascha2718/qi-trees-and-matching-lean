@@ -26,12 +26,12 @@ lemma failureD_le_PhiDres_add_zMass (α : ℝ) (hα0 : 0 ≤ α)
   rw [failureD, PhiDres, zMass, ← ENNReal.tsum_add]
   refine ENNReal.tsum_le_tsum fun x => ?_
   by_cases hr : rE ρt R x = 0
-  · simp only [hr, if_true, mul_zero, zero_add, mul_one]
+  · simp only [hr, ite_true, mul_zero, zero_add, mul_one]
     calc
       ρs x * qE ρt R x = qE ρt R x * ρs x := mul_comm _ _
       _ ≤ 1 * ρs x := mul_le_mul_left qE_le_one _
       _ = ρs x := one_mul _
-  · simp only [hr, if_false]
+  · simp only [hr, ite_false]
     have hqE : qE ρt R x = ENNReal.ofReal (q ρt R x) :=
       (ENNReal.ofReal_toReal qE_ne_top).symm
     rw [hqE, mul_zero, add_zero]
@@ -106,11 +106,11 @@ lemma HresD_le {α : ℝ} (hα : 1 ≤ α) (ρs ρt : PMF X) (R : X → X → Pr
     intro x
     by_cases h : R x y
     · simp [h]
-    · simp only [if_pos h]
+    · simp only [ite_eq_left h]
       by_cases hres : rE ρt R x = 0
-      · rw [WresD, if_pos hres, mul_zero, if_pos hres, mul_zero, mul_zero]
+      · rw [WresD, ite_eq_left hres, mul_zero, ite_eq_left hres, mul_zero, mul_zero]
         exact zero_le
-      · rw [WresD, if_neg hres, if_neg hres]
+      · rw [WresD, ite_eq_right hres, ite_eq_right hres]
         calc ρs x * WnnD α ρt R x
             ≤ ρs x * (1 + ENNReal.ofReal α * phiE α (q ρt R x)) := by
               gcongr
@@ -168,7 +168,7 @@ lemma tsum_wres_le {α : ℝ} (hα : 1 ≤ α) (ρ : PMF X)
     intro x
     by_cases h : r x = 0
     · simp [h]
-    · rw [if_neg h, if_neg h]
+    · rw [ite_eq_right h, ite_eq_right h]
       calc ρ x * (r x) ^ (-α)
           ≤ ρ x * (1 + ENNReal.ofReal α * phiE α (1 - (r x).toReal)) :=
             mul_le_mul_right (rpow_neg_le_one_add_phiE hα h (hr x)) _
@@ -197,10 +197,10 @@ lemma tsum_wres_restrict_le {α : ℝ} (hα : 1 ≤ α) (ρ : PMF X)
               (if r x = 0 then 0 else phiE α (1 - (r x).toReal)) else 0)) := by
     intro x
     by_cases hH : x ∈ H
-    · rw [if_pos hH, if_pos hH, if_pos hH, mul_one]
+    · rw [ite_eq_left hH, ite_eq_left hH, ite_eq_left hH, mul_one]
       by_cases h : r x = 0
       · simp [h]
-      · rw [if_neg h, if_neg h]
+      · rw [ite_eq_right h, ite_eq_right h]
         calc ρ x * (r x) ^ (-α)
             ≤ ρ x * (1 + ENNReal.ofReal α * phiE α (1 - (r x).toReal)) :=
               mul_le_mul_right (rpow_neg_le_one_add_phiE hα h (hr x)) _
@@ -230,7 +230,7 @@ variable {X : Type}
 
 lemma rE_rpow_neg_eq_WresD {α : ℝ} (ρt : PMF X) (R : X → X → Prop) (x : X)
     (h : rE ρt R x ≠ 0) : (rE ρt R x) ^ (-α) = WresD α ρt R x := by
-  rw [WresD, if_neg h, WnnD]
+  rw [WresD, ite_eq_right h, WnnD]
   have hq : q ρt R x < 1 := q_lt_one_of_rE_ne_zero h
   have h1 : rE ρt R x = ENNReal.ofReal (1 - q ρt R x) := by
     rw [← toReal_rE_eq ρt R x, ENNReal.ofReal_toReal rE_ne_top]
@@ -243,15 +243,15 @@ lemma tsum_WresD_le {α : ℝ} (hα : 1 ≤ α) (ρs ρt : PMF X) (R : X → X �
       = (if rE ρt R x = 0 then 0 else (rE ρt R x) ^ (-α)) := by
     intro x
     by_cases h : rE ρt R x = 0
-    · rw [WresD, if_pos h, if_pos h]
-    · rw [if_neg h, rE_rpow_neg_eq_WresD ρt R x h]
+    · rw [WresD, ite_eq_left h, ite_eq_left h]
+    · rw [ite_eq_right h, rE_rpow_neg_eq_WresD ρt R x h]
   have hq : ∀ x, (if rE ρt R x = 0 then (0 : ℝ≥0∞)
         else phiE α (1 - (rE ρt R x).toReal))
       = (if rE ρt R x = 0 then 0 else phiE α (q ρt R x)) := by
     intro x
     by_cases h : rE ρt R x = 0
-    · rw [if_pos h, if_pos h]
-    · rw [if_neg h, if_neg h,
+    · rw [ite_eq_left h, ite_eq_left h]
+    · rw [ite_eq_right h, ite_eq_right h,
         show (1 : ℝ) - (rE ρt R x).toReal = q ρt R x from by
           rw [toReal_rE_eq]; ring]
   calc ∑' x, ρs x * WresD α ρt R x
@@ -275,7 +275,7 @@ lemma WresD_square_le_sum {α : ℝ} (hα0 : 0 ≤ α) (ρe ρf : PMF X)
         + WresD α ρf R xp.1 * WresD α ρe R xp.2 := by
   obtain ⟨x₀, x₁⟩ := xp
   by_cases halive : rE (prodPMF ρe ρf) (SquareRel R) (x₀, x₁) = 0
-  · rw [WresD, if_pos halive]
+  · rw [WresD, ite_eq_left halive]
     exact zero_le
   · have hnb : ¬ (rE ρe R x₀ * rE ρf R x₁ = 0
         ∧ rE ρe R x₁ * rE ρf R x₀ = 0) := fun hc =>

@@ -426,7 +426,7 @@ lemma typeOf_of_ne_leaf' (σ : Bool) {τ : MTree} (hτ : τ ≠ MTree.leaf) :
 /-- The coercion into the live types is the identity on live types. -/
 lemma toLive_of_mem' {t : PType} (h : t ∈ P.live) : P.toLive t = ⟨t, h⟩ := by
   unfold toLive
-  rw [dif_pos h]
+  rw [dite_eq_left h]
 
 /-- The underlying raw type of the coercion of a live type. -/
 lemma toLive_val {t : PType} (h : t ∈ P.live) : (P.toLive t).1 = t := by

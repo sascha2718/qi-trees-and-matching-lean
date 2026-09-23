@@ -70,20 +70,20 @@ lemma tsum_ite_map {W V : Type*} (μ : PMF W) (lab : W → V) (P : V → Prop) :
       = ∑' v, ∑' σ, if P v ∧ v = lab σ then μ σ else 0 := by
         refine tsum_congr fun v ↦ ?_
         by_cases hv : P v
-        · rw [if_pos hv, PMF.map_apply]
+        · rw [ite_eq_left hv, PMF.map_apply]
           refine tsum_congr fun σ ↦ ?_
           by_cases h : v = lab σ
           · subst h
             simp [hv]
           · simp [h]
-        · rw [if_neg hv]
+        · rw [ite_eq_right hv]
           symm
           refine (tsum_congr fun σ ↦ ?_).trans tsum_zero
           simp [hv]
     _ = ∑' σ, ∑' v, if P v ∧ v = lab σ then μ σ else 0 := ENNReal.tsum_comm
     _ = ∑' σ, if P (lab σ) then μ σ else 0 := by
         refine tsum_congr fun σ ↦ ?_
-        rw [tsum_eq_single (lab σ) fun v hv ↦ if_neg fun h ↦ hv h.2]
+        rw [tsum_eq_single (lab σ) fun v hv ↦ ite_eq_right fun h ↦ hv h.2]
         simp
 
 /-- **The class law `μ_D = μ ∘ rep_D⁻¹` of `thm:relabel`**: the mixture of
@@ -108,8 +108,8 @@ lemma gClassPMF_eq_tsum (θ : Offspring J) (hJN : J ≤ N) (hq : θ.extinction <
   rw [gClassPMF_apply]
   refine tsum_congr fun σ ↦ ?_
   by_cases h : gNetLab Dq σ = v
-  · rw [if_pos h, if_pos h.symm]
-  · rw [if_neg h, if_neg (Ne.symm h)]
+  · rw [ite_eq_left h, ite_eq_left h.symm]
+  · rw [ite_eq_right h, ite_eq_right (Ne.symm h)]
 
 /-- **The ball mass of a class, on the shapes**: the mixture mass of the shapes whose
 class is the given one or adjacent to it. -/
@@ -130,10 +130,11 @@ lemma gMixPMF_le_rE_gClassPMF (θ : Offspring J) (hJN : J ≤ N) (hq : θ.extinc
   rw [rE_gClassPMF]
   calc gMixPMF θ hJN hq hq0 hs1 σ
       = (if compat (gNetGraph Dq) v (gNetLab Dq σ) then gMixPMF θ hJN hq hq0 hs1 σ else 0) :=
-        (if_pos h).symm
+        (ite_eq_left h).symm
     _ ≤ ∑' τ : GShape,
           if compat (gNetGraph Dq) v (gNetLab Dq τ) then gMixPMF θ hJN hq hq0 hs1 τ else 0 :=
-        ENNReal.le_tsum σ
+        ENNReal.le_tsum (f := fun τ : GShape ↦
+          if compat (gNetGraph Dq) v (gNetLab Dq τ) then gMixPMF θ hJN hq hq0 hs1 τ else 0) σ
 
 /-! ### The collapse onto the first class -/
 
@@ -183,8 +184,8 @@ lemma tsum_small_le_gClassPMF_zero (θ : Offspring J) (hJN : J ≤ N) (hq : θ.e
   rw [gClassPMF_eq_tsum]
   refine ENNReal.tsum_le_tsum fun σ ↦ ?_
   by_cases hσ : σ.size ≤ D ^ 2
-  · rw [if_pos hσ, if_pos (gNetLab_eq_zero_of_size_le hDR (gSize_cast_le_of_le_sq hσ))]
-  · rw [if_neg hσ]
+  · rw [ite_eq_left hσ, ite_eq_left (gNetLab_eq_zero_of_size_le hDR (gSize_cast_le_of_le_sq hσ))]
+  · rw [ite_eq_right hσ]
     exact zero_le
 
 /-- **`thm:relabel` (`it:relabel-eta`), the mass of `v₀`**: once the mass above
@@ -315,8 +316,8 @@ lemma etaG_map_eq_tsum {W V : Type*} (μ : PMF W) (lab : W → V) (G : SimpleGra
         ENNReal.tsum_comm
     _ = ∑' σ, μ σ * ENNReal.ofReal (wgt (gdeg (μ.map lab) G (lab σ))) := by
         refine tsum_congr fun σ ↦ ?_
-        rw [tsum_eq_single (lab σ) fun v hv ↦ if_neg hv]
-        exact if_pos rfl
+        rw [tsum_eq_single (lab σ) fun v hv ↦ ite_eq_right hv]
+        exact ite_eq_left rfl
 
 /-- A sum over a size fibre, on the whole type. -/
 lemma tsum_eq_size {W : Type*} (f : W → ℝ≥0∞) (sz : W → ℕ) (n : ℕ) :
@@ -379,7 +380,7 @@ theorem tsum_mul_wgt_le_size {W : Type*} (μ : PMF W) (b : W → ℝ) (sz : W �
             ≤ μ (σ : W) * ENNReal.ofReal (wgt (bb n)) := by
         intro w
         have hw : sz (w : W) = n := w.2
-        rw [if_neg (by omega)]
+        rw [ite_eq_right (by omega)]
         by_cases hμ : μ (w : W) = 0
         · rw [hμ, zero_mul]
           exact zero_le
@@ -402,7 +403,7 @@ theorem tsum_mul_wgt_le_size {W : Type*} (μ : PMF W) (b : W → ℝ) (sz : W �
             else μ (σ : W) * ENNReal.ofReal (wgt (b (σ : W)))) = 0 := by
         intro w
         have hw : sz (w : W) = n := w.2
-        rw [if_pos (by omega)]
+        rw [ite_eq_left (by omega)]
       rw [tsum_congr hzero, tsum_zero]
       exact zero_le
   have htail :
@@ -641,8 +642,8 @@ lemma tsum_gMixPMF_size_eq_le (θ : Offspring J) (hJN : J ≤ N) (hq : θ.extinc
     _ ≤ ∑' σ : GShape, (if σ.size ≤ n - 1 then 0 else gMixPMF θ hJN hq hq0 hs1 σ) := by
         refine ENNReal.tsum_le_tsum fun σ ↦ ?_
         by_cases hσ : σ.size = n
-        · rw [if_pos hσ, if_neg (by omega)]
-        · rw [if_neg hσ]
+        · rw [ite_eq_left hσ, ite_eq_right (by omega)]
+        · rw [ite_eq_right hσ]
           exact zero_le
     _ ≤ ENNReal.ofReal (Real.exp (-c * ((n - 1 : ℕ) : ℝ))) := htail (n - 1) (by omega)
     _ ≤ ENNReal.ofReal (Real.exp (-(c / 2 * (n : ℝ)))) := by

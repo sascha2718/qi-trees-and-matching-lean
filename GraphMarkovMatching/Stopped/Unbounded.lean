@@ -352,8 +352,8 @@ include e
 lemma rootLaw (t : I') : M.rootLaw (ι t) = M'.rootLaw t := by
   rw [Model.rootLaw, Model.rootLaw, e.hzero, e.hmu]
   by_cases ht : M'.fresh t
-  · rw [if_pos ((e.hfresh t).mpr ht), if_pos ht]
-  · rw [if_neg fun h => ht ((e.hfresh t).mp h), if_neg ht]
+  · rw [ite_eq_left ((e.hfresh t).mpr ht), ite_eq_left ht]
+  · rw [ite_eq_right fun h => ht ((e.hfresh t).mp h), ite_eq_right ht]
 
 /-- The typed root laws correspond. -/
 lemma rootT (t : I') : M.rootT (ι t) = (M'.rootT t).map (Prod.map ι id) := by
@@ -395,7 +395,7 @@ theorem sim (h : ℕ) : ∀ x y : FullLab (I' × V) h,
     intro x y
     show fullSim M.srel 0 (leaf (Prod.map ι id x)) (leaf (Prod.map ι id y))
       ↔ fullSim M'.srel 0 (leaf x) (leaf y)
-    rw [fullSim_leaf, fullSim_leaf]
+    rw [fullSim_leaf, fullSim_leaf M'.srel x y]
     show M.R x.2 y.2 ↔ M'.R x.2 y.2
     rw [e.hR]
   | succ h ih =>
@@ -420,8 +420,8 @@ theorem failProb (s t : I') (h : ℕ) : M.failProb (ι s) (ι t) h = M'.failProb
   congr 1
   unfold badInd
   by_cases hs : M'.sim h x y
-  · rw [if_pos ((e.sim h x y).mpr hs), if_pos hs]
-  · rw [if_neg fun hc => hs ((e.sim h x y).mp hc), if_neg hs]
+  · rw [ite_eq_left ((e.sim h x y).mpr hs), ite_eq_left hs]
+  · rw [ite_eq_right fun hc => hs ((e.sim h x y).mp hc), ite_eq_right hs]
 
 end IsEmbed
 
@@ -489,7 +489,7 @@ noncomputable def truncate (N : ℕ) (hN : ∀ a ∈ P.S, a ≤ N) : Presentatio
   mem_supp := by
     intro σ k
     rw [nuTrunc, PMF.filter_apply_ne_zero_iff, Finset.mem_filter, PMF.mem_support_iff,
-      P.mem_supp, Set.mem_setOf_eq]
+      P.mem_supp, Set.mem_ofPred_eq]
     exact and_comm
   S_nonempty := P.S_nonempty
   two_le_S := P.two_le_S
@@ -526,11 +526,11 @@ theorem truncate_tail (σ : Bool) : tvDist (P.ν σ) ((P.truncate N hN).ν σ) =
   refine tsum_congr fun k => ?_
   rw [truncate_nu, nuTrunc, PMF.filter_apply]
   by_cases hk : N < k
-  · rw [if_pos hk, Set.indicator_of_notMem (by simp only [Set.mem_setOf_eq]; omega),
+  · rw [ite_eq_left hk, Set.indicator_of_notMem (by simp only [Set.mem_ofPred_eq]; omega),
       zero_mul, tsub_zero]
-  · rw [if_neg hk]
+  · rw [ite_eq_right hk]
     apply tsub_eq_zero_of_le
-    rw [Set.indicator_of_mem (by simp only [Set.mem_setOf_eq]; omega)]
+    rw [Set.indicator_of_mem (by simp only [Set.mem_ofPred_eq]; omega)]
     refine le_mul_of_one_le_right zero_le ?_
     rw [ENNReal.one_le_inv]
     exact (ENNReal.tsum_le_tsum fun a => Set.indicator_le_self _ _ a).trans_eq

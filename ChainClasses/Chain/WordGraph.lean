@@ -157,7 +157,7 @@ theorem wordGraph_dist (hT : PrefixClosed T) (u v : {w : Word // T w}) :
 theorem wordGraph_connected (hT : PrefixClosed T) (hne : Nonempty {w : Word // T w}) :
     (wordGraph T).Connected := by
   obtain ⟨v0⟩ := hne
-  haveI : Nonempty {w : Word // T w} := ⟨v0⟩
+  have : Nonempty {w : Word // T w} := ⟨v0⟩
   refine ⟨fun u v => ?_⟩
   have hw : T (wedge u.1 v.1) := wedge_mem hT u.2
   obtain ⟨p, -⟩ := exists_walk_of_prefix hT (u.1.length - (wedge u.1 v.1).length)
@@ -274,20 +274,20 @@ theorem isQIWith_of_wordGraph (hT : PrefixClosed T) (hT' : PrefixClosed T') {K :
     (h : BranchingProcess.IsQIWith K (wordGraph T) (wordGraph T') g) :
     IsQIWith K T T' (fun x => if hx : T x then (g ⟨x, hx⟩).1 else x) where
   maps x hx := by
-    rw [dif_pos hx]
+    rw [dite_eq_left hx]
     exact (g ⟨x, hx⟩).2
   upper x y hx hy := by
-    rw [dif_pos hx, dif_pos hy]
+    rw [dite_eq_left hx, dite_eq_left hy]
     have := h.upper ⟨x, hx⟩ ⟨y, hy⟩
     rwa [wordGraph_dist hT' _ _, wordGraph_dist hT _ _] at this
   lower x y hx hy := by
-    rw [dif_pos hx, dif_pos hy]
+    rw [dite_eq_left hx, dite_eq_left hy]
     have := h.lower ⟨x, hx⟩ ⟨y, hy⟩
     rwa [wordGraph_dist hT' _ _, wordGraph_dist hT _ _] at this
   dense y' hy' := by
     obtain ⟨x, hx⟩ := h.dense ⟨y', hy'⟩
     rw [wordGraph_dist hT' _ _] at hx
-    exact ⟨x.1, x.2, by rw [dif_pos x.2]; exact hx⟩
+    exact ⟨x.1, x.2, by rw [dite_eq_left x.2]; exact hx⟩
 
 /-- **The obstruction transfers.** If no map of word sets is a quasi-isometry,
 then the graphs are not quasi-isometric. -/

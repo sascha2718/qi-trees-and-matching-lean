@@ -227,8 +227,8 @@ theorem audit_markov_matching_finite_infinite {α : ℝ} (hα : 1 ≤ α)
     Solution.Infrastructure.audit_markov_matching_finite_infinite hα hlam H T hT B hB
   refine ⟨Kc, ε, hε, ?_⟩
   intro V I _ _ _ _ M hc g Θ hT' hB' hFP hCR hζ s t hst
-  letI : MeasurableSpace I := ⊤
-  letI : MeasurableSingletonClass I := ⟨fun _ => trivial⟩
+  let : MeasurableSpace I := ⊤
+  let : MeasurableSingletonClass I := ⟨fun _ => trivial⟩
   exact Solution.Transport.matchingProcess_erase M s t _
     (hb M.toOld (M.toOld_compat hc) Θ.toOld hT' (Solution.Transport.fullSelection M) hB'
       (Solution.Transport.freshPositive_toOld M hFP) (M.returns_toOld Θ H hCR) hζ s t hst)
@@ -256,8 +256,8 @@ theorem audit_markov_matching_zero_infinite {α : ℝ} (hα : 1 ≤ α)
   obtain ⟨Kc, ε, hε, hb⟩ := Solution.Infrastructure.audit_markov_matching_zero_infinite hα hlam
   refine ⟨Kc, ε, hε, ?_⟩
   intro V I _ _ _ _ M hc hδ hζ s t
-  letI : MeasurableSpace I := ⊤
-  letI : MeasurableSingletonClass I := ⟨fun _ => trivial⟩
+  let : MeasurableSpace I := ⊤
+  let : MeasurableSingletonClass I := ⟨fun _ => trivial⟩
   exact Solution.Transport.matchingProcess_erase M s t _
     (hb M.toOld (M.toOld_compat hc) hδ hζ s t)
 

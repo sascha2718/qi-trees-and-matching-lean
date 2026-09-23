@@ -236,10 +236,10 @@ lemma isAddr_gBouquetPadInv (r : ℕ) : ∀ L : List (List RTree), ∀ y,
         isAddr_node_append_single'] at hy
       rw [gBouquetPadInv_cons_cons_cons, realiseAux_cons_of_ne_nil _ (by simp)]
       rcases hy with hy | ⟨rfl, hz⟩
-      · rw [if_neg fun h ↦ not_isAddr_of_length_le (le_of_eq h.symm) hy,
+      · rw [ite_eq_right fun h ↦ not_isAddr_of_length_le (le_of_eq h.symm) hy,
           isAddr_node_append_single']
         exact Or.inl hy
-      · rw [if_pos rfl, isAddr_node_append_single']
+      · rw [ite_eq_left rfl, isAddr_node_append_single']
         exact Or.inr ⟨rfl, isAddr_gBouquetPadInv r (γ :: rest) z hz⟩
 
 /-- The retraction fixes the addresses of the realisation. -/
@@ -251,14 +251,14 @@ lemma gBouquetPadInv_of_isAddr : ∀ L : List (List RTree), ∀ w,
       have hw' : IsAddr (.node β) (i :: z) := hw
       rw [isAddr_cons] at hw'
       obtain ⟨hi, -⟩ := hw'
-      rw [gBouquetPadInv_singleton_cons, if_pos hi]
+      rw [gBouquetPadInv_singleton_cons, ite_eq_left hi]
   | β :: γ :: rest, [], _ => rfl
   | β :: γ :: rest, i :: z, hw => by
       rw [realiseAux_cons_of_ne_nil _ (by simp), isAddr_node_append_single'] at hw
       rw [gBouquetPadInv_cons_cons_cons]
       rcases hw with hw | ⟨rfl, hz⟩
-      · rw [if_neg fun h ↦ not_isAddr_of_length_le (le_of_eq h.symm) hw]
-      · rw [if_pos rfl, gBouquetPadInv_of_isAddr (γ :: rest) z hz]
+      · rw [ite_eq_right fun h ↦ not_isAddr_of_length_le (le_of_eq h.symm) hw]
+      · rw [ite_eq_left rfl, gBouquetPadInv_of_isAddr (γ :: rest) z hz]
 
 /-- The retraction moves parent-child pairs by at most one. -/
 lemma addrDist_gBouquetPadInv_append (r : ℕ) : ∀ L : List (List RTree), ∀ y b,
@@ -274,9 +274,9 @@ lemma addrDist_gBouquetPadInv_append (r : ℕ) : ∀ L : List (List RTree), ∀ 
   | β :: γ :: rest, [], b, _ => by
       rw [List.nil_append, gBouquetPadInv_cons_cons_cons, gBouquetPadInv_cons_cons_nil]
       by_cases h : b = β.length
-      · rw [if_pos h, gBouquetPadInv_nil]
+      · rw [ite_eq_left h, gBouquetPadInv_nil]
         simp
-      · rw [if_neg h]
+      · rw [ite_eq_right h]
         simp
   | β :: γ :: rest, i :: y, b, hy => by
       rw [List.cons_append, gBouquetPadDecs_cons_cons,
@@ -284,11 +284,11 @@ lemma addrDist_gBouquetPadInv_append (r : ℕ) : ∀ L : List (List RTree), ∀ 
         isAddr_node_append_single'] at hy
       rw [List.cons_append, gBouquetPadInv_cons_cons_cons, gBouquetPadInv_cons_cons_cons]
       by_cases h : i = β.length
-      · rw [if_pos h, if_pos h, addrDist_cons_cons_self]
+      · rw [ite_eq_left h, ite_eq_left h, addrDist_cons_cons_self]
         rcases hy with hy | ⟨-, hz⟩
         · exact absurd hy (not_isAddr_of_length_le (le_of_eq h.symm))
         · exact addrDist_gBouquetPadInv_append r (γ :: rest) y b hz
-      · rw [if_neg h, if_neg h]
+      · rw [ite_eq_right h, ite_eq_right h]
         simp
 
 /-- The image is `1`-dense: every added leaf is one step from the exit. -/
@@ -315,11 +315,11 @@ lemma addrDist_gBouquetPadInv_self (r : ℕ) : ∀ L : List (List RTree), ∀ y,
         isAddr_node_append_single'] at hy
       rw [gBouquetPadInv_cons_cons_cons]
       by_cases h : i = β.length
-      · rw [if_pos h, addrDist_cons_cons_self]
+      · rw [ite_eq_left h, addrDist_cons_cons_self]
         rcases hy with hy | ⟨-, hz⟩
         · exact absurd hy (not_isAddr_of_length_le (le_of_eq h.symm))
         · exact addrDist_gBouquetPadInv_self r (γ :: rest) z hz
-      · rw [if_neg h]
+      · rw [ite_eq_right h]
         simp
 
 /-- **The bouquet padding is a `1`-marked quasi-isometry**: the inclusion of addresses
@@ -410,7 +410,7 @@ lemma bushMeasure_coord_gt_bound (θ : Offspring J) (v : GWord N) :
   have hdecomp : {c : GWord N → ℕ | J < c v}
       = ⋃ j : ℕ, {c : GWord N → ℕ | c v = J + 1 + j} := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iUnion]
+    simp only [Set.mem_ofPred_eq, Set.mem_iUnion]
     constructor
     · intro h
       exact ⟨c v - J - 1, by omega⟩
@@ -427,7 +427,7 @@ lemma bushMeasure_offspring_le_bound (θ : Offspring J) :
   have he : {c : GWord N → ℕ | ¬ ∀ v, c v ≤ J}
       = ⋃ v : GWord N, {c : GWord N → ℕ | J < c v} := by
     ext c
-    simp only [Set.mem_setOf_eq, Set.mem_iUnion, not_forall, not_le]
+    simp only [Set.mem_ofPred_eq, Set.mem_iUnion, not_forall, not_le]
   rw [he]
   exact measure_iUnion_null fun v ↦ bushMeasure_coord_gt_bound θ v
 

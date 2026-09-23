@@ -320,8 +320,8 @@ lemma tsum_pow_shapeStatMassE (f : Shape → ℕ) (s : ℝ≥0∞) :
         ENNReal.tsum_comm
     _ = ∑' σ : Shape, shapeMass θ σ * s ^ f σ := by
         refine tsum_congr fun σ ↦ ?_
-        refine (tsum_eq_single (f σ) fun n hn ↦ if_neg fun h ↦ hn h.symm).trans ?_
-        rw [if_pos rfl]
+        refine (tsum_eq_single (f σ) fun n hn ↦ ite_eq_right fun h ↦ hn h.symm).trans ?_
+        rw [ite_eq_left rfl]
 
 /-- **The size moment in the form `chernoff_tail` consumes**: a finite moment is a
 summable real series over the possible values of the statistic, and its sum is the

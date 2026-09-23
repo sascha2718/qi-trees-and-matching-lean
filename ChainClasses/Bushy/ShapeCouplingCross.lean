@@ -138,19 +138,19 @@ noncomputable def drawW (w : Shape → ℝ≥0∞) (dflt : Shape) (u : ℝ) : Sh
 lemma drawW_of_mem {w : Shape → ℝ≥0∞} (hw : ∑' b : Shape, w b = 1) (dflt : Shape)
     {u : ℝ} {b : Shape} (hu : u ∈ slotW w b) : drawW w dflt u = b := by
   have hex : ∃ b : Shape, u ∈ slotW w b := ⟨b, hu⟩
-  rw [drawW, dif_pos hex]
+  rw [drawW, dite_eq_left hex]
   by_contra hne
   exact slotW_disjoint hw hne hex.choose_spec hu
 
 lemma drawW_of_not_mem {w : Shape → ℝ≥0∞} (dflt : Shape) {u : ℝ}
     (hu : ¬ ∃ b : Shape, u ∈ slotW w b) : drawW w dflt u = dflt := by
-  rw [drawW, dif_neg hu]
+  rw [drawW, dite_eq_right hu]
 
 /-- Off the default the fibre of the draw is exactly the slot. -/
 lemma fibre_drawW_of_ne {w : Shape → ℝ≥0∞} (hw : ∑' b : Shape, w b = 1) {dflt b : Shape}
     (hb : b ≠ dflt) : {u : ℝ | drawW w dflt u = b} = slotW w b := by
   ext u
-  simp only [Set.mem_setOf_eq]
+  simp only [Set.mem_ofPred_eq]
   constructor
   · intro h
     by_cases hex : ∃ b' : Shape, u ∈ slotW w b'
@@ -166,7 +166,7 @@ lemma fibre_drawW_of_ne {w : Shape → ℝ≥0∞} (hw : ∑' b : Shape, w b = 1
 lemma fibre_drawW_dflt {w : Shape → ℝ≥0∞} (hw : ∑' b : Shape, w b = 1) (dflt : Shape) :
     {u : ℝ | drawW w dflt u = dflt} = slotW w dflt ∪ (⋃ b : Shape, slotW w b)ᶜ := by
   ext u
-  simp only [Set.mem_setOf_eq, Set.mem_union, Set.mem_compl_iff, Set.mem_iUnion, not_exists]
+  simp only [Set.mem_ofPred_eq, Set.mem_union, Set.mem_compl_iff, Set.mem_iUnion, not_exists]
   constructor
   · intro h
     by_cases hex : ∃ b' : Shape, u ∈ slotW w b'
@@ -264,10 +264,10 @@ lemma margSnd_ne_top (π : PMF (Shape × Shape)) (b : Shape) : margSnd π b ≠ 
   ne_top_of_le_ne_top ENNReal.one_ne_top (margSnd_le_one π b)
 
 lemma le_margFst (π : PMF (Shape × Shape)) (a b : Shape) : π (a, b) ≤ margFst π a :=
-  ENNReal.le_tsum b
+  ENNReal.le_tsum (f := fun b : Shape ↦ π (a, b)) b
 
 lemma le_margSnd (π : PMF (Shape × Shape)) (a b : Shape) : π (a, b) ≤ margSnd π b :=
-  ENNReal.le_tsum a
+  ENNReal.le_tsum (f := fun a : Shape ↦ π (a, b)) a
 
 /-- **The coupling of `thm:shape-coupling`**: a law on pairs whose marginals are the two
 shape laws and which charges only pairs of `9D³`-comparable shapes. -/
@@ -312,7 +312,7 @@ lemma gdeg_pairNet_of_zero (π : PMF (Shape × Shape)) (Dq : ℝ) {v : Shape × 
     rw [rE]
     calc ∑' y : Shape × Shape, (if compat (pairNet π Dq) v y then π y else 0)
         = ∑' y : Shape × Shape, π y := by
-          refine tsum_congr fun y => if_pos ?_
+          refine tsum_congr fun y => ite_eq_left ?_
           by_cases hy : y = v
           · exact Or.inl hy.symm
           · exact Or.inr ⟨fun h => hy h.symm, Or.inl hv⟩
@@ -412,21 +412,21 @@ noncomputable def condSnd (π : PMF (Shape × Shape)) (b a : Shape) : ℝ≥0∞
 
 lemma tsum_condFst (π : PMF (Shape × Shape)) (a : Shape) : ∑' b : Shape, condFst π a b = 1 := by
   by_cases h : margFst π a = 0
-  · simp only [condFst, if_pos h]
+  · simp only [condFst, ite_eq_left h]
     simp
   · have hterm : ∀ b : Shape, condFst π a b = π (a, b) * (margFst π a)⁻¹ := by
       intro b
-      rw [condFst, if_neg h, div_eq_mul_inv]
+      rw [condFst, ite_eq_right h, div_eq_mul_inv]
     rw [tsum_congr hterm, ENNReal.tsum_mul_right]
     exact ENNReal.mul_inv_cancel h (margFst_ne_top π a)
 
 lemma tsum_condSnd (π : PMF (Shape × Shape)) (b : Shape) : ∑' a : Shape, condSnd π b a = 1 := by
   by_cases h : margSnd π b = 0
-  · simp only [condSnd, if_pos h]
+  · simp only [condSnd, ite_eq_left h]
     simp
   · have hterm : ∀ a : Shape, condSnd π b a = π (a, b) * (margSnd π b)⁻¹ := by
       intro a
-      rw [condSnd, if_neg h, div_eq_mul_inv]
+      rw [condSnd, ite_eq_right h, div_eq_mul_inv]
     rw [tsum_congr hterm, ENNReal.tsum_mul_right]
     exact ENNReal.mul_inv_cancel h (margSnd_ne_top π b)
 
@@ -444,12 +444,12 @@ lemma condFst_partnerFst_ne_zero (π : PMF (Shape × Shape)) (a : Shape) :
   · have hno : ¬ ∃ b : Shape, π (a, b) ≠ 0 := by
       rintro ⟨b, hb⟩
       exact hb (nonpos_iff_eq_zero.mp (h ▸ le_margFst π a b))
-    rw [partnerFst, dif_neg hno, condFst, if_pos h, if_pos rfl]
+    rw [partnerFst, dite_eq_right hno, condFst, ite_eq_left h, ite_eq_left rfl]
     exact one_ne_zero
   · have hex : ∃ b : Shape, π (a, b) ≠ 0 := by
       by_contra hno
       exact h (ENNReal.tsum_eq_zero.mpr fun b => not_not.mp fun hb => hno ⟨b, hb⟩)
-    rw [partnerFst, dif_pos hex, condFst, if_neg h, Ne, ENNReal.div_eq_zero_iff]
+    rw [partnerFst, dite_eq_left hex, condFst, ite_eq_right h, Ne, ENNReal.div_eq_zero_iff]
     rintro (h1 | h1)
     · exact hex.choose_spec h1
     · exact margFst_ne_top π a h1
@@ -460,12 +460,12 @@ lemma condSnd_partnerSnd_ne_zero (π : PMF (Shape × Shape)) (b : Shape) :
   · have hno : ¬ ∃ a : Shape, π (a, b) ≠ 0 := by
       rintro ⟨a, ha⟩
       exact ha (nonpos_iff_eq_zero.mp (h ▸ le_margSnd π a b))
-    rw [partnerSnd, dif_neg hno, condSnd, if_pos h, if_pos rfl]
+    rw [partnerSnd, dite_eq_right hno, condSnd, ite_eq_left h, ite_eq_left rfl]
     exact one_ne_zero
   · have hex : ∃ a : Shape, π (a, b) ≠ 0 := by
       by_contra hno
       exact h (ENNReal.tsum_eq_zero.mpr fun a => not_not.mp fun ha => hno ⟨a, ha⟩)
-    rw [partnerSnd, dif_pos hex, condSnd, if_neg h, Ne, ENNReal.div_eq_zero_iff]
+    rw [partnerSnd, dite_eq_left hex, condSnd, ite_eq_right h, Ne, ENNReal.div_eq_zero_iff]
     rintro (h1 | h1)
     · exact hex.choose_spec h1
     · exact margSnd_ne_top π b h1
@@ -485,12 +485,12 @@ lemma measurableSet_pairLab_fibre (π : PMF (Shape × Shape)) (τ : Shape) (x : 
   · have hset : {u : ℝ | pairLab π τ u = x}
         = {u : ℝ | drawW (condFst π τ.fix) (partnerFst π τ.fix) u = x.2} := by
       ext u
-      simp only [pairLab, Set.mem_setOf_eq, Prod.ext_iff, h, true_and]
+      simp only [pairLab, Set.mem_ofPred_eq, Prod.ext_iff, h, true_and]
     rw [hset]
     exact measurableSet_fibre_drawW (tsum_condFst π τ.fix) _ _
   · have hset : {u : ℝ | pairLab π τ u = x} = (∅ : Set ℝ) := by
       ext u
-      simp only [pairLab, Set.mem_setOf_eq, Prod.ext_iff, Set.mem_empty_iff_false, iff_false]
+      simp only [pairLab, Set.mem_ofPred_eq, Prod.ext_iff, Set.mem_empty_iff_false, iff_false]
       tauto
     rw [hset]
     exact MeasurableSet.empty
@@ -501,12 +501,12 @@ lemma measurableSet_pairLab'_fibre (π : PMF (Shape × Shape)) (τ : Shape) (x :
   · have hset : {u : ℝ | pairLab' π τ u = x}
         = {u : ℝ | drawW (condSnd π τ.fix) (partnerSnd π τ.fix) u = x.1} := by
       ext u
-      simp only [pairLab', Set.mem_setOf_eq, Prod.ext_iff, h, and_true]
+      simp only [pairLab', Set.mem_ofPred_eq, Prod.ext_iff, h, and_true]
     rw [hset]
     exact measurableSet_fibre_drawW (tsum_condSnd π τ.fix) _ _
   · have hset : {u : ℝ | pairLab' π τ u = x} = (∅ : Set ℝ) := by
       ext u
-      simp only [pairLab', Set.mem_setOf_eq, Prod.ext_iff, Set.mem_empty_iff_false, iff_false]
+      simp only [pairLab', Set.mem_ofPred_eq, Prod.ext_iff, Set.mem_empty_iff_false, iff_false]
       tauto
     rw [hset]
     exact MeasurableSet.empty
@@ -537,7 +537,7 @@ lemma pairLab_ne_zero (θ : Offspring 2) (hq : θ.extinction < 1) (hq0 : 0 < θ.
   have hne := weight_drawW_ne_zero (tsum_condFst π τ.fix)
     (condFst_partnerFst_ne_zero π τ.fix) u
   intro hzero
-  rw [condFst, if_neg hpos, hzero, ENNReal.zero_div] at hne
+  rw [condFst, ite_eq_right hpos, hzero, ENNReal.zero_div] at hne
   exact hne rfl
 
 /-- The mirror statement for the second law. -/
@@ -551,7 +551,7 @@ lemma pairLab'_ne_zero (θ' : Offspring 2) (hq' : θ'.extinction < 1)
   have hne := weight_drawW_ne_zero (tsum_condSnd π τ.fix)
     (condSnd_partnerSnd_ne_zero π τ.fix) u
   intro hzero
-  rw [condSnd, if_neg hpos, hzero, ENNReal.zero_div] at hne
+  rw [condSnd, ite_eq_right hpos, hzero, ENNReal.zero_div] at hne
   exact hne rfl
 
 /-- **`thm:shape-coupling` (`it:shape-coupling-law`) for the first law**: the label
@@ -568,13 +568,13 @@ theorem labMass_pairLab (θ : Offspring 2) (hq : θ.extinction < 1) (hq0 : 0 < �
     · have hset : {u : ℝ | pairLab π τ u = x}
           = {u : ℝ | drawW (condFst π τ.fix) (partnerFst π τ.fix) u = x.2} := by
         ext u
-        simp only [pairLab, Set.mem_setOf_eq, Prod.ext_iff, h, true_and]
-      rw [hset, volume_fibre_drawW (tsum_condFst π τ.fix), if_pos h, h]
+        simp only [pairLab, Set.mem_ofPred_eq, Prod.ext_iff, h, true_and]
+      rw [hset, volume_fibre_drawW (tsum_condFst π τ.fix), ite_eq_left h, h]
     · have hset : {u : ℝ | pairLab π τ u = x} = (∅ : Set ℝ) := by
         ext u
-        simp only [pairLab, Set.mem_setOf_eq, Prod.ext_iff, Set.mem_empty_iff_false, iff_false]
+        simp only [pairLab, Set.mem_ofPred_eq, Prod.ext_iff, Set.mem_empty_iff_false, iff_false]
         tauto
-      rw [hset, measure_empty, if_neg h]
+      rw [hset, measure_empty, ite_eq_right h]
   have hterm : ∀ τ : Shape,
       shapeMass θ τ * (volume.restrict (Set.Ico (0 : ℝ) 1)) {u : ℝ | pairLab π τ u = x}
         = (if τ.fix = x.1 then shapeMass θ τ else 0) * condFst π x.1 x.2 := by
@@ -584,9 +584,9 @@ theorem labMass_pairLab (θ : Offspring 2) (hq : θ.extinction < 1) (hq0 : 0 < �
   rw [labMass, tsum_congr hterm, ENNReal.tsum_mul_right,
     ← shapePMF_eq_tsum θ hq hq0 h2, ← hm x.1]
   by_cases h0 : margFst π x.1 = 0
-  · rw [condFst, if_pos (by rw [hm] at h0 ⊢; exact h0), h0, zero_mul]
+  · rw [condFst, ite_eq_left (by rw [hm] at h0 ⊢; exact h0), h0, zero_mul]
     exact (nonpos_iff_eq_zero.mp (h0 ▸ le_margFst π x.1 x.2)).symm
-  · rw [condFst, if_neg h0]
+  · rw [condFst, ite_eq_right h0]
     exact ENNReal.mul_div_cancel' (fun h => absurd h h0)
       (fun h => absurd h (margFst_ne_top π x.1))
 
@@ -604,13 +604,13 @@ theorem labMass_pairLab' (θ' : Offspring 2) (hq' : θ'.extinction < 1)
     · have hset : {u : ℝ | pairLab' π τ u = x}
           = {u : ℝ | drawW (condSnd π τ.fix) (partnerSnd π τ.fix) u = x.1} := by
         ext u
-        simp only [pairLab', Set.mem_setOf_eq, Prod.ext_iff, h, and_true]
-      rw [hset, volume_fibre_drawW (tsum_condSnd π τ.fix), if_pos h, h]
+        simp only [pairLab', Set.mem_ofPred_eq, Prod.ext_iff, h, and_true]
+      rw [hset, volume_fibre_drawW (tsum_condSnd π τ.fix), ite_eq_left h, h]
     · have hset : {u : ℝ | pairLab' π τ u = x} = (∅ : Set ℝ) := by
         ext u
-        simp only [pairLab', Set.mem_setOf_eq, Prod.ext_iff, Set.mem_empty_iff_false, iff_false]
+        simp only [pairLab', Set.mem_ofPred_eq, Prod.ext_iff, Set.mem_empty_iff_false, iff_false]
         tauto
-      rw [hset, measure_empty, if_neg h]
+      rw [hset, measure_empty, ite_eq_right h]
   have hterm : ∀ τ : Shape,
       shapeMass θ' τ * (volume.restrict (Set.Ico (0 : ℝ) 1)) {u : ℝ | pairLab' π τ u = x}
         = (if τ.fix = x.2 then shapeMass θ' τ else 0) * condSnd π x.2 x.1 := by
@@ -620,9 +620,9 @@ theorem labMass_pairLab' (θ' : Offspring 2) (hq' : θ'.extinction < 1)
   rw [labMass, tsum_congr hterm, ENNReal.tsum_mul_right,
     ← shapePMF_eq_tsum θ' hq' hq0' h2', ← hm' x.2]
   by_cases h0 : margSnd π x.2 = 0
-  · rw [condSnd, if_pos (by rw [hm'] at h0 ⊢; exact h0), h0, zero_mul]
+  · rw [condSnd, ite_eq_left (by rw [hm'] at h0 ⊢; exact h0), h0, zero_mul]
     exact (nonpos_iff_eq_zero.mp (h0 ▸ le_margSnd π x.1 x.2)).symm
-  · rw [condSnd, if_neg h0]
+  · rw [condSnd, ite_eq_right h0]
     exact ENNReal.mul_div_cancel' (fun h => absurd h h0)
       (fun h => absurd h (margSnd_ne_top π x.2))
 
@@ -740,10 +740,10 @@ theorem gdeg_shapeNet_le_gdeg_pairNet {Dq : ℝ} (hD : 1 ≤ Dq) {q₁ q₂ : PM
       = ∑' d : Shape, (if compat (shapeNet Dq) (p.1, d).1 c then π (c, d) else 0) := by
     intro c
     by_cases hc : compat (shapeNet Dq) p.1 c
-    · simp only [if_pos hc]
+    · simp only [ite_eq_left hc]
       rw [← hπ.marg₁ c]
       rfl
-    · simp only [if_neg hc, tsum_zero]
+    · simp only [ite_eq_right hc, tsum_zero]
   have hprod : ∑' z : Shape × Shape, (if compat (shapeNet Dq) p.1 z.1 then π z else 0)
       = ∑' c : Shape, ∑' d : Shape,
           (if compat (shapeNet Dq) (p.1, d).1 c then π (c, d) else 0) := ENNReal.tsum_prod'
@@ -753,8 +753,8 @@ theorem gdeg_shapeNet_le_gdeg_pairNet {Dq : ℝ} (hD : 1 ≤ Dq) {q₁ q₂ : PM
     by_cases hz : π z = 0
     · simp [hz]
     · by_cases hc : compat (shapeNet Dq) p.1 z.1
-      · rw [if_pos hc, if_pos (compat_pairNet_of_compat_shapeNet hD hπ hp hz hc)]
-      · rw [if_neg hc]
+      · rw [ite_eq_left hc, ite_eq_left (compat_pairNet_of_compat_shapeNet hD hπ hp hz hc)]
+      · rw [ite_eq_right hc]
         exact zero_le
   exact ENNReal.toReal_mono (rE_ne_top (μ := π) (R := compat (pairNet π Dq)) (x := p)) hle
 

@@ -122,11 +122,12 @@ lemma phiE_tsum_jensen {ι : Type*} {α : ℝ} (hα : 1 ≤ α)
   -- Case: some charged component sits at Q = 1
   by_cases hbad : ∃ i, w i ≠ 0 ∧ ¬ Q i < 1
   · obtain ⟨i₀, hw₀, hQ₀⟩ := hbad
-    have htop : phiE α (Q i₀) = ⊤ := if_neg hQ₀
+    have htop : phiE α (Q i₀) = ⊤ := ite_eq_right hQ₀
     have : (⊤ : ℝ≥0∞) ≤ ∑' i, w i * phiE α (Q i) := by
       calc (⊤ : ℝ≥0∞) = w i₀ * phiE α (Q i₀) := by
             rw [htop, ENNReal.mul_top hw₀]
-        _ ≤ ∑' i, w i * phiE α (Q i) := ENNReal.le_tsum i₀
+        _ ≤ ∑' i, w i * phiE α (Q i) :=
+              ENNReal.le_tsum (f := fun i => w i * phiE α (Q i)) i₀
     exact le_trans le_top this
   -- Main case: Q < 1 wherever w charges
   push Not at hbad
@@ -160,7 +161,7 @@ lemma phiE_tsum_jensen {ι : Type*} {α : ℝ} (hα : 1 ≤ α)
       refine ENNReal.tsum_le_tsum fun i => ?_
       by_cases h' : i = i₀
       · simp [h']
-      · simp only [h', if_false]
+      · simp only [h', ite_false]
         calc w i * ENNReal.ofReal (Q i) ≤ w i * 1 :=
               mul_le_mul_right (by simpa using ENNReal.ofReal_le_ofReal (hQ1 i)) _
           _ = w i := mul_one _

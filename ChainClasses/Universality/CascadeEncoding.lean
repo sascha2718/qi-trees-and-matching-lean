@@ -128,7 +128,7 @@ lemma wedgeN_vals (u v : BranchingProcess.Word N) :
           by_cases hab : a = b
           · subst hab
             simp [ih]
-          · rw [if_neg (fun h ↦ hab (Fin.ext h)), if_neg hab]
+          · rw [ite_eq_right (fun h ↦ hab (Fin.ext h)), ite_eq_right hab]
             rfl
 
 /-- The tree metric of the ambient tree is the address metric of the readings. -/
@@ -144,7 +144,7 @@ def unval (N : ℕ) (w : List ℕ) : BranchingProcess.Word N :=
   induction u with
   | nil => rfl
   | cons a u ih =>
-      simp only [vals_cons, unval, List.filterMap_cons, dif_pos a.isLt, Fin.eta]
+      simp only [vals_cons, unval, List.filterMap_cons, dite_eq_left a.isLt, Fin.eta]
       rw [unval] at ih
       rw [ih]
 
@@ -335,7 +335,7 @@ variable {E}
 lemma bFamily_enc {σ : GWord N → GShape} {u : GWord N} (hu : E.Skel u) :
     E.bFamily σ (bnat (E.enc u)) = σ u := by
   have h : ∃ u', E.Skel u' ∧ bnat (E.enc u) = bnat (E.enc u') := ⟨u, hu, rfl⟩
-  rw [bFamily, dif_pos h]
+  rw [bFamily, dite_eq_left h]
   have hspec := h.choose_spec
   have : h.choose = u := E.enc_injOn hspec.1 hu (bnat_injective hspec.2).symm
   rw [this]
@@ -343,7 +343,7 @@ lemma bFamily_enc {σ : GWord N → GShape} {u : GWord N} (hu : E.Skel u) :
 lemma bFamily_of_not_isImage {σ : GWord N → GShape} {w : List ℕ} (h : ¬ E.IsImage w) :
     E.bFamily σ w = gOne := by
   have h' : ¬ ∃ u, E.Skel u ∧ w = bnat (E.enc u) := h
-  rw [bFamily, dif_neg h']
+  rw [bFamily, dite_eq_right h']
 
 lemma bFamily_of_not_isBin {σ : GWord N → GShape} {w : List ℕ} (h : ¬ IsBin w) :
     E.bFamily σ w = gOne :=
@@ -368,6 +368,7 @@ def liftN (N : ℕ) (σ : GWord N → GShape) (w : List ℕ) : GShape := σ (unv
 
 /-- **The `𝔹`-assembly** (**`thm:hairy-general`**): the assembly of the shape family
 over `𝔹`, over the prefix closure of the encoded skeleton. -/
+@[implicit_reducible]
 def BAssembly {L : ℕ} (E : CascadeEnc N L) (σ : GWord N → GShape) : Type :=
   {x : GAssembly (E.bFamily σ) // E.InClosure x.copy}
 

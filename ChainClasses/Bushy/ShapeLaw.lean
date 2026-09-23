@@ -129,7 +129,7 @@ lemma measurableSet_noSplit (n : ℕ) : MeasurableSet (noSplit n) := by
       = ⋂ k ∈ Finset.range n,
           {d : Amb → ℕ | skeletonDegree (shift d (neckRay d [] k)) ∈ ({1} : Set ℕ)} := by
     ext d
-    simp only [noSplit, Set.mem_setOf_eq, Set.mem_iInter, Finset.mem_range,
+    simp only [noSplit, Set.mem_ofPred_eq, Set.mem_iInter, Finset.mem_range,
       Set.mem_singleton_iff]
   rw [he]
   exact MeasurableSet.biInter (Set.to_countable _)
@@ -152,7 +152,7 @@ lemma noSplit_succ (n : ℕ) :
     noSplit (n + 1)
       = {d : Amb → ℕ | skeletonDegree d = 1} ∩ {d : Amb → ℕ | bushAt d 0 ∈ noSplit n} := by
   ext d
-  simp only [noSplit, Set.mem_setOf_eq, Set.mem_inter_iff]
+  simp only [noSplit, Set.mem_ofPred_eq, Set.mem_inter_iff]
   constructor
   · intro h
     have h0 : skeletonDegree d = 1 := by
@@ -179,21 +179,21 @@ theorem survivalMeasure_noSplit (θ : Offspring 2) (hq : θ.extinction < 1) (n :
           MeasurableSet (if m = 0 then noSplit n else (Set.univ : Set (Amb → ℕ))) := by
         intro m
         by_cases hm : m = 0
-        · rw [if_pos hm]; exact measurableSet_noSplit n
-        · rw [if_neg hm]; exact MeasurableSet.univ
+        · rw [ite_eq_left hm]; exact measurableSet_noSplit n
+        · rw [ite_eq_right hm]; exact MeasurableSet.univ
       have hkey := BranchingProcess.survivalMeasure_skeletonDegree_bushes θ le_rfl hq 1
         (A := fun m ↦ if m = 0 then noSplit n else Set.univ) hAmeas
       have hbox : {c : Amb → ℕ | ∀ m : ℕ, m < 1 →
             bushAt c m ∈ (if m = 0 then noSplit n else (Set.univ : Set (Amb → ℕ)))}
           = {c : Amb → ℕ | bushAt c 0 ∈ noSplit n} := by
         ext c
-        simp only [Set.mem_setOf_eq, Nat.lt_one_iff]
+        simp only [Set.mem_ofPred_eq, Nat.lt_one_iff]
         constructor
         · intro h
           have hc := h 0 rfl
-          rwa [if_pos rfl] at hc
+          rwa [ite_eq_left rfl] at hc
         · rintro h m rfl
-          rwa [if_pos rfl]
+          rwa [ite_eq_left rfl]
       rw [hbox] at hkey
       have hprod : ∏ m ∈ Finset.range 1,
           survivalMeasure (N := 2) θ (if m = 0 then noSplit n else Set.univ)
@@ -247,7 +247,7 @@ lemma measurableSet_neverSplits (v : Amb) : MeasurableSet (neverSplits v) := by
         ∩ ⋂ k : ℕ, {c : Amb → ℕ | shift c v ∈
             {d : Amb → ℕ | skeletonDegree (shift d (neckRay d [] k)) ∈ {m : ℕ | m ≤ 1}}} := by
     ext c
-    simp only [neverSplits, Set.mem_setOf_eq, Set.mem_inter_iff, Set.mem_iInter,
+    simp only [neverSplits, Set.mem_ofPred_eq, Set.mem_inter_iff, Set.mem_iInter,
       shift_neckRay c v]
   rw [he]
   refine MeasurableSet.inter (measurable_shiftMap v BranchingProcess.measurableSet_survives)
@@ -286,7 +286,7 @@ lemma sampleMeasure_neverSplits (θ : Offspring 2) (hq : θ.extinction < 1)
     sampleMeasure (N := 2) θ (neverSplits v) = 0 := by
   have he : neverSplits v = (fun c ↦ shift c v) ⁻¹' neverSplits [] := by
     ext c
-    simp only [neverSplits, Set.mem_setOf_eq, Set.mem_preimage, shift_neckRay c v]
+    simp only [neverSplits, Set.mem_ofPred_eq, Set.mem_preimage, shift_neckRay c v]
     constructor
     · rintro ⟨h1, h2⟩
       exact ⟨by simpa using h1, fun k ↦ by simpa using h2 k⟩
@@ -380,7 +380,7 @@ lemma splitDepth_nil_ge_iff {c : Amb → ℕ} (hc : IsBushySample c) (n : ℕ) :
     have hmem : splitDepth c [] ∈ {k | 2 ≤ skeletonDegree (shift c (neckRay c [] k))} :=
       Nat.sInf_mem ⟨k₀, hk₀⟩
     have := h (splitDepth c []) hlt'
-    simp only [Set.mem_setOf_eq] at hmem
+    simp only [Set.mem_ofPred_eq] at hmem
     omega
 
 lemma measurableSet_splitDepth_ge (n : ℕ) :
@@ -394,7 +394,7 @@ theorem survivalMeasure_splitDepth_ge (θ : Offspring 2) (hq : θ.extinction < 1
     survivalMeasure (N := 2) θ {c : Amb → ℕ | n ≤ splitDepth c []}
       = ENNReal.ofReal (θ.skeletonWeight 1) ^ n := by
   have hae : {c : Amb → ℕ | n ≤ splitDepth c []} =ᵐ[survivalMeasure (N := 2) θ] noSplit n := by
-    refine Filter.eventuallyEq_set.mpr ?_
+    refine Filter.eventuallyEqSet_iff.mpr ?_
     filter_upwards [ae_isBushySample_of_pos θ hq h2] with c hc
     exact splitDepth_nil_ge_iff hc n
   rw [measure_congr hae, survivalMeasure_noSplit θ hq n]
@@ -413,12 +413,12 @@ theorem survivalMeasure_neckLen (θ : Offspring 2) (hq : θ.extinction < 1) (h2 
     ext c
     have hne : (shapeAt c []).neckLen = splitDepth c [] + 1 := by
       rw [Shape.neckLen, shapeAt_necks, entryV_nil]
-    simp only [Set.mem_setOf_eq, Set.mem_sdiff, hne]
+    simp only [Set.mem_ofPred_eq, Set.mem_sdiff, hne]
     omega
   have hsub : {c : Amb → ℕ | j + 1 ≤ splitDepth c []}
       ⊆ {c : Amb → ℕ | j ≤ splitDepth c []} := by
     intro c hc
-    simp only [Set.mem_setOf_eq] at hc ⊢
+    simp only [Set.mem_ofPred_eq] at hc ⊢
     omega
   rw [hshape, measure_sdiff hsub (measurableSet_splitDepth_ge (j + 1)).nullMeasurableSet
       (measure_ne_top _ _),

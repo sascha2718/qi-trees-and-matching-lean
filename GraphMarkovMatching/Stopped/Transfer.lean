@@ -59,7 +59,7 @@ theorem infFail_le_of_marginals {Ω : Type*} [MeasurableSpace Ω]
     exact hfail n
   have hEq : {ω | ¬ InfMatch M.srel (fun n => X n ω) (fun n => Y n ω)} = ⋃ n, E n := by
     ext ω
-    simp only [Set.mem_setOf_eq, Set.mem_iUnion, E]
+    simp only [Set.mem_ofPred_eq, Set.mem_iUnion, E]
     change (¬ InfMatchK M.srel 1 0 (fun n => X n ω) (fun n => Y n ω)) ↔ _
     rw [infMatchK_iff_forall_level M.srel 1 0 (fun n => X n ω) (fun n => Y n ω)
       (fun n => hX n ω) (fun n => hY n ω)]
@@ -118,7 +118,7 @@ theorem state_infFail_le_of_marginals {Ω : Type*} [MeasurableSpace Ω]
     exact hfail n
   have hEq : {ω | ¬ InfMatch M.R (fun n => X n ω) (fun n => Y n ω)} = ⋃ n, E n := by
     ext ω
-    simp only [Set.mem_setOf_eq, Set.mem_iUnion, E]
+    simp only [Set.mem_ofPred_eq, Set.mem_iUnion, E]
     change (¬ InfMatchK M.R 1 0 (fun n => X n ω) (fun n => Y n ω)) ↔ _
     rw [infMatchK_iff_forall_level M.R 1 0 (fun n => X n ω) (fun n => Y n ω)
       (fun n => hX n ω) (fun n => hY n ω)]

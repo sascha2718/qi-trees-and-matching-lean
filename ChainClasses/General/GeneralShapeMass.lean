@@ -90,7 +90,7 @@ theorem tsum_gPairMass (θ : Offspring J) (hJN : J ≤ N) (hq : θ.extinction < 
         ({c : GWord N → ℕ | gShapeRoot c = σ} ∩ {c : GWord N → ℕ | gArity c = κ}))
       = {c : GWord N → ℕ | gArity c = κ} := by
     ext c
-    simp only [Set.mem_iUnion, Set.mem_inter_iff, Set.mem_setOf_eq]
+    simp only [Set.mem_iUnion, Set.mem_inter_iff, Set.mem_ofPred_eq]
     exact ⟨fun ⟨σ, _, h⟩ ↦ h, fun h ↦ ⟨gShapeRoot c, rfl, h⟩⟩
   calc ∑' σ : GShape, gPairMass (N := N) θ κ σ
       = ∑' σ : GShape, survivalMeasure (N := N) θ
@@ -133,7 +133,8 @@ lemma gPairMass_le_gMixMass (θ : Offspring J) {κ : ℕ} (hκ : 2 ≤ κ) (σ :
   have h : κ = (κ - 2) + 2 := by omega
   calc gPairMass (N := N) θ κ σ
       = gPairMass (N := N) θ ((κ - 2) + 2) σ := by rw [← h]
-    _ ≤ gMixMass (N := N) θ σ := ENNReal.le_tsum (κ - 2)
+    _ ≤ gMixMass (N := N) θ σ :=
+        ENNReal.le_tsum (f := fun j : ℕ ↦ gPairMass (N := N) θ (j + 2) σ) (κ - 2)
 
 /-- **The mixture is the marginal shape law**: the mass of a shape against a genuine
 split. -/
@@ -148,7 +149,7 @@ theorem gMixMass_eq_measure (θ : Offspring J) (hJN : J ≤ N) (hq : θ.extincti
     refine Set.disjoint_left.mpr fun c hc hc' ↦ hne ?_
     have h1 := hc.2
     have h2 := hc'.2
-    simp only [Set.mem_setOf_eq] at h1 h2
+    simp only [Set.mem_ofPred_eq] at h1 h2
     omega
   have hmeas : ∀ j : ℕ, MeasurableSet
       ({c : GWord N → ℕ | gShapeRoot c = σ} ∩ {c : GWord N → ℕ | gArity c = j + 2}) :=
@@ -157,7 +158,7 @@ theorem gMixMass_eq_measure (θ : Offspring J) (hJN : J ≤ N) (hq : θ.extincti
         ({c : GWord N → ℕ | gShapeRoot c = σ} ∩ {c : GWord N → ℕ | gArity c = j + 2}))
       = {c : GWord N → ℕ | gShapeRoot c = σ} ∩ {c : GWord N → ℕ | 2 ≤ gArity c} := by
     ext c
-    simp only [Set.mem_iUnion, Set.mem_inter_iff, Set.mem_setOf_eq]
+    simp only [Set.mem_iUnion, Set.mem_inter_iff, Set.mem_ofPred_eq]
     constructor
     · rintro ⟨j, hs, ha⟩
       exact ⟨hs, by omega⟩
@@ -182,7 +183,7 @@ lemma survivalMeasure_two_le_gArity (θ : Offspring J) (hJN : J ≤ N)
     refine measure_mono_null (fun c hc ↦ ?_)
       (measure_union_null (survivalMeasure_gArity_eq_one θ hJN hq hs1)
         (survivalMeasure_compl_survives θ hJN hq))
-    simp only [Set.mem_compl_iff, Set.mem_setOf_eq, not_le] at hc
+    simp only [Set.mem_compl_iff, Set.mem_ofPred_eq, not_le] at hc
     by_cases hsurv : Survives c
     · have h1 := one_le_gArity_of_survives hsurv
       exact Or.inl (show gArity c = 1 by omega)
@@ -218,7 +219,7 @@ theorem tsum_gMixMass (θ : Offspring J) (hJN : J ≤ N) (hq : θ.extinction < 1
         ({c : GWord N → ℕ | gShapeRoot c = σ} ∩ {c : GWord N → ℕ | 2 ≤ gArity c}))
       = {c : GWord N → ℕ | 2 ≤ gArity c} := by
     ext c
-    simp only [Set.mem_iUnion, Set.mem_inter_iff, Set.mem_setOf_eq]
+    simp only [Set.mem_iUnion, Set.mem_inter_iff, Set.mem_ofPred_eq]
     exact ⟨fun ⟨σ, _, h⟩ ↦ h, fun h ↦ ⟨gShapeRoot c, rfl, h⟩⟩
   calc ∑' σ : GShape, gMixMass (N := N) θ σ
       = ∑' σ : GShape, survivalMeasure (N := N) θ
@@ -398,7 +399,7 @@ lemma le_gDecMass (θ : Offspring J) (hJN : J ≤ N) (hq : θ.extinction < 1)
         = ∏ m ∈ Finset.range β.length,
             ENNReal.ofReal (gPointBase θ) ^ (β.getD m (.node [])).size := by
           rw [Finset.prod_pow_eq_pow_sum, RTree.sizeF_eq_sum_getD]
-      _ ≤ _ := Finset.prod_le_prod' hstep
+      _ ≤ _ := Finset.prod_le_prod hstep
   rw [gDecMass_def, BranchingProcess.decorationMass]
   have hr : 1 + β.length - 1 = β.length := by omega
   rw [hr, pow_add, pow_one]
@@ -433,7 +434,7 @@ lemma le_gSplitMass (θ : Offspring J) (hJN : J ≤ N) (hq : θ.extinction < 1)
         = ∏ m ∈ Finset.range β.length,
             ENNReal.ofReal (gPointBase θ) ^ (β.getD m (.node [])).size := by
           rw [Finset.prod_pow_eq_pow_sum, RTree.sizeF_eq_sum_getD]
-      _ ≤ _ := Finset.prod_le_prod' hstep
+      _ ≤ _ := Finset.prod_le_prod hstep
   rw [gSplitMass_def, BranchingProcess.decorationMass]
   have hr : κ + β.length - κ = β.length := by omega
   rw [hr, pow_add, pow_one]

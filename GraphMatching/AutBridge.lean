@@ -337,7 +337,7 @@ lemma exists_aut_of_iso {h : ℕ} (g : treeGraph h ≃g treeGraph h)
   obtain ⟨π, hπ⟩ := exists_aut_of h
     (fun s => if hs : s.length ≤ h then (g ⟨s, hs⟩).1 else s)
     (by
-      rw [dif_pos (by simp : ([] : List Bool).length ≤ h)]
+      rw [dite_eq_left (by simp : ([] : List Bool).length ≤ h)]
       have hrt : (⟨[], by simp⟩ : {s : List Bool // s.length ≤ h}) = treeRoot h := rfl
       rw [hrt, hroot]
       rfl)
@@ -346,14 +346,14 @@ lemma exists_aut_of_iso {h : ℕ} (g : treeGraph h ≃g treeGraph h)
       have hsc' : (s ++ [c]).length ≤ h := by
         simp only [List.length_append, List.length_singleton]
         omega
-      rw [dif_pos hsc', dif_pos hs]
+      rw [dite_eq_left hsc', dite_eq_left hs]
       exact iso_child g hroot s.length s hs c hsc' rfl)
     (fun s t hs ht heq => by
-      rw [dif_pos hs, dif_pos ht] at heq
+      rw [dite_eq_left hs, dite_eq_left ht] at heq
       have := g.injective (Subtype.ext heq)
       exact congrArg Subtype.val this)
   refine ⟨π, fun s hs => ?_⟩
-  rw [hπ s hs, dif_pos hs]
+  rw [hπ s hs, dite_eq_left hs]
 
 /-! ### The matching relations over graph automorphisms -/
 

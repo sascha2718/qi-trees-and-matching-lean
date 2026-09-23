@@ -859,7 +859,7 @@ theorem optHeight_eq (S : Finset ℕ) (D : ℕ → MTree)
       obtain ⟨t, ht, hl⟩ := hσ q hq
       exact Nat.sInf_mem (s := {h | ∃ t, IsCompositeProfile S D t ∧ t.leaves = σ q + 1
         ∧ t.height = h}) ⟨t.height, t, ht, hl, rfl⟩
-    haveI : Inhabited MTree := ⟨leaf⟩
+    have : Inhabited MTree := ⟨leaf⟩
     choose! f hf using hmin
     obtain ⟨_, hleaves, l, r, hDa⟩ := hD a haS
     have hne' : markRoot (graftLeaves f [] (D a)) ≠ leaf := by

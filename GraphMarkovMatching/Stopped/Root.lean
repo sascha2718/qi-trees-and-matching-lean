@@ -89,8 +89,8 @@ lemma PhiDres_rootLaw_forced (α : ℝ) (s : I) {t : I} (ht : ¬ M.fresh t) :
   intro v
   rw [rootLaw_forced M ht, q_eq_one_sub, rE_pure]
   by_cases hv : M.R v M.zero
-  · rw [if_pos hv, if_neg one_ne_zero, ENNReal.toReal_one, sub_self, phiE_zero, mul_zero]
-  · rw [if_neg hv, if_pos rfl, mul_zero]
+  · rw [ite_eq_left hv, ite_eq_right one_ne_zero, ENNReal.toReal_one, sub_self, phiE_zero, mul_zero]
+  · rw [ite_eq_right hv, ite_eq_left rfl, mul_zero]
 
 /-- Against a fresh target the restricted root potential is at most `η` for a fresh source
 and `φ_α(δ)` for a forced source (`sec:independent-root`). -/
@@ -106,8 +106,8 @@ lemma PhiDres_rootLaw_fresh_le (α : ℝ) (s : I) {t : I} (ht : M.fresh t) :
   refine hle.trans ?_
   rw [rootLaw_fresh M ht]
   by_cases hs : M.fresh s
-  · rw [if_pos hs, rootLaw_fresh M hs, eta]
-  · rw [if_neg hs, rootLaw_forced M hs, PhiD, tsum_pure_mul, e0]
+  · rw [ite_eq_left hs, rootLaw_fresh M hs, eta]
+  · rw [ite_eq_right hs, rootLaw_forced M hs, PhiD, tsum_pure_mul, e0]
 
 /-- The restricted root potential is at most `ζ_α` (`sec:independent-root`). -/
 lemma PhiDres_rootLaw_le (α : ℝ) (s t : I) :
@@ -144,7 +144,7 @@ private lemma root_average_le {α : ℝ} (s t : I) (Qb : ℝ≥0∞) :
   · have hA := M.PhiDres_rootLaw_fresh_le α s ht
     rw [rootLaw_fresh M ht] at hA ⊢
     by_cases hs : M.fresh s
-    · rw [if_pos hs] at hA
+    · rw [ite_eq_left hs] at hA
       rw [rootLaw_fresh M hs] at hA ⊢
       have hS : (∑' v, M.μ v * (if rE M.μ M.R v = 0 then 0 else (rE M.μ M.R v) ^ (1 - α)))
           ≤ ∑' v, M.μ v * (rE M.μ M.R v) ^ (1 - α) := by
@@ -161,7 +161,7 @@ private lemma root_average_le {α : ℝ} (s t : I) (Qb : ℝ≥0∞) :
         _ ≤ M.zeta α + M.DmuC α * Qb :=
             add_le_add (M.eta_le_zeta α)
               (mul_le_mul_left ((le_max_left _ _).trans (le_max_right _ _)) _)
-    · rw [if_neg hs] at hA
+    · rw [ite_eq_right hs] at hA
       rw [rootLaw_forced M hs] at hA ⊢
       rw [tsum_pure_mul]
       have hS : (if rE M.μ M.R M.zero = 0 then (0 : ℝ≥0∞) else (rE M.μ M.R M.zero) ^ (1 - α))
@@ -185,8 +185,8 @@ private lemma root_average_le {α : ℝ} (s t : I) (Qb : ℝ≥0∞) :
             refine ENNReal.tsum_le_tsum fun v => ?_
             rw [rootLaw_forced M ht, rE_pure]
             by_cases hv : M.R v M.zero
-            · rw [if_pos hv, if_neg one_ne_zero, ENNReal.one_rpow, mul_one]
-            · rw [if_neg hv, if_pos rfl, mul_zero]
+            · rw [ite_eq_left hv, ite_eq_right one_ne_zero, ENNReal.one_rpow, mul_one]
+            · rw [ite_eq_right hv, ite_eq_left rfl, mul_zero]
               exact zero_le
         _ = 1 := (M.rootLaw s).tsum_coe
     calc _ ≤ 1 * Qb := mul_le_mul_left hS _
@@ -231,10 +231,10 @@ theorem P_succ_le (hc : M.IsCompat) {α : ℝ} (hα : 1 ≤ α) (s t : I) (h : �
         = rE (M.rootLaw t) M.R v * rE (M.childMix t h) (SquareRel (M.sim h)) p :=
       fun p => M.deg_succ t h (s, v) p
     by_cases hc0 : rE (M.rootLaw t) M.R v = 0
-    · rw [if_pos hc0, if_pos hc0, zero_mul, zero_mul, add_zero]
+    · rw [ite_eq_left hc0, ite_eq_left hc0, zero_mul, zero_mul, add_zero]
       refine le_of_eq (ENNReal.tsum_eq_zero.mpr fun p => ?_)
-      rw [hd p, hc0, zero_mul, if_pos rfl, mul_zero]
-    · rw [if_neg hc0, if_neg hc0]
+      rw [hd p, hc0, zero_mul, ite_eq_left rfl, mul_zero]
+    · rw [ite_eq_right hc0, ite_eq_right hc0]
       calc (∑' p, M.childMix s h p
             * (if rE (M.rho t (h + 1)) (M.sim (h + 1)) (branch (s, v) p) = 0 then 0
                 else phiE α (q (M.rho t (h + 1)) (M.sim (h + 1)) (branch (s, v) p))))
@@ -246,11 +246,11 @@ theorem P_succ_le (hc : M.IsCompat) {α : ℝ} (hα : 1 ≤ α) (s t : I) (h : �
                     else phiE α (q (M.childMix t h) (SquareRel (M.sim h)) p))) := by
             refine ENNReal.tsum_le_tsum fun p => mul_le_mul_right ?_ _
             by_cases hr0 : rE (M.childMix t h) (SquareRel (M.sim h)) p = 0
-            · rw [hd p, hr0, mul_zero, if_pos rfl]
+            · rw [hd p, hr0, mul_zero, ite_eq_left rfl]
               exact zero_le
             · have hcr : rE (M.rootLaw t) M.R v
                   * rE (M.childMix t h) (SquareRel (M.sim h)) p ≠ 0 := mul_ne_zero hc0 hr0
-              rw [hd p, if_neg hcr, if_neg hr0,
+              rw [hd p, ite_eq_right hcr, ite_eq_right hr0,
                 q_eq_one_sub (M.rho t (h + 1)) (M.sim (h + 1)) (branch (s, v) p), hd p,
                 phiE_one_sub_mul hc0 rE_le_one hr0 rE_le_one,
                 ← q_eq_one_sub (M.rootLaw t) M.R v,

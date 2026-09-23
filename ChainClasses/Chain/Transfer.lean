@@ -48,7 +48,7 @@ lemma psi_apply {lam lam' : Word → ℕ} (hlam : ∀ u, 1 ≤ lam u) {w : Word}
     psi lam lam' (iotaL lam w ++ List.replicate l false)
       = iotaL lam' w ++ List.replicate (levelPhi lam lam' w l) false := by
   have hx : InAssoc lam (iotaL lam w ++ List.replicate l false) := ⟨w, l, hl, rfl⟩
-  rw [psi, dif_pos hx]
+  rw [psi, dite_eq_left hx]
   obtain ⟨hle, heq⟩ := hx.choose_spec.choose_spec
   obtain ⟨h1, h2⟩ := assoc_rep_unique lam hlam hle hl heq.symm
   rw [h2, h1]

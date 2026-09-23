@@ -504,14 +504,14 @@ theorem star_no_qi (hT : PrefixClosedN T) (hD : 1 ≤ D)
     · intro e he
       simp only [Finset.mem_coe] at he
       dsimp only
-      rw [dif_pos he, Finset.mem_coe, mem_sphereFinset]
+      rw [dite_eq_left he, Finset.mem_coe, mem_sphereFinset]
       have hfar := star_end_far hT hD S hf he
       exact ⟨geoPt_mem hT'c (f S.ctrVert).2 (f (S.endVert he)).2 _,
         geoPt_dist _ _ (by omega)⟩
     · intro e he e' he' hee
       simp only [Finset.mem_coe] at he he'
       dsimp only at hee
-      rw [dif_pos he, dif_pos he'] at hee
+      rw [dite_eq_left he, dite_eq_left he'] at hee
       by_contra hne
       exact star_gates_inj hT hD S hf he he' hne hee
   -- the sphere injects into the ends through the witnesses
@@ -528,7 +528,7 @@ theorem star_no_qi (hT : PrefixClosedN T) (hD : 1 ≤ D)
     · intro g hg
       simp only [Finset.mem_coe] at hg
       dsimp only
-      rw [dif_pos (hwit g hg), Finset.mem_coe]
+      rw [dite_eq_left (hwit g hg), Finset.mem_coe]
       exact ((hwit g hg).choose_spec).1
     · intro g hg g' hg' hgg'
       simp only [Finset.mem_coe] at hg hg'
@@ -536,7 +536,7 @@ theorem star_no_qi (hT : PrefixClosedN T) (hD : 1 ≤ D)
       have h1 := hwit g hg
       have h2 := hwit g' hg'
       dsimp only at hgg'
-      rw [dif_pos h1, dif_pos h2] at hgg'
+      rw [dite_eq_left h1, dite_eq_left h2] at hgg'
       obtain ⟨he1, hw1⟩ := h1.choose_spec
       obtain ⟨he2, hw2⟩ := h2.choose_spec
       rw [hgg'] at hw1
@@ -679,11 +679,11 @@ lemma getElem_ne_of_wedge {u v : GWord N}
           · subst hxy
             have hw : BranchingProcess.wedge (x :: u) (x :: v)
                 = x :: BranchingProcess.wedge u v := by
-              rw [BranchingProcess.wedge_cons_cons, if_pos rfl]
+              rw [BranchingProcess.wedge_cons_cons, ite_eq_left rfl]
             simp only [hw, List.length_cons, List.getElem_cons_succ] at hu hv ⊢
             exact ih (by omega) (by omega)
           · have hw : BranchingProcess.wedge (x :: u) (y :: v) = [] := by
-              rw [BranchingProcess.wedge_cons_cons, if_neg hxy]
+              rw [BranchingProcess.wedge_cons_cons, ite_eq_right hxy]
             simp only [hw, List.length_nil, List.getElem_cons_zero]
             exact hxy
 
@@ -694,7 +694,7 @@ lemma wedge_lineW_ne (hN : 0 < N) (a L i : ℕ) {j j' : Fin N} (hjj : j ≠ j')
     BranchingProcess.wedge (lineW hN a L i j t) (lineW hN a L i j' t')
       = zw hN (a + L + i) := by
   rw [lineW, lineW, BranchingProcess.wedge_append_append,
-    BranchingProcess.wedge_cons_cons, if_neg hjj]
+    BranchingProcess.wedge_cons_cons, ite_eq_right hjj]
   simp
 
 /-- The wedge of lines leaving at different stack depths, the lower one through a
@@ -721,7 +721,7 @@ lemma wedge_lineW_lt (hN : 0 < N) (a L : ℕ) {i i' : ℕ} (hii : i < i') {j j' 
     rw [hz]
     simp
   rw [lineW, hsplit, BranchingProcess.wedge_append_append,
-    BranchingProcess.wedge_cons_cons, if_neg (by
+    BranchingProcess.wedge_cons_cons, ite_eq_right (by
       intro hcon
       rw [hcon] at hj
       simp at hj)]
@@ -857,7 +857,7 @@ lemma card_linePairs {ks : List ℕ} (hks2 : ∀ k ∈ ks, 2 ≤ k) (hksN : ∀ 
     split_ifs <;> omega
   rw [Finset.sum_congr rfl hsplit, Finset.sum_add_distrib, hsum',
     Finset.sum_ite_eq' (Finset.range ks.length) (ks.length - 1) (fun _ => 1),
-    if_pos (Finset.mem_range.mpr (by omega))]
+    ite_eq_left (Finset.mem_range.mpr (by omega))]
 
 end Pattern
 
@@ -1047,21 +1047,21 @@ def pEnds (hN : 0 < N) (a L : ℕ) (ks : List ℕ) : Finset (GWord N) :=
 
 lemma pLine_arr (hN : 0 < N) (t : ℕ) :
     pLine hN a L (zw hN a) t = zw hN (a + L - 1 - t) := by
-  rw [pLine, if_pos (zw_length hN a)]
+  rw [pLine, ite_eq_left (zw_length hN a)]
 
 lemma pOff_arr (hN : 0 < N) : pOff a L (zw hN a) = 0 := by
-  rw [pOff, if_pos (zw_length hN a)]
+  rw [pOff, ite_eq_left (zw_length hN a)]
 
 lemma pLine_leaving (hN : 0 < N) (hL : 1 ≤ L) (i : ℕ) (j : Fin N) {t : ℕ}
     (ht : t ≤ L - 1) :
     pLine hN a L (lineW hN a L i j (L - 1)) t = lineW hN a L i j t := by
-  rw [pLine, if_neg (by rw [lineW_length]; omega), lineW_length,
+  rw [pLine, ite_eq_right (by rw [lineW_length]; omega), lineW_length,
     show a + L + i + 1 + (L - 1) - (L - 1) + t = a + L + i + 1 + t from by omega,
     lineW_take hN a L i j ht]
 
 lemma pOff_leaving (hN : 0 < N) (hL : 1 ≤ L) (i : ℕ) (j : Fin N) :
     pOff a L (lineW hN a L i j (L - 1)) = i := by
-  rw [pOff, if_neg (by rw [lineW_length]; omega), lineW_length]
+  rw [pOff, ite_eq_right (by rw [lineW_length]; omega), lineW_length]
   omega
 
 lemma mem_pEnds {hN : 0 < N} {e : GWord N} :

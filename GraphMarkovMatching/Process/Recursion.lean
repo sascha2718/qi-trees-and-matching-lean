@@ -17,18 +17,18 @@ lemma rE_succ_branch {S : Type u} (P : S → PMF (S × S)) (R₀ : S → S → P
       = if R₀ s t then rE (pairMix P t n) (SquareRel (fullSim R₀ n)) xp
         else 0 := by
   by_cases hst : R₀ s t
-  · rw [if_pos hst, muM_succ, rE_map, rE_eq_tsum_mul]
+  · rw [ite_eq_left hst, muM_succ, rE_map, rE_eq_tsum_mul]
     refine tsum_congr fun yp => ?_
     congr 1
     rw [goodInd, goodInd]
     by_cases h : SquareRel (fullSim R₀ n) xp yp
-    · rw [if_pos ((fullSim_branch R₀ n s t xp yp).mpr ⟨hst, h⟩), if_pos h]
-    · rw [if_neg (fun hc => h ((fullSim_branch R₀ n s t xp yp).mp hc).2),
-        if_neg h]
-  · rw [if_neg hst, muM_succ, rE_map]
+    · rw [ite_eq_left ((fullSim_branch R₀ n s t xp yp).mpr ⟨hst, h⟩), ite_eq_left h]
+    · rw [ite_eq_right (fun hc => h ((fullSim_branch R₀ n s t xp yp).mp hc).2),
+        ite_eq_right h]
+  · rw [ite_eq_right hst, muM_succ, rE_map]
     refine ENNReal.tsum_eq_zero.mpr fun yp => ?_
     rw [goodInd,
-      if_neg (fun hc => hst ((fullSim_branch R₀ n s t xp yp).mp hc).1),
+      ite_eq_right (fun hc => hst ((fullSim_branch R₀ n s t xp yp).mp hc).1),
       mul_zero]
 
 end GraphMarkovMatching

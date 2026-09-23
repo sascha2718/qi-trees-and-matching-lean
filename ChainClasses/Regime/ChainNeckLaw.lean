@@ -112,7 +112,7 @@ theorem survivalMeasure_neckArity_aux (θ : Offspring J) (hJN : J ≤ N)
                 ∩ {c : GWord N → ℕ | gArity c = k []})
               ∩ {c : GWord N → ℕ | ∀ m : ℕ, m < k [] → gSplitBush c m ∈ A m}) := by
           ext c
-          simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_setOf_eq]
+          simp only [Set.mem_iInter, Set.mem_inter_iff, Set.mem_ofPred_eq]
           constructor
           · intro h
             obtain ⟨hs0, ha0⟩ := h [] hroot
@@ -120,7 +120,7 @@ theorem survivalMeasure_neckArity_aux (θ : Offspring J) (hJN : J ≤ N)
             simp only [hA]
             split
             · rename_i hmN
-              simp only [hE, Set.mem_iInter, Set.mem_inter_iff, Set.mem_setOf_eq]
+              simp only [hE, Set.mem_iInter, Set.mem_inter_iff, Set.mem_ofPred_eq]
               intro u hu
               exact h (⟨m, hmN⟩ :: u) (mem_consSub.mp hu)
             · exact Set.mem_univ _
@@ -131,8 +131,8 @@ theorem survivalMeasure_neckArity_aux (θ : Offspring J) (hJN : J ≤ N)
                 by_cases hik : (i : ℕ) < k []
                 · have hm := hrest (i : ℕ) hik
                   simp only [hA] at hm
-                  rw [dif_pos i.isLt, Fin.eta] at hm
-                  simp only [hE, Set.mem_iInter, Set.mem_inter_iff, Set.mem_setOf_eq] at hm
+                  rw [dite_eq_left i.isLt, Fin.eta] at hm
+                  simp only [hE, Set.mem_iInter, Set.mem_inter_iff, Set.mem_ofPred_eq] at hm
                   exact hm u (mem_consSub.mpr hu)
                 · exact absurd (mem_consSub.mpr hu)
                     (by rw [hconsEmpty i (not_lt.mp hik)]; exact Finset.notMem_empty u)
@@ -159,7 +159,7 @@ theorem survivalMeasure_neckArity_aux (θ : Offspring J) (hJN : J ≤ N)
             ∏ u ∈ consSub i F, neckPairMass θ (k (i :: u)) (f (i :: u))
               = G (i : ℕ) := by
           intro i
-          simp only [hGdef, dif_pos i.isLt, Fin.eta]
+          simp only [hGdef, dite_eq_left i.isLt, Fin.eta]
         have hGone : ∀ m : ℕ, k [] ≤ m → G m = 1 := by
           intro m hm
           simp only [hGdef]
@@ -182,7 +182,7 @@ theorem survivalMeasure_neckArity_aux (θ : Offspring J) (hJN : J ≤ N)
           have hone : ∀ m ∈ Finset.range (k []), m ∉ Finset.range N → G m = 1 := by
             intro m _ hm'
             simp only [hGdef]
-            exact dif_neg fun hc ↦ hm' (Finset.mem_range.mpr hc)
+            exact dite_eq_right fun hc ↦ hm' (Finset.mem_range.mpr hc)
           exact (Finset.prod_subset hsub hone).symm
 
 /-- **`thm:conditional-iid`, the joint product formula**, at any prefix-closed probe. -/

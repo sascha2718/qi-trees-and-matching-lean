@@ -147,7 +147,7 @@ lemma relabelMap_apply (σ : Word → Bool ≃ Bool) {lam : Word → ℕ} (lam' 
     relabelMap σ lam lam' (iotaL lam w ++ List.replicate l false)
       = iotaL lam' (autOf σ w) ++ List.replicate l false := by
   have hx : InAssoc lam (iotaL lam w ++ List.replicate l false) := ⟨w, l, hl, rfl⟩
-  simp only [relabelMap, dif_pos hx]
+  simp only [relabelMap, dite_eq_left hx]
   obtain ⟨hl', heq⟩ := Exists.choose_spec (Exists.choose_spec hx)
   obtain ⟨hw, hll⟩ := assoc_rep_unique lam hlam hl' hl heq.symm
   exact congrArg₂ (· ++ ·) (by rw [hw]) (by rw [hll])

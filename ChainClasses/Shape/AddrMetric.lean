@@ -57,10 +57,10 @@ lemma wedgeN_cons_cons (a b : ℕ) (x y : List ℕ) :
     wedgeN (a :: x) (b :: y) = if a = b then a :: wedgeN x y else [] := rfl
 
 @[simp] lemma wedgeN_cons_cons_self (a : ℕ) (x y : List ℕ) :
-    wedgeN (a :: x) (a :: y) = a :: wedgeN x y := by rw [wedgeN_cons_cons, if_pos rfl]
+    wedgeN (a :: x) (a :: y) = a :: wedgeN x y := by rw [wedgeN_cons_cons, ite_eq_left rfl]
 
 lemma wedgeN_cons_cons_ne {a b : ℕ} (h : a ≠ b) (x y : List ℕ) :
-    wedgeN (a :: x) (b :: y) = [] := by rw [wedgeN_cons_cons, if_neg h]
+    wedgeN (a :: x) (b :: y) = [] := by rw [wedgeN_cons_cons, ite_eq_right h]
 
 lemma wedgeN_prefix_left : ∀ x y : List ℕ, wedgeN x y <+: x
   | [], _ => by simp
@@ -106,8 +106,8 @@ lemma wedgeN_comm : ∀ x y : List ℕ, wedgeN x y = wedgeN y x
   | a :: x, b :: y => by
       rw [wedgeN_cons_cons, wedgeN_cons_cons]
       by_cases h : a = b
-      · subst h; rw [if_pos rfl, if_pos rfl, wedgeN_comm x y]
-      · rw [if_neg h, if_neg (Ne.symm h)]
+      · subst h; rw [ite_eq_left rfl, ite_eq_left rfl, wedgeN_comm x y]
+      · rw [ite_eq_right h, ite_eq_right (Ne.symm h)]
 
 lemma wedgeN_length_le_left (x y : List ℕ) : (wedgeN x y).length ≤ x.length :=
   (wedgeN_prefix_left x y).length_le

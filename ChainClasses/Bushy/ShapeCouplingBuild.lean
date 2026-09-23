@@ -394,8 +394,8 @@ lemma tsum_fibre_eq (f : Shape → ℝ≥0∞) (a : Shape) :
   refine Eq.trans ?_ (tsum_subtype {τ : Shape | dm τ ∧ sh τ = a} f).symm
   refine tsum_congr fun b ↦ ?_
   by_cases hb : dm b ∧ sh b = a
-  · rw [if_pos hb, Set.indicator_of_mem (show b ∈ {τ : Shape | dm τ ∧ sh τ = a} from hb) f]
-  · rw [if_neg hb, Set.indicator_of_notMem (show b ∉ {τ : Shape | dm τ ∧ sh τ = a} from hb) f]
+  · rw [ite_eq_left hb, Set.indicator_of_mem (show b ∈ {τ : Shape | dm τ ∧ sh τ = a} from hb) f]
+  · rw [ite_eq_right hb, Set.indicator_of_notMem (show b ∉ {τ : Shape | dm τ ∧ sh τ = a} from hb) f]
 
 /-- The mass a source atom sends out, summed over the fibre it is the source of. -/
 lemma tsum_cascPair_fst (a : Shape) :
@@ -405,12 +405,12 @@ lemma tsum_cascPair_fst (a : Shape) :
   rw [ENNReal.tsum_add, ← tsum_fibre_eq out₂ a]
   congr 1
   by_cases ha : dm a
-  · rw [if_pos ha]
+  · rw [ite_eq_left ha]
     refine (tsum_eq_single (sh a) fun b hb ↦ ?_).trans ?_
-    · exact if_neg fun h ↦ hb h.2.symm
-    · exact if_pos ⟨ha, rfl⟩
-  · rw [if_neg ha]
-    exact (tsum_congr fun b ↦ if_neg fun h ↦ ha h.1).trans tsum_zero
+    · exact ite_eq_right fun h ↦ hb h.2.symm
+    · exact ite_eq_left ⟨ha, rfl⟩
+  · rw [ite_eq_right ha]
+    exact (tsum_congr fun b ↦ ite_eq_right fun h ↦ ha h.1).trans tsum_zero
 
 /-- The mirror statement on the second component. -/
 lemma tsum_cascPair_snd (b : Shape) :
@@ -420,12 +420,12 @@ lemma tsum_cascPair_snd (b : Shape) :
   rw [ENNReal.tsum_add, ← tsum_fibre_eq out₁ b, add_comm]
   congr 1
   by_cases hb : dm b
-  · rw [if_pos hb]
+  · rw [ite_eq_left hb]
     refine (tsum_eq_single (sh b) fun a ha ↦ ?_).trans ?_
-    · exact if_neg fun h ↦ ha h.2.symm
-    · exact if_pos ⟨hb, rfl⟩
-  · rw [if_neg hb]
-    exact (tsum_congr fun a ↦ if_neg fun h ↦ hb h.1).trans tsum_zero
+    · exact ite_eq_right fun h ↦ ha h.2.symm
+    · exact ite_eq_left ⟨hb, rfl⟩
+  · rw [ite_eq_right hb]
+    exact (tsum_congr fun a ↦ ite_eq_right fun h ↦ hb h.1).trans tsum_zero
 
 /-- The mass a side carries splits into the part the cascade spends and the leftover. -/
 lemma tsum_split_leftover (out : Shape → ℝ≥0∞) :
@@ -451,12 +451,12 @@ lemma tsum_tsum_fibre (f : Shape → ℝ≥0∞) :
     _ = ∑' b : Shape, (if dm b then f b else 0) := by
         refine tsum_congr fun b ↦ ?_
         by_cases hb : dm b
-        · rw [if_pos hb]
+        · rw [ite_eq_left hb]
           refine (tsum_eq_single (sh b) fun a ha ↦ ?_).trans ?_
-          · exact if_neg fun h ↦ ha h.2.symm
-          · exact if_pos ⟨hb, rfl⟩
-        · rw [if_neg hb]
-          exact (tsum_congr fun a ↦ if_neg fun h ↦ hb h.1).trans tsum_zero
+          · exact ite_eq_right fun h ↦ ha h.2.symm
+          · exact ite_eq_left ⟨hb, rfl⟩
+        · rw [ite_eq_right hb]
+          exact (tsum_congr fun a ↦ ite_eq_right fun h ↦ hb h.1).trans tsum_zero
 
 /-- **The coupling read off the cascade**: with the two cascade masses satisfying
 `out + in = mass` on either side, the cascade pairs and the normalised product of the two
@@ -551,42 +551,42 @@ theorem exists_coupling_of_out (q₁ q₂ : PMF Shape)
     simp only [cascCoupling]
     rw [ENNReal.tsum_add, tsum_cascPair_fst, hclos₁ a, ← hout₁ a, leftover]
     by_cases ha : dm a
-    · rw [if_pos ha, if_pos ha, add_zero]
-    · rw [if_neg ha, if_neg ha, zero_add, add_comm]
+    · rw [ite_eq_left ha, ite_eq_left ha, add_zero]
+    · rw [ite_eq_right ha, ite_eq_right ha, zero_add, add_comm]
   have hmarg₂ : ∀ b : Shape, ∑' a : Shape, cascCoupling dm sh out₁ out₂ (a, b) = q₂ b := by
     intro b
     simp only [cascCoupling]
     rw [ENNReal.tsum_add, tsum_cascPair_snd, hclos₂ b, ← hout₂ b, leftover]
     by_cases hb : dm b
-    · rw [if_pos hb, if_pos hb, add_zero]
-    · rw [if_neg hb, if_neg hb, zero_add, add_comm]
+    · rw [ite_eq_left hb, ite_eq_left hb, add_zero]
+    · rw [ite_eq_right hb, ite_eq_right hb, zero_add, add_comm]
   have htotal : ∑' p : Shape × Shape, cascCoupling dm sh out₁ out₂ p = 1 := by
     rw [ENNReal.tsum_prod', ← q₁.tsum_coe]
     exact tsum_congr hmarg₁
   refine ⟨⟨cascCoupling dm sh out₁ out₂, htotal ▸ ENNReal.summable.hasSum⟩, fun a ↦ ?_,
     fun b ↦ ?_, fun p hp ↦ ?_, fun a ha ↦ ?_, fun b hb ↦ ?_⟩
-  · rw [margFst]
+  · show ∑' b : Shape, cascCoupling dm sh out₁ out₂ (a, b) = q₁ a
     exact hmarg₁ a
-  · rw [margSnd]
+  · show ∑' a : Shape, cascCoupling dm sh out₁ out₂ (a, b) = q₂ b
     exact hmarg₂ b
   · by_cases h1 : dm p.1 ∧ sh p.1 = p.2
     · exact Or.inl h1
     by_cases h2 : dm p.2 ∧ sh p.2 = p.1
     · exact Or.inr (Or.inl h2)
     have hcp : cascPair dm sh out₁ out₂ p = 0 := by
-      rw [cascPair, if_neg h1, if_neg h2, add_zero]
+      rw [cascPair, ite_eq_right h1, ite_eq_right h2, add_zero]
     have hlft : leftover dm out₁ p.1 * leftover dm out₂ p.2 / leftoverTot dm out₁ ≠ 0 := by
       intro h0
       exact hp (show cascCoupling dm sh out₁ out₂ p = 0 by rw [cascCoupling, hcp, h0, zero_add])
     refine Or.inr (Or.inr ⟨fun hd ↦ hlft ?_, fun hd ↦ hlft ?_⟩)
-    · rw [show leftover dm out₁ p.1 = 0 by rw [leftover, if_pos hd], zero_mul,
+    · rw [show leftover dm out₁ p.1 = 0 by rw [leftover, ite_eq_left hd], zero_mul,
         ENNReal.zero_div]
-    · rw [show leftover dm out₂ p.2 = 0 by rw [leftover, if_pos hd], mul_zero,
+    · rw [show leftover dm out₂ p.2 = 0 by rw [leftover, ite_eq_left hd], mul_zero,
         ENNReal.zero_div]
-  · calc out₁ a = (if dm a ∧ sh a = sh a then out₁ a else 0) := (if_pos ⟨ha, rfl⟩).symm
+  · calc out₁ a = (if dm a ∧ sh a = sh a then out₁ a else 0) := (ite_eq_left ⟨ha, rfl⟩).symm
       _ ≤ cascPair dm sh out₁ out₂ (a, sh a) := le_self_add
       _ ≤ cascCoupling dm sh out₁ out₂ (a, sh a) := le_self_add
-  · calc out₂ b = (if dm b ∧ sh b = sh b then out₂ b else 0) := (if_pos ⟨hb, rfl⟩).symm
+  · calc out₂ b = (if dm b ∧ sh b = sh b then out₂ b else 0) := (ite_eq_left ⟨hb, rfl⟩).symm
       _ ≤ cascPair dm sh out₁ out₂ (sh b, b) := le_add_self
       _ ≤ cascCoupling dm sh out₁ out₂ (sh b, b) := le_self_add
 
@@ -603,8 +603,8 @@ noncomputable def sideMass (q₁ q₂ : PMF Shape) (p : Bool × Shape) : ℝ≥0
 lemma sideMass_ne_top (q₁ q₂ : PMF Shape) (p : Bool × Shape) : sideMass q₁ q₂ p ≠ ⊤ := by
   rw [sideMass]
   by_cases hp : p.1 = true
-  · rw [if_pos hp]; exact PMF.apply_ne_top _ _
-  · rw [if_neg hp]; exact PMF.apply_ne_top _ _
+  · rw [ite_eq_left hp]; exact PMF.apply_ne_top _ _
+  · rw [ite_eq_right hp]; exact PMF.apply_ne_top _ _
 
 @[simp] lemma sideMass_false (q₁ q₂ : PMF Shape) (a : Shape) :
     sideMass q₁ q₂ (false, a) = q₁ a := by
@@ -769,17 +769,17 @@ noncomputable def shrinkShape (s : ℕ) (σ : Shape) : Shape :=
 
 lemma supported_shrinkShape {s : ℕ} (hs : 1 ≤ s) (σ : Shape) :
     Shape.Supported (shrinkShape s σ) := by
-  rw [shrinkShape, dif_pos hs]
+  rw [shrinkShape, dite_eq_left hs]
   exact (markedQI_shape_shrink hs σ).choose_spec.1
 
 lemma size_shrinkShape_le {s : ℕ} (hs : 1 ≤ s) (σ : Shape) :
     (shrinkShape s σ).size ≤ 16 * (σ.size / s + 1) := by
-  rw [shrinkShape, dif_pos hs]
+  rw [shrinkShape, dite_eq_left hs]
   exact (markedQI_shape_shrink hs σ).choose_spec.2.1
 
 lemma markedQI_shrinkShape {s : ℕ} (hs : 1 ≤ s) (σ : Shape) :
     MarkedQI (2592 * (s : ℝ) ^ 2) (shapeSpace σ) (shapeSpace (shrinkShape s σ)) := by
-  rw [shrinkShape, dif_pos hs]
+  rw [shrinkShape, dite_eq_left hs]
   exact (markedQI_shape_shrink hs σ).choose_spec.2.2
 
 /-! ### `eq:capacity` at the shape laws -/
@@ -835,7 +835,7 @@ theorem capacity_of_mass_bounds {q₁ q₂ : PMF Shape} {p c : ℝ} {n₀ s N : 
       (ENNReal.tsum_le_tsum fun y ↦ ?_)
     by_cases hy : N < y.size ∧ shrinkShape s y = a
     · rw [Set.indicator_of_mem (show y ∈ {τ : Shape | N < τ.size ∧ shrinkShape s τ = a} from hy),
-        if_neg (by have := hfibsize y hy.1 hy.2; omega)]
+        ite_eq_right (by have := hfibsize y hy.1 hy.2; omega)]
     · rw [Set.indicator_of_notMem
         (show y ∉ {τ : Shape | N < τ.size ∧ shrinkShape s τ = a} from hy)]
       exact zero_le

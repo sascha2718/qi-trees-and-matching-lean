@@ -135,8 +135,8 @@ lemma measurable_readLab [MeasurableSpace V] (h : ℕ) :
   | zero => exact measurable_pi_apply []
   | succ h ih =>
       refine Measurable.prodMk (measurable_pi_apply []) (Measurable.prodMk ?_ ?_)
-      · exact ih.comp (measurable_pi_lambda _ (fun t => measurable_pi_apply (false :: t)))
-      · exact ih.comp (measurable_pi_lambda _ (fun t => measurable_pi_apply (true :: t)))
+      · exact ih.comp (Measurable.of_eval (fun t => measurable_pi_apply (false :: t)))
+      · exact ih.comp (Measurable.of_eval (fun t => measurable_pi_apply (true :: t)))
 
 /-- **The pushforward law**: reading a level-`h` labelling out of an i.i.d.
 labelling of the tree vertices has law `μ_h = fullMu μ h`. Proved by singleton

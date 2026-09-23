@@ -85,12 +85,13 @@ theorem starA_bound {V : Type*} {α : ℝ} (hα : 0 ≤ α)
         · simp
         · by_cases hv : μ v = 0
           · simp [hv]
-          · rw [if_neg hvo, if_neg hvo]
+          · rw [ite_eq_right hvo, ite_eq_right hvo]
             have hco : compat G v o := Or.inr (G.adj_symm (hstar v hv hvo))
             have hle : μ o ≤ rE μ (compat G) v := by
               rw [rE]
-              calc μ o = if compat G v o then μ o else 0 := (if_pos hco).symm
-                _ ≤ ∑' w, if compat G v w then μ w else 0 := ENNReal.le_tsum o
+              calc μ o = if compat G v o then μ o else 0 := (ite_eq_left hco).symm
+                _ ≤ ∑' w, if compat G v w then μ w else 0 :=
+                    ENNReal.le_tsum (f := fun w => if compat G v w then μ w else 0) o
             have hmv : p ≤ gdeg μ G v := by
               simp only [gdeg]
               exact ENNReal.toReal_mono rE_ne_top hle

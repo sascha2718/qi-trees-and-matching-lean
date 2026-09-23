@@ -81,11 +81,11 @@ theorem survivalMeasure_retainedEvent_inter (hJN : J ≤ N) (hq : θ.extinction 
   have hAtop : ∀ i, 2 ≤ i → A' i = Set.univ := by
     intro i hi
     simp only [hA']
-    rw [if_neg (by omega), if_neg (by omega)]
+    rw [ite_eq_right (by omega), ite_eq_right (by omega)]
   have hset : retainedEvent J m ∩ (fun c ↦ bushAt c 0) ⁻¹' A
       = {c | 2 ≤ skeletonDegree c} ∩ {c | ∀ i, i < skeletonDegree c → bushAt c i ∈ A' i} := by
     ext c
-    simp only [retainedEvent, Set.mem_inter_iff, Set.mem_setOf_eq, Set.mem_preimage, hA']
+    simp only [retainedEvent, Set.mem_inter_iff, Set.mem_ofPred_eq, Set.mem_preimage, hA']
     constructor
     · rintro ⟨⟨h2, hr⟩, hA0⟩
       refine ⟨h2, fun i _ ↦ ?_⟩
@@ -117,7 +117,7 @@ lemma tailGe_two_pos (hq : θ.extinction < 1) (hJ2 : 2 ≤ J) (hθJ : 0 < θ J) 
     · exact (θ.reduced hq).nonneg k
     · exact le_rfl
   have hterm : (if 2 ≤ J then (θ.reduced hq) J else 0) = θ.skeletonWeight J := by
-    rw [if_pos hJ2, BranchingProcess.Offspring.reduced_apply]
+    rw [ite_eq_left hJ2, BranchingProcess.Offspring.reduced_apply]
   calc (0 : ℝ) < θ.skeletonWeight J := hpos
     _ = if 2 ≤ J then (θ.reduced hq) J else 0 := hterm.symm
     _ ≤ (θ.reduced hq).tailGe 2 :=
@@ -145,7 +145,7 @@ second surviving subtree has a retained root. -/
 theorem ae_exists_retained_vertex (hJN : J ≤ N) (hq : θ.extinction < 1) (hJ : 24 ≤ J)
     (hθJ : 7 / 8 ≤ θ J) :
     ∀ᵐ c ∂survivalMeasure (N := N) θ, ∃ y ∈ sample c, RetainedInf J (J / 2 + 1) c y := by
-  haveI := BranchingProcess.isProbabilityMeasure_survivalMeasure (N := N) θ hJN hq
+  have := BranchingProcess.isProbabilityMeasure_survivalMeasure (N := N) θ hJN hq
   have hp : ENNReal.ofReal ((θ.reduced hq).tailGe 2)
       * survivalMeasure (N := N) θ {d : GWord N → ℕ | RetainedInf J (J / 2 + 1) d []} ≠ 0 := by
     refine mul_ne_zero (ENNReal.ofReal_pos.2 (tailGe_two_pos θ hq (by omega) (by linarith))).ne' ?_
@@ -162,7 +162,7 @@ theorem ae_exists_retained_vertex (hJN : J ≤ N) (hq : θ.extinction < 1) (hJ :
   obtain ⟨h2, hr⟩ := hk
   obtain ⟨hx, -, hxeq⟩ := neckVertex_spec hsurv k
   have hxs : neckVertex c k ∈ sample c := BranchingProcess.skeleton_subset_sample _ hx
-  simp only [Set.mem_setOf_eq] at h2 hr
+  simp only [Set.mem_ofPred_eq] at h2 hr
   rw [hxeq] at h2 hr
   obtain ⟨_, i₁, -, -, hi₁, -, hb₁⟩ := exists_two_skeleton_children h2
   rw [hb₁, ambSub_ambSub] at hr
@@ -216,11 +216,11 @@ def spineEvent (J m : ℕ) : Set (GWord N → ℕ) :=
   {c | c [] = J ∧ RetainedInf J m (fun w ↦ c (⟨1, by omega⟩ :: w)) []}
 
 lemma measurable_spineShift : Measurable (spineShift (N := N) hN) :=
-  measurable_pi_lambda _ fun _ ↦ measurable_pi_apply _
+  Measurable.of_eval fun _ ↦ measurable_pi_apply _
 
 lemma measurableSet_spineEvent (J m : ℕ) : MeasurableSet (spineEvent (N := N) hN J m) := by
   have hshift : Measurable fun c : GWord N → ℕ ↦ fun w ↦ c (⟨1, by omega⟩ :: w) :=
-    measurable_pi_lambda _ fun _ ↦ measurable_pi_apply _
+    Measurable.of_eval fun _ ↦ measurable_pi_apply _
   exact (BranchingProcess.measurableSet_coord_eq [] J).inter
     (hshift (BranchingProcess.measurableSet_retainedInf []))
 
@@ -250,7 +250,7 @@ lemma split_preimage_shiftBox (A : Set (GWord N → ℕ)) :
   constructor
   · intro h
     have h0 := h (some ⟨0, by omega⟩)
-    rw [shiftBox_some, if_pos rfl] at h0
+    rw [shiftBox_some, ite_eq_left rfl] at h0
     exact h0
   · intro h i
     cases i with
@@ -258,10 +258,10 @@ lemma split_preimage_shiftBox (A : Set (GWord N → ℕ)) :
     | some i =>
         rw [shiftBox_some]
         by_cases h0 : i = ⟨0, by omega⟩
-        · rw [if_pos h0]
+        · rw [ite_eq_left h0]
           subst h0
           exact h
-        · rw [if_neg h0]
+        · rw [ite_eq_right h0]
           exact Set.mem_univ _
 
 /-- **The shift preserves the law**: the subtree at the first child is again a sample, by
@@ -281,7 +281,7 @@ theorem sampleMeasure_spineShift_preimage {A : Set (GWord N → ℕ)} (hA : Meas
     (MeasurableSet.univ_pi (measurableSet_shiftBox hN hA)), BranchingProcess.map_split,
     ← Finset.coe_univ, Measure.infinitePi_pi _ (fun i _ ↦ measurableSet_shiftBox hN hA i),
     Fintype.prod_option, show shiftBox hN A none = Set.univ from rfl, measure_univ, one_mul,
-    Finset.prod_congr rfl fun i _ ↦ hfac i, Finset.prod_ite_eq', if_pos (Finset.mem_univ _)]
+    Finset.prod_congr rfl fun i _ ↦ hfac i, Finset.prod_ite_eq', ite_eq_left (Finset.mem_univ _)]
 
 /-- The product event: the root has `J` children, the subtree at the first child lies in
 `A`, and the root of the subtree at the second child is retained. -/
@@ -315,13 +315,13 @@ lemma split_preimage_spineBox {m : ℕ} (A : Set (GWord N → ℕ)) :
   have hab : (⟨1, by omega⟩ : Fin N) ≠ ⟨0, by omega⟩ := by simp
   ext c
   simp only [Set.mem_preimage, Set.mem_univ_pi, spineEvent, Set.mem_inter_iff,
-    Set.mem_setOf_eq]
+    Set.mem_ofPred_eq]
   constructor
   · intro h
     have h0 := h (some ⟨0, by omega⟩)
     have h1 := h (some ⟨1, by omega⟩)
-    rw [spineBox_some, if_pos rfl] at h0
-    rw [spineBox_some, if_neg hab, if_pos rfl] at h1
+    rw [spineBox_some, ite_eq_left rfl] at h0
+    rw [spineBox_some, ite_eq_right hab, ite_eq_left rfl] at h1
     exact ⟨⟨h none, h1⟩, h0⟩
   · rintro ⟨⟨hroot, hret⟩, hA0⟩ i
     cases i with
@@ -329,15 +329,15 @@ lemma split_preimage_spineBox {m : ℕ} (A : Set (GWord N → ℕ)) :
     | some i =>
         rw [spineBox_some]
         by_cases h0 : i = ⟨0, by omega⟩
-        · rw [if_pos h0]
+        · rw [ite_eq_left h0]
           subst h0
           exact hA0
-        · rw [if_neg h0]
+        · rw [ite_eq_right h0]
           by_cases h1 : i = ⟨1, by omega⟩
-          · rw [if_pos h1]
+          · rw [ite_eq_left h1]
             subst h1
             exact hret
-          · rw [if_neg h1]
+          · rw [ite_eq_right h1]
             exact Set.mem_univ _
 
 /-- **`A_0` is independent of the shifted field**, with mass `θ_J p`: the splitting at the
@@ -367,15 +367,15 @@ theorem sampleMeasure_spineEvent_inter {m : ℕ} {A : Set (GWord N → ℕ)} (hA
           else 1) = 1 := by
     intro i _ hi
     rw [Finset.mem_insert, Finset.mem_singleton, not_or] at hi
-    rw [if_neg hi.1, if_neg hi.2]
+    rw [ite_eq_right hi.1, ite_eq_right hi.2]
   rw [← split_preimage_spineBox hN A, ← Measure.map_apply BranchingProcess.measurable_split
     (MeasurableSet.univ_pi (measurableSet_spineBox hN J m hA)), BranchingProcess.map_split,
     ← Finset.coe_univ, Measure.infinitePi_pi _ (fun i _ ↦ measurableSet_spineBox hN J m hA i),
     Fintype.prod_option,
     show spineBox hN J m A none = {u | u BranchingProcess.rootIdx = J} from rfl,
     BranchingProcess.infinitePi_root_apply θ J, Finset.prod_congr rfl fun i _ ↦ hfac i,
-    ← Finset.prod_subset (Finset.subset_univ _) hrest, Finset.prod_pair hab, if_pos rfl,
-    if_neg hab.symm, if_pos rfl]
+    ← Finset.prod_subset (Finset.subset_univ _) hrest, Finset.prod_pair hab, ite_eq_left rfl,
+    ite_eq_right hab.symm, ite_eq_left rfl]
   ring
 
 /-- **Every `A_n` has mass `θ_J p`.** -/
@@ -465,7 +465,7 @@ theorem sampleMeasure_spine_fail {m : ℕ} (n : ℕ) :
       have hset : {c : GWord N → ℕ | ∀ i < k + 1, (spineShift hN)^[i] c ∉ spineEvent hN J m}
           = iterFail (spineShift hN) (spineEvent hN J m) k := by
         ext c
-        rw [Set.mem_setOf_eq, mem_iterFail_iff]
+        rw [Set.mem_ofPred_eq, mem_iterFail_iff]
         exact forall_congr' fun i ↦ imp_congr_left Nat.lt_succ_iff
       rw [hset]
       exact measure_iterFail_eq (measurable_spineShift hN)
@@ -590,7 +590,7 @@ theorem ae_sampleMeasure_of_ae_survivalMeasure {P : (GWord N → ℕ) → Prop}
     ENNReal.inv_ne_zero.2 (measure_ne_top _ _)
   have h' := (mul_eq_zero.1 h).resolve_left hne
   refine measure_mono_null (fun c hc ↦ ?_) h'
-  simp only [Set.mem_setOf_eq, Classical.not_imp] at hc
+  simp only [Set.mem_ofPred_eq, Classical.not_imp] at hc
   exact ⟨hc.1, hc.2⟩
 
 end ChainClasses

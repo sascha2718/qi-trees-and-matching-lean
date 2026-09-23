@@ -56,7 +56,7 @@ noncomputable def freshC (μ : PMF V) (ν : PMF ℕ) : PMF (CState V) :=
   rw [freshC, PMF.map_apply]
   apply ENNReal.tsum_eq_zero.mpr
   intro s
-  rw [if_neg]
+  rw [ite_eq_right]
   intro h
   exact CtrC.noConfusion (congrArg Prod.snd h)
 
@@ -73,20 +73,20 @@ noncomputable def markK (μ : PMF V) (ν : PMF ℕ) (v0 : V) (a b i : ℕ) :
 lemma markK_le_two {μ : PMF V} {ν : PMF ℕ} {v0 : V} {a b i : ℕ}
     (h : val a i ≤ 2) :
     markK μ ν v0 a b i = (freshC μ ν).map fun f => ((v0, CtrC.ord b), f) := by
-  rw [markK, if_pos h]
+  rw [markK, ite_eq_left h]
 
 lemma markK_three {μ : PMF V} {ν : PMF ℕ} {v0 : V} {a b i : ℕ}
     (h : val a i = 3) :
     markK μ ν v0 a b i =
       PMF.pure ((v0, CtrC.ord 2), (v0, CtrC.ord b)) := by
-  rw [markK, if_neg (by omega), if_pos h]
+  rw [markK, ite_eq_right (by omega), ite_eq_left h]
 
 lemma markK_of_ge {μ : PMF V} {ν : PMF ℕ} {v0 : V} {a b i : ℕ}
     (h : 4 ≤ val a i) :
     markK μ ν v0 a b i =
       PMF.pure ((v0, CtrC.mark a b (i + 1)),
         (v0, CtrC.ord (val a i - val a i / 2))) := by
-  rw [markK, if_neg (by omega), if_neg (by omega)]
+  rw [markK, ite_eq_right (by omega), ite_eq_right (by omega)]
 
 /-- The composite kernel of a side with exceptional data `exc`
 (the composite reference model). -/
@@ -115,7 +115,7 @@ lemma compK_ord_exc {z : ℕ} {p : ℕ × ℕ} (hz : exc z = some p) (v : V) :
 lemma compK_ord_none_of_ge {k : ℕ} (hk : exc k = none) (h4 : 4 ≤ k) (v : V) :
     compK exc μ ν v0 (v, CtrC.ord k) =
       PMF.pure ((v0, CtrC.ord (k / 2)), (v0, CtrC.ord (k - k / 2))) := by
-  simp only [compK, hk, if_pos h4]
+  simp only [compK, hk, ite_eq_left h4]
 
 lemma compK_ord_none_three {k : ℕ} (hk : exc k = none) (h3 : k = 3) (v : V) :
     compK exc μ ν v0 (v, CtrC.ord k) =
@@ -127,8 +127,8 @@ lemma compK_ord_none_three {k : ℕ} (hk : exc k = none) (h3 : k = 3) (v : V) :
 lemma compK_ord_none_le_two {k : ℕ} (hk : exc k = none) (h2 : k ≤ 2) (v : V) :
     compK exc μ ν v0 (v, CtrC.ord k) =
       prodPMF (freshC μ ν) (freshC μ ν) := by
-  simp only [compK, hk, if_neg (by omega : ¬ 4 ≤ k),
-    if_neg (by omega : ¬ k = 3)]
+  simp only [compK, hk, ite_eq_right (by omega : ¬ 4 ≤ k),
+    ite_eq_right (by omega : ¬ k = 3)]
 
 /-- The fresh subtree law of the side. -/
 noncomputable def cT (h : ℕ) : PMF (FullLab (CState V) h) :=

@@ -20,7 +20,7 @@ theorem ae_reduced_skelBounded (θ : Offspring J) (hJN : J ≤ N)
     ∀ᵐ c ∂survivalMeasure (N := N) θ, Profile.SkelBounded J (gArityAt c) := by
   refine ae_all_iff.mpr fun u => ?_
   rw [ae_iff]
-  simpa only [gCompat_iff_mem_sample, Set.mem_setOf_eq, Classical.not_imp] using
+  simpa only [gCompat_iff_mem_sample, Set.mem_ofPred_eq, Classical.not_imp] using
     survivalMeasure_compat_bad_null θ hJN hq hs1 hJ2 u
 
 /-- The original chain sample has finite bare-neck pieces and bounded reduced arities. -/
@@ -45,14 +45,14 @@ theorem chain_general_ae (θ : Offspring J) (hJN : J ≤ N) (hθ0 : θ 0 = 0)
     ∀ᵐ cc ∂((survivalMeasure (N := N) θ).prod (survivalMeasure (N := N') θ')),
       BranchingProcess.QuasiIsometric (wordGraphN (· ∈ sample cc.1))
         (wordGraphN (· ∈ sample cc.2)) := by
-  haveI : NeZero N := ⟨by omega⟩
-  haveI : NeZero N' := ⟨by omega⟩
+  have : NeZero N := ⟨by omega⟩
+  have : NeZero N' := ⟨by omega⟩
   have hq := extinction_lt_one_of_chain θ hθ0
   have hq' := extinction_lt_one_of_chain θ' hθ0'
-  haveI := BranchingProcess.isProbabilityMeasure_survivalMeasure (N := N) θ hJN hq
-  haveI := BranchingProcess.isProbabilityMeasure_survivalMeasure (N := N') θ' hJN' hq'
-  haveI := isProbabilityMeasure_labelMeasure (N' := N') θ' hJN' hq'
-  haveI : IsProbabilityMeasure (directChainMeasure (N := N) (N' := N') θ θ') :=
+  have := BranchingProcess.isProbabilityMeasure_survivalMeasure (N := N) θ hJN hq
+  have := BranchingProcess.isProbabilityMeasure_survivalMeasure (N := N') θ' hJN' hq'
+  have := isProbabilityMeasure_labelMeasure (N' := N') θ' hJN' hq'
+  have : IsProbabilityMeasure (directChainMeasure (N := N) (N' := N') θ θ') :=
     inferInstanceAs (IsProbabilityMeasure ((survivalMeasure (N := N) θ).prod
       (labelMeasure (N' := N') θ')))
   obtain ⟨C, C', hmatch⟩ := exists_direct_chain_match θ hJN hθ0 hθ1 hθ1' hJ2 hθJ θ'
@@ -96,7 +96,7 @@ theorem chain_general_ae (θ : Offspring J) (hJN : J ≤ N) (hθ0 : θ 0 = 0)
           (IsGBushySample ω.2.1 ∧ (∀ v, 1 ≤ ω.2.1 v) ∧ Profile.SkelBounded J' (gArityAt ω.2.1)))} := by
       intro ω hω
       by_contra hcon
-      simp only [Set.mem_union, Set.mem_compl_iff, Set.mem_setOf_eq, not_or, not_not] at hcon
+      simp only [Set.mem_union, Set.mem_compl_iff, Set.mem_ofPred_eq, not_or, not_not] at hcon
       obtain ⟨hm, ⟨hc, hp, hs⟩, ⟨hc', hp', hs'⟩⟩ := hcon
       obtain ⟨F, hF⟩ := sample_qi_of_direct_chain_match C C' hc hc' hp hp' hs hs'
         (by omega) (by omega) hθ1 hθ1' hθ1'₀ hθ1'' (by omega) hgD ω.2.2 hm

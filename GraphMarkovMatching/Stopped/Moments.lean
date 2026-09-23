@@ -46,8 +46,8 @@ lemma wZero_le_moment {α : ℝ} (s : I) (D : Set I) (u : I) (h : ℕ) :
   unfold wZero
   refine ENNReal.tsum_le_tsum fun x => ?_
   by_cases hx : M.ZeroEv D h x
-  · rw [if_pos hx]
-  · rw [if_neg hx, mul_zero]
+  · rw [ite_eq_left hx]
+  · rw [ite_eq_right hx, mul_zero]
     exact zero_le
 
 /-- The weighted zero integral is at most `1 + α P_h(s,u)`. -/
@@ -61,8 +61,8 @@ lemma W_eq_ite (α : ℝ) (u : I) (h : ℕ) (x : FullLab (I × V) h) :
     M.W α u h x
       = (if rE (M.rho u h) (M.sim h) x = 0 then 0 else (rE (M.rho u h) (M.sim h) x) ^ (-α)) := by
   by_cases h0 : rE (M.rho u h) (M.sim h) x = 0
-  · rw [if_pos h0, W, WresD, if_pos h0]
-  · rw [if_neg h0, W, rE_rpow_neg_eq_WresD _ _ _ h0]
+  · rw [ite_eq_left h0, W, WresD, ite_eq_left h0]
+  · rw [ite_eq_right h0, W, rE_rpow_neg_eq_WresD _ _ _ h0]
 
 /-- **The weighted union bound** (`eq:zero-union-moment`): the probability union bound is
 applied to the constant part of the weight only, the potential part is integrated once. -/
@@ -77,15 +77,15 @@ lemma wUnion_le {α : ℝ} (hα : 1 ≤ α) (s : I) (D : Set I) (u : I) (h : ℕ
     unfold wUnion
     refine tsum_congr fun x => ?_
     by_cases hx : M.UnionEv D h x
-    · rw [if_pos hx, if_pos (show x ∈ {x | M.UnionEv D h x} from hx), W_eq_ite]
-    · rw [if_neg hx, if_neg (show x ∉ {x | M.UnionEv D h x} from hx)]
+    · rw [ite_eq_left hx, ite_eq_left (show x ∈ {x | M.UnionEv D h x} from hx), W_eq_ite]
+    · rw [ite_eq_right hx, ite_eq_right (show x ∉ {x | M.UnionEv D h x} from hx)]
   have hU : M.unionMass s D h
       = ∑' x, M.rho s h x * (if x ∈ {x | M.UnionEv D h x} then 1 else 0) := by
     unfold unionMass
     refine tsum_congr fun x => ?_
     by_cases hx : M.UnionEv D h x
-    · rw [if_pos hx, if_pos (show x ∈ {x | M.UnionEv D h x} from hx)]
-    · rw [if_neg hx, if_neg (show x ∉ {x | M.UnionEv D h x} from hx)]
+    · rw [ite_eq_left hx, ite_eq_left (show x ∈ {x | M.UnionEv D h x} from hx)]
+    · rw [ite_eq_right hx, ite_eq_right (show x ∉ {x | M.UnionEv D h x} from hx)]
   have hP : ∑' x, M.rho s h x * (if x ∈ {x | M.UnionEv D h x} then
           (if rE (M.rho u h) (M.sim h) x = 0 then 0
             else phiE α (1 - (rE (M.rho u h) (M.sim h) x).toReal)) else 0)
@@ -94,11 +94,11 @@ lemma wUnion_le {α : ℝ} (hα : 1 ≤ α) (s : I) (D : Set I) (u : I) (h : ℕ
     refine ENNReal.tsum_le_tsum fun x => ?_
     refine mul_le_mul_right ?_ _
     by_cases hx : x ∈ {x | M.UnionEv D h x}
-    · rw [if_pos hx]
+    · rw [ite_eq_left hx]
       by_cases h0 : rE (M.rho u h) (M.sim h) x = 0
-      · rw [if_pos h0, if_pos h0]
-      · rw [if_neg h0, if_neg h0, toReal_rE_eq, sub_sub_cancel]
-    · rw [if_neg hx]
+      · rw [ite_eq_left h0, ite_eq_left h0]
+      · rw [ite_eq_right h0, ite_eq_right h0, toReal_rE_eq, sub_sub_cancel]
+    · rw [ite_eq_right hx]
       exact zero_le
   rw [hL, hU]
   exact key.trans (add_le_add_right (mul_le_mul_right hP _) _)
@@ -121,7 +121,7 @@ lemma WresD_childMix_le {α : ℝ} (hα : 0 ≤ α) (Sel : Selection M) (t : I) 
       ≤ ∑ j ∈ Sel.J t, (M.π t j) ^ (-α)
           * WresD α (prodPMF (M.rho j.1 h) (M.rho j.2 h)) (SquareRel (M.sim h)) p := by
   by_cases hbar : rE (M.childMix t h) (SquareRel (M.sim h)) p = 0
-  · rw [WresD, if_pos hbar]
+  · rw [WresD, ite_eq_left hbar]
     exact zero_le
   · obtain ⟨j, hj, hjpos⟩ := Sel.positive t h p hp1 hp2 hbar
     have hπ : M.π t j ≠ 0 := Sel.charged t j hj
@@ -155,7 +155,7 @@ lemma R_zero_of_delta_zero (hδ : M.delta = 0) {v : V} (hv : M.μ v ≠ 0) : M.R
   rw [delta, qE, ENNReal.tsum_eq_zero] at hδ
   by_contra hR
   have := hδ v
-  rw [if_neg hR] at this
+  rw [ite_eq_right hR] at this
   exact hv this
 
 /-- When `δ = 0` every realised state is compatible with `0` (`sec:positive-degrees`). -/
@@ -189,7 +189,7 @@ lemma deg_ne_zero_of_delta_zero (hc : M.IsCompat) (hδ : M.delta = 0) :
     obtain ⟨-, hroot⟩ := (M.rho_zero_ne_zero_iff s x).mp hx'
     have hv : x.2 ∈ M.Vmu := M.rootLaw_mem_Vmu hroot
     show M.deg t 0 (leaf x) ≠ 0
-    rw [deg_zero]
+    rw [M.deg_zero t x]
     exact M.rootDeg_ne_zero hc hb0 t hv (M.R_zero_of_mem_Vmu hc hδ hv)
   | succ h ih =>
     intro s t x hx
@@ -226,7 +226,7 @@ lemma z_eq_zero_of_delta_zero (hc : M.IsCompat) (hδ : M.delta = 0) (s t : I) (h
   by_cases hx : M.rho s h x = 0
   · rw [hx, zero_mul]
   · have hd : rE (M.rho t h) (M.sim h) x ≠ 0 := M.deg_ne_zero_of_delta_zero hc hδ h s t x hx
-    rw [if_neg hd, mul_zero]
+    rw [ite_eq_right hd, mul_zero]
 
 /-- When `δ = 0` the weighted zero integrals vanish for nonempty `D`. -/
 lemma wZero_eq_zero_of_delta_zero (hc : M.IsCompat) (hδ : M.delta = 0) {α : ℝ} (s : I)
@@ -239,7 +239,7 @@ lemma wZero_eq_zero_of_delta_zero (hc : M.IsCompat) (hδ : M.delta = 0) {α : �
       intro hz
       obtain ⟨t, ht⟩ := hD
       exact M.deg_ne_zero_of_delta_zero hc hδ h s t x hx (hz t ht)
-    rw [if_neg hz, mul_zero]
+    rw [ite_eq_right hz, mul_zero]
 
 /-- When `δ = 0`, fresh positivity holds. -/
 lemma freshPositive_of_delta_zero (hc : M.IsCompat) (hδ : M.delta = 0) : M.FreshPositive :=
@@ -267,10 +267,10 @@ lemma WresD_rootLaw_forced (α : ℝ) {u : I} (hu : ¬ M.fresh u) (v : V) :
   have hr : rE (M.rootLaw u) M.R v = if M.R v M.zero then 1 else 0 := by
     rw [rootLaw_forced M hu, rE_pure]
   by_cases hv : M.R v M.zero
-  · rw [if_pos hv] at hr ⊢
+  · rw [ite_eq_left hv] at hr ⊢
     rw [← rE_rpow_neg_eq_WresD _ _ _ (by rw [hr]; exact one_ne_zero), hr, ENNReal.one_rpow]
-  · rw [if_neg hv] at hr ⊢
-    rw [WresD, if_pos hr]
+  · rw [ite_eq_right hv] at hr ⊢
+    rw [WresD, ite_eq_left hr]
 
 /-- **The incompatible-root factor**: the root-state average of the normalising weight
 over roots incompatible with `0` is at most `f` for a fresh normaliser and zero for a
@@ -279,16 +279,16 @@ lemma root_incompatible_le {α : ℝ} (hc : M.IsCompat) (s u : I) :
     ∑' v, M.rootLaw s v * (if M.R v M.zero then 0 else WresD α (M.rootLaw u) M.R v)
       ≤ if M.fresh u then M.fRoot α else 0 := by
   by_cases hu : M.fresh u
-  · rw [if_pos hu, rootLaw_fresh M hu]
+  · rw [ite_eq_left hu, rootLaw_fresh M hu]
     by_cases hs : M.fresh s
     · rw [rootLaw_fresh M hs, fRoot]
-    · rw [rootLaw_forced M hs, tsum_pure_mul, if_pos (hc.refl _)]
+    · rw [rootLaw_forced M hs, tsum_pure_mul, ite_eq_left (hc.refl _)]
       exact zero_le
-  · rw [if_neg hu]
+  · rw [ite_eq_right hu]
     refine le_of_eq (ENNReal.tsum_eq_zero.mpr fun v => ?_)
     by_cases hv : M.R v M.zero
-    · rw [if_pos hv, mul_zero]
-    · rw [if_neg hv, WresD_rootLaw_forced M α hu, if_neg hv, mul_zero]
+    · rw [ite_eq_left hv, mul_zero]
+    · rw [ite_eq_right hv, WresD_rootLaw_forced M α hu, ite_eq_right hv, mul_zero]
 
 /-- **The compatible-root factor**: the root-state average of the normalising weight over
 roots compatible with `0` is at most `R_μ`, for every source and normalising type. -/
@@ -300,14 +300,14 @@ lemma root_compatible_le {α : ℝ} (hc : M.IsCompat) (s u : I) :
     by_cases hs : M.fresh s
     · rw [rootLaw_fresh M hs]
       exact le_trans (le_max_right _ _) (le_max_right _ _)
-    · rw [rootLaw_forced M hs, tsum_pure_mul, if_pos (hc.refl _)]
+    · rw [rootLaw_forced M hs, tsum_pure_mul, ite_eq_left (hc.refl _)]
       exact le_trans (le_max_left _ _) (le_max_right _ _)
   · calc ∑' v, M.rootLaw s v * (if M.R v M.zero then WresD α (M.rootLaw u) M.R v else 0)
         ≤ ∑' v, M.rootLaw s v := by
           refine ENNReal.tsum_le_tsum fun v => ?_
           by_cases hv : M.R v M.zero
-          · rw [if_pos hv, WresD_rootLaw_forced M α hu, if_pos hv, mul_one]
-          · rw [if_neg hv, mul_zero]
+          · rw [ite_eq_left hv, WresD_rootLaw_forced M α hu, ite_eq_left hv, mul_one]
+          · rw [ite_eq_right hv, mul_zero]
             exact zero_le
       _ = 1 := (M.rootLaw s).tsum_coe
       _ ≤ M.RmuC α := M.one_le_RmuC α
@@ -330,12 +330,12 @@ lemma W_succ (α : ℝ) (u : I) (h : ℕ) (s : I × V)
   · have hz : rE (M.rho u (h + 1)) (M.sim (h + 1)) (branch s p) = 0 := by
       rw [hd, h1, zero_mul]
     unfold W WresD
-    rw [if_pos hz, if_pos h1, zero_mul]
+    rw [ite_eq_left hz, ite_eq_left h1, zero_mul]
   · by_cases h2 : rE (M.childMix u h) (SquareRel (M.sim h)) p = 0
     · have hz : rE (M.rho u (h + 1)) (M.sim (h + 1)) (branch s p) = 0 := by
         rw [hd, h2, mul_zero]
       unfold W WresD
-      rw [if_pos hz, if_pos h2, mul_zero]
+      rw [ite_eq_left hz, ite_eq_left h2, mul_zero]
     · have hz : rE (M.rho u (h + 1)) (M.sim (h + 1)) (branch s p) ≠ 0 := by
         rw [hd]
         exact mul_ne_zero h1 h2
@@ -349,9 +349,9 @@ lemma rootLaw_incompatible_le (hc : M.IsCompat) (s : I) :
   · rw [rootLaw_fresh M hs, delta, qE]
     refine le_of_eq (tsum_congr fun v => ?_)
     by_cases hv : M.R v M.zero
-    · rw [if_pos hv, mul_zero, if_pos (hc.symm _ _ hv)]
-    · rw [if_neg hv, mul_one, if_neg (fun h => hv (hc.symm _ _ h))]
-  · rw [rootLaw_forced M hs, tsum_pure_mul, if_pos (hc.refl _)]
+    · rw [ite_eq_left hv, mul_zero, ite_eq_left (hc.symm _ _ hv)]
+    · rw [ite_eq_right hv, mul_one, ite_eq_right (fun h => hv (hc.symm _ _ h))]
+  · rw [rootLaw_forced M hs, tsum_pure_mul, ite_eq_left (hc.refl _)]
     exact zero_le
 
 end Model

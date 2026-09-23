@@ -62,7 +62,7 @@ lemma remSize_eq (t : Tri) : remSize s t = if IsCut s t then 0 else rawSize s t 
 
 /-- An uncut vertex passes up everything it has accumulated. -/
 lemma remSize_of_not_isCut {t : Tri} (h : ¬ IsCut s t) : remSize s t = rawSize s t := by
-  rw [remSize_eq, if_neg h]
+  rw [remSize_eq, ite_eq_right h]
 
 /-- The remainder of an uncut vertex is below `s`. -/
 lemma rawSize_lt_of_not_isCut {t : Tri} (h : ¬ IsCut s t) : rawSize s t < s :=
@@ -147,10 +147,10 @@ lemma part_concat (T : Tri) (u : Word) (a : Bool) :
     List.nil_append, List.singleton_append, partRev, List.reverse_reverse]
 
 lemma part_of_isCut {T : Tri} {u : Word} {a : Bool} (h : IsCut s (subAt T (u ++ [a]))) :
-    part s T (u ++ [a]) = u ++ [a] := by rw [part_concat, if_pos h]
+    part s T (u ++ [a]) = u ++ [a] := by rw [part_concat, ite_eq_left h]
 
 lemma part_of_not_isCut {T : Tri} {u : Word} {a : Bool} (h : ¬ IsCut s (subAt T (u ++ [a]))) :
-    part s T (u ++ [a]) = part s T u := by rw [part_concat, if_neg h]
+    part s T (u ++ [a]) = part s T u := by rw [part_concat, ite_eq_right h]
 
 /-- The part root is an ancestor. -/
 lemma part_prefix (T : Tri) : ∀ w : Word, part s T w <+: w := by
@@ -325,6 +325,7 @@ open Tri
 variable (s : ℕ) (T : Tri)
 
 /-- A vertex of the contracted tree: an address topping its own part. -/
+@[implicit_reducible]
 def PartVert : Type := {w : Word // T.IsAddr w ∧ part s T w = w}
 
 variable {s T}
@@ -405,7 +406,7 @@ theorem partGraph_connected : (partGraph s T).Connected := by
             simp only [contract_val]
             omega
           exact (ih _ hlen).trans (Adj.reachable (adj_contract_dropLast hua' hu))
-  haveI : Nonempty (PartVert s T) := ⟨rootPart⟩
+  have : Nonempty (PartVert s T) := ⟨rootPart⟩
   exact ⟨fun p q => (key p.1.length p le_rfl).symm.trans (key q.1.length q le_rfl)⟩
 
 /-- The metric of the contracted tree. -/
@@ -539,6 +540,7 @@ theorem treeDist_le_contract (hs : 1 ≤ s) (x y : {w : Word // T.IsAddr w}) :
 
 /-- The contracted tree as a marked metric space: the root part is the entry
 and the part of the exit is the mark. -/
+@[implicit_reducible]
 noncomputable def partSpace (s : ℕ) {T : Tri} {e : Word} (he : T.IsAddr e) : MarkedSpace where
   carrier := PartVert s T
   entry := rootPart

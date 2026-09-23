@@ -110,24 +110,24 @@ noncomputable def rootDeg (t : I) (v : V) : ℝ≥0∞ := rE (M.rootLaw t) M.R v
 
 /-! ### The recursion of the laws -/
 
-lemma rootLaw_fresh {t : I} (ht : M.fresh t) : M.rootLaw t = M.μ := if_pos ht
+lemma rootLaw_fresh {t : I} (ht : M.fresh t) : M.rootLaw t = M.μ := ite_eq_left ht
 
-lemma rootLaw_forced {t : I} (ht : ¬ M.fresh t) : M.rootLaw t = PMF.pure M.zero := if_neg ht
+lemma rootLaw_forced {t : I} (ht : ¬ M.fresh t) : M.rootLaw t = PMF.pure M.zero := ite_eq_right ht
 
 lemma rootT_apply (t : I) (s : I × V) :
     M.rootT t s = if s.1 = t then M.rootLaw t s.2 else 0 := by
   rw [rootT, PMF.map_apply]
   by_cases hs : s.1 = t
-  · rw [if_pos hs]
+  · rw [ite_eq_left hs]
     refine (tsum_congr fun v => ?_).trans (tsum_ite_eq s.2 (M.rootLaw t))
     congr 1
     apply propext
     constructor
     · intro h; rw [h]
     · intro h; rw [h, ← hs]
-  · rw [if_neg hs]
+  · rw [ite_eq_right hs]
     refine ENNReal.tsum_eq_zero.mpr fun v => ?_
-    rw [if_neg]
+    rw [ite_eq_right]
     intro h
     exact hs (by rw [h])
 
@@ -185,9 +185,9 @@ lemma rootLab_of_rho_ne_zero {t : I} {h : ℕ} {x : FullLab (I × V) h}
   have h2 : muM M.kernel s h x ≠ 0 := right_ne_zero_of_mul hs
   rw [rootLab_of_ne_zero M.kernel h s x h2, rootT_apply] at *
   by_cases hst : s.1 = t
-  · rw [if_pos hst] at h1
+  · rw [ite_eq_left hst] at h1
     exact ⟨hst, h1⟩
-  · rw [if_neg hst] at h1
+  · rw [ite_eq_right hst] at h1
     exact absurd rfl h1
 
 /-! ### The support of the laws -/
@@ -196,9 +196,9 @@ lemma rho_zero_ne_zero_iff (t : I) (s : I × V) :
     M.rho t 0 (leaf s) ≠ 0 ↔ s.1 = t ∧ M.rootLaw t s.2 ≠ 0 := by
   rw [rho_zero_apply, rootT_apply]
   by_cases hst : s.1 = t
-  · rw [if_pos hst]
+  · rw [ite_eq_left hst]
     exact ⟨fun h => ⟨hst, h⟩, fun h => h.2⟩
-  · rw [if_neg hst]
+  · rw [ite_eq_right hst]
     exact ⟨fun h => absurd rfl h, fun h => absurd h.1 hst⟩
 
 /-- Attaching a root is injective in both arguments (`sec:markov-proof`). -/
@@ -227,7 +227,7 @@ lemma rho_succ_apply (t : I) (h : ℕ) (s : I × V)
   · intro s' hs'
     rw [PMF.map_apply]
     refine mul_eq_zero_of_right _ (ENNReal.tsum_eq_zero.mpr fun p' => ?_)
-    rw [if_neg]
+    rw [ite_eq_right]
     intro hc
     exact hs' (branch_inj.mp hc).1.symm
 
@@ -246,9 +246,9 @@ lemma rho_succ_ne_zero_iff (t : I) (h : ℕ) (s : I × V)
     rw [prodPMF_apply, mul_ne_zero_iff, mul_ne_zero_iff]
   rw [rho_succ_apply, mul_ne_zero_iff, rootT_apply, childMix, PMF.bind_apply, hsum]
   by_cases hst : s.1 = t
-  · rw [if_pos hst]
+  · rw [ite_eq_left hst]
     exact ⟨fun h => ⟨hst, h.1, h.2⟩, fun h => ⟨h.2.1, h.2.2⟩⟩
-  · rw [if_neg hst]
+  · rw [ite_eq_right hst]
     exact ⟨fun h => absurd rfl h.1, fun h => absurd h.1 hst⟩
 
 /-- Every height-`(h+1)` labelling is a branch. -/
@@ -273,8 +273,8 @@ lemma deg_zero (u : I) (s : I × V) : M.deg u 0 (leaf s) = M.rootDeg u s.2 := by
   congr 1
   simp only [goodInd]
   by_cases hR : M.R s.2 v
-  · rw [if_pos hR, if_pos ((fullSim_leaf M.srel s (u, v)).mpr hR)]
-  · rw [if_neg hR, if_neg (fun hc => hR ((fullSim_leaf M.srel s (u, v)).mp hc))]
+  · rw [ite_eq_left hR, ite_eq_left ((fullSim_leaf M.srel s (u, v)).mpr hR)]
+  · rw [ite_eq_right hR, ite_eq_right (fun hc => hR ((fullSim_leaf M.srel s (u, v)).mp hc))]
 
 /-- **The degree recursion** (`sec:independent-root`): the degree of a branch against a
 type is the root factor at the source root state times the degree of the child pair
@@ -287,8 +287,8 @@ lemma deg_succ (u : I) (h : ℕ) (s : I × V) (p : FullLab (I × V) h × FullLab
   refine tsum_congr fun v => ?_
   rw [rE_succ_branch, pairMix_kernel, goodInd]
   by_cases hR : M.srel s (u, v)
-  · rw [if_pos hR, if_pos (show M.R s.2 v from hR), mul_one]
-  · rw [if_neg hR, if_neg (show ¬ M.R s.2 v from hR), mul_zero, zero_mul]
+  · rw [ite_eq_left hR, ite_eq_left (show M.R s.2 v from hR), mul_one]
+  · rw [ite_eq_right hR, ite_eq_right (show ¬ M.R s.2 v from hR), mul_zero, zero_mul]
 
 /-- The child-pair degree is the mixture over the target transitions of the component pair
 degrees. -/
@@ -319,7 +319,7 @@ lemma rootLaw_mem_Vmu {t : I} {v : V} (hv : M.rootLaw t v ≠ 0) : v ∈ M.Vmu :
   · rw [rootLaw_forced M ht, PMF.pure_apply] at hv
     by_cases hz : v = M.zero
     · exact Or.inr hz
-    · rw [if_neg hz] at hv
+    · rw [ite_eq_right hz] at hv
       exact absurd rfl hv
 
 /-- Every charged sample has all its states in `V_μ`. -/
@@ -357,7 +357,7 @@ lemma rootDeg_ne_zero (hc : M.IsCompat) (hb0 : rE M.μ M.R M.zero ≠ 0) (t : I)
   by_cases ht : M.fresh t
   · rw [rootDeg_fresh M ht]
     exact M.rE_mu_ne_zero hc hb0 hv
-  · rw [rootDeg_forced M ht, if_pos hv0]
+  · rw [rootDeg_forced M ht, ite_eq_left hv0]
     exact one_ne_zero
 
 /-- The root factor vanishes exactly at incompatible roots for forced targets, and a

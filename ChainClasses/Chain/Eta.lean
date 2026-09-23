@@ -68,9 +68,9 @@ lemma qE_zero_eq (ha : 0 ≤ a) (ha1 : a < 1) (hD : 2 ≤ D) :
     qE (qPMF ha ha1 hD) (compat pathGraph) 0 = ENNReal.ofReal (tailB a D 2) := by
   rw [qE, tsum_eq_zero_add' ENNReal.summable, tsum_eq_zero_add' ENNReal.summable]
   have e0 : (if compat pathGraph 0 0 then (0 : ℝ≥0∞) else qPMF ha ha1 hD 0) = 0 :=
-    if_pos (Or.inl rfl)
+    ite_eq_left (Or.inl rfl)
   have e1 : (if compat pathGraph 0 (0 + 1) then (0 : ℝ≥0∞) else qPMF ha ha1 hD (0 + 1)) = 0 :=
-    if_pos (Or.inr (by rw [pathGraph_adj]; omega))
+    ite_eq_left (Or.inr (by rw [pathGraph_adj]; omega))
   have e2 : ∀ k, (if compat pathGraph 0 (k + 1 + 1) then (0 : ℝ≥0∞)
       else qPMF ha ha1 hD (k + 1 + 1)) = ENNReal.ofReal (qF a D (k + 2)) := by
     intro k
@@ -78,7 +78,7 @@ lemma qE_zero_eq (ha : 0 ≤ a) (ha1 : a < 1) (hD : 2 ≤ D) :
       rintro (h | h)
       · omega
       · rw [pathGraph_adj] at h; omega
-    rw [if_neg hnc, qPMF_apply]
+    rw [ite_eq_right hnc, qPMF_apply]
   rw [e0, e1, zero_add, zero_add]
   simp only [e2]
   rw [← ENNReal.ofReal_tsum_of_nonneg (fun k => qF_nonneg ha ha1.le hD _)
@@ -91,12 +91,12 @@ lemma qE_one_eq (ha : 0 ≤ a) (ha1 : a < 1) (hD : 2 ≤ D) :
   rw [qE, tsum_eq_zero_add' ENNReal.summable, tsum_eq_zero_add' ENNReal.summable,
     tsum_eq_zero_add' ENNReal.summable]
   have e0 : (if compat pathGraph 1 0 then (0 : ℝ≥0∞) else qPMF ha ha1 hD 0) = 0 :=
-    if_pos (Or.inr (by rw [pathGraph_adj]; omega))
+    ite_eq_left (Or.inr (by rw [pathGraph_adj]; omega))
   have e1 : (if compat pathGraph 1 (0 + 1) then (0 : ℝ≥0∞) else qPMF ha ha1 hD (0 + 1)) = 0 :=
-    if_pos (Or.inl rfl)
+    ite_eq_left (Or.inl rfl)
   have e2 : (if compat pathGraph 1 (0 + 1 + 1) then (0 : ℝ≥0∞)
       else qPMF ha ha1 hD (0 + 1 + 1)) = 0 :=
-    if_pos (Or.inr (by rw [pathGraph_adj]; omega))
+    ite_eq_left (Or.inr (by rw [pathGraph_adj]; omega))
   have e3 : ∀ k, (if compat pathGraph 1 (k + 1 + 1 + 1) then (0 : ℝ≥0∞)
       else qPMF ha ha1 hD (k + 1 + 1 + 1)) = ENNReal.ofReal (qF a D (k + 3)) := by
     intro k
@@ -104,7 +104,7 @@ lemma qE_one_eq (ha : 0 ≤ a) (ha1 : a < 1) (hD : 2 ≤ D) :
       rintro (h | h)
       · omega
       · rw [pathGraph_adj] at h; omega
-    rw [if_neg hnc, qPMF_apply]
+    rw [ite_eq_right hnc, qPMF_apply]
   rw [e0, e1, e2, zero_add, zero_add, zero_add]
   simp only [e3]
   rw [← ENNReal.ofReal_tsum_of_nonneg (fun k => qF_nonneg ha ha1.le hD _)

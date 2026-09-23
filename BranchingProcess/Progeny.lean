@@ -120,7 +120,7 @@ theorem ofReal_pow_le_sampleMeasure_agreeOn (θ : Offspring J) {p : ℝ} {e : Wo
     ENNReal.ofReal p ^ (sample e : Set (Word N)).ncard
       ≤ sampleMeasure (N := N) θ (agreeOn e) := by
   rw [sampleMeasure_agreeOn θ hfin, Set.ncard_eq_toFinset_card _ hfin, ← Finset.prod_const]
-  refine Finset.prod_le_prod' fun v hv ↦ ENNReal.ofReal_le_ofReal (hmass v ?_)
+  refine Finset.prod_le_prod fun v hv ↦ ENNReal.ofReal_le_ofReal (hmass v ?_)
   rwa [Set.Finite.mem_toFinset] at hv
 
 /-- **`thm:shape-mass`\labelcref{it:shape-mass-point} under the sample law**: the sample
@@ -340,9 +340,9 @@ lemma measurable_progenyFactor (s : ℝ≥0∞) (k j : ℕ) (i : Option (Fin N))
   | some i =>
       rw [progenyFactor_some]
       by_cases hij : (i : ℕ) < j
-      · simp only [if_pos hij]
+      · simp only [ite_eq_left hij]
         exact Measurable.of_discrete.comp (measurable_progeny k)
-      · simp only [if_neg hij]
+      · simp only [ite_eq_right hij]
         exact measurable_const
 
 /-- The root factor is the indicator of the offspring count at the root. -/
@@ -405,9 +405,9 @@ lemma lintegral_progeny_root (θ : Offspring J) (s : ℝ≥0∞) (k : ℕ) {j : 
     by_cases hij : (i : ℕ) < j
     · have hfm : Measurable (fun d : Word N → ℕ ↦ s ^ progeny k d) :=
         Measurable.of_discrete.comp (measurable_progeny k)
-      simp only [if_pos hij]
+      simp only [ite_eq_left hij]
       rw [← lintegral_map hfm (measurable_shift i), map_shift θ i]
-    · simp only [if_neg hij]
+    · simp only [ite_eq_right hij]
       simp
   rw [← lintegral_indicator (measurableSet_root_eq j),
     lintegral_congr fun c ↦ (hprod c).symm,
@@ -583,7 +583,7 @@ lemma measurableSet_subtree_eq (F : Finset (Word N)) :
       = {T : Subtree N | (F : Set (Word N)) ⊆ (T : Set (Word N))}
         ∩ ⋂ v : Word N, ⋂ _ : v ∉ (F : Set (Word N)), {T : Subtree N | v ∈ T}ᶜ := by
     ext T
-    simp only [Set.mem_setOf_eq, Set.mem_inter_iff, Set.mem_iInter, Set.mem_compl_iff,
+    simp only [Set.mem_ofPred_eq, Set.mem_inter_iff, Set.mem_iInter, Set.mem_compl_iff,
       SetLike.mem_coe]
     constructor
     · intro hT
@@ -609,7 +609,7 @@ lemma measurableSet_ncard_eq (n : ℕ) :
         = ⋃ F : {F : Finset (Word N) // F.card = m},
             {T : Subtree N | (T : Set (Word N)) = ((F : Finset (Word N)) : Set (Word N))} := by
       ext T
-      simp only [Set.mem_setOf_eq, Set.mem_iUnion]
+      simp only [Set.mem_ofPred_eq, Set.mem_iUnion]
       constructor
       · intro hT
         have hfin : (T : Set (Word N)).Finite := by
@@ -628,7 +628,7 @@ lemma measurableSet_ncard_eq (n : ℕ) :
   · have h : {T : Subtree N | (T : Set (Word N)).ncard = 0}
         = (⋃ m : ℕ, {T : Subtree N | (T : Set (Word N)).ncard = m + 1})ᶜ := by
       ext T
-      simp only [Set.mem_setOf_eq, Set.mem_compl_iff, Set.mem_iUnion, not_exists]
+      simp only [Set.mem_ofPred_eq, Set.mem_compl_iff, Set.mem_iUnion, not_exists]
       constructor
       · intro hT m
         omega

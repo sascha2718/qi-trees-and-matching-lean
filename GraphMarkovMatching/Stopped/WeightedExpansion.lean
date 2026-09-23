@@ -112,9 +112,9 @@ private lemma branch_weight_le (hc : M.IsCompat) (hb0 : rE M.μ M.R M.zero ≠ 0
       = WresD α (M.rootLaw u) M.R v * WresD α (M.childMix u h) (SquareRel (M.sim h)) p :=
     M.W_succ α u h (s, v) p
   by_cases hv0 : M.R v M.zero
-  · rw [if_pos hv0, if_pos hv0, zero_mul, zero_add]
+  · rw [ite_eq_left hv0, ite_eq_left hv0, zero_mul, zero_add]
     by_cases hz : M.ZeroEv D (h + 1) (branch (s, v) p)
-    · rw [if_pos hz, hWs]
+    · rw [ite_eq_left hz, hWs]
       have h1 : 1 ≤ indW M (M.children D) h p := by
         rcases M.zeroEv_succ_imp hc hb0 hv hv0 hz with h1 | h2 | ⟨h3, h4⟩
         · simp only [indW, h1, ite_true]
@@ -127,9 +127,9 @@ private lemma branch_weight_le (hc : M.IsCompat) (hb0 : rE M.μ M.R M.zero ≠ 0
           ≤ WresD α (M.rootLaw u) M.R v * (selW M α Sel u h p * 1) := by
             rw [mul_one]; exact mul_le_mul_right hW _
         _ ≤ _ := mul_le_mul_right (mul_le_mul_right h1 _) _
-    · rw [if_neg hz]
+    · rw [ite_eq_right hz]
       exact zero_le
-  · rw [if_neg hv0, if_neg hv0, zero_mul, add_zero]
+  · rw [ite_eq_right hv0, ite_eq_right hv0, zero_mul, add_zero]
     refine le_trans ?_ (mul_le_mul_right hW _)
     rw [← hWs]
     split_ifs <;> simp
@@ -476,10 +476,10 @@ lemma wZero_zero_le (hc : M.IsCompat) (hb0 : rE M.μ M.R M.zero ≠ 0) {α : ℝ
     refine mul_le_mul_right ?_ _
     rw [W_zero]
     by_cases hz : M.ZeroEv D 0 (leaf (s, v))
-    · rw [if_pos hz]
+    · rw [ite_eq_left hz]
       have hv0 : ¬ M.R v M.zero := M.zeroEv_zero_imp hc hb0 hD (M.rootLaw_mem_Vmu hv) hz
-      rw [if_neg hv0]
-    · rw [if_neg hz]
+      rw [ite_eq_right hv0]
+    · rw [ite_eq_right hz]
       exact zero_le
   calc M.wZero α s D u 0 = _ := hexp
     _ ≤ ∑' v, M.rootLaw s v * (if M.R v M.zero then 0 else WresD α (M.rootLaw u) M.R v) :=

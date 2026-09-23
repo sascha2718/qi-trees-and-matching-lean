@@ -160,7 +160,7 @@ lemma survivors_card_add_dyingSet_card {d : GWord N → ℕ} (hd : d [] ≤ N) :
 
 lemma survLetter_of_lt {d : GWord N → ℕ} {j : ℕ} (h : j < (survivors d).card) :
     survLetter d j = (((survivors d).orderEmbOfFin rfl ⟨j, h⟩ : Fin N) : ℕ) := by
-  rw [survLetter, dif_pos h]
+  rw [survLetter, dite_eq_left h]
 
 lemma survLetter_mem {d : GWord N → ℕ} {j : ℕ} (h : j < (survivors d).card) :
     ∃ i ∈ survivors d, survLetter d j = (i : ℕ) :=
@@ -173,11 +173,11 @@ lemma survLetter_lt {d : GWord N → ℕ} {j : ℕ} (h : j < (survivors d).card)
 
 lemma survLetter_of_le {d : GWord N → ℕ} {j : ℕ} (h : (survivors d).card ≤ j) :
     survLetter d j = N + j := by
-  rw [survLetter, dif_neg (by omega)]
+  rw [survLetter, dite_eq_right (by omega)]
 
 lemma dyingLetter_of_lt {d : GWord N → ℕ} {m : ℕ} (h : m < (dyingSet d).card) :
     dyingLetter d m = (((dyingSet d).orderEmbOfFin rfl ⟨m, h⟩ : Fin N) : ℕ) := by
-  rw [dyingLetter, dif_pos h]
+  rw [dyingLetter, dite_eq_left h]
 
 lemma dyingLetter_mem {d : GWord N → ℕ} {m : ℕ} (h : m < (dyingSet d).card) :
     ∃ i ∈ dyingSet d, dyingLetter d m = (i : ℕ) :=
@@ -195,11 +195,11 @@ lemma letterMap_lt_iff {d : GWord N → ℕ} (hd : d [] ≤ N) (m : ℕ) :
   rw [skeletonDegree] at hsum
   rw [letterMap]
   by_cases hm : m < (dyingSet d).card
-  · rw [if_pos hm]
+  · rw [ite_eq_left hm]
     obtain ⟨i, hi, hieq⟩ := dyingLetter_mem hm
     rw [hieq]
     exact iff_of_true (mem_dyingSet.mp hi).1 (by omega)
-  · rw [if_neg hm]
+  · rw [ite_eq_right hm]
     by_cases hj : m - (dyingSet d).card < (survivors d).card
     · obtain ⟨i, hi, hieq⟩ := survLetter_mem hj
       rw [hieq]
@@ -248,13 +248,13 @@ lemma letterMap_injective (d : GWord N → ℕ) : Function.Injective (letterMap 
       have := i.isLt
       omega
   by_cases hm : m < (dyingSet d).card <;> by_cases hm' : m' < (dyingSet d).card
-  · rw [if_pos hm, if_pos hm'] at h
+  · rw [ite_eq_left hm, ite_eq_left hm'] at h
     exact hdy hm hm' h
-  · rw [if_pos hm, if_neg hm'] at h
+  · rw [ite_eq_left hm, ite_eq_right hm'] at h
     exact absurd h (hmix hm)
-  · rw [if_neg hm, if_pos hm'] at h
+  · rw [ite_eq_right hm, ite_eq_left hm'] at h
     exact absurd h.symm (hmix hm')
-  · rw [if_neg hm, if_neg hm'] at h
+  · rw [ite_eq_right hm, ite_eq_right hm'] at h
     have := hsv h
     omega
 
@@ -276,10 +276,10 @@ lemma letterMap_surj {d : GWord N → ℕ} (hd : d [] ≤ N) {j : ℕ} (hj : j <
   by_cases hs : i ∈ survivors d
   · obtain ⟨m, hm, hmeq⟩ := exists_orderEmbOfFin_eq hs
     refine ⟨(dyingSet d).card + m, by rw [skeletonDegree] at hsum; omega, ?_⟩
-    rw [letterMap, if_neg (by omega), Nat.add_sub_cancel_left, survLetter_of_lt hm, hmeq]
+    rw [letterMap, ite_eq_right (by omega), Nat.add_sub_cancel_left, survLetter_of_lt hm, hmeq]
   · have hdy : i ∈ dyingSet d := mem_dyingSet.mpr ⟨hj, hs⟩
     obtain ⟨m, hm, hmeq⟩ := exists_orderEmbOfFin_eq hdy
-    exact ⟨m, by omega, by rw [letterMap, if_pos hm, dyingLetter_of_lt hm, hmeq]⟩
+    exact ⟨m, by omega, by rw [letterMap, ite_eq_left hm, dyingLetter_of_lt hm, hmeq]⟩
 
 /-- In a dying subtree every child is a dying child and the letter map is the identity
 on the children. -/
@@ -289,7 +289,7 @@ lemma letterMap_of_not_survives {d : GWord N → ℕ} (hd : d [] ≤ N) (hfin : 
   have hdy : dyingSet d = childSet N (d []) := by rw [dyingSet, hemp, Finset.sdiff_empty]
   have hcard : (dyingSet d).card = d [] := by rw [hdy, BranchingProcess.card_childSet hd]
   have hm' : m < (dyingSet d).card := by omega
-  rw [letterMap, if_pos hm', dyingLetter_of_lt hm']
+  rw [letterMap, ite_eq_left hm', dyingLetter_of_lt hm']
   have hf : (fun x : Fin (dyingSet d).card ↦ (⟨(x : ℕ), by omega⟩ : Fin N))
       = (dyingSet d).orderEmbOfFin rfl := by
     refine Finset.orderEmbOfFin_unique rfl (fun x ↦ ?_) (fun x y hxy ↦ ?_)
@@ -487,7 +487,7 @@ lemma dyingAt_eq_ambSub {e : GWord N → ℕ} {m : ℕ} (hm : m < (dyingSet e).c
     dyingAt e m = ambSub e (unval N [dyingLetter e m]) := by
   rw [dyingLetter_of_lt hm, unval_singleton (Fin.isLt _)]
   show BranchingProcess.bushOf (dyingSet e) m e = _
-  rw [BranchingProcess.bushOf, dif_pos hm]
+  rw [BranchingProcess.bushOf, dite_eq_left hm]
   rfl
 
 /-- A dying subtree does not survive. -/
@@ -834,7 +834,7 @@ lemma transSampleN_neck {c : GWord N → ℕ} (hc : IsGBushySample c) {a : List 
       rw [neckAddr_succ hi', ← List.append_assoc, transSampleN_concat, ih, sampleLetterN_vals,
         ← ambSub_ambSub, ← neckIter_eq_ambSub_neckPath hs i, decs_gShapeRoot_getElem _ hi',
         length_gDecList_eq hN, vals_append, vals_append, vals_neckPath_succ hs i,
-        ← List.append_assoc, letterMap, if_neg (lt_irrefl _), Nat.sub_self]
+        ← List.append_assoc, letterMap, ite_eq_right (lt_irrefl _), Nat.sub_self]
 
 /-- The entry vertices lie in the sample, at the root. -/
 lemma gEntryV_mem_sample' {c : GWord N → ℕ} (hc : IsGBushySample c) {u : GWord N}
@@ -871,7 +871,7 @@ lemma transSampleN_gCopyAddr {c : GWord N → ℕ} (hc : IsGBushySample c) :
         gShapeRoot_exitAddr, transSampleN_concat, transSampleN_neck hc hih hs _ le_rfl,
         gShapeRoot_bouquet, gEntryV_concat, hred, splitPath, unval_singleton hlt,
         sampleLetterN_vals, ← ambSub_ambSub, ← neckIter_eq_ambSub_neckPath hs, ← hsf,
-        length_gDecList_eq hN, letterMap, if_neg (by omega), Nat.add_sub_cancel_left]
+        length_gDecList_eq hN, letterMap, ite_eq_right (by omega), Nat.add_sub_cancel_left]
       simp only [vals_append, vals_cons, vals_nil, List.append_assoc]
 
 /-- A vertex of a finite subtree founds a finite subtree. -/
@@ -1026,7 +1026,7 @@ lemma transSampleN_spec_bush {c : GWord N → ℕ} (hc : IsGBushySample c) {a : 
   have htrans2 : transSampleN c (a ++ neckAddr (gShapeRoot (ambSub c y₀)).decs i ++ [m₀])
       = vals (y₀ ++ neckPath (ambSub c y₀) i ++ unval N [dyingLetter (neckIter (ambSub c y₀) i) m₀]) := by
     rw [transSampleN_concat, transSampleN_neck hc ha hs i hin, sampleLetterN_vals, he1,
-      letterMap, if_pos hm₀', unval_singleton hℓlt]
+      letterMap, ite_eq_left hm₀', unval_singleton hℓlt]
     simp only [vals_append, vals_cons, vals_nil]
   have htrans : transSampleN c (a ++ (neckAddr (gShapeRoot (ambSub c y₀)).decs i ++ m₀ :: vals v))
       = vals (y₀ ++ neckPath (ambSub c y₀) i ++ unval N [dyingLetter (neckIter (ambSub c y₀) i) m₀] ++ v) := by

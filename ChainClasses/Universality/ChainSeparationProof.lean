@@ -97,14 +97,14 @@ lemma measurableSet_patEvent : MeasurableSet (patEvent hN ks L) :=
     BranchingProcess.measurable_coord v (measurableSet_singleton _)
 
 lemma patXi_ray {s : ℕ} (hs : s < L) : patXi hN ks L (zw hN s) = 1 := by
-  rw [patXi, if_neg]
+  rw [patXi, ite_eq_right]
   rintro ⟨-, h2, -⟩
   rw [zw_length] at h2
   omega
 
 lemma patXi_stack {i : ℕ} (_hi : i < ks.length) :
     patXi hN ks L (zw hN (L + i)) = ks.getD i 0 := by
-  rw [patXi, if_pos]
+  rw [patXi, ite_eq_left]
   · rw [zw_length]
     congr 1
     omega
@@ -127,11 +127,11 @@ lemma patXi_line {i : ℕ} (_hi : i < ks.length) {j : Fin N}
       rcases hv with h | h
       · omega
       · exact h
-    rw [eq_zero_letter (hN := hN) hj0, lineW_zero' hN, patXi, if_neg]
+    rw [eq_zero_letter (hN := hN) hj0, lineW_zero' hN, patXi, ite_eq_right]
     rintro ⟨-, -, h3⟩
     rw [zw_length] at h3
     omega
-  · rw [patXi, if_neg]
+  · rw [patXi, ite_eq_right]
     rintro ⟨h1, -, -⟩
     have hjmem : j ∈ lineW hN 0 L i j t := by
       rw [lineW]
@@ -405,13 +405,13 @@ lemma ae_forall_mass_pos (θ : Offspring J) :
   have hsub : {c : GWord N → ℕ | ¬ θ (c v) ≠ 0}
       ⊆ ⋃ k ∈ {k : ℕ | θ k = 0}, {c : GWord N → ℕ | c v = k} := by
     intro c hc
-    simp only [Set.mem_setOf_eq, not_not] at hc
+    simp only [Set.mem_ofPred_eq, not_not] at hc
     exact Set.mem_biUnion hc rfl
   refine measure_mono_null hsub
     ((measure_biUnion_null_iff (Set.to_countable {k : ℕ | θ k = 0})).mpr
       fun k hk => ?_)
   have hco := BranchingProcess.sampleMeasure_coord (N := N) θ v k
-  rw [hco, Set.mem_setOf_eq.mp hk]
+  rw [hco, Set.mem_ofPred_eq.mp hk]
   simp
 
 /-- The mono step for quasi-isometry constants. -/
@@ -530,9 +530,9 @@ lemma chainSeparation_side {J J' N N' : ℕ} (θ : Offspring J) (θ' : Offspring
 holds. -/
 theorem chainSeparation : ChainSeparation := by
   intro J J' N N' θ hJN hθ0 hθ1 hθ1' hJ2 hθJ θ' hJN' hθ0' hθ1'₀ hθ1'' hJ2' hθJ' hsem
-  haveI := BranchingProcess.isProbabilityMeasure_survivalMeasure (N := N) θ hJN
+  have := BranchingProcess.isProbabilityMeasure_survivalMeasure (N := N) θ hJN
     (extinction_lt_one_of_chain θ hθ0)
-  haveI := BranchingProcess.isProbabilityMeasure_survivalMeasure (N := N') θ' hJN'
+  have := BranchingProcess.isProbabilityMeasure_survivalMeasure (N := N') θ' hJN'
     (extinction_lt_one_of_chain θ' hθ0')
   by_cases hside : ∃ m, m ∈ AddSubmonoid.closure (shiftSupp θ : Set ℕ)
       ∧ m ∉ AddSubmonoid.closure (shiftSupp θ' : Set ℕ)

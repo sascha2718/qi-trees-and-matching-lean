@@ -101,7 +101,7 @@ lemma measurableSet_shapeLab_fibre [MeasurableSpace V] {ℓ : Shape → ℝ → 
   have hset : {ω : BushySample | shapeLab ℓ ω w = v}
       = ⋃ τ : Shape, {c : Amb → ℕ | shapeAt c w = τ} ×ˢ {u : Word → ℝ | ℓ τ (u w) = v} := by
     ext ω
-    simp only [Set.mem_setOf_eq, Set.mem_iUnion, Set.mem_prod, shapeLab]
+    simp only [Set.mem_ofPred_eq, Set.mem_iUnion, Set.mem_prod, shapeLab]
     constructor
     · intro h
       exact ⟨shapeAt ω.1 w, rfl, h⟩
@@ -152,10 +152,10 @@ lemma measurable_bushyXY [MeasurableSpace V] [Countable V] [MeasurableSingletonC
       (bushyX ℓ h ω, bushyY ℓ' h ω) := by
   have hfst : Measurable fun ω : BushySample × BushySample ↦
       fun s : Word ↦ shapeLab ℓ ω.1 s :=
-    measurable_pi_lambda _ fun s ↦ (measurable_shapeLab hℓ s).comp measurable_fst
+    Measurable.of_eval fun s ↦ (measurable_shapeLab hℓ s).comp measurable_fst
   have hsnd : Measurable fun ω : BushySample × BushySample ↦
       fun s : Word ↦ shapeLab ℓ' ω.2 s :=
-    measurable_pi_lambda _ fun s ↦ (measurable_shapeLab hℓ' s).comp measurable_snd
+    Measurable.of_eval fun s ↦ (measurable_shapeLab hℓ' s).comp measurable_snd
   exact ((measurable_readLab h).comp hfst).prodMk ((measurable_readLab h).comp hsnd)
 
 /-- The addresses of `𝔹_h` are prefix-closed: this is the form in which
@@ -202,7 +202,7 @@ lemma bushyMeasure_readLab [MeasurableSpace V] (θ : Offspring 2) (q : PMF V)
       = ⋂ s ∈ Vtx h, {ω : BushySample |
           shapeLab ℓ ω s = GraphMatching.coord h x s} := by
     ext ω
-    simp only [Set.mem_setOf_eq, Set.mem_iInter]
+    simp only [Set.mem_ofPred_eq, Set.mem_iInter]
     exact readLab_eq_iff h _ x
   rw [hset, hprod (Vtx h) (prefixClosed_Vtx h) (fun s ↦ GraphMatching.coord h x s),
     fullMu_apply_prod]
@@ -234,7 +234,7 @@ lemma twoBushyMeasure_map [MeasurableSpace V] [MeasurableSingletonClass V]
       = {ω : BushySample | readLab (fun s ↦ shapeLab ℓ ω s) h = x}
         ×ˢ {ω : BushySample | readLab (fun s ↦ shapeLab ℓ' ω s) h = y} := by
     ext ω
-    simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_prod, Set.mem_setOf_eq,
+    simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_prod, Set.mem_ofPred_eq,
       Prod.mk.injEq, bushyX, bushyY]
   rw [hpre, twoBushyMeasure, Measure.prod_prod, bushyMeasure_readLab θ q hprod h x,
     bushyMeasure_readLab θ' q hprod' h y,
@@ -260,7 +260,7 @@ lemma measurableSet_bushyMatchEvent [MeasurableSpace V] [Countable V]
       = ⋂ h : ℕ, {ω : BushySample × BushySample |
           fullSim (compat G) h (bushyX ℓ h ω) (bushyY ℓ' h ω)} := by
     ext ω
-    simp only [bushyMatchEvent, Set.mem_setOf_eq, Set.mem_iInter]
+    simp only [bushyMatchEvent, Set.mem_ofPred_eq, Set.mem_iInter]
     exact infMatch_iff_forall_level (compat G) _ _ (fun h ↦ restrictLab_bushyX ℓ h ω)
       (fun h ↦ restrictLab_bushyY ℓ' h ω)
   rw [hset]
@@ -422,7 +422,7 @@ lemma twoBushyMeasure_fst_null (θ θ' : Offspring 2) (hq : θ.extinction < 1)
       = (A ×ˢ (Set.univ : Set (Word → ℝ)))
         ×ˢ (Set.univ : Set BushySample) := by
     ext ω
-    simp only [Set.mem_setOf_eq, Set.mem_prod, Set.mem_univ, and_true]
+    simp only [Set.mem_ofPred_eq, Set.mem_prod, Set.mem_univ, and_true]
   rw [hset, twoBushyMeasure, Measure.prod_prod, bushyMeasure_prod_null θ hq hA, zero_mul]
 
 /-- Null events of the second sample stay null on the two-sample space. -/
@@ -436,7 +436,7 @@ lemma twoBushyMeasure_snd_null (θ θ' : Offspring 2) (hq : θ.extinction < 1)
       = (Set.univ : Set BushySample)
         ×ˢ (A ×ˢ (Set.univ : Set (Word → ℝ))) := by
     ext ω
-    simp only [Set.mem_setOf_eq, Set.mem_prod, Set.mem_univ, true_and, and_true]
+    simp only [Set.mem_ofPred_eq, Set.mem_prod, Set.mem_univ, true_and, and_true]
   rw [hset, twoBushyMeasure, Measure.prod_prod, bushyMeasure_prod_null θ' hq' hA, mul_zero]
 
 /-- The samples that `thm:shape-iid` misses: those not isometric to the

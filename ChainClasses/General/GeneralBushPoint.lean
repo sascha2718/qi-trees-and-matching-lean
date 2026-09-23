@@ -189,7 +189,7 @@ theorem bushRTree_eq_of_sample_eq {c e : GWord N → ℕ}
       · show u ∈ (sample c : Set (GWord N))
         rw [h]
         exact hu
-    simp only [Set.mem_setOf_eq]
+    simp only [Set.mem_ofPred_eq]
     exact ⟨fun hn u hu ↦ hn u ((hmem u).mpr hu), fun hn u hu ↦ hn u ((hmem u).mp hu)⟩
   rw [bushRTree, bushRTree, hsh, rtreeOf_eq_of_sample_eq _ h]
 
@@ -237,7 +237,7 @@ lemma ambSub_fieldOfR (cs : List RTree) (i : Fin N) (h : (i : ℕ) < cs.length) 
   funext w
   rw [ambSub_apply]
   show fieldOfR (.node cs) (i :: w) = _
-  rw [fieldOfR_cons, dif_pos h]
+  rw [fieldOfR_cons, dite_eq_left h]
 
 /-- Every vertex of the sample of the field of a tree sits strictly inside the size. -/
 lemma length_lt_size_of_mem_sample_fieldOfR :
@@ -263,7 +263,7 @@ lemma not_survives_fieldOfR (t : RTree) : ¬ Survives (fieldOfR (N := N) t) := b
   rw [BranchingProcess.Survives, Set.not_infinite]
   refine Set.Finite.subset (List.finite_length_le (Fin N) t.size) fun v hv ↦ ?_
   have := length_lt_size_of_mem_sample_fieldOfR v t hv
-  exact Set.mem_setOf_eq ▸ (by omega : v.length ≤ t.size)
+  exact Set.mem_ofPred_eq ▸ (by omega : v.length ≤ t.size)
 
 /-! ### The sample of the field has at most `|t|` vertices -/
 
@@ -383,7 +383,7 @@ lemma pminOff_le {θ : Offspring J} {d : ℕ} (hd : 0 < θ d) : pminOff θ ≤ �
     exact lt_irrefl 0 hd
   have hmem : d ∈ (Finset.range (J + 1)).filter fun j ↦ 0 < θ j :=
     Finset.mem_filter.mpr ⟨Finset.mem_range.mpr (by omega), hd⟩
-  rw [pminOff, dif_pos ⟨d, hmem⟩]
+  rw [pminOff, dite_eq_left ⟨d, hmem⟩]
   exact Finset.inf'_le θ hmem
 
 lemma pminOff_le_one (θ : Offspring J) : pminOff θ ≤ 1 := by
@@ -406,7 +406,7 @@ noncomputable def bushMassR (θ : Offspring J) (t : RTree) : ℝ≥0∞ :=
 lemma bushMeasure_listSets {θ : Offspring J} {β : List RTree} {m : ℕ}
     (hm : m < β.length) :
     bushMeasure (N := N) θ (listSets β m) = bushMassR (N := N) θ (β[m]'hm) := by
-  rw [listSets, dif_pos hm, bushMassR]
+  rw [listSets, dite_eq_left hm, bushMassR]
 
 /-- **`thm:mass-uniform`, the bush factor**: a charged bush carries at least one factor
 of the least positive mass per vertex. -/
@@ -421,7 +421,7 @@ theorem ofReal_pow_le_bushMassR (θ : Offspring J) (hJN : J ≤ N) {t : RTree}
   have hsub : {c : GWord N → ℕ | (sample c : Set (GWord N)) = (sample e : Set (GWord N))}
       ⊆ {c : GWord N → ℕ | bushRTree c = t} := by
     intro c hc
-    rw [Set.mem_setOf_eq, bushRTree_eq_of_sample_eq hc, he, bushRTree_fieldOfR hJN hch.degLe]
+    rw [Set.mem_ofPred_eq, bushRTree_eq_of_sample_eq hc, he, bushRTree_fieldOfR hJN hch.degLe]
   -- one factor per vertex of the sample
   have hmass : ∀ v ∈ sample e, pminOff θ ≤ θ (e v) := by
     have key : ∀ (v : GWord N) (s : RTree), RTree.ChargedT θ s →
@@ -441,7 +441,7 @@ theorem ofReal_pow_le_bushMassR (θ : Offspring J) (hJN : J ≤ N) {t : RTree}
           obtain ⟨-, hall⟩ := hch'
           have hval : fieldOfR (N := N) (RTree.node cs) (i :: u)
               = fieldOfR (cs[(i : ℕ)]'hi) u := by
-            rw [fieldOfR_cons, dif_pos hi]
+            rw [fieldOfR_cons, dite_eq_left hi]
           rw [hval]
           exact ih _ (hall _ (cs.getElem_mem hi)) hu
     exact fun v hv ↦ key v t hch hv

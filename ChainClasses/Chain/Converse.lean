@@ -304,7 +304,7 @@ lemma chainMeasure_ray_iIndepSet {t : ℝ} (ht : 0 < t) (ht1 : t ≤ 1) (n : ℕ
       = ⋂ k ∈ s, {χ : Word → Bool | labAux χ (List.replicate k false) = n} := by
     ext χ
     simp only [Set.mem_iInter, Finset.mem_image, Set.mem_preimage, Set.mem_singleton_iff,
-      Set.mem_setOf_eq]
+      Set.mem_ofPred_eq]
     constructor
     · intro h k hk
       exact h _ ⟨k, hk, rfl⟩

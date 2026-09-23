@@ -31,9 +31,9 @@ lemma sum_reducedWeight (θ' : Offspring J') (hq' : θ'.extinction < 1)
   have e1 : ∀ i ∈ Finset.range (J' - 1),
       (if 2 ≤ i + 1 + 1 then reducedWeight θ' (i + 1 + 1) else 0)
         = θ'.skeletonWeight (i + 1 + 1) / (1 - θ'.skeletonWeight 1) := fun i _ => by
-    rw [if_pos (by omega), reducedWeight_def]
+    rw [ite_eq_left (by omega), reducedWeight_def]
   have h1 : 0 < 1 - θ'.skeletonWeight 1 := by linarith
-  rw [Finset.sum_congr rfl e1, if_neg (by norm_num), if_neg (by norm_num), add_zero, add_zero,
+  rw [Finset.sum_congr rfl e1, ite_eq_right (by norm_num), ite_eq_right (by norm_num), add_zero, add_zero,
     ← Finset.sum_div, div_eq_one_iff_eq h1.ne']
   linarith
 
@@ -68,7 +68,7 @@ lemma reducedPMF_apply (θ' : Offspring J') (hq' : θ'.extinction < 1)
 lemma reducedPMF_of_le (θ' : Offspring J') (hq' : θ'.extinction < 1)
     (hs1' : θ'.skeletonWeight 1 < 1) (hJ2' : 2 ≤ J') {κ : ℕ} (hκ : 2 ≤ κ) :
     reducedPMF θ' hq' hs1' hJ2' κ = ENNReal.ofReal (reducedWeight θ' κ) := by
-  rw [reducedPMF_apply, if_pos hκ]
+  rw [reducedPMF_apply, ite_eq_left hκ]
 
 lemma reducedPMF_eq_zero (θ' : Offspring J') (hq' : θ'.extinction < 1)
     (hs1' : θ'.skeletonWeight 1 < 1) (hJ2' : 2 ≤ J') {κ : ℕ} (hκ : ¬ (2 ≤ κ ∧ κ ≤ J')) :
@@ -105,17 +105,17 @@ lemma skeletonWeight_of_extinction_zero (θ : Offspring J) (h0 : θ.extinction =
           = if j = k then θ k else 0 := by
       intro j _
       rcases lt_trichotomy j k with hjk | rfl | hjk
-      · rw [Nat.choose_eq_zero_of_lt hjk, if_neg (by omega)]
+      · rw [Nat.choose_eq_zero_of_lt hjk, ite_eq_right (by omega)]
         simp
       · simp
-      · rw [if_neg (by omega), zero_pow (by omega : j - k ≠ 0)]
+      · rw [ite_eq_right (by omega), zero_pow (by omega : j - k ≠ 0)]
         ring
     rw [Finset.sum_congr rfl hterm, Finset.sum_ite_eq' (Finset.range (J + 1)) k
       (fun _ ↦ θ k)]
     by_cases hkJ : k ∈ Finset.range (J + 1)
-    · rw [if_pos hkJ]
+    · rw [ite_eq_left hkJ]
       simp
-    · rw [if_neg hkJ, θ.vanishing k (by
+    · rw [ite_eq_right hkJ, θ.vanishing k (by
         rw [Finset.mem_range] at hkJ
         omega)]
       simp
@@ -216,7 +216,7 @@ lemma chain_reducedPMF_ne_zero_iff (θ : Offspring J) (hθ0 : θ 0 = 0)
       ↔ k ∈ reducedSupport θ := by
   rw [reducedPMF_apply, mem_reducedSupport]
   by_cases hk : 2 ≤ k
-  · rw [if_pos hk, reducedWeight_def, skeletonWeight_eq_of_chain θ hθ0,
+  · rw [ite_eq_left hk, reducedWeight_def, skeletonWeight_eq_of_chain θ hθ0,
       skeletonWeight_eq_of_chain θ hθ0]
     simp only [ne_eq, ENNReal.ofReal_eq_zero, not_le, hk, true_and]
     constructor
@@ -262,7 +262,7 @@ termination_by k
 decreasing_by all_goals omega
 
 lemma balanced_two : balanced 2 = .gnode .leaf .leaf := by
-  rw [balanced, dif_neg (by omega), if_neg (by omega)]
+  rw [balanced, dite_eq_right (by omega), ite_eq_right (by omega)]
 
 lemma balanced_gnode (k : ℕ) : ∃ l r, balanced k = .gnode l r := by
   rw [balanced]

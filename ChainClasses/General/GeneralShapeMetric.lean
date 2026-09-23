@@ -85,6 +85,7 @@ lemma GShape.exitAddr_mem_addrList (σ : GShape) : σ.exitAddr ∈ addrList σ.r
 
 /-- A rose tree with a marked address, as a marked metric space: the entry at the root,
 the exit at the address when it is one. -/
+@[implicit_reducible]
 noncomputable def gSpace (t : RTree) (e : List ℕ) : MarkedSpace where
   carrier := Vert t
   entry := rootVert t
@@ -95,7 +96,7 @@ noncomputable def gSpace (t : RTree) (e : List ℕ) : MarkedSpace where
 @[simp] lemma entry_gSpace (t : RTree) (e : List ℕ) : (gSpace t e).entry = rootVert t := rfl
 
 lemma exit_gSpace_of_mem {t : RTree} {e : List ℕ} (he : e ∈ addrList t) :
-    (gSpace t e).exit = ⟨e, he⟩ := dif_pos he
+    (gSpace t e).exit = ⟨e, he⟩ := dite_eq_left he
 
 /-- **`def:shape-general` as a marked space**: the realisation with the entry at the
 root and the exit at the terminating split. -/
@@ -249,8 +250,8 @@ instance : Infinite GShape := by
   omega
 
 /-- One key occurs for each of the infinitely many shapes. -/
-lemma gShapeKey_range_infinite : (setOf (fun k => k ∈ Set.range gShapeKey)).Infinite := by
-  rw [Set.setOf_mem_eq]
+lemma gShapeKey_range_infinite : (Set.ofPred (fun k => k ∈ Set.range gShapeKey)).Infinite := by
+  rw [Set.ofPred_mem_eq]
   exact Set.infinite_range_of_injective gShapeKey_injective
 
 /-- **`def:shape-net` at general arity**: the enumeration of `𝒮` by size, the ties
