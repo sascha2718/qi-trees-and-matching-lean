@@ -124,10 +124,17 @@ be installed setuid root; `COMPARATOR_BWRAP` selects a particular binary. The sa
 the verdict rests on, so the runner does not offer to disable it, and a host without
 bubblewrap, macOS included, cannot run the audit.
 
+Palomar registers the toolchain's bundled kernels itself: it ignores `enable_nanoda` in a
+submitted `comparator.json` and rejects `external_kernels` there. The runner therefore judges
+against a generated copy of the configuration that names `nanoda_bin` and `con-ron` by their
+absolute paths under `lean --print-prefix`, so a local run and the registry's run reach the
+same verdict. This follows
+[PalomarTemplate's `scripts/verify-comparator.sh`](https://github.com/PalomarRegistry/PalomarTemplate/blob/main/scripts/verify-comparator.sh).
+
 The [CI comparator job](.github/workflows/build.yml) is the reference form: it uses a separate
-checkout, compiles no project code before the judge sees `Solution.lean`, and builds the
-pinned bubblewrap release with an AppArmor profile, as Palomar's verifier does, because Ubuntu
-24.04 restricts unprivileged user namespaces.
+checkout, compiles no project code before the judge sees `Solution.lean`, installs bubblewrap
+and relaxes `kernel.apparmor_restrict_unprivileged_userns` on the disposable runner, because
+Ubuntu 24.04 restricts the user namespaces `bwrap` needs.
 
 The challenge imports Mathlib alone and contains only statement vocabulary and theorem holes;
 Solution and the libraries contain the proofs. The comparator permits only `propext`,

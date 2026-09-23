@@ -115,42 +115,16 @@ jobs:
           fi
           mkdir -p .lake
 
-      # The judge sandboxes the build it is judging with bubblewrap. Ubuntu 24.04
-      # restricts unprivileged user namespaces by AppArmor, and the distribution
-      # package predates the fix for GHSA-pxhw-h44j-8pfx, so this builds the pinned
-      # upstream release and loads a profile for it, exactly as Palomar's verifier
-      # does. The installer is taken from an immutable PalomarSubmission commit.
-      - name: Build pinned bubblewrap
-        id: bwrap
+      - name: Install bubblewrap for lake comparator's sandbox
+        # Ubuntu 24.04 restricts unprivileged user namespaces through AppArmor,
+        # which `bwrap` needs for the sandbox; the runner is disposable.
         shell: bash
-        env:
-          PIPELINE_COMMIT: 1703d7babd984ccc3831cdf89c28221abe34808f
         run: |
-          set -euo pipefail
-          git clone --filter=blob:none --no-checkout \
-            https://github.com/PalomarRegistry/PalomarSubmission.git "$RUNNER_TEMP/pipeline"
-          git -C "$RUNNER_TEMP/pipeline" checkout --detach "$PIPELINE_COMMIT"
-          test "$(git -C "$RUNNER_TEMP/pipeline" rev-parse HEAD)" = "$PIPELINE_COMMIT"
-
           sudo apt-get update -qq >/dev/null
-          sudo apt-get install -y -qq meson ninja-build libcap-dev pkg-config >/dev/null
-          echo "COMPARATOR_BWRAP=$("$RUNNER_TEMP/pipeline/scripts/install_bwrap.sh" \
-            "$RUNNER_TEMP/bwrap-bin")" >> "$GITHUB_ENV"
+          sudo apt-get install -y -qq bubblewrap >/dev/null
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
-      - name: Judge the headline theorems
+      - name: Run the toolchain's lake comparator
         working-directory: ${{ env.PROJECT_DIR }}
         shell: bash
-        run: |
-          set -euo pipefail
-
-          # The judge must read Solution as source, not as an olean built for it.
-          test ! -e .lake/build/lib/lean/Solution.olean
-
-          # `lake comparator` ships in the pinned toolchain along with the kernels
-          # it replays through, so the audit has no separately built verifier to
-          # pin and no version skew to check. It builds Challenge and Solution
-          # inside the bubblewrap sandbox, compares the statements named in
-          # comparator.json, enforces the permitted axioms, and replays the
-          # exported proofs through Lean's kernel and, under `--paranoid`, through
-          # every external checker the toolchain bundles.
-          lake comparator --config comparator.json --paranoid
+        run: ./comparator-audit.sh

@@ -225,12 +225,18 @@ binding `/` read-only, leaving only `.lake` writable, and giving the build, the 
 kernels an empty network namespace; only dependency resolution has a network, which is why the
 project must carry its `lake-manifest.json`.
 
-Preserve the pinned bubblewrap build in the workflow. Ubuntu 24.04 restricts unprivileged user
-namespaces by AppArmor, and the distribution package predates the fix for
-GHSA-pxhw-h44j-8pfx, so the upstream release is built and a profile loaded for it, as
-Palomar's verifier does. The sandbox is what the verdict rests on: neither the workflow nor
-the local runner may pass `--inadvisably-no-sandbox`, and a host without bubblewrap simply
-cannot run the audit.
+Preserve the bubblewrap step in the workflow. Ubuntu 24.04 restricts by AppArmor the
+unprivileged user namespaces `bwrap` needs, so the job installs bubblewrap and relaxes
+`kernel.apparmor_restrict_unprivileged_userns` on the disposable runner. The sandbox is what
+the verdict rests on: neither the workflow nor the local runner may pass
+`--inadvisably-no-sandbox`, and a host without bubblewrap simply cannot run the audit.
+
+Keep [comparator-audit.sh](comparator-audit.sh) aligned with PalomarTemplate's
+`scripts/verify-comparator.sh`, which it follows. It judges against a generated copy of
+`comparator.json` naming `nanoda_bin` and `con-ron` by absolute path, because Palomar ignores
+`enable_nanoda` and rejects `external_kernels` in a submitted configuration and registers the
+toolchain's kernels itself. Naming a kernel by bare command name fails inside the sandbox,
+where it is not on `PATH`.
 
 The author's workstation retains deprecated proofs in `GraphMarkovMatching/Archive/FullMatching/`
 and `ChainClasses/Archive/FullMatching/`. Their local source map is
