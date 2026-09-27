@@ -1,5 +1,5 @@
 /-
-Binary profiles and their composites (`arbitrary_offspring_matching.tex`,
+Binary profiles and their composites (`markov_matching_applications.tex`,
 `sec:common-presentations`): full binary trees with marked graft roots.
 
 * `MTree`: `leaf` is a fresh continuation, `node` a forced vertex, `gnode` a forced vertex

@@ -1,11 +1,13 @@
 /-
-The scalar threshold analysis of `arbitrary_offspring_matching.tex` (`sec:completion`,
-"Completion of the proof"): the real forms of the explicit constants `S_H`, `G_H`,
+The scalar threshold analysis used in `arbitrary_offspring_matching.tex` (Section 19),
+with explicit constants from `markov_matching_applications.tex`
+(Proposition 21.1 and equations (21.1) and (21.2)):
+the real forms of the explicit constants `S_H`, `G_H`,
 `E(M)` and `Q(M)`, with their bridges to the `ℝ≥0∞` versions of `Paths.lean`, the
 scalar upper bounds `Z̄(t)`, `Ē(t, M)`, `Q̄(t, M)` at the root bounds `δ ≤ ζ`,
 `f ≤ (α+1) ζ`, `R_μ ≤ 1 + α ζ`, the monotone continuous threshold function `J_K` of
-`eq:constructive-threshold` with its maximal admissible point `ε_K > 0`, the
-zero-compatible quadratic `M_η` of `eq:zero-compatible-quadratic`, and the zero-compatible
+equation (21.2) with its maximal admissible point `ε_K > 0`, the
+zero-compatible quadratic `M_η` of equation (21.1), and the zero-compatible
 threshold `ε⁰_K`.
 
 * `SH`, `GH`, `Ereal`, `Qreal`: the real constants, with `SHe_eq_ofReal`, `GHe_ofReal`,
@@ -13,9 +15,9 @@ threshold `ε⁰_K`.
 * `Zbar`, `Zbar_fixed`: the smaller root of `Z = S_H t + S_H T² Z²`, with `Z̄(t) ≤ 2 S_H t`;
 * `Ebar`, `Qbar`, `JK`: the scalar bounds and the threshold function, with `JK_eq_div`,
   `JK_zero`, `JK_monotoneOn`, `JK_continuousOn`;
-* `epsK`, `epsK_spec`, `barrier_of_le_epsK`: `eq:constructive-threshold` and the real
+* `epsK`, `epsK_spec`, `barrier_of_le_epsK`: equation (21.2) and the real
   barrier `t + (1 + (2α-1) t) Q̄(t, Kt) ≤ K t` on `[0, ε_K]`;
-* `Meta`, `Meta_fixed`: `eq:zero-compatible-quadratic`;
+* `Meta`, `Meta_fixed`: equation (21.1);
 * `JK0`, `epsK0`, `epsK0_spec`, `barrier0_of_le_epsK0`: the zero-compatible threshold.
 
 Everything is pure real analysis; no model enters.
@@ -28,13 +30,13 @@ namespace GraphMarkovMatching.Stopped
 open GraphMarkovMatching GraphMarkovMatching.Support Model
 open scoped ENNReal Classical
 
-/-! ### The real constants `S_H` and `G_H` (`eq:explicit-zero-bound`,
-`eq:explicit-weighted-error`) -/
+/-! ### The real constants `S_H` and `G_H` (equation (18.3),
+equation (18.7)) -/
 
-/-- `S_H = 2^{H+1} - 1` (`eq:explicit-zero-bound`). -/
+/-- `S_H = 2^{H+1} - 1` (equation (18.3)). -/
 noncomputable def SH (H : ℕ) : ℝ := 2 ^ (H + 1) - 1
 
-/-- `S_H = ∑_{d ≤ H} 2^d` (`eq:explicit-zero-bound`). -/
+/-- `S_H = ∑_{d ≤ H} 2^d` (equation (18.3)). -/
 lemma SH_eq_sum (H : ℕ) : SH H = ∑ d ∈ Finset.range (H + 1), (2 : ℝ) ^ d := by
   induction H with
   | zero => norm_num [SH]
@@ -42,7 +44,7 @@ lemma SH_eq_sum (H : ℕ) : SH H = ∑ d ∈ Finset.range (H + 1), (2 : ℝ) ^ d
     rw [Finset.sum_range_succ, ← ih, SH, SH]
     ring
 
-/-- `1 ≤ S_H` (`eq:explicit-zero-bound`). -/
+/-- `1 ≤ S_H` (equation (18.3)). -/
 lemma one_le_SH (H : ℕ) : 1 ≤ SH H := by
   unfold SH
   have h : (2 : ℝ) ≤ 2 ^ (H + 1) := by
@@ -53,27 +55,27 @@ lemma one_le_SH (H : ℕ) : 1 ≤ SH H := by
 /-- `0 < S_H`. -/
 lemma SH_pos (H : ℕ) : 0 < SH H := lt_of_lt_of_le one_pos (one_le_SH H)
 
-/-- The `ℝ≥0∞` constant `S_H` of `Paths.lean` is the real one (`eq:explicit-zero-bound`). -/
+/-- The `ℝ≥0∞` constant `S_H` of `Paths.lean` is the real one (equation (18.3)). -/
 lemma SHe_eq_ofReal (H : ℕ) : SHe H = ENNReal.ofReal (SH H) := by
   rw [SH_eq_sum, SHe, ENNReal.ofReal_sum_of_nonneg (fun d _ => by positivity)]
   refine Finset.sum_congr rfl fun d _ => ?_
   rw [ENNReal.ofReal_pow (by norm_num), ENNReal.ofReal_ofNat]
 
-/-- `G_H(x) = ∑_{d ≤ H} x^d` (`eq:explicit-weighted-error`). -/
+/-- `G_H(x) = ∑_{d ≤ H} x^d` (equation (18.7)). -/
 noncomputable def GH (H : ℕ) (x : ℝ) : ℝ := ∑ d ∈ Finset.range (H + 1), x ^ d
 
 /-- The `ℝ≥0∞` function `G_H` of `Paths.lean` at a nonnegative real argument
-(`eq:explicit-weighted-error`). -/
+(equation (18.7)). -/
 lemma GHe_ofReal (H : ℕ) {x : ℝ} (hx : 0 ≤ x) :
     GHe H (ENNReal.ofReal x) = ENNReal.ofReal (GH H x) := by
   rw [GH, GHe, ENNReal.ofReal_sum_of_nonneg (fun d _ => pow_nonneg hx d)]
   exact Finset.sum_congr rfl fun d _ => (ENNReal.ofReal_pow hx d).symm
 
-/-- `G_H` is nondecreasing on `[0, ∞)` (`sec:completion`). -/
+/-- `G_H` is nondecreasing on `[0, ∞)` (proof of Proposition 21.1). -/
 lemma GH_mono (H : ℕ) {x y : ℝ} (hx : 0 ≤ x) (hxy : x ≤ y) : GH H x ≤ GH H y :=
   Finset.sum_le_sum fun d _ => pow_le_pow_left₀ hx hxy d
 
-/-- `1 ≤ G_H(x)` for `x ≥ 0` (`eq:explicit-weighted-error`). -/
+/-- `1 ≤ G_H(x)` for `x ≥ 0` (equation (18.7)). -/
 lemma one_le_GH (H : ℕ) {x : ℝ} (hx : 0 ≤ x) : 1 ≤ GH H x := by
   rw [GH, Finset.sum_range_succ', pow_zero]
   exact le_add_of_nonneg_left (Finset.sum_nonneg fun d _ => pow_nonneg hx _)
@@ -82,14 +84,14 @@ lemma one_le_GH (H : ℕ) {x : ℝ} (hx : 0 ≤ x) : 1 ≤ GH H x := by
 lemma GH_nonneg (H : ℕ) {x : ℝ} (hx : 0 ≤ x) : 0 ≤ GH H x :=
   zero_le_one.trans (one_le_GH H hx)
 
-/-- `G_H` is continuous (`sec:completion`). -/
+/-- `G_H` is continuous (proof of Proposition 21.1). -/
 lemma GH_continuous (H : ℕ) : Continuous (GH H) :=
   continuous_finsetSum _ fun d _ => continuous_pow d
 
-/-! ### The real forms of `E(M)` and `Q(M)` (`eq:explicit-weighted-error`,
-`sec:averaging`) -/
+/-! ### The real forms of `E(M)` and `Q(M)` (equation (18.7),
+Section 19.1) -/
 
-/-- The real form of `E(M)` of `eq:explicit-weighted-error`, with the root quantities
+/-- The real form of `E(M)` of equation (18.7), with the root quantities
 `f`, `R_μ` and the zero bound `Z` as parameters. -/
 noncomputable def Ereal (α : ℝ) (H T : ℕ) (B f Rμ Z Mv : ℝ) : ℝ :=
   GH H (4 * B * Rμ * (1 + α * Mv))
@@ -102,7 +104,7 @@ lemma Ufun_ofReal {α : ℝ} (hα : 0 ≤ α) {Mv : ℝ} (hM : 0 ≤ Mv) :
     ENNReal.ofReal_mul hα]
 
 /-- The `ℝ≥0∞` bound `E(M)` of `Paths.lean` at nonnegative real arguments is the real one
-(`eq:explicit-weighted-error`). -/
+(equation (18.7)). -/
 lemma Efun_ofReal (α : ℝ) (hα : 0 ≤ α) (H T : ℕ) {B f Rμ Z Mv : ℝ} (hB : 0 ≤ B)
     (hf : 0 ≤ f) (hR : 0 ≤ Rμ) (hZ : 0 ≤ Z) (hM : 0 ≤ Mv) :
     Efun α H T (ENNReal.ofReal B) (ENNReal.ofReal f) (ENNReal.ofReal Rμ) (ENNReal.ofReal Z)
@@ -130,8 +132,8 @@ lemma Efun_ofReal (α : ℝ) (hα : 0 ≤ α) (H T : ℕ) {B f Rμ Z Mv : ℝ} (
   rw [hG, h1, h2, GHe_ofReal H (by positivity), ← ENNReal.ofReal_add (by positivity)
     (by positivity), ← ENNReal.ofReal_mul (GH_nonneg H (by positivity))]
 
-/-- `E(M)` is nondecreasing in `B`, `f`, `R_μ`, `Z` and `M` (`sec:completion`: every
-coefficient of `eq:explicit-weighted-error` is nonnegative). -/
+/-- `E(M)` is nondecreasing in `B`, `f`, `R_μ`, `Z` and `M` (Section 19: every
+coefficient of equation (18.7) is nonnegative). -/
 lemma Efun_mono (α : ℝ) (H : ℕ) (T : ℝ≥0∞) {B B' f f' Rμ Rμ' Z Z' Mb Mb' : ℝ≥0∞}
     (hB : B ≤ B') (hf : f ≤ f') (hR : Rμ ≤ Rμ') (hZ : Z ≤ Z') (hM : Mb ≤ Mb') :
     Efun α H T B f Rμ Z Mb ≤ Efun α H T B' f' Rμ' Z' Mb' := by
@@ -142,12 +144,12 @@ lemma Efun_mono (α : ℝ) (H : ℕ) (T : ℝ≥0∞) {B B' f f' Rμ Rμ' Z Z' M
   gcongr
   exact GHe_mono_left H (by gcongr)
 
-/-- The real form of `Q(M) = a M + b M² + (γ + 4αM) Z + C (1 + αM) E` (`sec:averaging`). -/
+/-- The real form of `Q(M) = a M + b M² + (γ + 4αM) Z + C (1 + αM) E` (Section 19.1). -/
 noncomputable def Qreal (α a b γ C Z E Mv : ℝ) : ℝ :=
   a * Mv + b * Mv ^ 2 + (γ + 4 * α * Mv) * Z + C * (1 + α * Mv) * E
 
 /-- The `ℝ≥0∞` bound `Q(M)` of `Paths.lean` at nonnegative real arguments is the real one
-(`sec:averaging`). -/
+(Section 19.1). -/
 lemma Qfun_ofReal (α : ℝ) (hα : 0 ≤ α) {a b γ C Z E Mv : ℝ} (ha : 0 ≤ a) (hb : 0 ≤ b)
     (hγ : 0 ≤ γ) (hC : 0 ≤ C) (hZ : 0 ≤ Z) (hE : 0 ≤ E) (hM : 0 ≤ Mv) :
     Qfun α (ENNReal.ofReal a) (ENNReal.ofReal b) (ENNReal.ofReal γ) (ENNReal.ofReal C)
@@ -172,20 +174,20 @@ lemma Qfun_ofReal (α : ℝ) (hα : 0 ≤ α) {a b γ C Z E Mv : ℝ} (ha : 0 �
     ← ENNReal.ofReal_add (by positivity) (by positivity),
     ← ENNReal.ofReal_add (by positivity) (by positivity)]
 
-/-- `Q(M)` is nondecreasing in `Z`, `E` and `M` (`sec:completion`). -/
+/-- `Q(M)` is nondecreasing in `Z`, `E` and `M` (Section 19). -/
 lemma Qfun_mono (α : ℝ) (a b γ C : ℝ≥0∞) {Z Z' E E' Mb Mb' : ℝ≥0∞} (hZ : Z ≤ Z')
     (hE : E ≤ E') (hM : Mb ≤ Mb') :
     Qfun α a b γ C Z E Mb ≤ Qfun α a b γ C Z' E' Mb' := by
   unfold Qfun
   gcongr
 
-/-! ### The scalar zero bound `Z̄(t)` (`sec:completion`) -/
+/-! ### The scalar zero bound `Z̄(t)` (proof of Proposition 21.1) -/
 
-/-- `Z̄(t) = 2 S_H t/(1 + √(1 - 4 S_H² T² t))` (`sec:completion`). -/
+/-- `Z̄(t) = 2 S_H t/(1 + √(1 - 4 S_H² T² t))` (proof of Proposition 21.1). -/
 noncomputable def Zbar (H T : ℕ) (t : ℝ) : ℝ :=
   2 * SH H * t / (1 + Real.sqrt (1 - 4 * SH H ^ 2 * T ^ 2 * t))
 
-/-- `Z̄(t)/t = 2 S_H/(1 + √(1 - 4 S_H² T² t))` (`sec:completion`). -/
+/-- `Z̄(t)/t = 2 S_H/(1 + √(1 - 4 S_H² T² t))` (proof of Proposition 21.1). -/
 noncomputable def ZbarQ (H T : ℕ) (t : ℝ) : ℝ :=
   2 * SH H / (1 + Real.sqrt (1 - 4 * SH H ^ 2 * T ^ 2 * t))
 
@@ -206,13 +208,13 @@ lemma Zden_pos (H T : ℕ) (t : ℝ) : 0 < 1 + Real.sqrt (1 - 4 * SH H ^ 2 * T ^
 lemma ZbarQ_nonneg (H T : ℕ) (t : ℝ) : 0 ≤ ZbarQ H T t :=
   div_nonneg (by linarith [SH_pos H]) (Zden_pos H T t).le
 
-/-- `0 ≤ Z̄(t)` for `t ≥ 0` (`sec:completion`). -/
+/-- `0 ≤ Z̄(t)` for `t ≥ 0` (proof of Proposition 21.1). -/
 lemma Zbar_nonneg (H T : ℕ) {t : ℝ} (ht : 0 ≤ t) : 0 ≤ Zbar H T t := by
   rw [Zbar_eq_mul]
   exact mul_nonneg ht (ZbarQ_nonneg H T t)
 
 /-- `Z̄(t)` is the smaller root of `Z = S_H t + S_H T² Z²` when `4 S_H² T² t ≤ 1`
-(`sec:completion`). -/
+(proof of Proposition 21.1). -/
 theorem Zbar_fixed (H T : ℕ) {t : ℝ} (ht0 : 0 ≤ t) (ht : 4 * SH H ^ 2 * T ^ 2 * t ≤ 1) :
     SH H * (t + (T : ℝ) ^ 2 * Zbar H T t ^ 2) = Zbar H T t := by
   -- `ht0` belongs to the interface; the identity needs only the discriminant condition
@@ -231,7 +233,7 @@ theorem Zbar_fixed (H T : ℕ) {t : ℝ} (ht0 : 0 ≤ t) (ht : 4 * SH H ^ 2 * T 
   · exact absurd (pow_eq_zero_iff (n := 2) (by norm_num) |>.mp h1) hden.ne'
   · linarith
 
-/-- `Z̄(t) ≤ 2 S_H t` (`sec:completion`). -/
+/-- `Z̄(t) ≤ 2 S_H t` (proof of Proposition 21.1). -/
 theorem Zbar_le_two (H T : ℕ) {t : ℝ} (ht0 : 0 ≤ t) (ht : 4 * SH H ^ 2 * T ^ 2 * t ≤ 1) :
     Zbar H T t ≤ 2 * SH H * t := by
   -- `ht` belongs to the interface; the bound holds for every `t ≥ 0`
@@ -239,7 +241,7 @@ theorem Zbar_le_two (H T : ℕ) {t : ℝ} (ht0 : 0 ≤ t) (ht : 4 * SH H ^ 2 * T
   unfold Zbar
   exact div_le_self (by linarith [mul_nonneg (SH_pos H).le ht0]) (one_le_Zden H T t)
 
-/-- `t ≤ Z̄(t)` (`sec:completion`: `Z̄(t) ≥ S_H t ≥ t`). -/
+/-- `t ≤ Z̄(t)` (proof of Proposition 21.1: `Z̄(t) ≥ S_H t ≥ t`). -/
 theorem le_Zbar (H T : ℕ) {t : ℝ} (ht0 : 0 ≤ t) (ht : 4 * SH H ^ 2 * T ^ 2 * t ≤ 1) :
     t ≤ Zbar H T t := by
   -- `ht` belongs to the interface; the bound holds for every `t ≥ 0`
@@ -253,7 +255,7 @@ theorem le_Zbar (H T : ℕ) {t : ℝ} (ht0 : 0 ≤ t) (ht : 4 * SH H ^ 2 * T ^ 2
   rw [le_div_iff₀ hden]
   nlinarith [one_le_SH H, mul_nonneg ht0 (sub_nonneg.mpr hs1)]
 
-/-- `Z̄(t)/t` is nondecreasing (`sec:completion`): the denominator decreases. -/
+/-- `Z̄(t)/t` is nondecreasing (proof of Proposition 21.1): the denominator decreases. -/
 lemma ZbarQ_mono' (H T : ℕ) {t t' : ℝ} (htt : t ≤ t') : ZbarQ H T t ≤ ZbarQ H T t' := by
   unfold ZbarQ
   refine div_le_div_of_nonneg_left (by linarith [SH_pos H]) (Zden_pos H T t') ?_
@@ -263,7 +265,7 @@ lemma ZbarQ_mono' (H T : ℕ) {t t' : ℝ} (htt : t ≤ t') : ZbarQ H T t ≤ Zb
     by linarith)
   linarith
 
-/-- `Z̄(t)/t` is nondecreasing on `[0, t_*]` (`sec:completion`). -/
+/-- `Z̄(t)/t` is nondecreasing on `[0, t_*]` (proof of Proposition 21.1). -/
 theorem ZbarQ_mono (H T : ℕ) {t t' : ℝ} (ht : 0 ≤ t) (htt : t ≤ t')
     (ht' : 4 * SH H ^ 2 * T ^ 2 * t' ≤ 1) : ZbarQ H T t ≤ ZbarQ H T t' := by
   -- `ht` and `ht'` belong to the interface; monotonicity holds on the whole line
@@ -271,70 +273,71 @@ theorem ZbarQ_mono (H T : ℕ) {t t' : ℝ} (ht : 0 ≤ t) (htt : t ≤ t')
   have _ := ht'
   exact ZbarQ_mono' H T htt
 
-/-- `Z̄(t)/t` is continuous (`sec:completion`). -/
+/-- `Z̄(t)/t` is continuous (proof of Proposition 21.1). -/
 lemma ZbarQ_continuous (H T : ℕ) : Continuous (ZbarQ H T) := by
   unfold ZbarQ
   refine Continuous.div continuous_const ?_ fun t => (Zden_pos H T t).ne'
   exact continuous_const.add (Real.continuous_sqrt.comp (by fun_prop))
 
-/-- `Z̄(t)/t` is continuous on `[0, 1/(4 S_H² T²)]` (`sec:completion`). -/
+/-- `Z̄(t)/t` is continuous on `[0, 1/(4 S_H² T²)]` (proof of Proposition 21.1). -/
 theorem ZbarQ_continuousOn (H T : ℕ) :
     ContinuousOn (ZbarQ H T) (Set.Icc 0 (1 / (4 * SH H ^ 2 * T ^ 2))) :=
   (ZbarQ_continuous H T).continuousOn
 
-/-- `Z̄(t)/t = S_H` at `t = 0` (`sec:completion`: `Z̄(t) = S_H t + O(t²)`). -/
+/-- `Z̄(t)/t = S_H` at `t = 0` (proof of Proposition 21.1: `Z̄(t) = S_H t + O(t²)`). -/
 lemma ZbarQ_zero (H T : ℕ) : ZbarQ H T 0 = SH H := by
   unfold ZbarQ
   rw [mul_zero, sub_zero, Real.sqrt_one]
   ring
 
 /-! ### The scalar bounds `Ē(t, M)`, `Q̄(t, M)` and the threshold function `J_K`
-(`sec:completion`) -/
+(proof of Proposition 21.1) -/
 
 /-- `Ē(t, M) = E(M)` at the root bounds `f = (α+1) t`, `R_μ = 1 + α t`, `Z = Z̄(t)`
-(`sec:completion`). -/
+(proof of Proposition 21.1). -/
 noncomputable def Ebar (α : ℝ) (H T : ℕ) (B t Mv : ℝ) : ℝ :=
   Ereal α H T B ((α + 1) * t) (1 + α * t) (Zbar H T t) Mv
 
-/-- `Ē(t, Kt)/t`, written without division (`sec:completion`). -/
+/-- `Ē(t, Kt)/t`, written without division (proof of Proposition 21.1). -/
 noncomputable def EbarQ (α : ℝ) (H T : ℕ) (B t Kc : ℝ) : ℝ :=
   GH H (4 * B * (1 + α * t) * (1 + α * (Kc * t)))
     * (2 * B * (1 + α * (Kc * t)) ^ 2 * (α + 1)
       + 2 * B * (1 + α * t) * t * (T * ZbarQ H T t + α * Kc) ^ 2)
 
-/-- `Ē(t, Kt) = t · Ē(t, Kt)/t`, for every `t` (`sec:completion`). -/
+/-- `Ē(t, Kt) = t · Ē(t, Kt)/t`, for every `t` (proof of Proposition 21.1). -/
 lemma Ebar_eq_mul (α : ℝ) (H T : ℕ) (B t Kc : ℝ) :
     Ebar α H T B t (Kc * t) = t * EbarQ α H T B t Kc := by
   unfold Ebar Ereal EbarQ
   rw [Zbar_eq_mul]
   ring
 
-/-- `Q̄(t, M) = Q(M)` at `Z = Z̄(t)`, `E = Ē(t, M)` (`sec:completion`). -/
+/-- `Q̄(t, M) = Q(M)` at `Z = Z̄(t)`, `E = Ē(t, M)` (proof of Proposition 21.1). -/
 noncomputable def Qbar (α a b γ C : ℝ) (H T : ℕ) (B t Mv : ℝ) : ℝ :=
   Qreal α a b γ C (Zbar H T t) (Ebar α H T B t Mv) Mv
 
-/-- `A_0 = γ S_H + 2 C B (α+1) G_H(4B)` (`sec:completion`). -/
+/-- `A_0 = γ S_H + 2 C B (α+1) G_H(4B)` (proof of Proposition 21.1). -/
 noncomputable def A0 (α γ C : ℝ) (H : ℕ) (B : ℝ) : ℝ :=
   γ * SH H + 2 * C * B * (α + 1) * GH H (4 * B)
 
-/-- `K_0 = (1 + A_0)/(1 - a)` (`sec:completion`). -/
+/-- The lower bound `K_0 = (1 + A_0)/(1 - a)` on the choice of `K`
+in the proof of Proposition 21.1. -/
 noncomputable def K0 (a A : ℝ) : ℝ := (1 + A) / (1 - a)
 
-/-- `K_match = K + 2 S_H` (`sec:completion`). -/
+/-- `K_match = K + 2 S_H` (proof of Proposition 21.1). -/
 noncomputable def Kmatch (H : ℕ) (Kc : ℝ) : ℝ := Kc + 2 * SH H
 
-/-- `t_* = min{1/(4 S_H² T²), 1/(2 K_match)}` (`sec:completion`). -/
+/-- `t_* = min{1/(4 S_H² T²), 1/(2 K_match)}` (proof of Proposition 21.1). -/
 noncomputable def tstar (H T : ℕ) (Kc : ℝ) : ℝ :=
   min (1 / (4 * SH H ^ 2 * T ^ 2)) (1 / (2 * Kmatch H Kc))
 
-/-- `J_K(t)` of `eq:constructive-threshold`, in the division-free form
+/-- `J_K(t)` from the proof of Proposition 21.1, in the division-free form
 `1 + (1 + (2α-1)t)[aK + bK²t + (γ + 4αKt) Z̄(t)/t + C(1 + αKt) Ē(t,Kt)/t]`. -/
 noncomputable def JK (α a b γ C : ℝ) (H T : ℕ) (B Kc t : ℝ) : ℝ :=
   1 + (1 + (2 * α - 1) * t)
     * (a * Kc + b * Kc ^ 2 * t + (γ + 4 * α * Kc * t) * ZbarQ H T t
       + C * (1 + α * Kc * t) * EbarQ α H T B t Kc)
 
-/-- The barrier expression is `t · J_K(t)`, for every `t` (`sec:completion`). -/
+/-- The barrier expression is `t · J_K(t)`, for every `t` (proof of Proposition 21.1). -/
 lemma barrier_eq_mul_JK (α a b γ C : ℝ) (H T : ℕ) (B Kc t : ℝ) :
     t + (1 + (2 * α - 1) * t) * Qbar α a b γ C H T B t (Kc * t)
       = t * JK α a b γ C H T B Kc t := by
@@ -342,13 +345,14 @@ lemma barrier_eq_mul_JK (α a b γ C : ℝ) (H T : ℕ) (B Kc t : ℝ) :
   rw [Zbar_eq_mul, Ebar_eq_mul]
   ring
 
-/-- `J_K(t) = (t + [1 + (2α-1)t] Q̄(t, Kt))/t` for `t > 0` (`eq:constructive-threshold`). -/
+/-- `J_K(t) = (t + [1 + (2α-1)t] Q̄(t, Kt))/t` for `t > 0`
+(proof of Proposition 21.1). -/
 theorem JK_eq_div (α a b γ C : ℝ) (H T : ℕ) (B Kc : ℝ) {t : ℝ} (ht : 0 < t) :
     JK α a b γ C H T B Kc t
       = (t + (1 + (2 * α - 1) * t) * Qbar α a b γ C H T B t (Kc * t)) / t := by
   rw [barrier_eq_mul_JK, mul_div_cancel_left₀ _ ht.ne']
 
-/-- `J_K(0) = 1 + aK + A_0` (`sec:completion`). -/
+/-- `J_K(0) = 1 + aK + A_0` (proof of Proposition 21.1). -/
 theorem JK_zero (α a b γ C : ℝ) (H T : ℕ) (B Kc : ℝ) :
     JK α a b γ C H T B Kc 0 = 1 + a * Kc + A0 α γ C H B := by
   unfold JK EbarQ A0
@@ -356,7 +360,7 @@ theorem JK_zero (α a b γ C : ℝ) (H T : ℕ) (B Kc : ℝ) :
   simp only [mul_zero, add_zero, mul_one, zero_mul]
   ring
 
-/-! ### Monotonicity and continuity of `J_K` (`sec:completion`) -/
+/-! ### Monotonicity and continuity of `J_K` (proof of Proposition 21.1) -/
 
 /-- `0 ≤ Ē(t, Kt)/t` for `t ≥ 0`. -/
 lemma EbarQ_nonneg {α : ℝ} (hα : 0 ≤ α) (H T : ℕ) {B Kc t : ℝ} (hB : 0 ≤ B) (hK : 0 ≤ Kc)
@@ -365,7 +369,7 @@ lemma EbarQ_nonneg {α : ℝ} (hα : 0 ≤ α) (H T : ℕ) {B Kc t : ℝ} (hB : 
   unfold EbarQ
   exact mul_nonneg (GH_nonneg H (by positivity)) (by positivity)
 
-/-- `Ē(t, Kt)/t` is nondecreasing on `[0, ∞)` (`sec:completion`: after substituting
+/-- `Ē(t, Kt)/t` is nondecreasing on `[0, ∞)` (proof of Proposition 21.1: after substituting
 `M = Kt`, every factor is nonnegative and nondecreasing). -/
 lemma EbarQ_mono {α : ℝ} (hα : 0 ≤ α) (H T : ℕ) {B Kc t t' : ℝ} (hB : 0 ≤ B) (hK : 0 ≤ Kc)
     (ht : 0 ≤ t) (htt : t ≤ t') : EbarQ α H T B t Kc ≤ EbarQ α H T B t' Kc := by
@@ -383,7 +387,7 @@ lemma EbarQ_mono {α : ℝ} (hα : 0 ≤ α) (H T : ℕ) {B Kc t t' : ℝ} (hB :
   exact mul_le_mul (GH_mono H (by positivity) hX) hY (by positivity)
     (GH_nonneg H (by positivity))
 
-/-- `Ē(t, Kt)/t` is continuous in `t` (`sec:completion`). -/
+/-- `Ē(t, Kt)/t` is continuous in `t` (proof of Proposition 21.1). -/
 lemma EbarQ_continuous (α : ℝ) (H T : ℕ) (B Kc : ℝ) :
     Continuous (fun t => EbarQ α H T B t Kc) := by
   have hG : Continuous (fun t : ℝ => GH H (4 * B * (1 + α * t) * (1 + α * (Kc * t)))) :=
@@ -392,8 +396,8 @@ lemma EbarQ_continuous (α : ℝ) (H T : ℕ) (B Kc : ℝ) :
   unfold EbarQ
   fun_prop
 
-/-- `J_K` is nondecreasing on `[0, ∞)` (`sec:completion`: every factor in the explicit
-expression is nonnegative and nondecreasing). -/
+/-- `J_K` is nondecreasing on `[0, ∞)` (proof of Proposition 21.1): every factor
+in the explicit expression is nonnegative and nondecreasing. -/
 lemma JK_mono_of_le {α a b γ C : ℝ} (hα : 1 ≤ α) (ha : 0 ≤ a) (hb : 0 ≤ b) (hγ : 0 ≤ γ)
     (hC : 0 ≤ C) (H T : ℕ) {B Kc t t' : ℝ} (hB : 0 ≤ B) (hK : 0 ≤ Kc) (ht : 0 ≤ t)
     (htt : t ≤ t') : JK α a b γ C H T B Kc t ≤ JK α a b γ C H T B Kc t' := by
@@ -418,7 +422,7 @@ lemma JK_mono_of_le {α a b γ C : ℝ} (hα : 1 ≤ α) (ha : 0 ≤ a) (hb : 0 
   unfold JK
   exact add_le_add le_rfl (mul_le_mul hA hS hS0 hA0')
 
-/-- `J_K` is nondecreasing on `[0, 1/(4 S_H² T²)]` (`sec:completion`). -/
+/-- `J_K` is nondecreasing on `[0, 1/(4 S_H² T²)]` (proof of Proposition 21.1). -/
 theorem JK_monotoneOn {α a b γ C : ℝ} (hα : 1 ≤ α) (ha : 0 ≤ a) (hb : 0 ≤ b) (hγ : 0 ≤ γ)
     (hC : 0 ≤ C) {H T : ℕ} {B Kc : ℝ} (hB : 0 ≤ B) (hK : 0 ≤ Kc) (hT : 1 ≤ T) :
     MonotoneOn (JK α a b γ C H T B Kc) (Set.Icc 0 (1 / (4 * SH H ^ 2 * T ^ 2))) := by
@@ -427,7 +431,7 @@ theorem JK_monotoneOn {α a b γ C : ℝ} (hα : 1 ≤ α) (ha : 0 ≤ a) (hb : 
   intro t ht t' _ htt
   exact JK_mono_of_le hα ha hb hγ hC H T hB hK ht.1 htt
 
-/-- `J_K` is continuous (`sec:completion`). -/
+/-- `J_K` is continuous (proof of Proposition 21.1). -/
 lemma JK_continuous (α a b γ C : ℝ) (H T : ℕ) (B Kc : ℝ) :
     Continuous (JK α a b γ C H T B Kc) := by
   have hZ := ZbarQ_continuous H T
@@ -435,7 +439,7 @@ lemma JK_continuous (α a b γ C : ℝ) (H T : ℕ) (B Kc : ℝ) :
   unfold JK
   fun_prop
 
-/-- `J_K` is continuous on `[0, 1/(4 S_H² T²)]` (`sec:completion`). -/
+/-- `J_K` is continuous on `[0, 1/(4 S_H² T²)]` (proof of Proposition 21.1). -/
 theorem JK_continuousOn {α a b γ C : ℝ} (hα : 1 ≤ α) (ha : 0 ≤ a) (hb : 0 ≤ b) (hγ : 0 ≤ γ)
     (hC : 0 ≤ C) {H T : ℕ} {B Kc : ℝ} (hB : 0 ≤ B) (hK : 0 ≤ Kc) (hT : 1 ≤ T) :
     ContinuousOn (JK α a b γ C H T B Kc) (Set.Icc 0 (1 / (4 * SH H ^ 2 * T ^ 2))) := by
@@ -450,12 +454,12 @@ theorem JK_continuousOn {α a b γ C : ℝ} (hα : 1 ≤ α) (ha : 0 ≤ a) (hb 
   have _ := hT
   exact (JK_continuous α a b γ C H T B Kc).continuousOn
 
-/-! ### The maximal admissible point (`eq:constructive-threshold`) -/
+/-! ### The maximal admissible point (equation (21.2)) -/
 
 /-- The maximal point of `[0, t_*]` at which a continuous function, nondecreasing on
 `[0, ∞)` and below the level `K` at `0`, stays at most `K`: it is positive, at most `t_*`,
 and the function is at most `K` on the whole interval up to it
-(`eq:constructive-threshold`). -/
+(equation (21.2)). -/
 lemma sSup_admissible_spec {J : ℝ → ℝ} {Kc tst : ℝ} (hcont : Continuous J)
     (hmono : ∀ t t', 0 ≤ t → t ≤ t' → J t ≤ J t') (htst : 0 < tst) (h0 : J 0 < Kc) :
     0 < sSup {t | t ∈ Set.Icc 0 tst ∧ J t ≤ Kc}
@@ -480,11 +484,11 @@ lemma sSup_admissible_spec {J : ℝ → ℝ} {Kc tst : ℝ} (hcont : Continuous 
     exact lt_of_lt_of_le hmin (le_csSup hbdd ht0)
   exact ⟨hpos, hmem.1.2, fun t ht => (hmono t (sSup S) ht.1 ht.2).trans hmem.2⟩
 
-/-- `ε_K = max{t ∈ [0, t_*] : J_K(t) ≤ K}` (`eq:constructive-threshold`). -/
+/-- `ε_K = max{t ∈ [0, t_*] : J_K(t) ≤ K}` (equation (21.2)). -/
 noncomputable def epsK (α a b γ C : ℝ) (H T : ℕ) (B Kc : ℝ) : ℝ :=
   sSup {t | t ∈ Set.Icc 0 (tstar H T Kc) ∧ JK α a b γ C H T B Kc t ≤ Kc}
 
-/-- `0 ≤ A_0` (`sec:completion`). -/
+/-- `0 ≤ A_0` (proof of Proposition 21.1). -/
 lemma A0_nonneg {α γ C : ℝ} (hα : 0 ≤ α) (hγ : 0 ≤ γ) (hC : 0 ≤ C) (H : ℕ) {B : ℝ}
     (hB : 0 ≤ B) : 0 ≤ A0 α γ C H B := by
   have := SH_pos H
@@ -492,16 +496,16 @@ lemma A0_nonneg {α γ C : ℝ} (hα : 0 ≤ α) (hγ : 0 ≤ γ) (hC : 0 ≤ C)
   unfold A0
   positivity
 
-/-- `0 < K_0` (`sec:completion`). -/
+/-- `0 < K_0` (proof of Proposition 21.1). -/
 theorem K0_pos {a A : ℝ} (ha1 : a < 1) (hA : 0 ≤ A) : 0 < K0 a A :=
   div_pos (by linarith) (by linarith)
 
-/-- `0 < K_match` (`sec:completion`). -/
+/-- `0 < K_match` (proof of Proposition 21.1). -/
 theorem Kmatch_pos {H : ℕ} {Kc : ℝ} (hK : 0 < Kc) : 0 < Kmatch H Kc := by
   unfold Kmatch
   linarith [SH_pos H]
 
-/-- `0 < t_*` (`sec:completion`). -/
+/-- `0 < t_*` (proof of Proposition 21.1). -/
 theorem tstar_pos {H T : ℕ} {Kc : ℝ} (hK : 0 < Kc) (hT : 1 ≤ T) : 0 < tstar H T Kc := by
   have hT' : (1 : ℝ) ≤ T := by exact_mod_cast hT
   have := SH_pos H
@@ -510,7 +514,7 @@ theorem tstar_pos {H T : ℕ} {Kc : ℝ} (hK : 0 < Kc) (hT : 1 ≤ T) : 0 < tsta
   exact lt_min (by positivity) (by positivity)
 
 /-- `t ≤ t_*` gives the two conditions `4 S_H² T² t ≤ 1` and `2 K_match t ≤ 1`
-(`sec:completion`). -/
+(proof of Proposition 21.1). -/
 theorem le_tstar_imp {H T : ℕ} {Kc t : ℝ} (hK : 0 < Kc) (hT : 1 ≤ T)
     (ht : t ≤ tstar H T Kc) :
     4 * SH H ^ 2 * T ^ 2 * t ≤ 1 ∧ 2 * Kmatch H Kc * t ≤ 1 := by
@@ -524,7 +528,7 @@ theorem le_tstar_imp {H T : ℕ} {Kc t : ℝ} (hK : 0 < Kc) (hT : 1 ≤ T)
   · linarith
   · linarith
 
-/-- `J_K(0) < K` for `K > K_0` (`sec:completion`). -/
+/-- `J_K(0) < K` for `K > K_0` (proof of Proposition 21.1). -/
 lemma JK_zero_lt {α a b γ C : ℝ} (ha1 : a < 1) (H T : ℕ) {B Kc : ℝ}
     (hK : K0 a (A0 α γ C H B) < Kc) : JK α a b γ C H T B Kc 0 < Kc := by
   rw [JK_zero]
@@ -532,7 +536,7 @@ lemma JK_zero_lt {α a b γ C : ℝ} (ha1 : a < 1) (H T : ℕ) {B Kc : ℝ}
   rw [div_lt_iff₀ (by linarith)] at hK
   linarith
 
-/-- **`eq:constructive-threshold`**: `ε_K > 0`, `ε_K ≤ t_*`, and `J_K ≤ K` on `[0, ε_K]`. -/
+/-- **Equation (21.2)**: `ε_K > 0`, `ε_K ≤ t_*`, and `J_K ≤ K` on `[0, ε_K]`. -/
 theorem epsK_spec {α a b γ C : ℝ} (hα : 1 ≤ α) (ha0 : 0 ≤ a) (ha1 : a < 1) (hb : 0 ≤ b)
     (hγ : 0 ≤ γ) (hC : 0 ≤ C) {H T : ℕ} {B Kc : ℝ} (hB : 1 ≤ B) (hT : 1 ≤ T)
     (hK : K0 a (A0 α γ C H B) < Kc) :
@@ -544,7 +548,7 @@ theorem epsK_spec {α a b γ C : ℝ} (hα : 1 ≤ α) (ha0 : 0 ≤ a) (ha1 : a 
     (fun t t' ht htt => JK_mono_of_le hα ha0 hb hγ hC H T hB0 hKpos.le ht htt)
     (tstar_pos hKpos hT) (JK_zero_lt ha1 H T hK)
 
-/-- The barrier in real form (`sec:completion`): for `0 ≤ t ≤ ε_K`,
+/-- The barrier in real form (proof of Proposition 21.1): for `0 ≤ t ≤ ε_K`,
 `t + (1 + (2α-1) t) Q̄(t, Kt) ≤ K t`. -/
 theorem barrier_of_le_epsK {α a b γ C : ℝ} (hα : 1 ≤ α) (ha0 : 0 ≤ a) (ha1 : a < 1)
     (hb : 0 ≤ b) (hγ : 0 ≤ γ) (hC : 0 ≤ C) {H T : ℕ} {B Kc : ℝ} (hB : 1 ≤ B) (hT : 1 ≤ T)
@@ -555,10 +559,10 @@ theorem barrier_of_le_epsK {α a b γ C : ℝ} (hα : 1 ≤ α) (ha0 : 0 ≤ a) 
   rw [barrier_eq_mul_JK, mul_comm Kc t]
   exact mul_le_mul_of_nonneg_left hJ ht0
 
-/-! ### The zero-compatible quadratic (`eq:zero-compatible-quadratic`) -/
+/-! ### The zero-compatible quadratic (equation (21.1)) -/
 
 /-- The zero-compatible quadratic `M_η = 2η/(1 - da + √((1-da)² - 4dbη))` of
-`eq:zero-compatible-quadratic`. -/
+equation (21.1). -/
 noncomputable def Meta (a b d η : ℝ) : ℝ :=
   2 * η / (1 - d * a + Real.sqrt ((1 - d * a) ^ 2 - 4 * d * b * η))
 
@@ -569,7 +573,7 @@ lemma Meta_den_pos {a b d η : ℝ} (h1 : d * a < 1) :
   linarith
 
 /-- `M_η` is the smallest nonnegative solution of `M = η + d(aM + bM²)`
-(`eq:zero-compatible-quadratic`). -/
+(equation (21.1)). -/
 theorem Meta_fixed {a b d η : ℝ} (hη : 0 ≤ η) (hd : 0 ≤ d) (hb : 0 ≤ b) (h1 : d * a < 1)
     (h2 : 4 * d * b * η ≤ (1 - d * a) ^ 2) :
     η + d * (a * Meta a b d η + b * Meta a b d η ^ 2) = Meta a b d η := by
@@ -592,24 +596,24 @@ theorem Meta_fixed {a b d η : ℝ} (hη : 0 ≤ η) (hd : 0 ≤ d) (hb : 0 ≤ 
   · exact absurd (pow_eq_zero_iff (n := 2) (by norm_num) |>.mp h1') hden.ne'
   · linarith
 
-/-- `0 ≤ M_η` (`eq:zero-compatible-quadratic`). -/
+/-- `0 ≤ M_η` (equation (21.1)). -/
 theorem Meta_nonneg {a b d η : ℝ} (hη : 0 ≤ η) (h1 : d * a < 1) : 0 ≤ Meta a b d η :=
   div_nonneg (by linarith) (Meta_den_pos (b := b) (η := η) h1).le
 
-/-- `M_η ≤ 2η/(1 - da)` (`eq:zero-compatible-quadratic`). -/
+/-- `M_η ≤ 2η/(1 - da)` (equation (21.1)). -/
 theorem Meta_le {a b d η : ℝ} (hη : 0 ≤ η) (h1 : d * a < 1) :
     Meta a b d η ≤ 2 * η / (1 - d * a) :=
   div_le_div_of_nonneg_left (by linarith) (by linarith)
     (le_add_of_nonneg_right (Real.sqrt_nonneg _))
 
-/-! ### The zero-compatible threshold (`sec:completion`, `δ = 0`) -/
+/-! ### The zero-compatible threshold (Section 19, `δ = 0`) -/
 
 /-- The zero-compatible threshold function `J⁰_K(t) = 1 + (1 + (2α-1)t)(aK + bK²t)`
-(`sec:completion`: `Z̄ = Ē = 0` and `A_0 = 0` when `δ = 0`). -/
+(Section 19: `Z̄ = Ē = 0` and `A_0 = 0` when `δ = 0`). -/
 noncomputable def JK0 (α a b Kc t : ℝ) : ℝ :=
   1 + (1 + (2 * α - 1) * t) * (a * Kc + b * Kc ^ 2 * t)
 
-/-- `ε⁰_K = max{t ∈ [0, 1/(2K)] : J⁰_K(t) ≤ K}` (`sec:completion`). -/
+/-- `ε⁰_K = max{t ∈ [0, 1/(2K)] : J⁰_K(t) ≤ K}` (Section 19). -/
 noncomputable def epsK0 (α a b Kc : ℝ) : ℝ :=
   sSup {t | t ∈ Set.Icc 0 (1 / (2 * Kc)) ∧ JK0 α a b Kc t ≤ Kc}
 
@@ -627,7 +631,7 @@ lemma JK0_continuous (α a b Kc : ℝ) : Continuous (JK0 α a b Kc) := by
   fun_prop
 
 /-- The zero-compatible threshold: `ε⁰_K > 0`, `ε⁰_K ≤ 1/(2K)`, and `J⁰_K ≤ K` on
-`[0, ε⁰_K]` for `K > 1/(1-a)` (`sec:completion`). -/
+`[0, ε⁰_K]` for `K > 1/(1-a)` (Section 19). -/
 theorem epsK0_spec {α a b Kc : ℝ} (hα : 1 ≤ α) (ha0 : 0 ≤ a) (ha1 : a < 1) (hb : 0 ≤ b)
     (hK : 1 / (1 - a) < Kc) :
     0 < epsK0 α a b Kc ∧ epsK0 α a b Kc ≤ 1 / (2 * Kc)
@@ -641,7 +645,7 @@ theorem epsK0_spec {α a b Kc : ℝ} (hα : 1 ≤ α) (ha0 : 0 ≤ a) (ha1 : a <
     (fun t t' ht htt => JK0_mono_of_le hα ha0 hb hKpos.le ht htt)
     (one_div_pos.mpr (by positivity)) h0
 
-/-- The zero-compatible barrier in real form (`sec:completion`): for `0 ≤ t ≤ ε⁰_K`,
+/-- The zero-compatible barrier in real form (Section 19): for `0 ≤ t ≤ ε⁰_K`,
 `t + (1 + (2α-1) t)(a Kt + b (Kt)²) ≤ K t`. -/
 theorem barrier0_of_le_epsK0 {α a b Kc : ℝ} (hα : 1 ≤ α) (ha0 : 0 ≤ a) (ha1 : a < 1)
     (hb : 0 ≤ b) (hK : 1 / (1 - a) < Kc) {t : ℝ} (ht0 : 0 ≤ t) (ht : t ≤ epsK0 α a b Kc) :

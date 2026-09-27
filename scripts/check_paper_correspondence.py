@@ -271,9 +271,9 @@ def scan_paper_file(path: Path) -> list[PaperDeclaration]:
 
 def appendix_lean_section(path: Path) -> str:
     text = strip_tex_comments(path.read_text(encoding="utf-8"))
-    heading = re.search(r"\\section\{The Lean formalisations\}", text)
+    heading = re.search(r"\\section\{[^{}]*\}\s*\\label\{app:lean\}", text)
     if heading is None:
-        raise ManifestError(f"{path}: cannot find the Appendix B Lean-formalisations section")
+        raise ManifestError(f"{path}: cannot find the appendix section labelled app:lean")
     following = re.search(r"\\section\{", text[heading.end() :])
     end = heading.end() + following.start() if following else len(text)
     return text[heading.start() : end].replace(r"\_", "_")

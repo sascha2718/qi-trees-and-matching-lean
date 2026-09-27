@@ -1,6 +1,6 @@
 /-
 The height induction of `arbitrary_offspring_matching.tex` (`sec:completion`): the scalar
-barrier `ζ + D_μ Q(M) ≤ M` of `eq:scalar-barrier-condition` propagates the bound `M` on
+barrier `ζ + A_μ Q(M) ≤ M` of `eq:scalar-barrier-condition` propagates the bound `M` on
 every equal-phase restricted potential from the heights below `h+1` to the height `h+1`,
 through the uniform zero bound `Z` (`z_le_fixed`), the weighted zero bound `E(M)`
 (`wZero_le_Efun`), the child-pair bound `Q(M)` (`childPair_le_Qfun`) and the independent
@@ -97,7 +97,7 @@ theorem fourLawAtZero_of_params (hc : M.IsCompat) (hδ : M.delta = 0) {α β u L
 /-! ### The finite alternative (`sec:completion`) -/
 
 /-- **The height induction, finite alternative** (`sec:completion`): under the scalar
-barrier `ζ + D_μ Q(M) ≤ M` with `Q` evaluated at the uniform zero bound `Z` and the weighted
+barrier `ζ + A_μ Q(M) ≤ M` with `Q` evaluated at the uniform zero bound `Z` and the weighted
 bound `E(M)`, every equal-phase restricted potential at every height is at most `M`. -/
 theorem P_le_finite [Fintype I] (hc : M.IsCompat) (hb0 : rE M.μ M.R M.zero ≠ 0)
     (hFP : M.FreshPositive) {α : ℝ} (hα : 1 ≤ α) {g : ℕ} (Θ : Phase M g) {T : ℕ}
@@ -167,7 +167,7 @@ theorem failProb_le_finite_fresh [Fintype I] (hc : M.IsCompat) (hb0 : rE M.μ M.
 /-! ### The zero-compatible alternative (`sec:completion`) -/
 
 /-- **The height induction, zero-compatible alternative** (`sec:completion`): with
-`δ = 0`, under `ζ + D_μ (a M + b M²) ≤ M`, every restricted potential at every height is
+`δ = 0`, under `ζ + A_μ (a M + b M²) ≤ M`, every restricted potential at every height is
 at most `M`. -/
 theorem P_le_zero (hc : M.IsCompat) (hδ : M.delta = 0) {α : ℝ} (hα : 1 ≤ α) (a b : ℝ≥0∞)
     (hfour : ∀ h Mb, M.FourLawAtZero α h a b Mb) {Mb : ℝ≥0∞}

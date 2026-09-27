@@ -23,14 +23,14 @@ open scoped ENNReal Classical
 
 variable {X : Type*}
 
-/-! ### The symmetrised square, eq (10) -/
+/-! ### The symmetrised square, equation (11.13) -/
 
-/-- The symmetrised square `R^□` of eq (10):
+/-- The symmetrised square `R^□` of equation (11.13):
 `(x₀,x₁) R^□ (y₀,y₁) ↔ (x₀ R y₀ ∧ x₁ R y₁) ∨ (x₀ R y₁ ∧ x₁ R y₀)`.
 
 The second disjunct crosses the coordinates; this is what distinguishes `R^□`
 from the tensor square `ProdRel R R`, and it is exactly the "good antidiagonal"
-of the transversal Lemma 2.2. -/
+of the transversal Lemma 11.4. -/
 def SquareRel (R : X → X → Prop) : X × X → X × X → Prop :=
   fun x y => (R x.1 y.1 ∧ R x.2 y.2) ∨ (R x.1 y.2 ∧ R x.2 y.1)
 
@@ -101,9 +101,9 @@ private lemma tsum_ite_not (μ : PMF X) (R : X → X → Prop) (x : X) :
     (∑' y, if ¬ R x y then μ y else 0) = qE μ R x := by
   rw [qE]; exact tsum_congr fun y => by by_cases h : R x y <;> simp [h]
 
-/-! ### M6b: the good and bad degree of `R^□`, eqs (13),(14) -/
+/-! ### M6b: the good and bad degree of `R^□`, equations (11.19) and (11.20) -/
 
-/-- **eq (13)**, the good-degree inclusion-exclusion for `R^□`, in additive
+/-- **Equation (11.19)**, the good-degree inclusion-exclusion for `R^□`, in additive
 form (so no `ℝ≥0∞` subtraction): `R + a² = 2 r₀ r₁`.
 
 The two diagonals of the `2×2` array each succeed with probability `r₀ r₁`, and
@@ -154,10 +154,10 @@ lemma rE_square_add_aOverlap_sq (μ : PMF X) (R : X → X → Prop) (x₀ x₁ :
   rw [hSq, hInt, hA, hB] at hadd
   rw [hadd]; ring
 
-/-- **eq (14)**, the bad-degree union bound for `R^□`: `Q ≤ q₀² + q₁² + 2c`.
+/-- **Equation (11.20)**, the bad-degree union bound for `R^□`: `Q ≤ q₀² + q₁² + 2c`.
 
 A pair `(Y₀,Y₁)` fails to give a good transversal exactly when
-`(x₀,x₁) ⋠^{(2)} (Y₀,Y₁)`; by the `2×2` transversal (Lemma 2.2, here the same
+`(x₀,x₁) ⋠^{(2)} (Y₀,Y₁)`; by the `2×2` transversal (Lemma 11.4, here the same
 finite propositional fact dispatched by `tauto`) this forces a bad row or a bad
 column. The four bad-line events have probabilities `q₀²`, `q₁²`, `c`, `c`, and
 the pointwise indicator bound is the union bound. -/
@@ -168,7 +168,7 @@ lemma qE_square_le (μ : PMF X) (R : X → X → Prop) (x₀ x₁ : X) :
       = ∑' p : X × X, if SquareRel R (x₀, x₁) p then 0 else μ p.1 * μ p.2 := by
     rw [qE]; simp_rw [prodPMF_apply]
   -- pointwise union bound: a pair with no good transversal lands in one of the
-  -- four bad lines (Lemma 2.2), so its weight is at most their indicator sum.
+  -- four bad lines (Lemma 11.4), so its weight is at most their indicator sum.
   have hpoint : ∀ p : X × X,
       (if SquareRel R (x₀, x₁) p then 0 else μ p.1 * μ p.2)
         ≤ (if ¬ R x₀ p.1 ∧ ¬ R x₀ p.2 then μ p.1 * μ p.2 else 0)

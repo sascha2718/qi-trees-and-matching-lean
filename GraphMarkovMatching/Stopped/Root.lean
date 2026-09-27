@@ -1,6 +1,6 @@
 /-
 The independent root of `arbitrary_offspring_matching.tex` (`sec:independent-root`): the
-restricted potential at height `h+1` is at most `ζ + D_μ Q` whenever the child-pair
+restricted potential at height `h+1` is at most `ζ + A_μ Q` whenever the child-pair
 restricted potential is at most `Q`, using the root identity
 `(1 - sr)/(sr)^α = (1-s)/s^α · r^{-α} + s^{1-α}(1-r)/r^α`, the inverse moment
 `1 + α Q` of the child pair, and the independence of the source root state from its
@@ -134,7 +134,7 @@ theorem P_zero_le (hc : M.IsCompat) {α : ℝ} (hα : 1 ≤ α) (s t : I) :
 
 /-- **The root averages**: the restricted root potential times the inverse moment factor
 `1 + α Qb`, plus the restricted `(1-α)`-moment of the root factor times `Qb`, is at most
-`ζ_α + D_μ Qb` in each of the three cases (fresh-fresh, forced-fresh, forced target). -/
+`ζ_α + A_μ Qb` in each of the three cases (fresh-fresh, forced-fresh, forced target). -/
 private lemma root_average_le {α : ℝ} (s t : I) (Qb : ℝ≥0∞) :
     PhiDres α (M.rootLaw s) (M.rootLaw t) M.R * (1 + ENNReal.ofReal α * Qb)
       + (∑' v, M.rootLaw s v * (if rE (M.rootLaw t) M.R v = 0 then 0
@@ -196,7 +196,7 @@ private lemma root_average_le {α : ℝ} (s t : I) (Qb : ℝ≥0∞) :
 set_option linter.unusedVariables false in
 /-- **The root step** (`sec:independent-root`): if the restricted potential of the source
 child-pair mixture against the target child-pair mixture at height `h` is at most `Qb`,
-the restricted potential at height `h+1` is at most `ζ_α + D_μ Qb`.  The compatibility
+the restricted potential at height `h+1` is at most `ζ_α + A_μ Qb`.  The compatibility
 hypothesis of `sec:quantitative-stopping` is carried for a uniform interface; the root
 identity and the inverse moment need only `α ≥ 1`. -/
 theorem P_succ_le (hc : M.IsCompat) {α : ℝ} (hα : 1 ≤ α) (s t : I) (h : ℕ) {Qb : ℝ≥0∞}

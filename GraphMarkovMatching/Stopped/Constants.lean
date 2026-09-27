@@ -5,9 +5,9 @@ and `sec:independent-root`) and their bounds:
 * `eta`, `delta`, `e0`, `zeta`: the graph potential `η_{G,α}(μ)`, the incompatible root
   mass `δ = 1 - b(0)`, the forced-state term `φ_α(δ)` and the defect
   `ζ_α = max{η_α, φ_α(δ)}`, infinite when `b(0) = 0`;
-* `fRoot`, `RmuC`, `DmuC`: the root factors `f`, `R_μ` and `D_μ`;
+* `fRoot`, `RmuC`, `DmuC`: the root factors `f`, `R_μ` and `A_μ`;
 * `delta_le_zeta`, `fRoot_le`, `fRoot_le_zeta`, `RmuC_le`, `DmuC_le`
-  (`eq:root-parameter-bounds` and `D_μ ≤ 1 + (2α-1)ζ`);
+  (`eq:root-parameter-bounds` and `A_μ ≤ 1 + (2α-1)ζ`);
 * `e0_le_eta_div`, `fRoot_le_eta_div`, `delta_le_eta_div`, `zeta_le_eta_div`: the bounds
   through `η` when `μ(0) ≥ p > 0`.
 -/
@@ -108,8 +108,8 @@ noncomputable def RmuC (α : ℝ) : ℝ≥0∞ :=
   max 1 (max (WresD α M.μ M.R M.zero)
     (∑' v, M.μ v * (if M.R v M.zero then WresD α M.μ M.R v else 0)))
 
-/-- The integrated root coefficient
-`D_μ = max{1, α η + ∑_v μ(v) b(v)^{1-α}, α e_0 + b(0)^{1-α}}`. -/
+/-- The paper's integrated root coefficient `A_μ`, represented by `Model.DmuC`:
+`A_μ = max{1, α η + ∑_v μ(v) b(v)^{1-α}, α e_0 + b(0)^{1-α}}`. -/
 noncomputable def DmuC (α : ℝ) : ℝ≥0∞ :=
   max 1 (max (ENNReal.ofReal α * M.eta α + ∑' v, M.μ v * (rE M.μ M.R v) ^ (1 - α))
     (ENNReal.ofReal α * M.e0 α + (rE M.μ M.R M.zero) ^ (1 - α)))
@@ -228,7 +228,7 @@ private lemma tsum_rpow_one_sub_le (hc : M.IsCompat) {α : ℝ} (hα : 1 ≤ α)
     _ = 1 + ENNReal.ofReal (α - 1) * M.eta α := by
         rw [ENNReal.tsum_add, ENNReal.tsum_mul_left, PMF.tsum_coe, eta, PhiD]
 
-/-- `D_μ ≤ 1 + (2α - 1) ζ_α` (`sec:independent-root`), from
+/-- `A_μ ≤ 1 + (2α - 1) ζ_α` (`sec:independent-root`), from
 `s^{1-α} ≤ 1 + (α-1)(1-s)/s^α`. -/
 lemma DmuC_le (hc : M.IsCompat) {α : ℝ} (hα : 1 ≤ α) :
     M.DmuC α ≤ 1 + ENNReal.ofReal (2 * α - 1) * M.zeta α := by

@@ -7,6 +7,7 @@ manuscript_files:
   - gw_classes_simple.tex
   - matching_classes_general.tex
   - arbitrary_offspring_matching.tex
+  - markov_matching_applications.tex
   - trichotomy.tex
   - quasi_isometric_embeddings.tex
 
@@ -20,6 +21,7 @@ entries:
     lean: ["ChainClasses.shiftSupp"]
     relation: representation
     headline: false
+    note: "shiftSupp records the positive shifted arities generating the branching semigroup. The paper's Lambda_theta is represented by AddSubmonoid.closure (ChainClasses.shiftSupp θ : Set ℕ)."
 
   - source: "thm:trichotomy"
     kind: theorem
@@ -27,7 +29,7 @@ entries:
     lean: ["Challenge.audit_bounded_graph_qi_point", "Challenge.audit_extinction_of_not_supercritical", "Challenge.audit_full_classification_ae_iff"]
     relation: split
     headline: true
-    note: "The three audited declarations separate the finite-class input from the full classification. The classification endpoint places no restriction on the two laws and holds almost surely under the product of the unconditioned laws. It expresses the conditioning on infinite diameter by quantifying over the surviving samples, and its first alternative is the finite class. The library internally replaces a nonminimal support bound J by the actual largest supported arity."
+    note: "The three audited declarations separate the finite-class input from the full classification. The classification endpoint places no restriction on the two laws and holds almost surely under the product of the unconditioned laws. It expresses the conditioning on infinite diameter by quantifying over the surviving samples, and its first alternative is the finite class. The library internally replaces a nonminimal support bound J by the actual largest supported arity. The formal laws have support bounded above by J, with no requirement that theta_J > 0, and are realised in an ambient N-ary tree with J <= N. Almost surely, a root-preserving quasi-isometry exists exactly when both trees are finite, or both survive and Challenge.SameInfiniteClass holds. Conditioning on both survival events recovers the printed statement for the laws allowed there, which have positive survival probability. The other laws die out almost surely."
 
   - source: "thm:twovalue"
     kind: theorem
@@ -35,6 +37,7 @@ entries:
     lean: ["Challenge.audit_twovalue_ae_tree_family", "Challenge.audit_twovalue_rate_tree"]
     relation: split
     headline: true
+    note: "The formal statements use t = theta_2 and theta_1 = 1 - t. The formal rate is 256 sqrt((1-t)^(D(2D-5))), equal to 256 theta_1^(D(D-5/2)) for D >= 3. Thus the formal proof supplies C = 256 in eq:rate, where the paper allows C to depend on theta_1."
 
   - source: "thm:boundary"
     kind: corollary
@@ -49,7 +52,7 @@ entries:
     lean: ["BranchingProcess.IsQIWith", "BranchingProcess.IsQIEmbWith"]
     relation: specialization
     headline: false
-    note: "The paper gives the metric-space definition; the Lean declarations are its graph-metric form, for quasi-isometries and for the quasi-isometric embeddings defined after it."
+    note: "The paper gives the metric-space definition; the Lean declarations are its graph-metric form, for quasi-isometries and for the quasi-isometric embeddings defined after it. In Challenge.lean, GraphQIEmbWith retains the two metric inequalities of GraphQIWith and omits the density condition."
 
   - source: "thm:embedding-hierarchy"
     kind: theorem
@@ -57,7 +60,7 @@ entries:
     lean: ["Challenge.audit_mutual_embeddability"]
     relation: exact
     headline: true
-    note: "The conditioning on infinite diameter is expressed by quantifying over the surviving samples of the unconditioned law, as in the classification endpoint. The proof chooses a representative of a chain class from the atoms of its semigroup and treats the bushy class through the survival skeleton. Lean first trims the support bound to J = max supp theta, then uses one representative for all three supercritical classes, the mixture theta' = (7/8) delta_{J_1} + (1/8) theta with J_1 - 1 = 24(J - 1) a multiple of a generator of Lambda_theta (BranchingProcess.Offspring.concentrate), which lies in the class of theta by BranchingProcess.Offspring.sameInfiniteClass_concentrate. The retained vertex of the representative is found under the conditioned law as in the note on thm:concentrated-regular-subtree, so the bushy case does not pass through the skeleton, and the classification transports the binary subtree in every case. The passage from the product law to the law of the tree uses that the representative survives with positive probability. No measurability of the embedding event is asserted. The strict hierarchy Fin < N_0 < T of sec:embedding-hierarchy carries no numbered statement in the paper. Lean records it in ChainClasses.qiEmbeddable_rayGraph_of_not_survives, ChainClasses.not_qiEmbeddable_rayGraph_of_not_survives, ChainClasses.qiEmbeddable_rayGraph_of_survives and ChainClasses.ae_not_qiEmbeddable_rayGraph, the last through BranchingProcess.not_qiEmbeddable_rayGraph, the form of thm:three-rays for quasi-isometric embeddings from which the quasi-isometry statement is derived. The composition of the two embeddings for two independent laws is ChainClasses.mutual_embeddability_ae."
+    note: "The conditioning on infinite diameter is expressed by quantifying over the surviving samples of the unconditioned law, as in the classification endpoint. The proof chooses a representative of a chain class from the atoms of its semigroup and treats the bushy class through the survival skeleton. Lean first trims the support bound to J = max supp theta, then uses one representative for all three supercritical classes, the mixture theta' = (7/8) delta_{J_1} + (1/8) theta with J_1 - 1 = 24(J - 1) a multiple of a generator of Lambda_theta (BranchingProcess.Offspring.concentrate), which lies in the class of theta by BranchingProcess.Offspring.sameInfiniteClass_concentrate. The retained vertex of the representative is found under the conditioned law as in the note on thm:concentrated-regular-subtree, so the bushy case does not pass through the skeleton, and the classification transports the binary subtree in every case. The passage from the product law to the law of the tree uses that the representative survives with positive probability. No measurability of the embedding event is asserted. The strict hierarchy Fin < N_0 < T of sec:embedding-hierarchy carries no numbered statement in the paper. Lean records it in ChainClasses.qiEmbeddable_rayGraph_of_not_survives, ChainClasses.not_qiEmbeddable_rayGraph_of_not_survives, ChainClasses.qiEmbeddable_rayGraph_of_survives and ChainClasses.ae_not_qiEmbeddable_rayGraph, the last through BranchingProcess.not_qiEmbeddable_rayGraph, the form of thm:three-rays for quasi-isometric embeddings from which the quasi-isometry statement is derived. The composition of the two embeddings for two independent laws is ChainClasses.mutual_embeddability_ae. The binary tree is represented by the parent-child graph of all finite words over a two-letter alphabet."
 
   - source: "thm:concentrated-regular-subtree"
     kind: lemma
@@ -87,7 +90,7 @@ entries:
     lean: ["Challenge.audit_graph_leaf_matching_bound", "Challenge.audit_graph_full_matching_bound", "Challenge.audit_exists_infinite_tree_matching_graphAut"]
     relation: split
     headline: true
-    note: "The library constructs the probability space of the infinite-height declaration from the infinite product measure."
+    note: "The library constructs the probability space of the infinite-height declaration from the infinite product measure. The infinite-height endpoint asserts the existence of a probability space carrying two independent consistent labelling processes with the prescribed finite-height laws, and bounds the probability that a single root-fixing automorphism matches every vertex. Its compatibility relation is reflexive and symmetric, equivalent to equality or adjacency in the simple graph joining distinct related labels."
 
   - source: "thm:full-probability-recursion"
     kind: proposition
@@ -109,7 +112,7 @@ entries:
     lean: ["Challenge.audit_markov_matching_finite", "Challenge.audit_markov_matching_zero", "Challenge.audit_markov_matching_finite_infinite", "Challenge.audit_markov_matching_zero_infinite"]
     relation: split
     headline: true
-    note: "The library obtains the processes of the infinite-height declarations from the Ionescu-Tulcea trajectory measure. It proves the finite alternative for retained transitions J_t, recorded in GraphMarkovMatching.Stopped.Model.Selection, and Solution.lean applies it with J_t = supp P_t. The finite-height bound in terms of eta_alpha for the finite alternative is GraphMarkovMatching.Stopped.markov_matching_finite_eta. The remaining bounds in terms of eta_alpha follow from the audited bounds and the inequality zeta_alpha <= eta_alpha/p, which is GraphMarkovMatching.Stopped.Model.zeta_le_eta_div."
+    note: "The library obtains the processes of the infinite-height declarations from the Ionescu-Tulcea trajectory measure. It proves the finite alternative for retained transitions J_t, recorded in GraphMarkovMatching.Stopped.Model.Selection, and Solution.lean applies it with J_t = supp P_t. The finite-height bound in terms of eta_alpha for the finite alternative is GraphMarkovMatching.Stopped.markov_matching_finite_eta. The remaining bounds in terms of eta_alpha follow from the audited bounds and the inequality zeta_alpha <= eta_alpha/p, which is GraphMarkovMatching.Stopped.Model.zeta_le_eta_div. The challenge statements use full transition supports and bounds in terms of zeta_alpha. The retained-transition and eta_alpha refinements belong to the library correspondence rather than to these challenge statements. When mu(0) >= p > 0, the comparison zeta_alpha <= eta_alpha/p gives bounds of the form (K/p) eta_alpha with the correspondingly rescaled smallness threshold. All four endpoints use a reflexive symmetric compatibility relation, equivalent to equality or adjacency in the simple graph joining distinct related labels. Each infinite-height endpoint asserts the existence of a probability space carrying two independent consistent processes with the prescribed finite-height laws, and bounds the probability that a single root-fixing automorphism matches every vertex."
 
   - source: "thm:two-sided-potential"
     kind: lemma
@@ -506,7 +509,7 @@ entries:
     lean: ["GraphMarkovMatching.Stopped.fourLaw_contraction"]
     relation: exact
     headline: false
-    note: "The paper uses the exact constants L_alpha(beta), K_alpha(beta) and L_alpha. The Lean lemma permits arbitrary majorants L >= L_alpha(beta), K >= K_alpha(beta) and L_0 >= L_alpha. The four audited matching declarations choose these majorants before the Markov model, which makes their claimed uniformity part of the quantified statement."
+    note: "The paper uses the exact constants L_alpha(beta), K_alpha(beta) and L_alpha. The Lean lemma permits arbitrary majorants L >= L_alpha(beta), K >= K_alpha(beta) and L_0 >= L_alpha. The four audited matching declarations choose these majorants before the Markov model, which makes their claimed uniformity part of the quantified statement. The paper's error bounds delta_1 and delta_2 are the Lean parameters z and e, respectively."
 
   - source: "thm:zero-degree-dichotomy"
     kind: lemma
@@ -521,6 +524,7 @@ entries:
     lean: ["GraphMarkovMatching.Stopped.Model.zeroMass_le_of_stops", "GraphMarkovMatching.Stopped.Model.z_le_of_returns"]
     relation: split
     headline: false
+    note: "Model.z s t h is the zero-degree probability for one ordered type pair. The paper's delta_{1,h} is its supremum over all type pairs when b(0) = 1, and its maximum over equal-phase pairs otherwise. The Lean estimates are stated pairwise, so their uniform bounds imply the paper's aggregate bound."
 
   - source: "thm:explicit-weighted-bound"
     kind: lemma
@@ -532,9 +536,10 @@ entries:
   - source: "thm:one-step-closure"
     kind: lemma
     status: formalized
-    lean: ["GraphMarkovMatching.Stopped.Model.fourLawAt_of_params"]
-    relation: exact
+    lean: ["GraphMarkovMatching.Stopped.Model.P_succ_le", "GraphMarkovMatching.Stopped.Model.DmuC_le", "GraphMarkovMatching.Stopped.Model.childPair_le_Qfun", "GraphMarkovMatching.Stopped.Model.fourLawAt_of_params"]
+    relation: split
     headline: false
+    note: "Model.P_succ_le gives the root inequality with the paper's A_mu represented by Model.DmuC; Model.DmuC_le gives its coefficient bound. Model.childPair_le_Qfun supplies the child-pair estimate in the finite-type case, using the four-law input furnished by Model.fourLawAt_of_params and the preceding zero-degree and weighted bounds. When b(0) = 1, Model.childPair_le_of_delta_zero and Model.fourLawAtZero_of_params supply the corresponding ingredients. This is a composition of estimates, not an exact restatement by the preparatory four-law lemma."
 
   - source: "thm:zero-mixture-convexity"
     kind: lemma
@@ -632,13 +637,6 @@ entries:
     status: formalized
     lean: ["ChainClasses.bushy_general_ae"]
     relation: exact
-    headline: false
-
-  - source: "thm:chain-cross"
-    kind: lemma
-    status: formalized
-    lean: ["ChainClasses.neck_ratio_of_compat", "ChainClasses.flatG_markedQI"]
-    relation: split
     headline: false
 
   - source: "thm:chain-general"

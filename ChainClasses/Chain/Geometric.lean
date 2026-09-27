@@ -5,7 +5,7 @@ import Mathlib.Probability.Independence.Basic
 import Mathlib.Analysis.SpecificLimits.Basic
 
 /-!
-`thm:geometric` of `matching_classes_simple.tex`, the probabilistic layer of the
+Lemma 9.2 of `matching_classes_simple.tex`, the probabilistic layer of the
 chain encoding, over an abstract i.i.d. offspring field `X : Word → Ω → Bool`
 with `P {X v = true} = θ₂ = t`.
 
@@ -15,15 +15,15 @@ with `P {X v = true} = θ₂ = t`.
 * `measurableSet_labAux`, `measurable_labAux`: the label events are measurable.
 * `not_chains_null`, `chains_ae`: the event `Ω₀`, that every chain terminates,
   has full probability.
-* `exploration`: `eq:exploration`, the product formula for the label events of
-  a prefix-closed finite set of binary words.
+* `exploration`: the product formula for label events over a prefix-closed finite
+  set of binary words, establishing the independence in Lemma 9.2.
 * `label_prod`: the same product formula for an arbitrary finite set, by
   summing out the missing prefixes.
 * `label_marginal`: the geometric law `ℙ(λ(w) = m) = θ₁^(m-1) θ₂`.
 * `label_iIndepFun`: the labels form an independent family; together with
-  `label_marginal` this is `thm:geometric`.
+  `label_marginal` this is Lemma 9.2.
 * `quantised_label_iIndepFun`: the quantised labels `ℓ_D(λ(w))` inherit the
-  independence, the independence clause of `thm:quantised-law`.
+  independence, the independence clause of Lemma 9.6.
 -/
 
 namespace ChainClasses
@@ -38,11 +38,11 @@ open scoped ENNReal Classical
 noncomputable def kappaAux (χ : Word → Bool) (v : Word) : ℕ :=
   if h : ∃ k, χ (v ++ List.replicate k false) = true then Nat.find h + 1 else 0
 
-/-- The junk-valued projection: the fold of `eq:phi-def` through `kappaAux`. -/
+/-- The junk-valued projection: the fold of equation (9.1) through `kappaAux`. -/
 noncomputable def iotaAux (χ : Word → Bool) (w : Word) : Word :=
   w.foldl (fun v j => v ++ List.replicate (kappaAux χ v - 1) false ++ [j]) []
 
-/-- The junk-valued labelling `eq:lambda-def`. -/
+/-- The junk-valued labelling of equation (9.2). -/
 noncomputable def labAux (χ : Word → Bool) (w : Word) : ℕ := kappaAux χ (iotaAux χ w)
 
 lemma labAux_def (χ : Word → Bool) (w : Word) : labAux χ w = kappaAux χ (iotaAux χ w) := rfl
@@ -70,7 +70,7 @@ lemma one_le_labAux {χ : Word → Bool} (hχ : Chains χ) (w : Word) : 1 ≤ la
   rw [labAux_eq hχ]
   exact lab_pos hχ w
 
-/-- `eq:phi-def` for the totalised projection. -/
+/-- Equation (9.1) for the totalised projection. -/
 lemma iotaAux_concat (χ : Word → Bool) (w : Word) (j : Bool) :
     iotaAux χ (w ++ [j])
       = iotaAux χ w ++ List.replicate (labAux χ w - 1) false ++ [j] := by
@@ -123,7 +123,7 @@ lemma kappaAux_eq_zero_iff {χ : Word → Bool} {v : Word} :
 /-! ### The deterministic bridge
 
 The projection of a deterministic labelling `n : Word → ℕ` through the encoding
-fold, `eq:normal-form` read off `n` alone; everything in this layer is private. -/
+fold, equation (9.3) read off `n` alone; everything in this layer is private. -/
 
 private noncomputable def iotaN (n : Word → ℕ) (w : Word) : Word :=
   (w.foldl (fun p j => (p.1 ++ [j], p.2 ++ List.replicate (n p.1 - 1) false ++ [j]))
@@ -256,7 +256,7 @@ private lemma labAux_eq_iff_pattern (χ : Word → Bool) (n : Word → ℕ) {w :
 
 /-- The full label prescription on a prefix-closed finite set is exactly the
 coordinate pattern along all its chains; the reverse direction is the
-exploration induction of `thm:geometric`. -/
+exploration induction of Lemma 9.2. -/
 private lemma labAux_forall_iff_pattern (χ : Word → Bool) (s : Finset Word)
     (hs : ∀ w ∈ s, ∀ p, p <+: w → p ∈ s) (n : Word → ℕ) (hn : ∀ w ∈ s, 1 ≤ n w) :
     (∀ w ∈ s, labAux χ w = n w) ↔
@@ -504,8 +504,8 @@ private lemma prob_coordEvent (hmeas : ∀ v, Measurable (X v)) (hindep : iIndep
   rw [hlast, prob_coord_true P X t htrue, Finset.prod_congr rfl hchain, Finset.prod_const,
     Finset.card_range, ← ENNReal.ofReal_pow h0, ← ENNReal.ofReal_mul (pow_nonneg h0 k)]
 
-/-- **`eq:exploration`**: for a prefix-closed finite set of binary words the
-label events factorise into the geometric masses. -/
+/-- **Finite-label factorisation for Lemma 9.2**: for a prefix-closed finite set
+of binary words the label events factorise into the geometric masses. -/
 theorem exploration (hmeas : ∀ v, Measurable (X v)) (hindep : iIndepFun X P)
     (htrue : ∀ v, P {ω | X v ω = true} = ENNReal.ofReal t) (ht1 : t ≤ 1)
     (ht0 : 0 ≤ t) (s : Finset Word) (hs : ∀ w ∈ s, ∀ p, p <+: w → p ∈ s)
@@ -605,7 +605,7 @@ private lemma mem_closureF {s : Finset Word} {p : Word} :
     p ∈ closureF s ↔ ∃ w ∈ s, p <+: w := by
   simp [closureF, List.mem_inits]
 
-/-- **`thm:geometric`, the product formula**: over an arbitrary finite set of
+/-- **Lemma 9.2, the product formula**: over an arbitrary finite set of
 binary words the label events factorise into the geometric masses. -/
 theorem label_prod (hmeas : ∀ v, Measurable (X v)) (hindep : iIndepFun X P)
     (htrue : ∀ v, P {ω | X v ω = true} = ENNReal.ofReal t) (ht : 0 < t) (ht1 : t ≤ 1)
@@ -698,7 +698,7 @@ theorem label_prod (hmeas : ∀ v, Measurable (X v)) (hindep : iIndepFun X P)
         zero_add, tsum_congr hterm, ENNReal.tsum_mul_right, tsum_geometric_mass t ht ht1,
         one_mul]
 
-/-- **`thm:geometric`, the marginal law**: each label is geometric,
+/-- **Lemma 9.2, the marginal law**: each label is geometric,
 `ℙ(λ(w) = m) = θ₁^(m-1) θ₂`. -/
 theorem label_marginal (hmeas : ∀ v, Measurable (X v)) (hindep : iIndepFun X P)
     (htrue : ∀ v, P {ω | X v ω = true} = ENNReal.ofReal t) (ht : 0 < t) (ht1 : t ≤ 1)
@@ -782,10 +782,10 @@ private lemma labelPi_iIndepSets (hmeas : ∀ v, Measurable (X v)) (hindep : iIn
     label_meas_biInter P X t hmeas hindep htrue ht ht1 S n]
   exact (Finset.prod_congr rfl fun w hw => by rw [hset w hw]).symm
 
-/-- **`thm:geometric`, independence**: the chain labels of an i.i.d. offspring
+/-- **Lemma 9.2, independence**: the chain labels of an i.i.d. offspring
 field form an independent family. Together with `label_marginal` this is the
 statement of the lemma, and it certifies the independence clause of
-`thm:quantised-law` at its root. -/
+Lemma 9.6 at its root. -/
 theorem label_iIndepFun (hmeas : ∀ v, Measurable (X v)) (hindep : iIndepFun X P)
     (htrue : ∀ v, P {ω | X v ω = true} = ENNReal.ofReal t) (ht : 0 < t) (ht1 : t ≤ 1) :
     iIndepFun (fun w ω => labAux (fun v => X v ω) w) P := by
@@ -795,7 +795,7 @@ theorem label_iIndepFun (hmeas : ∀ v, Measurable (X v)) (hindep : iIndepFun X 
     (fun w => labelPi_isPiSystem X w) (fun w => comap_label_eq X w)
     (labelPi_iIndepSets P X t hmeas hindep htrue ht ht1)
 
-/-- **The independence clause of `thm:quantised-law`**: the quantised labels
+/-- **The independence clause of Lemma 9.6**: the quantised labels
 `ℓ_D(λ(w))`, `w ∈ 𝔹`, form an independent family. -/
 theorem quantised_label_iIndepFun (D : ℕ) (hmeas : ∀ v, Measurable (X v))
     (hindep : iIndepFun X P) (htrue : ∀ v, P {ω | X v ω = true} = ENNReal.ofReal t)

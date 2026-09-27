@@ -2,6 +2,10 @@
 The unweighted stopped expansion of `arbitrary_offspring_matching.tex`
 (`sec:unweighted`, `thm:explicit-zero-bound`).
 
+`Model.z s t h` is the zero-degree probability for one ordered pair of types. The paper's
+`δ_{1,h}` is its supremum over all type pairs when `b(0) = 1`, and its maximum over
+equal-phase pairs otherwise. The pairwise bounds below give the corresponding uniform bounds.
+
 * `zeroEv_succ_imp`: the dichotomy of an impossible comparison at a compatible source
   root: one source child has degree zero against every child type, or both source
   children have degree zero against some child type;
@@ -9,9 +13,9 @@ The unweighted stopped expansion of `arbitrary_offspring_matching.tex`
   `δ` and the split contributing the product of the two union masses;
 * `zeroMass_zero_le`: the height-zero terminal case;
 * `zeroMass_le_of_stops`: the stopped expansion, `G_n(2) (δ + T² m²)` under `Stops`;
-* `z_le_of_returns` (`thm:explicit-zero-bound`): the recurrence
-  `z_h ≤ S_H δ + S_H T² (max_{j<h} z_j)²`;
-* `z_le_fixed`: any `Z` with `S_H (δ + T² Z²) ≤ Z` bounds every `z_h`.
+* `z_le_of_returns` (`thm:explicit-zero-bound`): the pairwise form of the recurrence
+  `δ_{1,h} ≤ S_H δ + S_H T² (max_{j<h} δ_{1,j})²`;
+* `z_le_fixed`: any `Z` with `S_H (δ + T² Z²) ≤ Z` bounds every equal-phase `Model.z s t h`.
 -/
 import GraphMarkovMatching.Stopped.Moments
 
@@ -298,8 +302,10 @@ theorem zeroMass_le_of_stops [Fintype I] (hc : M.IsCompat) (hb0 : rE M.μ M.R M.
         _ = SHe (n + 1) * X := by
             rw [SHe_succ, hX]; ring
 
-/-- **`thm:explicit-zero-bound`**: under common returns within `H`,
-`z_h ≤ S_H δ + S_H T² (max_{j<h} z_j)²` for every equal-phase pair. -/
+/-- **`thm:explicit-zero-bound`**: under common returns within `H`, the pairwise bound
+`Model.z s t h ≤ S_H (δ + T² m²)` for equal-phase pairs, where `m` bounds all earlier
+equal-phase zero-degree probabilities. Taking the maximum gives the paper's recurrence
+for `δ_{1,h}`. -/
 theorem z_le_of_returns [Fintype I] (hc : M.IsCompat) (hb0 : rE M.μ M.R M.zero ≠ 0)
     (hFP : M.FreshPositive) {g : ℕ} (Θ : Phase M g) {T : ℕ} (hT : ∀ i, Θ.count i ≤ T)
     {H : ℕ} (hCR : M.CommonReturns Θ H) {h : ℕ} {m : ℝ≥0∞}

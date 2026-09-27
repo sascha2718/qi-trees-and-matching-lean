@@ -2,11 +2,11 @@ import ChainClasses.Chain.Geometric
 import BranchingProcess.Field
 
 /-!
-The chain half of `thm:geometric` of `matching_classes_simple.tex` on a concrete
+The chain half of Lemma 9.2 of `matching_classes_simple.tex` on a concrete
 probability space. `ChainClasses.Chain.Geometric` carries the probabilistic content
 over an assumed i.i.d. offspring field; the space is supplied here by the
 Bernoulli field of `BranchingProcess.Field`, indexed by `Word`, so the offspring
-field of `sec:encoding` is a coordinate family and the hypotheses of the chain
+field of Section 9.1 is a coordinate family and the hypotheses of the chain
 half are discharged rather than assumed.
 
 * `chainMeasure`: the offspring field in which each vertex independently has two
@@ -17,8 +17,8 @@ half are discharged rather than assumed.
   coordinate field.
 * `chainMeasure_chains_ae`: the event that every chain terminates has full
   probability.
-* `chainMeasure_exploration`: `eq:exploration`, the product formula over a
-  prefix-closed finite set of binary words.
+* `chainMeasure_exploration`: the product formula over a prefix-closed finite set
+  of binary words, establishing the independence in Lemma 9.2.
 * `chainMeasure_label_marginal`: the geometric law `ℙ(λ(w) = m) = θ₁^(m-1) θ₂`.
 * `chainMeasure_label_iIndepFun`, `chainMeasure_quantised_label_iIndepFun`: the
   labels and the quantised labels form independent families.
@@ -32,7 +32,7 @@ open MeasureTheory ProbabilityTheory BranchingProcess
 
 /-! ### The offspring field -/
 
-/-- The offspring field of `sec:encoding`: on the space of `Bool`-valued fields
+/-- The offspring field of Section 9.1: on the space of `Bool`-valued fields
 indexed by the binary words, each vertex independently has two children with
 probability `t`, the paper's `θ₂`, and one otherwise. -/
 noncomputable def chainMeasure {t : ℝ} (ht : 0 < t) (ht1 : t ≤ 1) : Measure (Word → Bool) :=
@@ -69,8 +69,8 @@ theorem chainMeasure_chains_ae {t : ℝ} (ht : 0 < t) (ht1 : t ≤ 1) :
     measurable_chainMeasure_coord (chainMeasure_iIndepFun ht ht1)
     (chainMeasure_coord_true ht ht1) ht
 
-/-- **`eq:exploration`**: for a prefix-closed finite set of binary words the
-label events of the offspring field factorise into the geometric masses. -/
+/-- **Finite-label factorisation for Lemma 9.2**: for a prefix-closed finite set
+of binary words the label events of the offspring field factorise into the geometric masses. -/
 theorem chainMeasure_exploration {t : ℝ} (ht : 0 < t) (ht1 : t ≤ 1) (s : Finset Word)
     (hs : ∀ w ∈ s, ∀ p, p <+: w → p ∈ s) (n : Word → ℕ) (hn : ∀ w ∈ s, 1 ≤ n w) :
     chainMeasure ht ht1 (⋂ w ∈ s, {ω | labAux ω w = n w})
@@ -79,7 +79,7 @@ theorem chainMeasure_exploration {t : ℝ} (ht : 0 < t) (ht1 : t ≤ 1) (s : Fin
     measurable_chainMeasure_coord (chainMeasure_iIndepFun ht ht1)
     (chainMeasure_coord_true ht ht1) ht1 ht.le s hs n hn
 
-/-- **`thm:geometric`, the marginal law**: each label of the offspring field is
+/-- **Lemma 9.2, the marginal law**: each label of the offspring field is
 geometric, `ℙ(λ(w) = m) = θ₁^(m-1) θ₂`. -/
 theorem chainMeasure_label_marginal {t : ℝ} (ht : 0 < t) (ht1 : t ≤ 1) (w : Word)
     {m : ℕ} (hm : 1 ≤ m) :
@@ -88,7 +88,7 @@ theorem chainMeasure_label_marginal {t : ℝ} (ht : 0 < t) (ht1 : t ≤ 1) (w : 
     measurable_chainMeasure_coord (chainMeasure_iIndepFun ht ht1)
     (chainMeasure_coord_true ht ht1) ht ht1 w hm
 
-/-- **`thm:geometric`, independence**: the chain labels of the offspring field
+/-- **Lemma 9.2, independence**: the chain labels of the offspring field
 form an independent family. -/
 theorem chainMeasure_label_iIndepFun {t : ℝ} (ht : 0 < t) (ht1 : t ≤ 1) :
     iIndepFun (fun (w : Word) (ω : Word → Bool) ↦ labAux ω w) (chainMeasure ht ht1) :=
@@ -96,7 +96,7 @@ theorem chainMeasure_label_iIndepFun {t : ℝ} (ht : 0 < t) (ht1 : t ≤ 1) :
     measurable_chainMeasure_coord (chainMeasure_iIndepFun ht ht1)
     (chainMeasure_coord_true ht ht1) ht ht1
 
-/-- **The independence clause of `thm:quantised-law`**: the quantised labels
+/-- **The independence clause of Lemma 9.6**: the quantised labels
 `ℓ_D(λ(w))`, `w ∈ 𝔹`, of the offspring field form an independent family. -/
 theorem chainMeasure_quantised_label_iIndepFun {t : ℝ} (ht : 0 < t) (ht1 : t ≤ 1) (D : ℕ) :
     iIndepFun (fun (w : Word) (ω : Word → Bool) ↦ levelMap D (labAux ω w))
@@ -111,7 +111,7 @@ theorem chainMeasure_quantised_label_iIndepFun {t : ℝ} (ht : 0 < t) (ht1 : t �
 /-- **The chain half on a concrete space.** For `0 < t ≤ 1` there is a
 probability space carrying a measurable, independent offspring field, each
 vertex having two children with probability `t`, on which every chain terminates
-almost surely, the label events obey `eq:exploration` over prefix-closed finite
+almost surely, the label events satisfy the product formula for Lemma 9.2 over prefix-closed finite
 sets, every label is geometric with parameter `t`, and the labels and their
 quantisations `ℓ_D` form independent families. The space is `Word → Bool` under
 `chainMeasure`. -/

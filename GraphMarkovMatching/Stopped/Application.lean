@@ -1,6 +1,6 @@
 /-
 The application of `thm:markov-matching` to two product laws with a common core
-(`arbitrary_offspring_matching.tex`, `sec:common-presentations`,
+(`markov_matching_applications.tex`, `sec:common-presentations`,
 `sec:types-degrees`, `sec:return-times`, `thm:common-semigroup-matching`, and the
 "In particular" after `thm:markov-matching`).
 

@@ -1,5 +1,5 @@
 /-
-Polynomial dependence on the largest arity (`arbitrary_offspring_matching.tex`,
+Polynomial dependence on the largest arity (`markov_matching_applications.tex`,
 `sec:arity-dependence`): for a fixed atom set `𝒜` and a probability floor `c` on the core
 arities, the canonical presentations (`sec:profile-depths`: one root child a leaf, the other
 a balanced tree) with largest arity `N` satisfy `thm:markov-matching` at exponent `2` with
@@ -427,7 +427,7 @@ lemma Ereal_two_le (H T : ℕ) {B t Mv S : ℝ} (hB : 1 ≤ B) (ht0 : 0 ≤ t) (
     _ = 32 * B * GH H (16 * B) * (t + Mv ^ 2) := by ring
 
 /-- The barrier left side at exponent `2` with `a = 381/512`, `b = 38`, `γ = 17/8`,
-`C = 4 + 24 B`, `D_μ ≤ 1 + 3ζ`, `Z = 2 S ζ` and `E ≤ 32 B G (ζ + M²)`: it is at most
+`C = 4 + 24 B`, `A_μ ≤ 1 + 3ζ`, `Z = 2 S ζ` and `E ≤ 32 B G (ζ + M²)`: it is at most
 `a M + (98 + 31 S + 4480 B² G)(ζ + M²)` (`sec:arity-dependence`). -/
 lemma barrier_two_le {t Mv S G B E : ℝ} (ht0 : 0 ≤ t) (ht : t ≤ 1 / 2) (hM0 : 0 ≤ Mv)
     (hM : Mv ≤ 1 / 2) (hB : 1 ≤ B) (hS : 0 ≤ S) (hE0 : 0 ≤ E)

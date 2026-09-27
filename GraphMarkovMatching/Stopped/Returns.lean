@@ -1,5 +1,5 @@
 /-
-The phases and the return bound of `arbitrary_offspring_matching.tex` (`sec:return-times`, "Available
+The phases and the return bound of `markov_matching_applications.tex` (`sec:return-times`, "Available
 fresh return times", `thm:bounded-return`) for the Markov model of a common-core
 presentation.
 

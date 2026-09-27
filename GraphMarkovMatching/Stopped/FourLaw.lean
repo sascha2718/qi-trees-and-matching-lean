@@ -7,7 +7,8 @@ integrals are at most `e`,
 
     P(ρ₁ × ρ₂, τ₁ × τ₂; R^□) ≤ a M + b M² + (γ + 4αM) z + 4 (1 + αM) e
 
-with `a = 2 (L + K)`, `b = C_α(u)` and `γ = 2 + 2β`.  The proof integrates over the
+with `a = 2 (L + K)`, `b = C_α(u)` and `γ = 2 + 2β`. The bound parameters `z` and `e`
+are the paper's `δ₁` and `δ₂`, respectively. The proof integrates over the
 doubly-positive set with the cancellation of the mean bad degrees between the source-row
 terms and the target-overlap terms (`eq:four-law-rows`, `eq:four-law-overlaps`), and
 handles the source pairs with a zero child degree by the resolved normalisation.
@@ -846,7 +847,8 @@ private lemma main_sum_le {X : Type} {α u : ℝ} (hα : 1 ≤ α) (hu0 : 0 < u)
 
 /-! ### The assembly -/
 
-/-- **The four-law contraction** (`thm:four-law-contraction`). -/
+/-- **The four-law contraction** (`thm:four-law-contraction`), with the paper's error
+bounds `δ₁` and `δ₂` represented by the parameters `z` and `e`, respectively. -/
 theorem fourLaw_contraction {X : Type} {α β u L K L0 : ℝ} (hα : 1 ≤ α) (hβ0 : 0 ≤ β)
     (hβ1 : β ≤ 1) (hu0 : 0 < u) (hu1 : u < 1)
     (hL : ∀ q, 0 ≤ q → q ≤ 1 → Lsummand α β q ≤ L)

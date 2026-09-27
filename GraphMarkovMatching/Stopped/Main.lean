@@ -1,14 +1,15 @@
 /-
-The headline theorem of `arbitrary_offspring_matching.tex`: `thm:markov-matching` assembled
+The headline theorem of `arbitrary_offspring_matching.tex`: Theorem 6.1 assembled
 from the height induction (`Induction.lean`), the König step (`Infinite.lean`) and the
-scalar threshold analysis (`Threshold.lean`), following "Completion of the proof" in
-`sec:completion`.
+scalar threshold analysis (`Threshold.lean`). The height induction is in Section 19,
+and the explicit constants are in the proof of Proposition 21.1 in
+`markov_matching_applications.tex`.
 
 * `Params`: the scalar parameters `α, β, u, L, K, L0` of the four-law contraction with
   the linear coefficient `a = 2(L+K) < 1`; `Params.ofLambda` chooses them from the
   exponent condition `λ_α < 1` at a minimising `β` and `u = 1/2`;
 * `finiteA0`, `finiteK0`, `finiteEps`, `finiteKmatch`: the explicit constants of the
-  finite alternative;
+  finite alternative (proof of Proposition 21.1);
 * `markov_matching_finite`, `markov_matching_finite_infinite`,
   `markov_matching_finite_exists`, `markov_matching_finite_exists_infinite`,
   `markov_matching_finite_eta`: the finite alternative, with the explicit constants, at
@@ -16,8 +17,8 @@ scalar threshold analysis (`Threshold.lean`), following "Completion of the proof
 * `markov_matching_zero`, `markov_matching_zero_infinite`, `markov_matching_zero_exists`:
   the zero-compatible alternative, with constants depending only on `α`;
 * `markov_matching_zero_quadratic`: the explicit quadratic bound
-  `eq:zero-compatible-quadratic`;
-* `markov_matching_of_lambda`, `markov_matching_zero_of_lambda`: `thm:markov-matching` as
+  equation (21.1);
+* `markov_matching_of_lambda`, `markov_matching_zero_of_lambda`: Theorem 6.1 as
   stated, in terms of the exponent condition alone.
 -/
 import GraphMarkovMatching.Stopped.Induction
@@ -29,17 +30,17 @@ namespace GraphMarkovMatching.Stopped
 open GraphMarkovMatching GraphMarkovMatching.Support Model
 open scoped ENNReal Classical
 
-/-! ### The scalar parameters (`sec:completion`) -/
+/-! ### The scalar parameters (Section 19) -/
 
 /-- The scalar parameters of the contraction: exponent, `β`, `u`, and admissible bounds
 `L ≥ L_α(β)`, `K ≥ K_α(β)`, `L0 ≥ L_α` with linear coefficient `2(L+K) < 1`
-(`sec:completion`). -/
+(Section 19). -/
 structure Params where
   /-- The exponent `α ≥ 1`. -/
   α : ℝ
-  /-- The parameter `β ∈ [0,1]` of `eq:mean-constants`. -/
+  /-- The parameter `β ∈ [0,1]` of equation (17.1). -/
   β : ℝ
-  /-- The chord parameter `u ∈ (0,1)` of `eq:four-law-constants`. -/
+  /-- The chord parameter `u ∈ (0,1)` of equation (17.2). -/
   u : ℝ
   /-- An upper bound for `L_α(β)`. -/
   L : ℝ
@@ -59,16 +60,16 @@ structure Params where
 
 namespace Params
 
-/-- The linear coefficient `a = 2(L+K)` (`sec:completion`). -/
+/-- The linear coefficient `a = 2(L+K)` (Section 19). -/
 noncomputable def a (p : Params) : ℝ := 2 * (p.L + p.K)
 
-/-- The quadratic coefficient `b = C_α(u)` (`sec:completion`). -/
+/-- The quadratic coefficient `b = C_α(u)` (Section 19). -/
 noncomputable def b (p : Params) : ℝ := Cfun p.α p.L0 p.u
 
-/-- The zero coefficient `γ = 2 + 2β` (`sec:completion`). -/
+/-- The zero coefficient `γ = 2 + 2β` (Section 19). -/
 noncomputable def γ (p : Params) : ℝ := 2 + 2 * p.β
 
-/-- The mixture constant `C = 4 + 8(α+1)B` of the finite alternative (`sec:averaging`),
+/-- The mixture constant `C = 4 + 8(α+1)B` of the finite alternative (Section 19.1),
 real. -/
 noncomputable def Cm (p : Params) (B : ℝ) : ℝ := 4 + 8 * (p.α + 1) * B
 
@@ -109,7 +110,7 @@ lemma Cm_nonneg (p : Params) {B : ℝ} (hB : 0 ≤ B) : 0 ≤ p.Cm B := by
   have := p.α_nonneg
   positivity
 
-/-- The `ℝ≥0∞` mixture constant of `Paths.lean` is the real one (`sec:averaging`). -/
+/-- The `ℝ≥0∞` mixture constant of `Paths.lean` is the real one (Section 19.1). -/
 lemma Cmix_eq (p : Params) {B : ℝ} (hB : 0 ≤ B) :
     Cmix p.α (ENNReal.ofReal B) = ENNReal.ofReal (p.Cm B) := by
   have hα1 : (0 : ℝ) ≤ p.α + 1 := by linarith [p.hα]
@@ -117,12 +118,12 @@ lemma Cmix_eq (p : Params) {B : ℝ} (hB : 0 ≤ B) :
   rw [Cm, ENNReal.ofReal_add (by norm_num) (mul_nonneg h8 hB), ENNReal.ofReal_mul h8,
     ENNReal.ofReal_mul (by norm_num), ENNReal.ofReal_ofNat, ENNReal.ofReal_ofNat, Cmix]
 
-/-- A minimising `β` of `eq:mean-constants`. -/
+/-- A minimising `β` of equation (17.1). -/
 private noncomputable def betaMin {α : ℝ} (hα : 1 ≤ α) : ℝ :=
   Classical.choose (exists_beta_min hα)
 
 /-- The minimising `β` is admissible, attains `λ_α`, and minimises `L_α + K_α` on `[0,1]`
-(`eq:mean-constants`). -/
+(equation (17.1)). -/
 private lemma betaMin_spec {α : ℝ} (hα : 1 ≤ α) :
     0 ≤ betaMin hα ∧ betaMin hα ≤ 1
       ∧ lambda α = 2 * (Lfun α (betaMin hα) + Kfun α (betaMin hα))
@@ -130,7 +131,7 @@ private lemma betaMin_spec {α : ℝ} (hα : 1 ≤ α) :
         Lfun α (betaMin hα) + Kfun α (betaMin hα) ≤ Lfun α β' + Kfun α β' :=
   Classical.choose_spec (exists_beta_min hα)
 
-/-- The parameters at the exact maxima, from the exponent condition (`sec:completion`: a
+/-- The parameters at the exact maxima, from the exponent condition (Section 19: a
 minimising `β`, `u = 1/2`, `L = L_α(β)`, `K = K_α(β)`, `L0 = L_α`). -/
 noncomputable def ofLambda {α : ℝ} (hα : 1 ≤ α) (h : lambda α < 1) : Params where
   α := α
@@ -154,39 +155,40 @@ noncomputable def ofLambda {α : ℝ} (hα : 1 ≤ α) (h : lambda α < 1) : Par
 /-- The exponent of the parameters chosen from the exponent condition. -/
 lemma ofLambda_α {α : ℝ} (hα : 1 ≤ α) (h : lambda α < 1) : (ofLambda hα h).α = α := rfl
 
-/-- With a minimising `β`, `a = λ_α` (`sec:completion`). -/
+/-- With a minimising `β`, `a = λ_α` (Section 19). -/
 lemma ofLambda_a {α : ℝ} (hα : 1 ≤ α) (h : lambda α < 1) : (ofLambda hα h).a = lambda α := by
   show 2 * (Lfun α (betaMin hα) + Kfun α (betaMin hα)) = lambda α
   exact (betaMin_spec hα).2.2.1.symm
 
 end Params
 
-/-! ### The constants of the finite alternative (`sec:completion`) -/
+/-! ### The constants of the finite alternative (proof of Proposition 21.1) -/
 
-/-- `A_0 = γ S_H + 2 C B (α+1) G_H(4B)` (`sec:completion`). -/
+/-- `A_0 = γ S_H + 2 C B (α+1) G_H(4B)` (proof of Proposition 21.1). -/
 noncomputable def finiteA0 (p : Params) (H : ℕ) (B : ℝ) : ℝ := A0 p.α p.γ (p.Cm B) H B
 
-/-- `K_0 = (1 + A_0)/(1 - a)` (`sec:completion`). -/
+/-- The lower bound `K_0 = (1 + A_0)/(1 - a)` on the choice of `K`
+in the proof of Proposition 21.1. -/
 noncomputable def finiteK0 (p : Params) (H : ℕ) (B : ℝ) : ℝ := K0 p.a (finiteA0 p H B)
 
-/-- `ε_K` of `eq:constructive-threshold` at the parameters `p`. -/
+/-- `ε_K` of equation (21.2) at the parameters `p`. -/
 noncomputable def finiteEps (p : Params) (H T : ℕ) (B Kc : ℝ) : ℝ :=
   epsK p.α p.a p.b p.γ (p.Cm B) H T B Kc
 
-/-- `K_match = K + 2 S_H` (`sec:completion`). -/
+/-- `K_match = K + 2 S_H` (proof of Proposition 21.1). -/
 noncomputable def finiteKmatch (H : ℕ) (Kc : ℝ) : ℝ := Kmatch H Kc
 
 /-- `0 < K_0`. -/
 lemma finiteK0_pos (p : Params) (H : ℕ) {B : ℝ} (hB : 0 ≤ B) : 0 < finiteK0 p H B :=
   K0_pos p.a_lt_one (A0_nonneg p.α_nonneg p.γ_nonneg (p.Cm_nonneg hB) H hB)
 
-/-- `ε_K > 0` (`eq:constructive-threshold`). -/
+/-- `ε_K > 0` (equation (21.2)). -/
 theorem finiteEps_pos (p : Params) (H T : ℕ) (hT : 1 ≤ T) (B : ℝ) (hB : 1 ≤ B) (Kc : ℝ)
     (hK : finiteK0 p H B < Kc) : 0 < finiteEps p H T B Kc :=
   (epsK_spec p.hα p.a_nonneg p.a_lt_one p.b_nonneg p.γ_nonneg (p.Cm_nonneg (by linarith))
     hB hT hK).1
 
-/-! ### The bridge from the scalar barrier to the `ℝ≥0∞` barrier (`sec:completion`) -/
+/-! ### The bridge from the scalar barrier to the `ℝ≥0∞` barrier (Section 19) -/
 
 namespace Model
 
@@ -196,7 +198,7 @@ variable {V I : Type} (M : Model V I)
 private lemma zeta_eq_ofReal {α : ℝ} (hζ : M.zeta α ≠ ⊤) :
     M.zeta α = ENNReal.ofReal (M.zeta α).toReal := (ENNReal.ofReal_toReal hζ).symm
 
-/-- `f ≤ ofReal ((α+1) ζ)` (`eq:root-parameter-bounds`). -/
+/-- `f ≤ ofReal ((α+1) ζ)` (equation (18.4)). -/
 private lemma fRoot_le_ofReal (hc : M.IsCompat) {α : ℝ} (hα : 1 ≤ α) (hζ : M.zeta α ≠ ⊤) :
     M.fRoot α ≤ ENNReal.ofReal ((α + 1) * (M.zeta α).toReal) := by
   have e := M.zeta_eq_ofReal hζ
@@ -205,7 +207,7 @@ private lemma fRoot_le_ofReal (hc : M.IsCompat) {α : ℝ} (hα : 1 ≤ α) (hζ
     _ = ENNReal.ofReal ((α + 1) * (M.zeta α).toReal) := by
         rw [← ENNReal.ofReal_mul (by linarith), add_comm]
 
-/-- `R_μ ≤ ofReal (1 + α ζ)` (`eq:root-parameter-bounds`). -/
+/-- `R_μ ≤ ofReal (1 + α ζ)` (equation (18.4)). -/
 private lemma RmuC_le_ofReal (hc : M.IsCompat) {α : ℝ} (hα : 1 ≤ α) (hζ : M.zeta α ≠ ⊤) :
     M.RmuC α ≤ ENNReal.ofReal (1 + α * (M.zeta α).toReal) := by
   have e := M.zeta_eq_ofReal hζ
@@ -216,7 +218,7 @@ private lemma RmuC_le_ofReal (hc : M.IsCompat) {α : ℝ} (hα : 1 ≤ α) (hζ 
         rw [← ENNReal.ofReal_mul (by linarith), ENNReal.ofReal_add zero_le_one h0,
           ENNReal.ofReal_one]
 
-/-- `D_μ ≤ ofReal (1 + (2α-1) ζ)` (`sec:independent-root`). -/
+/-- `A_μ ≤ ofReal (1 + (2α-1) ζ)` (Section 19.2). -/
 private lemma DmuC_le_ofReal (hc : M.IsCompat) {α : ℝ} (hα : 1 ≤ α) (hζ : M.zeta α ≠ ⊤) :
     M.DmuC α ≤ ENNReal.ofReal (1 + (2 * α - 1) * (M.zeta α).toReal) := by
   have h2 : (0 : ℝ) ≤ 2 * α - 1 := by linarith
@@ -228,7 +230,7 @@ private lemma DmuC_le_ofReal (hc : M.IsCompat) {α : ℝ} (hα : 1 ≤ α) (hζ 
         rw [← ENNReal.ofReal_mul h2, ENNReal.ofReal_add zero_le_one h0, ENNReal.ofReal_one]
 
 /-- The fixed-point condition of the uniform zero bound at `Z = ofReal Z̄(ζ)`
-(`sec:completion`, `eq:explicit-zero-bound`). -/
+(equation (18.3), proof of Proposition 21.1). -/
 private lemma zbar_fixed_ennreal {α : ℝ} (hα : 0 ≤ α) (hζ : M.zeta α ≠ ⊤) (H T : ℕ)
     (h4 : 4 * SH H ^ 2 * T ^ 2 * (M.zeta α).toReal ≤ 1) :
     SHe H * (M.delta + (T : ℝ≥0∞) ^ 2 * (ENNReal.ofReal (Zbar H T (M.zeta α).toReal)) ^ 2)
@@ -248,8 +250,8 @@ private lemma zbar_fixed_ennreal {α : ℝ} (hα : 0 ≤ α) (hζ : M.zeta α �
           ENNReal.ofReal_pow (Nat.cast_nonneg T), ENNReal.ofReal_natCast]
     _ = ENNReal.ofReal (Zbar H T t) := by rw [Zbar_fixed H T ht0 h4]
 
-/-- The `ℝ≥0∞` barrier `ζ + D_μ Q(Kζ) ≤ Kζ` of `eq:scalar-barrier-condition` from the real
-barrier `barrier_of_le_epsK` (`sec:completion`). -/
+/-- The `ℝ≥0∞` barrier `ζ + A_μ Q(Kζ) ≤ Kζ` of equation (19.3) from the real
+barrier `barrier_of_le_epsK` (proof of Proposition 21.1). -/
 private lemma barrier_ennreal (hc : M.IsCompat) (p : Params) (H T : ℕ) (hT : 1 ≤ T) (B : ℝ)
     (hB : 1 ≤ B) (Kc : ℝ) (hK : finiteK0 p H B < Kc) (hζ : M.zeta p.α ≠ ⊤)
     (hε : (M.zeta p.α).toReal ≤ finiteEps p H T B Kc) :
@@ -335,7 +337,7 @@ private lemma barrier_ennreal (hc : M.IsCompat) (p : Params) (H T : ℕ) (hT : 1
     _ ≤ ENNReal.ofReal (Kc * t) := ENNReal.ofReal_le_ofReal hbarR
 
 /-- `Z + M ≤ ofReal K_match · ζ` at `Z = ofReal Z̄(ζ)`, `M = ofReal (Kζ)`
-(`sec:completion`: `Z̄ ≤ 2 S_H ζ`). -/
+(proof of Proposition 21.1: `Z̄ ≤ 2 S_H ζ`). -/
 private lemma zbar_add_le {α : ℝ} (hζ : M.zeta α ≠ ⊤) (H T : ℕ) {Kc : ℝ} (hK : 0 ≤ Kc)
     (h4 : 4 * SH H ^ 2 * T ^ 2 * (M.zeta α).toReal ≤ 1) :
     ENNReal.ofReal (Zbar H T (M.zeta α).toReal) + ENNReal.ofReal (Kc * (M.zeta α).toReal)
@@ -362,10 +364,10 @@ private lemma ofReal_mul_zeta {α : ℝ} (hζ : M.zeta α ≠ ⊤) {Kc : ℝ} (h
 
 end Model
 
-/-! ### The finite alternative (`thm:markov-matching`, `sec:completion`) -/
+/-! ### The finite alternative (Theorem 6.1, Section 19) -/
 
-/-- **`thm:markov-matching`, finite alternative, with the explicit constants**
-(`sec:completion`): for every finite model with a phase map of class size at most `T`, a
+/-- **Theorem 6.1, finite alternative, with the explicit constants**
+(Proposition 21.1): for every finite model with a phase map of class size at most `T`, a
 transition selection with inverse-probability sums at most `B`, fresh positivity and common returns within `H`,
 if `ζ_α ≤ ε_K` then every equal-phase pair fails at every height with probability at most
 `K_match ζ_α`, fresh pairs with probability at most `K ζ_α`, and every equal-phase
@@ -416,8 +418,8 @@ theorem markov_matching_finite (p : Params) (H T : ℕ) (hT : 1 ≤ T) (B : ℝ)
   · rw [← hMb]
     exact hP h s u hsu
 
-/-- The infinite-tree conclusion of the finite alternative (`thm:markov-matching`,
-`sec:completion`: König's lemma and continuity of probability). -/
+/-- The infinite-tree conclusion of the finite alternative (Theorem 6.1,
+Section 19: König's lemma and continuity of probability). -/
 theorem markov_matching_finite_infinite (p : Params) (H T : ℕ) (hT : 1 ≤ T) (B : ℝ)
     (hB : 1 ≤ B) (Kc : ℝ) (hK : finiteK0 p H B < Kc) {V I : Type} [Fintype I]
     [Countable V] [MeasurableSpace V] [MeasurableSingletonClass V] [MeasurableSpace I]
@@ -434,7 +436,7 @@ theorem markov_matching_finite_infinite (p : Params) (H T : ℕ) (hT : 1 ≤ T) 
     fun s t hs ht => M.trajPair_infFail_le s t (h2 s t hs ht)⟩
 
 set_option linter.unusedVariables false in
-/-- **`thm:markov-matching`, finite alternative, existential form**: constants depending
+/-- **Theorem 6.1, finite alternative, existential form**: constants depending
 only on `α` (through the parameters), `H`, `T`, `B`, uniform over all models with these
 bounds. -/
 theorem markov_matching_finite_exists (p : Params) (H T : ℕ) (hT : 1 ≤ T) (B : ℝ)
@@ -452,7 +454,7 @@ theorem markov_matching_finite_exists (p : Params) (H T : ℕ) (hT : 1 ≤ T) (B
   exact (markov_matching_finite p H T hT B hB _ hK M hc Θ hTc Sel hBs hFP hCR hζ).1
 
 set_option linter.unusedVariables false in
-/-- **`thm:markov-matching`, finite alternative, existential form at infinite height**. -/
+/-- **Theorem 6.1, finite alternative, existential form at infinite height**. -/
 theorem markov_matching_finite_exists_infinite (p : Params) (H T : ℕ) (hT : 1 ≤ T) (B : ℝ)
     (hB : 1 ≤ B) :
     ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} [Fintype I] [Countable V] [MeasurableSpace V]
@@ -468,7 +470,7 @@ theorem markov_matching_finite_exists_infinite (p : Params) (H T : ℕ) (hT : 1 
   intro V I _ _ _ _ _ _ M hc g Θ hTc Sel hBs hFP hCR hζ s t hst
   exact M.trajPair_infFail_le s t (hbound M hc Θ hTc Sel hBs hFP hCR hζ s t hst)
 
-/-- **The `η` form** (`thm:markov-matching`, last sentence): with `μ(0) ≥ p₀ > 0`, replace
+/-- **The `η` form** (Theorem 6.1, last sentence): with `μ(0) ≥ p₀ > 0`, replace
 `ζ` by `η`, the constant by `K_match/p₀` and the threshold by `p₀ ε`. -/
 theorem markov_matching_finite_eta (p : Params) (H T : ℕ) (hT : 1 ≤ T) (B : ℝ) (hB : 1 ≤ B)
     (Kc : ℝ) (hK : finiteK0 p H B < Kc) {V I : Type} [Fintype I] (M : Model V I)
@@ -496,9 +498,9 @@ theorem markov_matching_finite_eta (p : Params) (H T : ℕ) (hT : 1 ≤ T) (B : 
         rw [ENNReal.ofReal_div_of_pos hp0, div_eq_mul_inv, div_eq_mul_inv]
         ring
 
-/-! ### The zero-compatible alternative (`thm:markov-matching`, `sec:completion`) -/
+/-! ### The zero-compatible alternative (Theorem 6.1, Section 19) -/
 
-/-- **`thm:markov-matching`, zero-compatible alternative**: countably many types, no return
+/-- **Theorem 6.1, zero-compatible alternative**: countably many types, no return
 or transition-bound assumption; constants depending only on `α`. -/
 theorem markov_matching_zero (p : Params) (Kc : ℝ) (hK : 1 / (1 - p.a) < Kc) {V I : Type}
     (M : Model V I) (hc : M.IsCompat) (hδ : M.delta = 0)
@@ -546,7 +548,7 @@ theorem markov_matching_zero (p : Params) (Kc : ℝ) (hK : 1 / (1 - p.a) < Kc) {
     fun s u h => M.P_le_zero hc hδ hα _ _ hfour hbar h s u⟩
 
 /-- The infinite-tree conclusion of the zero-compatible alternative
-(`thm:markov-matching`, `sec:completion`). -/
+(Theorem 6.1, Section 19). -/
 theorem markov_matching_zero_infinite (p : Params) (Kc : ℝ) (hK : 1 / (1 - p.a) < Kc)
     {V I : Type} [Countable V] [MeasurableSpace V] [MeasurableSingletonClass V] [Countable I]
     [MeasurableSpace I] [MeasurableSingletonClass I] (M : Model V I) (hc : M.IsCompat)
@@ -556,7 +558,7 @@ theorem markov_matching_zero_infinite (p : Params) (Kc : ℝ) (hK : 1 / (1 - p.a
     ((markov_matching_zero p Kc hK M hc hδ hζ).1 s t)
 
 set_option linter.unusedVariables false in
-/-- **`thm:markov-matching`, zero-compatible alternative, existential form**: constants
+/-- **Theorem 6.1, zero-compatible alternative, existential form**: constants
 depending only on `α` (through the parameters). -/
 theorem markov_matching_zero_exists (p : Params) :
     ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} (M : Model V I) (hc : M.IsCompat), M.delta = 0 →
@@ -568,7 +570,7 @@ theorem markov_matching_zero_exists (p : Params) :
   intro V I M hc hδ hζ
   exact (markov_matching_zero p _ hK M hc hδ hζ).1
 
-/-- **`eq:zero-compatible-quadratic`**: with `d = 1 + (2α-1)η`, `d a < 1` and
+/-- **equation (21.1)**: with `d = 1 + (2α-1)η`, `d a < 1` and
 `(1-da)² ≥ 4 d b η`, the failure probabilities are at most `M_η`, without any type-count
 or transition-bound assumption. -/
 theorem markov_matching_zero_quadratic (p : Params) {V I : Type} (M : Model V I)
@@ -614,10 +616,10 @@ theorem markov_matching_zero_quadratic (p : Params) {V I : Type} (M : Model V I)
       h Mb
   exact fun s t h => M.failProb_le_zero hc hδ hα _ _ hfour hbar h s t
 
-/-! ### The headline in terms of the exponent condition (`thm:markov-matching`) -/
+/-! ### The headline in terms of the exponent condition (Theorem 6.1) -/
 
 set_option linter.unusedVariables false in
-/-- **`thm:markov-matching`, finite alternative, as stated**: under the exponent condition
+/-- **Theorem 6.1, finite alternative, as stated**: under the exponent condition
 `λ_α < 1`, constants depending only on `α, H, T, B`. -/
 theorem markov_matching_of_lambda {α : ℝ} (hα : 1 ≤ α) (hlam : lambda α < 1) (H T : ℕ)
     (hT : 1 ≤ T) (B : ℝ) (hB : 1 ≤ B) :
@@ -629,7 +631,7 @@ theorem markov_matching_of_lambda {α : ℝ} (hα : 1 ≤ α) (hlam : lambda α 
   markov_matching_finite_exists (Params.ofLambda hα hlam) H T hT B hB
 
 set_option linter.unusedVariables false in
-/-- **`thm:markov-matching`, zero-compatible alternative, as stated**: under the exponent
+/-- **Theorem 6.1, zero-compatible alternative, as stated**: under the exponent
 condition `λ_α < 1`, constants depending only on `α`. -/
 theorem markov_matching_zero_of_lambda {α : ℝ} (hα : 1 ≤ α) (hlam : lambda α < 1) :
     ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} (M : Model V I) (hc : M.IsCompat), M.delta = 0 →

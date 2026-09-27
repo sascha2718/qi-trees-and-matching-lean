@@ -23,11 +23,11 @@ variable {X : Type*} {μ : PMF X} {R : X → X → Prop} {x y : X}
 
 /-! ### The two degrees -/
 
-/-- The good degree `r(x) = μ{y : x R y}` of §2. -/
+/-- The good degree `r(x) = μ{y : x R y}` of Section 11.3. -/
 noncomputable def rE (μ : PMF X) (R : X → X → Prop) (x : X) : ℝ≥0∞ :=
   ∑' y, if R x y then μ y else 0
 
-/-- The bad degree `q(x) = μ{y : ¬ x R y}` of §2. -/
+/-- The bad degree `q(x) = μ{y : ¬ x R y}` of Section 11.3. -/
 noncomputable def qE (μ : PMF X) (R : X → X → Prop) (x : X) : ℝ≥0∞ :=
   ∑' y, if R x y then 0 else μ y
 
@@ -47,14 +47,14 @@ lemma qE_ne_top : qE μ R x ≠ ⊤ := ne_top_of_le_ne_top ENNReal.one_ne_top qE
 lemma rE_ne_top : rE μ R x ≠ ⊤ := ne_top_of_le_ne_top ENNReal.one_ne_top rE_le_one
 
 /-- Reflexivity puts `x`'s own mass into the good degree: `μ{x} ≤ r(x)`. This
-is the observation of §2 that makes `q < 1` on the support. -/
+is the observation of Section 11.3 that makes `q < 1` on the support. -/
 lemma le_rE_of_refl (hrefl : R x x) : μ x ≤ rE μ R x := by
   rw [rE]
   calc (μ x : ℝ≥0∞) = if R x x then μ x else 0 := by simp [hrefl]
     _ ≤ ∑' y, if R x y then μ y else 0 :=
         ENNReal.le_tsum (f := fun y => if R x y then μ y else 0) x
 
-/-! ### The potential, eq (9)
+/-! ### The potential, equation (11.12)
 
 Both degrees are finite (`≤ 1`), so it is cleanest to pass to `ℝ` once and do
 the `q < 1` arithmetic there with `linarith`, rather than fight truncated
@@ -121,9 +121,9 @@ lemma mul_q_le_summand {α : ℝ} (hα : 0 ≤ α) (hrefl : R x x) (hx : μ x �
 `μ{x : ¬ x R y} = q(y)`.
 
 This is the step `𝔼_X 1_{X ⋡ y} = q(y)` in the second-term estimate of
-Lemma 2.1, and it is the *only* place symmetry is used there. It is also
+Lemma 11.3, and it is the *only* place symmetry is used there. It is also
 load-bearing: the numerical search found reflexive but non-symmetric relations
-where Lemma 2.1 fails outright (the potential doubles instead of contracting),
+where Lemma 11.3 fails outright (the potential doubles instead of contracting),
 so this lemma cannot be dispensed with. -/
 lemma tsum_not_rel_eq_qE (hsymm : ∀ a b, R a b → R b a) (μ : PMF X) (y : X) :
     (∑' x, if R x y then 0 else μ x) = qE μ R y := by

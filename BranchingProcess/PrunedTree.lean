@@ -1,6 +1,6 @@
 /-
-`thm:concentrated-regular-subtree`, the probabilistic assertions of the pruning: the exact
-binomial recursion `eq:pruned-subtree-recursion` for the probability that the root survives
+Lemma 23.1, the probabilistic assertions of the pruning: the exact
+binomial recursion (23.1) for the probability that the root survives
 the rounds, its fixed point for the retained root, and **the retained descendant tree is a
 Galton-Watson tree** with the binomial law conditioned to be at least `m`, under the law
 conditioned on the root being retained.
@@ -16,7 +16,7 @@ prefix-closed set of words, the sample side of which is `sampleMeasure_subset_sa
 * `childPattern`, `patternBox`, `sampleMeasure_pattern`, `sampleMeasure_pattern_card`,
   `sampleMeasure_root_pattern_ge`: the children of the root whose subfield has a property,
   their pattern mass `θ_J p^{|S|} (1-p)^{J-|S|}` and its binomial counts.
-* `binomialTail`, `retainedProb_succ`: **`eq:pruned-subtree-recursion`**,
+* `binomialTail`, `retainedProb_succ`: **equation (23.1)**,
   `p_{n+1} = θ_J ℙ(Bin(J, p_n) ≥ m)`; `sampleMeasure_retainedInf_eq`: its fixed point
   `p = θ_J ℙ(Bin(J, p) ≥ m)` for the retained root.
 * `retDegree`, `retAt`, `retSub`, `retField`, `retTree`: the retained descendant tree of the
@@ -275,7 +275,7 @@ lemma retainedInfChildren_nil_eq (c : Word N → ℕ) :
 
 variable (N) (θ : Offspring J)
 
-/-- **`eq:pruned-subtree-recursion`.**  The root survives `n + 1` rounds exactly when it
+/-- **Equation (23.1).** The root survives `n + 1` rounds exactly when it
 has `J` children of which at least `m` survive `n` rounds:
 `p_{n+1} = θ_J ℙ(Bin(J, p_n) ≥ m)`. -/
 theorem retainedProb_succ (hJN : J ≤ N) (n : ℕ) :
@@ -677,7 +677,7 @@ noncomputable def prunedWeight (N : ℕ) (θ : Offspring J) (m k : ℕ) : ℝ :=
       / binomialTailR J m (retProbR N θ m)
   else 0
 
-/-- **The law of the retained descendant tree**, `eq:pruned-subtree-law`: the binomial law
+/-- **The law of the retained descendant tree**, in the proof of Lemma 23.1: the binomial law
 with parameters `J` and `p` conditioned to be at least `m`, supported on `{m, …, J}`. -/
 noncomputable def pruned (N : ℕ) (θ : Offspring J) (m : ℕ)
     (hZ : 0 < binomialTailR J m (retProbR N θ m)) : Offspring J where
@@ -1023,7 +1023,7 @@ the root, conditioned on the root being retained. -/
 noncomputable def retainedTreeLaw (N : ℕ) (θ : Offspring J) (m : ℕ) : Measure (Subtree N) :=
   (retainedMeasure N θ m).map (retTree J m)
 
-/-- **`thm:concentrated-regular-subtree`, the Galton-Watson assertion.**  Conditioned on the
+/-- **Lemma 23.1, the Galton-Watson assertion.**  Conditioned on the
 root being retained, its retained descendant tree is a Galton-Watson tree whose offspring law
 is the binomial law with parameters `J` and `p` conditioned to be at least `m`, supported on
 `{m, …, J}`.  The two laws agree on the containment π-system generating the measurable
@@ -1047,7 +1047,7 @@ theorem retainedTreeLaw_eq_treeLaw (hJN : J ≤ N)
     exact retainedMeasure_subset_retTree θ hJN hp hZ n F hF hn
   · rw [measure_univ, measure_univ]
 
-/-- **`thm:concentrated-regular-subtree`, the Galton-Watson assertion under its hypotheses**:
+/-- **Lemma 23.1, the Galton-Watson assertion under its hypotheses**:
 for `J ≥ 24`, `θ_J ≥ 7/8` and `m = ⌊J/2⌋ + 1`, the root is retained with positive
 probability and the pruned law is defined, and the retained descendant tree is a
 Galton-Watson tree with that law. -/

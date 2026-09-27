@@ -121,7 +121,7 @@ lemma phi_prod_le {α q₁ q₂ : ℝ} (hα : 1 ≤ α)
     mul_le_mul_of_nonneg_left (rpow_neg_alpha_le hα h₁1) hq₂
   nlinarith [step1, b₁, b₂]
 
-/-! ### Lemma 3.1 at exponent α -/
+/-! ### Lemma 11.7 at exponent α -/
 
 /-- `ofReal` distributes over the shape of the pointwise bound, for nonnegative
 arguments. -/

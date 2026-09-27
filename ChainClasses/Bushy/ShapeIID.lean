@@ -1,12 +1,12 @@
 import ChainClasses.Bushy.ShapeSplitLaw
 
 /-!
-`sec:shape-harris` of `matching_classes_simple.tex`: **`thm:shape-iid`** in full.
+Section 10.1 of `matching_classes_simple.tex`: **Proposition 10.3** in full.
 
 The pieces are in place: `ShapeSplitLaw` has the law of the shape at the root jointly
 with the two subtrees below its split, and the identification of the shape at a copy
 below the root with the shape of that copy read in the subtree the split hands it.  What
-is left is the induction over the copies, and it is the one of `eq:exploration`: over a
+is left is the induction over the copies, as for the independent chain labels in Lemma 9.2: over a
 prefix-closed finite set of copies, which contains the root and cuts into the copies
 below each of the two letters, the mass factorises into the mass of the root shape and
 the masses of the two subtrees, and the subtrees are independent copies of the
@@ -14,7 +14,7 @@ conditioned law.  Every step is taken modulo the event `IsBushySample`, of full 
 by `ae_isBushySample_of_pos`.
 
 Independence is stated as the product formula over prefix-closed finite sets, as
-`eq:exploration` is for the chain labels, rather than through `iIndepFun`: the shapes
+for the chain labels in Lemma 9.2, rather than through `iIndepFun`: the shapes
 carry no measurable structure, and the events `{shapeAt c w = σ}` are what the rest of
 the section consumes.  The marginal at a copy other than the root would follow by summing
 the prefixes out, as `label_prod` does for the chain labels.
@@ -24,11 +24,11 @@ the prefixes out, as `label_prod` does for the chain labels.
   copies hands them.
 * `finset_decomp`, `prod_decomp`: **the copies split at the root**, and the product over
   them.
-* `shapeMass`: **the law `μ` of `thm:shape-iid`**, one decoration factor per neck vertex
+* `shapeMass`: **the law `μ` of Proposition 10.3**, one decoration factor per neck vertex
   and the split weight `θ̃₂` at the end.
-* `survivalMeasure_shapes_aux`, `survivalMeasure_shapes`: **`thm:shape-iid`, the i.i.d.
+* `survivalMeasure_shapes_aux`, `survivalMeasure_shapes`: **Proposition 10.3, the i.i.d.
   clause**, the product formula over a prefix-closed finite set of copies.
-* `shape_decomposition`: **`thm:shape-iid`**, the i.i.d. clause together with the
+* `shape_decomposition`: **Proposition 10.3**, the i.i.d. clause together with the
   isometry of a sample with the assembly of its own shapes.
 -/
 
@@ -108,7 +108,7 @@ lemma prod_decomp {M : Type*} [CommMonoid M] {s : Finset Word} (h : ([] : Word) 
 
 /-! ### The law of the shape field -/
 
-/-- **`thm:shape-iid`, the law `μ`**: the mass of a shape, one decoration factor per
+/-- **Proposition 10.3, the law `μ`**: the mass of a shape, one decoration factor per
 neck vertex and the split weight `θ̃₂` at the end. -/
 noncomputable def shapeMass (θ : Offspring 2) (σ : Shape) : ENNReal :=
   (σ.decs.map (decMass θ)).prod * ENNReal.ofReal (θ.skeletonWeight 2)
@@ -119,7 +119,7 @@ lemma measurableSet_shapes (s : Finset Word) (f : Word → Shape) :
   refine MeasurableSet.biInter (Set.to_countable _) fun w _ ↦ ?_
   exact fibreMeasurable_shapeAt w (f w)
 
-/-- **`thm:shape-iid`, the i.i.d. clause**: conditioned on survival the shapes of a
+/-- **Proposition 10.3, the i.i.d. clause**: conditioned on survival the shapes of a
 prefix-closed finite set of copies are independent with the law `μ`.  The recursion is
 the root decomposition: the shape of the root, and below its split two independent copies
 of the conditioned law carrying the shape fields of the two subtrees. -/
@@ -206,7 +206,7 @@ theorem survivalMeasure_shapes_aux (θ : Offspring 2) (hq : θ.extinction < 1)
         survivalMeasure_shapeAt_nil_split θ hq hq0 h2 hmeas₀ hmeas₁ (f []),
         hE₀, hE₁, hsub₀, hsub₁, prod_decomp hnil (fun w ↦ shapeMass θ (f w)), shapeMass]
 
-/-- **`thm:shape-iid`, the i.i.d. clause.** -/
+/-- **Proposition 10.3, the i.i.d. clause.** -/
 theorem survivalMeasure_shapes (θ : Offspring 2) (hq : θ.extinction < 1)
     (hq0 : 0 < θ.extinction) (h2 : 0 < θ 2) (s : Finset Word)
     (hs : ∀ w ∈ s, ∀ p, p <+: w → p ∈ s) (f : Word → Shape) :
@@ -215,7 +215,7 @@ theorem survivalMeasure_shapes (θ : Offspring 2) (hq : θ.extinction < 1)
   refine survivalMeasure_shapes_aux θ hq hq0 h2 (s.sup List.length) s (fun w hw ↦ ?_) hs f
   exact Finset.le_sup (f := List.length) hw
 
-/-- **`thm:shape-iid`**: conditioned on survival the shapes of the copies are
+/-- **Proposition 10.3**: conditioned on survival the shapes of the copies are
 independent with the law `μ`, and the sample is isometric to the assembly of its own
 shapes. -/
 theorem shape_decomposition (θ : Offspring 2) (hq : θ.extinction < 1)

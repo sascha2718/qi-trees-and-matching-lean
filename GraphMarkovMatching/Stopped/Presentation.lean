@@ -1,5 +1,5 @@
 /-
-The Markov model of a common-core presentation (`arbitrary_offspring_matching.tex`,
+The Markov model of a common-core presentation (`markov_matching_applications.tex`,
 `sec:common-presentations`, `sec:types-degrees`): two arity laws `ν_L, ν_R` with finite supports, a
 common core `S` with core profiles `D a` (`a ∈ S`), and for every supported arity `k` on
 either side a composite profile `C σ k` with `k` leaves built from the core profiles, the

@@ -1,5 +1,5 @@
 /-
-The explicit consequences of `thm:markov-matching` in `arbitrary_offspring_matching.tex` at the
+The explicit consequences of `thm:markov-matching` in `markov_matching_applications.tex` at the
 rational parameters of `sec:two-exponent-values` and `sec:exponent-four-thirds`.
 
 * `paramsTwo`: the parameters `α = 2`, `β = 1/16`, `u = 1/2`, `L = 1/4`, `K = 125/1024`,
@@ -137,7 +137,7 @@ theorem two_exponent_consequence {V I : Type} (M : Model V I) (hc : M.IsCompat)
   have hη0 : 0 ≤ η := ENNReal.toReal_nonneg
   have hηle : η ≤ 1 / 2500 := ENNReal.toReal_le_of_le_ofReal (by norm_num) hη
   have hM0 : 0 ≤ 1024 / 131 * η := by positivity
-  -- the root coefficient `D_μ ≤ 1 + 3η`
+  -- the root coefficient `A_μ ≤ 1 + 3η`
   have hD : M.DmuC 2 ≤ ENNReal.ofReal (1 + 3 * η) := by
     calc M.DmuC 2 ≤ 1 + ENNReal.ofReal (2 * 2 - 1) * M.zeta 2 := M.DmuC_le hc (by norm_num)
       _ = ENNReal.ofReal (1 + 3 * η) := by
