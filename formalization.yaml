@@ -11,24 +11,13 @@ project:
     Lean 4 formalisation of the automorphism-matching theorems and the quasi-isometry
     classification of Galton–Watson trees from the paper "The quasi-isometry classes of
     Galton–Watson trees" by Jayadev S. Athreya and Sascha Troscheit (arXiv:2609.23882). The
-    audited statements are: the i.i.d. matching theorem on the binary tree (leaf and full
-    bounds, and the existence of a root-fixing automorphism of the infinite binary tree matching
-    two independent i.i.d. labellings with probability at least 1 - 16 η_{5/2}, where η_{5/2}
-    is the one-site potential of the label law); the general Markov matching theorem for
-    typed label processes on the binary tree, in its finite-type and zero-compatible forms at
-    finite and at infinite height, with a failure probability at most a constant multiple of
-    the one-site defect; the complete classification, up to quasi-isometry, of Galton–Watson
-    trees with finitely supported offspring law conditioned on infinite diameter, into the ray
-    class, the binary-tree class, one chain class for each branching semigroup, and the bushy
-    class, with two independent conditioned trees almost surely quasi-isometric exactly when
-    their laws share a class, together with the finite class, so that over the unconditioned
-    laws two trees are almost surely quasi-isometric exactly when both are finite or both are
-    infinite with laws in the same class; the mutual embeddability theorem, that a
-    Galton–Watson tree with finitely supported supercritical offspring law, conditioned on
-    infinite diameter, almost surely admits quasi-isometric embeddings into the binary tree and
-    from it; and, for offspring supported on {1,2}, almost sure quasi-isometry
-    together with an explicit exponential bound on the failure probability of a
-    (D^2+3)-quasi-isometry. The statements are made in Challenge.lean over Mathlib alone and
+    audited statements are: the i.i.d. matching theorem on the binary tree,
+    the general Markov matching theorem for
+    typed label processes on the binary tree, in its finite-type and zero-compatible forms,
+    the complete classification, up to quasi-isometry, of Galton–Watson
+    trees with finitely supported offspring law conditioned on infinite diameter,
+    the mutual embeddability theorem.
+    The statements are made in Challenge.lean over Mathlib alone and
     discharged by Solution.lean from four library targets.
   authors:
     - "Jayadev S. Athreya"
@@ -38,8 +27,8 @@ project:
     - "Sascha Troscheit"
 
 classification:
-  arxiv: ["math.PR", "math.MG"]
-  msc2020: ["60J80", "05C80", "51F30", "05C05"]
+  arxiv: ["math.PR", "math.GR", "math.MG"]
+  msc2020: ["60J80", "51F30", "30L10", "28A80", "60K35", "68V20"]
 
 sources:
   - title: "The quasi-isometry classes of Galton–Watson trees"
@@ -52,7 +41,7 @@ sources:
     relationship: "formalizes"
     note: >-
       The paper whose matching theorems and classification are formalised here, available at
-      https://arxiv.org/abs/2609.23882. Theorem numbers in this file refer to its version 1.
+      https://arxiv.org/abs/2609.23882. Theorem numbers in this file refer to its version 2.
       Its Appendix B records the statement-by-statement correspondence with the Lean
       declarations, and paper-correspondence.yaml in this repository records the same
       correspondence for the static check described in the README. The formalisation and the
@@ -107,8 +96,7 @@ automation:
       framework: "Claude Code (Anthropic)"
       tool_setup: >-
         Agentic Lean development in Claude Code, including multi-agent sessions with one agent
-        per file, used to write, refactor and repair library proofs against a fixed statement
-        surface. Every retained argument was selected, checked and curated by the authors.
+        per file, used to write, refactor and repair library proofs.
       cost:
         wall_time: "not tracked"
         spend_usd: "subscription-based"
@@ -118,8 +106,7 @@ automation:
       models: ["Sol", "Astra"]
       framework: "Codex (OpenAI)"
       tool_setup: >-
-        Agentic Lean development in Codex, used to formalise arguments in Lean. Every retained
-        argument was selected, checked and curated by the authors.
+        Agentic Lean development in Codex, used to formalise arguments in Lean. 
       cost:
         wall_time: "not tracked"
         spend_usd: "subscription-based"
@@ -162,16 +149,17 @@ automation:
   notes: >-
     AI tools were used extensively during the Lean formalisation, following the principles of
     the Leiden Declaration on the responsible use of artificial intelligence in research. The
-    Challenge module, which fixes the audited statements, was reviewed by the authors against
+    Challenge module, which fixes the audited statements, was manually reviewed by the authors against
     the paper. The authors verified every non-human part of the formalisation and accept full
     responsibility for its contents.
 
 fidelity:
   divergences: >-
     The Lean statements are the manuscript's statements with these presentational differences.
-    Vertices of the infinite binary tree are addressed by List Bool where the prose uses words
-    over {1,2}, and Galton–Watson vertices by words over Fin N. Finite-height labellings and
-    the automorphism group are defined by recursion on the height rather than through an
+    Vertices are addressed by words over Fin N, with Fin 2 for the binary tree where the prose
+    uses {1,2}. The libraries retain Boolean binary addresses; Solution/Binary.lean proves the
+    correspondence, preserving roots, graph distances and probability laws. Finite-height
+    labellings and the automorphism group are defined by recursion on the height rather than through an
     alphabet; one unrestricted matching relation serves both the i.i.d. and Markov results.
     The library proves the recursive matching relation equal to matching over root-fixing
     graph automorphisms. Markov laws are stated directly on state labellings, with types

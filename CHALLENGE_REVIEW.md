@@ -94,3 +94,59 @@ All names below are in namespace `Challenge`.
   equals that of the pinned Mathlib revision, every manifest dependency is a GitHub repository
   pinned to a full commit, and the repository contains no submodules, LFS pointers or compiled
   artifacts.
+
+## Commentary and infinite matching revision, 29 September 2026
+
+The thirteen endpoints listed above are unchanged. Shortening the commentary reduced
+`Challenge.lean` from 605 to 499 lines without changing any code. Factoring the three infinite
+matching conclusions into `InfiniteMatching` then reduced it to 482 lines and 23,662 bytes.
+This predicate specifies independent consistent labellings, their finite-height laws and a
+lower bound on the probability of one root-fixing matching automorphism. Its declaration is
+identical in Challenge and `Solution/Definitions.lean`; the process projection proof now uses
+it in place of the former internal `MatchingProcess` definition.
+
+Local checks for this revision:
+
+- `lake build Challenge Solution` succeeds. Challenge has exactly the thirteen expected
+  `sorry` warnings, and Solution builds without warnings.
+- The three original expanded theorem statements, retained in a temporary Lean file, accept
+  the revised Solution theorems by `exact`, verifying definitional equality. The other ten
+  Challenge statement headers and all thirteen Solution proof bodies are unchanged.
+- Source comparison confirms that all thirteen theorem headers and all vocabulary code agree
+  between Challenge and Solution. Challenge contains thirteen theorem holes and no other
+  theorem, lemma or axiom.
+- An elaborated traversal from the thirteen endpoint types reaches all 57 named vocabulary
+  declarations, including `InfiniteMatching` and the full-labelling measurable-space instance.
+  The offspring coercion instance is unchanged and unfolds during elaboration.
+- `#print axioms` reports only `propext`, `Classical.choice` and `Quot.sound` for each of the
+  thirteen Solution theorems.
+- `python3 -B scripts/check_paper_correspondence.py` passes against the current manuscript:
+  88 labelled declarations, 13 structure entries and 6,564 distinct Lean declarations.
+
+The sandboxed Comparator audit was not run on this macOS host, which lacks bubblewrap.
+The CI audit remains the reference check for the independent kernels and sandboxed build.
+
+## Markov names and binary addresses, 29 September 2026
+
+The challenge vocabulary now uses `Challenge.Markov` in place of `Challenge.Stopped`.
+Binary vertex addresses are `List (Fin 2)`, with children `0,1` corresponding to the paper's
+`1,2`. Boolean values still record subtree swaps and Bernoulli outcomes. Challenge has 481
+lines and 23,640 bytes, and retains the same thirteen headline endpoints listed above.
+
+`Solution/Binary.lean` proves the correspondence with the libraries' Boolean addresses:
+adjacency, coordinate evaluation, root-fixing automorphisms, sample graph isomorphisms and
+Bernoulli product laws. It transports quasi-isometries with the same constant and root image.
+The original library statements and proofs remain in use through these transports; the
+challenge contains none of this representation infrastructure.
+
+- Challenge builds with exactly thirteen `sorry` warnings. `lake --wfail build Solution`
+  succeeds without warnings.
+- The thirteen statement headers and all vocabulary code agree between Challenge and
+  Solution. There are no additional theorem or lemma bodies or axioms in Challenge, and no
+  holes or added axioms in Solution.
+- The elaborated dependency traversal reaches all 57 named vocabulary declarations from the
+  thirteen endpoint types. Each Solution endpoint uses only `propext`, `Classical.choice` and
+  `Quot.sound`.
+- The paper-correspondence check passes with 88 labelled manuscript declarations, 13 structure
+  entries and 6,599 distinct Lean source declarations. The sandboxed Comparator limitation
+  recorded above still applies.

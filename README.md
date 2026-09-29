@@ -172,10 +172,12 @@ without this machine-specific symlink.
 
 The challenge uses one unrestricted automorphism family for both matching theorems, states
 the Markov laws directly on state labels, and uses the full transition-support bound from the
-paper. The two-value and general classification results share the parent-child graph and
-quasi-isometry definitions. Only an upper offspring-support bound is required; positive mass
-at that bound is not a hypothesis. The boundary and fractal applications and the continuous
-branching-time results are outside the formalised scope, as disclosed in the manuscript.
+paper. Its Markov vocabulary is in `Challenge.Markov`, and its vertex addresses are words over
+`Fin N`, including `Fin 2` for binary trees. The two-value and general classification results
+share the parent-child graph and quasi-isometry definitions. Only an upper offspring-support
+bound is required; positive mass at that bound is not a hypothesis. The boundary and fractal
+applications and the continuous branching-time results are outside the formalised scope,
+as disclosed in the manuscript.
 
 ## Provenance and process
 

@@ -3,8 +3,8 @@ import Mathlib
 /-!
 # The challenge vocabulary
 
-This file repeats the definitions of `Challenge.lean`, with the same names, types, values and
-docstrings, so that the solution does not import the challenge. Comparator checks that the
+This file repeats the definitions of `Challenge.lean`, with the same names, types and values,
+so that the solution does not import the challenge. Comparator checks that the
 definitions used by the thirteen theorems agree between the two modules. Theorem, equation and
 condition numbers refer to version 1 of arXiv:2609.23882.
 -/
@@ -119,20 +119,19 @@ def restrictLab : (h : ℕ) → FullLab V (h + 1) → FullLab V h
   | 0, x => x.1
   | h + 1, x => (x.1, restrictLab h x.2.1, restrictLab h x.2.2)
 
-/-- The label of `x` at the vertex addressed by a word, where `false` selects the first child
-and `true` the second. It is used for words of length at most the height. -/
-def coord : (h : ℕ) → FullLab V h → List Bool → V
+/-- The label of `x` at the vertex addressed by a word, where `0` selects the first child
+and `1` the second. It is used for words of length at most the height. -/
+def coord : (h : ℕ) → FullLab V h → List (Fin 2) → V
   | 0, x, _ => x
   | _ + 1, x, [] => x.1
-  | h + 1, x, false :: t => coord h x.2.1 t
-  | h + 1, x, true :: t => coord h x.2.2 t
+  | h + 1, x, c :: t => coord h (if c = 0 then x.2.1 else x.2.2) t
 
 /-- Adjacency in the infinite rooted binary tree: one word extends the other by one letter. -/
-def treeAdj (s t : List Bool) : Prop := (∃ c, t = s ++ [c]) ∨ (∃ c, s = t ++ [c])
+def treeAdj (s t : List (Fin 2)) : Prop := (∃ c, t = s ++ [c]) ∨ (∃ c, s = t ++ [c])
 
 /-- `g` is a root-fixing automorphism of the infinite binary tree: a bijection of the words
 that fixes the root `[]` and preserves adjacency in both directions. -/
-def IsTreeAut (g : List Bool ≃ List Bool) : Prop :=
+def IsTreeAut (g : List (Fin 2) ≃ List (Fin 2)) : Prop :=
   g [] = [] ∧ ∀ s t, treeAdj s t ↔ treeAdj (g s) (g t)
 
 /-- The product σ-algebra on full labellings. -/
@@ -145,6 +144,20 @@ instance instMeasurableFullLab {V : Type*} [MeasurableSpace V] :
         (@Prod.instMeasurableSpace (FullLab V h) (FullLab V h) inst inst)
 
 end Iid
+
+/-- Independent consistent labellings with finite-height laws `μ`, `ν`, matched at every
+vertex by one root-fixing automorphism with probability at least `p`. -/
+def InfiniteMatching {V : Type u} [MeasurableSpace V] (R : V → V → Prop)
+    (μ ν : (h : ℕ) → PMF (FullLab V h)) (p : ℝ≥0∞) : Prop :=
+  ∃ (Ω : Type u) (_ : MeasurableSpace Ω) (P : Measure Ω) (_ : IsProbabilityMeasure P)
+    (X Y : (h : ℕ) → Ω → FullLab V h),
+    (∀ h ω, restrictLab h (X (h + 1) ω) = X h ω) ∧
+    (∀ h ω, restrictLab h (Y (h + 1) ω) = Y h ω) ∧
+    (∀ h, Measurable (fun ω => (X h ω, Y h ω))) ∧
+    (∀ h, P.map (fun ω => (X h ω, Y h ω)) = (prodPMF (μ h) (ν h)).toMeasure) ∧
+    p ≤ P {ω | ∃ g : List (Fin 2) ≃ List (Fin 2), IsTreeAut g ∧
+      ∀ s : List (Fin 2), R (coord (g s).length (X (g s).length ω) (g s))
+        (coord s.length (Y s.length ω) s)}
 
 /-! ## Galton–Watson trees and quasi-isometry -/
 
@@ -256,15 +269,15 @@ end Classification
 
 section TwoValue
 
-/-- Vertices of the binary tree, as words over `Bool`. -/
-abbrev Word : Type := List Bool
+/-- Vertices of the binary tree, as words over `Fin 2`. -/
+abbrev Word : Type := List (Fin 2)
 
 /-- The sample tree of the offspring field `χ`: the root, one child `v·1` always,
 and a second child `v·2` exactly when `χ v = true`. -/
 inductive InTree (χ : Word → Bool) : Word → Prop
   | root : InTree χ []
-  | one {v : Word} : InTree χ v → InTree χ (v ++ [false])
-  | two {v : Word} : InTree χ v → χ v = true → InTree χ (v ++ [true])
+  | one {v : Word} : InTree χ v → InTree χ (v ++ [0])
+  | two {v : Word} : InTree χ v → χ v = true → InTree χ (v ++ [1])
 
 /-- The i.i.d. field recording at each vertex whether it has two children (`true`, with
 probability `t`) or one child (`false`). With `InTree`, a sample gives the Galton–Watson tree
@@ -277,7 +290,7 @@ end TwoValue
 
 /-! ## Markov labels -/
 
-namespace Stopped
+namespace Markov
 
 /-- A Markov label model of Section 6 with states `V` and types `I`. `R` is the compatibility
 relation on states, `zero` the prescribed state `0`, `μ` the law of fresh states, `fresh` the
@@ -384,6 +397,6 @@ noncomputable def lambda (α : ℝ) : ℝ :=
     sSup ((fun q : ℝ => q / (1 + q) ^ α + β * (1 - q) ^ α) '' Set.Icc 0 1) +
       α ^ α / (α + 1) ^ (α + 1) * (1 - β) ^ (α + 1)) '' Set.Icc 0 1)
 
-end Stopped
+end Markov
 
 end Challenge

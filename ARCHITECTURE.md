@@ -174,7 +174,9 @@ classification uses the one-site bounds at exponent `5/2`.
 
 Implementation boundaries:
 
-- Binary addresses are `List Bool`, with `false,true` corresponding to the paper's `1,2`.
+- The libraries use binary addresses `List Bool`, with `false,true` corresponding to the
+  paper's `1,2`. The challenge uses `List (Fin 2)`, with children `0,1`; `Solution/Binary.lean`
+  proves the address, graph and probability-law correspondences.
   General offspring laws also appear as real sequences with finite support, alongside the
   bundled `BranchingProcess.Offspring` interface. Shifted semigroups are `AddSubmonoid`s.
 - `ChainClasses.IsQIWith` uses word metrics; `BranchingProcess.IsQIWith` uses graph metrics.
@@ -213,6 +215,16 @@ scope; see the exclusions in the correspondence manifest.
 and transports in `Solution/`. The thirteen endpoint names and the exact axiom whitelist are
 maintained in [comparator.json](comparator.json), rather than in another list here.
 Keep proof infrastructure and audit reports out of Challenge.
+
+The three infinite-height matching statements share `Challenge.InfiniteMatching`: independent
+consistent labellings with prescribed finite-height laws and a lower bound on the probability
+of a matching automorphism. Unfolding it recovers the expanded conclusions. The definition is
+repeated in `Solution/Definitions.lean` and also used by the process projection proof.
+
+The challenge's Markov vocabulary is in `Challenge.Markov`. The proof libraries retain
+`GraphMarkovMatching.Stopped`; `Solution/Transport.lean` identifies the models and laws.
+`Solution/Binary.lean` transports infinite matching automorphisms and the two-value family
+from Boolean addresses to `Fin 2`, preserving roots, distances and probability bounds.
 
 The [CI workflow](.github/workflows/build.yml) separates cached library builds from a fresh
 audit. The audit prepares trusted Mathlib dependencies but does not restore project builds or

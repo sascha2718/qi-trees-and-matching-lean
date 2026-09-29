@@ -1,36 +1,15 @@
 import Mathlib
 
 /-!
-# The quasi-isometry classes of Galton–Watson trees: audited statements
+# The quasi-isometry classes of Galton–Watson trees
 
-This file states the thirteen headline theorems of J. S. Athreya and S. Troscheit,
-*The quasi-isometry classes of Galton–Watson trees*, arXiv:2609.23882. Theorem, equation and
-condition numbers below refer to version 1 of that paper. Every theorem here has the proof
-`sorry`. `Solution.lean` proves declarations of the same names and types from the project
-libraries, and Comparator checks that they agree and that the proofs use only `propext`,
-`Classical.choice` and `Quot.sound`. The vocabulary below depends on Mathlib alone.
+Thirteen statements from J. S. Athreya and S. Troscheit,
+*The quasi-isometry classes of Galton–Watson trees*, arXiv:2609.23882v1.
+Theorem, equation and condition numbers refer to that version.
 
-* Matching (Theorem 5.1). Two independent labellings of the binary tree, each with i.i.d.
-  labels of law `μ`, are matched by a tree automorphism with high probability when the
-  one-site potential `η_{5/2}(μ)` is small: `audit_graph_leaf_matching_bound`,
-  `audit_graph_full_matching_bound` and `audit_exists_infinite_tree_matching_graphAut`.
-* Classification (Theorem 1.2). Two independent Galton–Watson trees with finitely supported
-  offspring laws almost surely admit a quasi-isometry exactly when both are finite, or both are
-  infinite with laws in the same infinite class, and in that case they admit a root-preserving
-  one: `audit_full_classification_ae_iff`, with the finite-class inputs
-  `audit_bounded_graph_qi_point` and `audit_extinction_of_not_supercritical`.
-* Mutual embeddability (Theorem 1.3): `audit_mutual_embeddability`.
-* Universality in the two-value family (Theorem 1.4, with the rate (1.1)):
-  `audit_twovalue_ae_tree_family` and `audit_twovalue_rate_tree`.
-* Markov matching (Theorem 6.1), in its finite-type and zero-compatible alternatives, each at
-  finite and at infinite height: `audit_markov_matching_finite`, `audit_markov_matching_zero`,
-  `audit_markov_matching_finite_infinite` and `audit_markov_matching_zero_infinite`.
-
-Conventions. Vertices of the binary tree are words in `List Bool`, whose letters `false` and
-`true` stand for the paper's children `1` and `2`. Vertices of the `N`-ary tree are words over
-`Fin N`, whose letters `0, …, N-1` stand for the paper's `1, …, N`. Laws of labels are `PMF`s,
-and probabilities of events take values in `ℝ≥0∞`. Distances are Mathlib's graph distance
-`SimpleGraph.dist`, which is the graph metric on the connected graphs used here.
+Vertices are words over `Fin N`, with `0, …, N-1` representing the paper's children
+`1, …, N`; the binary tree uses `Fin 2`. Label laws are `PMF`s; event probabilities lie in
+`ℝ≥0∞`. Distances are `SimpleGraph.dist`, the graph metric on the connected graphs used here.
 -/
 
 namespace Challenge
@@ -40,20 +19,18 @@ open MeasureTheory
 
 /-! ## Matching labels on the binary tree -/
 
-/-- The product law of `μ` and `ν`: the joint law of independent draws from `μ` and `ν`. -/
+/-- The joint law of independent draws from `μ` and `ν`. -/
 noncomputable def prodPMF {X Y : Type*} (μ : PMF X) (ν : PMF Y) : PMF (X × Y) :=
   μ.bind fun x => ν.map fun y => (x, y)
 
 section Potential
 variable {X : Type*}
 
-/-- The compatible mass `b(x) = μ{y : x R y}` of a label `x`: the probability that a label
-drawn from `μ` is compatible with `x`. -/
+/-- The compatible mass `b(x) = μ{y : x R y}`. -/
 noncomputable def rE (μ : PMF X) (R : X → X → Prop) (x : X) : ℝ≥0∞ :=
   ∑' y, if R x y then μ y else 0
 
-/-- The incompatible mass `q(x) = μ{y : ¬ x R y} = 1 - b(x)`: the probability that a label
-drawn from `μ` is not compatible with `x`. -/
+/-- The incompatible mass `q(x) = μ{y : ¬ x R y} = 1 - b(x)`. -/
 noncomputable def qE (μ : PMF X) (R : X → X → Prop) (x : X) : ℝ≥0∞ :=
   ∑' y, if R x y then 0 else μ y
 
@@ -67,17 +44,13 @@ noncomputable def phi (α t : ℝ) : ℝ := t / (1 - t) ^ α
 noncomputable def phiE (α t : ℝ) : ℝ≥0∞ :=
   if t < 1 then ENNReal.ofReal (phi α t) else ⊤
 
-/-- The one-site potential `η_α(μ) = ∑_x μ(x) φ_α(q(x))` of equation (5.1), for the
-compatibility relation `R`. It is infinite when some label of positive mass has compatible
-mass `b(x) = 0`. -/
+/-- The one-site potential `η_α(μ)` of (5.1), infinite if `b(x) = 0` at a label of positive mass. -/
 noncomputable def potential (α : ℝ) (μ : PMF X) (R : X → X → Prop) : ℝ≥0∞ :=
   ∑' x, μ x * phiE α (q μ R x)
 
 end Potential
 
-/-- Full labellings of the binary tree of height `n`, with a label in `S` at every vertex:
-a single label at height `0`, and otherwise the root label together with the labellings of
-the two subtrees of height `n - 1`. -/
+/-- Labellings of every vertex of the binary tree of height `n`. -/
 def FullLab (S : Type*) : ℕ → Type _
   | 0 => S
   | n + 1 => S × (FullLab S n × FullLab S n)
@@ -85,21 +58,17 @@ def FullLab (S : Type*) : ℕ → Type _
 section Iid
 variable {V : Type*}
 
-/-- Leaf labellings of the binary tree of height `h`, with a label in `V` at each of the `2^h`
-leaves: a single label at height `0`, and otherwise the leaf labellings of the two subtrees. -/
+/-- Labellings of the `2^h` leaves of the binary tree of height `h`. -/
 def Leaf (V : Type*) : ℕ → Type _
   | 0 => V
   | h + 1 => Leaf V h × Leaf V h
 
-/-- The rooted automorphisms `Aut(𝔹_h)` of the binary tree of height `h`, encoded recursively:
-a bit recording whether the two subtrees of the root are exchanged, and automorphisms of the
-two subtrees. -/
+/-- Rooted automorphisms `Aut(𝔹_h)`, encoded by a swap bit and two subtree automorphisms. -/
 def Aut : ℕ → Type
   | 0 => Unit
   | h + 1 => Bool × Aut h × Aut h
 
-/-- `matchesA R₀ h π x y`: the automorphism `π` carries every leaf of `x` to an
-`R₀`-compatible leaf of `y`. -/
+/-- The automorphism `π` matches every leaf of `x` to an `R₀`-compatible leaf of `y`. -/
 def matchesA (R₀ : V → V → Prop) : (h : ℕ) → Aut h → Leaf V h → Leaf V h → Prop
   | 0, _, x, y => R₀ x y
   | h + 1, π, x, y =>
@@ -110,8 +79,7 @@ def matchesA (R₀ : V → V → Prop) : (h : ℕ) → Aut h → Leaf V h → Le
 def leafSim (R₀ : V → V → Prop) (h : ℕ) (x y : Leaf V h) : Prop :=
   ∃ π : Aut h, matchesA R₀ h π x y
 
-/-- `fullMatchesA R₀ h π x y`: the automorphism `π` carries every vertex of `x` to an
-`R₀`-compatible vertex of `y`. -/
+/-- The automorphism `π` matches every vertex of `x` to an `R₀`-compatible vertex of `y`. -/
 def fullMatchesA (R₀ : V → V → Prop) : (h : ℕ) → Aut h → FullLab V h → FullLab V h → Prop
   | 0, _, x, y => R₀ x y
   | h + 1, π, x, y =>
@@ -133,30 +101,25 @@ noncomputable def fullMu (μ : PMF V) : (h : ℕ) → PMF (FullLab V h)
   | 0 => μ
   | h + 1 => prodPMF μ (prodPMF (fullMu μ h) (fullMu μ h))
 
-/-- Compatibility of labels in a label graph `G`: equal or adjacent, that is,
-`d_G(v, w) ≤ 1`. -/
+/-- Labels in `G` are compatible when equal or adjacent. -/
 def compat (G : SimpleGraph V) (v w : V) : Prop := v = w ∨ G.Adj v w
 
-/-- The restriction of a full labelling of height `h + 1` to the vertices of depth at most
-`h`. -/
+/-- Restriction from height `h + 1` to height `h`. -/
 def restrictLab : (h : ℕ) → FullLab V (h + 1) → FullLab V h
   | 0, x => x.1
   | h + 1, x => (x.1, restrictLab h x.2.1, restrictLab h x.2.2)
 
-/-- The label of `x` at the vertex addressed by a word, where `false` selects the first child
-and `true` the second. It is used for words of length at most the height. -/
-def coord : (h : ℕ) → FullLab V h → List Bool → V
+/-- The label at a word, used for words of length at most the height. -/
+def coord : (h : ℕ) → FullLab V h → List (Fin 2) → V
   | 0, x, _ => x
   | _ + 1, x, [] => x.1
-  | h + 1, x, false :: t => coord h x.2.1 t
-  | h + 1, x, true :: t => coord h x.2.2 t
+  | h + 1, x, c :: t => coord h (if c = 0 then x.2.1 else x.2.2) t
 
 /-- Adjacency in the infinite rooted binary tree: one word extends the other by one letter. -/
-def treeAdj (s t : List Bool) : Prop := (∃ c, t = s ++ [c]) ∨ (∃ c, s = t ++ [c])
+def treeAdj (s t : List (Fin 2)) : Prop := (∃ c, t = s ++ [c]) ∨ (∃ c, s = t ++ [c])
 
-/-- `g` is a root-fixing automorphism of the infinite binary tree: a bijection of the words
-that fixes the root `[]` and preserves adjacency in both directions. -/
-def IsTreeAut (g : List Bool ≃ List Bool) : Prop :=
+/-- A root-fixing automorphism of the infinite binary tree. -/
+def IsTreeAut (g : List (Fin 2) ≃ List (Fin 2)) : Prop :=
   g [] = [] ∧ ∀ s t, treeAdj s t ↔ treeAdj (g s) (g t)
 
 /-- The product σ-algebra on full labellings. -/
@@ -170,18 +133,29 @@ instance instMeasurableFullLab {V : Type*} [MeasurableSpace V] :
 
 end Iid
 
+/-- Independent consistent labellings with finite-height laws `μ`, `ν`, matched at every
+vertex by one root-fixing automorphism with probability at least `p`. -/
+def InfiniteMatching {V : Type u} [MeasurableSpace V] (R : V → V → Prop)
+    (μ ν : (h : ℕ) → PMF (FullLab V h)) (p : ℝ≥0∞) : Prop :=
+  ∃ (Ω : Type u) (_ : MeasurableSpace Ω) (P : Measure Ω) (_ : IsProbabilityMeasure P)
+    (X Y : (h : ℕ) → Ω → FullLab V h),
+    (∀ h ω, restrictLab h (X (h + 1) ω) = X h ω) ∧
+    (∀ h ω, restrictLab h (Y (h + 1) ω) = Y h ω) ∧
+    (∀ h, Measurable (fun ω => (X h ω, Y h ω))) ∧
+    (∀ h, P.map (fun ω => (X h ω, Y h ω)) = (prodPMF (μ h) (ν h)).toMeasure) ∧
+    p ≤ P {ω | ∃ g : List (Fin 2) ≃ List (Fin 2), IsTreeAut g ∧
+      ∀ s : List (Fin 2), R (coord (g s).length (X (g s).length ω) (g s))
+        (coord s.length (Y s.length ω) s)}
+
 /-! ## Galton–Watson trees and quasi-isometry -/
 
-/-- The parent–child graph on a set `T` of words: each word in `T` is joined to its one-letter
-extensions in `T`. For the prefix-closed sets used below, this is the rooted tree with vertex
-set `T` and root `[]`. -/
+/-- The parent–child graph on `T`, joining words to their one-letter extensions in `T`. -/
 def wordGraph {A : Type*} (T : List A → Prop) : SimpleGraph {w // T w} :=
   SimpleGraph.fromRel fun u v => ∃ a, v.1 = u.1 ++ [a]
 
 section Classification
 
-/-- An offspring distribution `θ` with support in `{0, …, J}`. The bound `J` need not be
-attained: positive mass at `J` is not required. -/
+/-- An offspring law supported on `{0, …, J}`; positive mass at `J` is not required. -/
 structure Offspring (J : ℕ) where
   /-- The law of the number of children. -/
   pmf : PMF ℕ
@@ -206,20 +180,16 @@ end Offspring
 /-- Vertex addresses of the `N`-ary tree, as words over `Fin N`. -/
 abbrev GWWord (N : ℕ) : Type := List (Fin N)
 
-/-- Membership in the tree cut out by an offspring-count field `c`, which assigns a number of
-children to every word: `v` belongs to the tree when each letter of `v` is less than the value
-of `c` at the prefix preceding it. The tree is prefix-closed and contains the root `[]`. -/
+/-- The tree cut out by offspring counts `c`: each letter is below the count at its prefix. -/
 def inGWSample {N : ℕ} (c : GWWord N → ℕ) (v : GWWord N) : Prop :=
   ∀ i, (h : i < v.length) → ((v.get ⟨i, h⟩ : Fin N) : ℕ) < c (v.take i)
 
-/-- Survival: the tree cut out by the offspring-count field `c` is infinite. Since every vertex
-has at most `N` children, this is equivalent to infinite diameter. -/
+/-- Survival: the sample tree is infinite, equivalently of infinite diameter. -/
 def gwSurvives {N : ℕ} (c : GWWord N → ℕ) : Prop :=
   {v | inGWSample c v}.Infinite
 
-/-- The law of the offspring field: independent offspring counts with law `θ` at all words of
-the `N`-ary tree. For `J ≤ N`, the tree cut out by a sample is a Galton–Watson tree with
-offspring distribution `θ`. -/
+/-- Independent offspring counts with law `θ` on the `N`-ary tree. For `J ≤ N`,
+`inGWSample` gives a Galton–Watson tree with offspring law `θ`. -/
 noncomputable def gwField {J N : ℕ} (theta : Offspring J) : Measure (GWWord N → ℕ) :=
   Measure.infinitePi (fun _ : GWWord N => theta.pmf.toMeasure)
 
@@ -227,9 +197,7 @@ noncomputable def gwField {J N : ℕ} (theta : Offspring J) : Measure (GWWord N 
 def gwRoot {N : ℕ} (c : GWWord N → ℕ) : {w : GWWord N // inGWSample c w} :=
   ⟨[], fun _ h => absurd h (Nat.not_lt_zero _)⟩
 
-/-- `GraphQIWith D G G' f`: `f` is a `D`-quasi-isometry from `G` to `G'` for the graph metrics
-`d`, `d'`, that is, `d'(f x, f y) ≤ D d(x, y) + D` and `d(x, y) ≤ D d'(f x, f y) + D²` for all
-`x`, `y`, and every vertex of `G'` lies within distance `D` of the image. -/
+/-- A `D`-quasi-isometry for the graph metrics, with `D`-dense image. -/
 structure GraphQIWith {V V' : Type*} (D : ℕ) (G : SimpleGraph V)
     (G' : SimpleGraph V') (f : V → V') : Prop where
   upper : ∀ x y, G'.dist (f x) (f y) ≤ D * G.dist x y + D
@@ -245,15 +213,13 @@ def GraphQuasiIsometricRooted {V V' : Type*} (G : SimpleGraph V) (G' : SimpleGra
     (r : V) (r' : V') : Prop :=
   ∃ (D : ℕ) (f : V → V'), GraphQIWith D G G' f ∧ f r = r'
 
-/-- `GraphQIEmbWith D G G' f`: `f` is a `D`-quasi-isometric embedding of `G` into `G'`, the
-two metric inequalities of a `D`-quasi-isometry without coarse density. -/
+/-- A `D`-quasi-isometric embedding: the metric inequalities without coarse density. -/
 structure GraphQIEmbWith {V V' : Type*} (D : ℕ) (G : SimpleGraph V)
     (G' : SimpleGraph V') (f : V → V') : Prop where
   upper : ∀ x y, G'.dist (f x) (f y) ≤ D * G.dist x y + D
   lower : ∀ x y, G.dist x y ≤ D * G'.dist (f x) (f y) + D * D
 
-/-- `G` embeds quasi-isometrically into `G'`: some map is a `D`-quasi-isometric embedding
-for some `D`. -/
+/-- Existence of a quasi-isometric embedding from `G` into `G'`. -/
 def GraphQIEmbeddable {V V' : Type*} (G : SimpleGraph V) (G' : SimpleGraph V') : Prop :=
   ∃ (D : ℕ) (f : V → V'), GraphQIEmbWith D G G' f
 
@@ -262,10 +228,8 @@ the branching semigroup `Λ_θ` that indexes the chain classes. -/
 noncomputable def shiftSupp {J : ℕ} (theta : Offspring J) : Finset ℕ :=
   ((Finset.range (J + 1)).filter fun k => 2 ≤ k ∧ theta k ≠ 0).image fun k => k - 1
 
-/-- Two laws lie in the same infinite class of Theorem 1.2: both in the ray class (R),
-`θ(1) = 1`; both in the full tree class (F), `θ(0) = θ(1) = 0`; both in chain classes,
-`θ(0) = 0 < θ(1) < 1`, with the same branching semigroup; or both in the bushy class (B),
-`θ(0) > 0`. -/
+/-- The same infinite class of Theorem 1.2: ray (R), full tree (F), chain `(C_Λ)` with
+the same branching semigroup, or bushy (B), in the order below. -/
 def SameInfiniteClass {J J' : ℕ} (theta : Offspring J) (theta' : Offspring J') : Prop :=
   (theta 1 = 1 ∧ theta' 1 = 1) ∨
   (theta 0 = 0 ∧ theta 1 = 0 ∧ theta' 0 = 0 ∧ theta' 1 = 0) ∨
@@ -280,19 +244,17 @@ end Classification
 
 section TwoValue
 
-/-- Vertices of the binary tree, as words over `Bool`. -/
-abbrev Word : Type := List Bool
+/-- Vertices of the binary tree, as words over `Fin 2`. -/
+abbrev Word : Type := List (Fin 2)
 
 /-- The sample tree of the offspring field `χ`: the root, one child `v·1` always,
 and a second child `v·2` exactly when `χ v = true`. -/
 inductive InTree (χ : Word → Bool) : Word → Prop
   | root : InTree χ []
-  | one {v : Word} : InTree χ v → InTree χ (v ++ [false])
-  | two {v : Word} : InTree χ v → χ v = true → InTree χ (v ++ [true])
+  | one {v : Word} : InTree χ v → InTree χ (v ++ [0])
+  | two {v : Word} : InTree χ v → χ v = true → InTree χ (v ++ [1])
 
-/-- The i.i.d. field recording at each vertex whether it has two children (`true`, with
-probability `t`) or one child (`false`). With `InTree`, a sample gives the Galton–Watson tree
-with `θ(2) = t` and `θ(1) = 1 - t`. -/
+/-- Independent Bernoulli labels; `InTree` gives offspring law `θ(2) = t`, `θ(1) = 1 - t`. -/
 noncomputable def bernoulliField {t : ℝ} (ht : 0 ≤ t) (ht1 : t ≤ 1) : Measure (Word → Bool) :=
   Measure.infinitePi (fun _ : Word =>
     ProbabilityTheory.bernoulliMeasure true false ⟨t, ht, ht1⟩)
@@ -301,12 +263,10 @@ end TwoValue
 
 /-! ## Markov labels -/
 
-namespace Stopped
+namespace Markov
 
-/-- A Markov label model of Section 6 with states `V` and types `I`. `R` is the compatibility
-relation on states, `zero` the prescribed state `0`, `μ` the law of fresh states, `fresh` the
-set `I_μ` of types that draw a fresh state, and `π t` the law `P_t` of the pair of child types
-of a vertex of type `t`. -/
+/-- A Markov model of Section 6 with states `V`, types `I`, compatibility `R`, prescribed
+state `zero`, fresh law `μ`, fresh types `I_μ`, and child-type pair laws `π t = P_t`. -/
 structure Model (V I : Type) where
   R : V → V → Prop
   zero : V
@@ -323,38 +283,29 @@ structure IsCompat (M : Model V I) : Prop where
   refl : ∀ v, M.R v v
   symm : ∀ v w, M.R v w → M.R w v
 
-/-- The law of the state at a vertex of type `t`: `μ` for a fresh type, and the point mass at
-`zero` otherwise. -/
+/-- The state law at type `t`: `μ` if fresh, the point mass at `zero` otherwise. -/
 noncomputable def rootLaw (t : I) : PMF V :=
   if M.fresh t then M.μ else PMF.pure M.zero
 
-/-- The law of the state labelling of height `h` started at type `t`. The root state has law
-`rootLaw t`; independently, the two child types are drawn from `π t`, and given them the two
-subtrees are independent with the laws for their types. The labelling records states only,
-not types. -/
+/-- The state labelling law at height `h` from type `t`: draw the root state and child types
+independently, then independent subtrees conditional on their types. -/
 noncomputable def rho : I → (h : ℕ) → PMF (FullLab V h)
   | t, 0 => M.rootLaw t
   | t, h + 1 => (M.rootLaw t).bind fun v =>
       ((M.π t).bind fun j => prodPMF (rho j.1 h) (rho j.2 h)).map fun p => (v, p)
 
-/-- The failure probability `P(M_h(s,t)^c)`: the probability that two independent state
-labellings of height `h`, started at types `s` and `t`, admit no automorphism matching the
-states at every vertex. -/
+/-- The failure probability `P(M_h(s,t)^c)` for independent state labellings from `s` and `t`. -/
 noncomputable def failProb (s t : I) (h : ℕ) : ℝ≥0∞ :=
   ∑' x, M.rho s h x * qE (M.rho t h) (fullSim M.R h) x
 
-/-- `δ = 1 - b(0) = μ{v : ¬ R 0 v}`: the probability that a fresh state is incompatible with
-the prescribed state. -/
+/-- The incompatibility mass of the prescribed state: `δ = 1 - b(0) = μ{v : ¬ R 0 v}`. -/
 noncomputable def delta : ℝ≥0∞ := qE M.μ M.R M.zero
 
-/-- The one-site defect `ζ_α = max(η_α, φ_α(δ))` of equation (6.1), where
-`φ_α(δ) = (1 - b(0))/b(0)^α`. It is infinite when `b(0) = 0`. -/
+/-- The one-site defect `ζ_α = max(η_α, φ_α(δ))` of (6.1), infinite when `b(0) = 0`. -/
 noncomputable def zeta (α : ℝ) : ℝ≥0∞ :=
   max (potential α M.μ M.R) (phiE α M.delta.toReal)
 
-/-- A partition of the types into `g` cyclic classes, indexed by `ZMod g`, as in the
-finite-type hypotheses of Theorem 6.1: fresh types lie in class `0`, and both child types of a
-transition of positive probability lie in the class following that of the parent. -/
+/-- The cyclic type classes of the finite-type alternative in Theorem 6.1. -/
 structure Phase (M : Model V I) (g : ℕ) where
   /-- The class of each type. -/
   θ : I → ZMod g
@@ -391,94 +342,61 @@ def FreshPositive : Prop :=
   ∀ (h : ℕ) (s t : I) (x : FullLab V h), M.fresh s → M.fresh t → M.rho s h x ≠ 0 →
     rE (M.rho t h) (fullSim M.R h) x ≠ 0
 
-/-- The transition sum `∑_{j ∈ supp P_t} P_t(j)^(-α)` over the support of the child-type law of
-`t`. Bounds on these sums control the constants of the finite-type alternative. -/
+/-- The transition sum `∑_{j ∈ supp P_t} P_t(j)^(-α)` over the full transition support. -/
 noncomputable def inverseSum [Fintype I] (α : ℝ) (t : I) : ℝ≥0∞ :=
   ∑ j ∈ Finset.univ.filter (fun j => M.π t j ≠ 0), (M.π t j) ^ (-α)
 
 end Model
 
-/-- The contraction coefficient of equation (6.2),
-`λ_α = 2 min_{0 ≤ β ≤ 1} (max_{0 ≤ q ≤ 1} (q/(1+q)^α + β(1-q)^α) + α^α (1-β)^(α+1)/(α+1)^(α+1))`.
-The matching theorems assume `λ_α < 1`, which holds for `α ≥ 4/3`: the library proves
-`λ_{4/3} < 499/500` (`GraphMarkovMatching.Stopped.lambda_fourThirds_lt`) and that `λ` is
-strictly decreasing on `[1, ∞)` (`GraphMarkovMatching.Stopped.lambda_strictAntiOn`). -/
+/-- The contraction coefficient `λ_α` of (6.2); `λ_α < 1` holds for `α ≥ 4/3`. -/
 noncomputable def lambda (α : ℝ) : ℝ :=
   2 * sInf ((fun β : ℝ =>
     sSup ((fun q : ℝ => q / (1 + q) ^ α + β * (1 - q) ^ α) '' Set.Icc 0 1) +
       α ^ α / (α + 1) ^ (α + 1) * (1 - β) ^ (α + 1)) '' Set.Icc 0 1)
 
-end Stopped
+end Markov
 
 /-! ## The i.i.d. matching theorem -/
 
-/-- Theorem 5.1(1), the leaf bound (5.2). Let `μ` be a law on the vertex set of a graph `G`,
-and call two labels compatible when they are equal or adjacent. If `η_{5/2}(μ) ≤ 1/256`, then
-two independent leaf labellings of the binary tree of height `h`, each with i.i.d. labels of
-law `μ`, admit no automorphism carrying every leaf to a leaf with a compatible label with
-probability at most `(253/256)^h η_{5/2}(μ)`. The left side is this probability, written as
-the expected mass of second labellings that the first labelling fails to match. -/
+/-- Theorem 5.1(1), the leaf bound (5.2). The sum is the matching failure probability
+for two independent i.i.d. leaf labellings. -/
 theorem audit_graph_leaf_matching_bound {V : Type u} (μ : PMF V) (G : SimpleGraph V)
     (h0 : potential (5 / 2) μ (compat G) ≤ 1 / 256) (h : ℕ) :
     ∑' x, leafMu μ h x * qE (leafMu μ h) (leafSim (compat G) h) x
       ≤ (253 / 256) ^ h * potential (5 / 2) μ (compat G) := sorry
 
-/-- Theorem 5.1(2), the full bound (5.3) at finite height. In the setting of the leaf bound,
-with every vertex labelled, `η_{5/2}(μ) ≤ 10⁻⁴` implies that two independent labellings of the
-binary tree of height `h` admit no automorphism matching every vertex with probability at most
-`16 η_{5/2}(μ)`, uniformly in `h`. -/
+/-- Theorem 5.1(2), the full bound (5.3): matching failure for independent i.i.d. labellings
+of every vertex, uniformly in the height. -/
 theorem audit_graph_full_matching_bound {V : Type u} (μ : PMF V) (G : SimpleGraph V)
     (hη : potential (5 / 2) μ (compat G) ≤ 1 / 10000) (h : ℕ) :
     ∑' x, fullMu μ h x * qE (fullMu μ h) (fullSim (compat G) h) x
       ≤ 16 * potential (5 / 2) μ (compat G) := sorry
 
-/-- Theorem 5.1(2) at infinite height. Let `R₀` be a reflexive symmetric compatibility
-relation on a countable label set, which is compatibility in the graph joining distinct related
-labels, and let `η_{5/2}(μ) ≤ 10⁻⁴`. There is a probability space carrying two sequences of
-full labellings `X h`, `Y h` of all heights, each restricting to the previous one, such that
-`(X h, Y h)` has the law of two independent labellings of height `h` with i.i.d. labels of law
-`μ`. With probability at least `1 - 16 η_{5/2}(μ)`, there is one root-fixing automorphism `g`
-of the infinite binary tree such that, at every vertex `s`, the label of `X` at `g s` is
-compatible with the label of `Y` at `s`. -/
+/-- Theorem 5.1(2) at infinite height: with probability at least `1 - 16 η_{5/2}(μ)`,
+one root-fixing automorphism matches two independent i.i.d. labellings at every vertex. -/
 theorem audit_exists_infinite_tree_matching_graphAut {V : Type u} (μ : PMF V)
     [MeasurableSpace V] [MeasurableSingletonClass V] [Countable V] (R₀ : V → V → Prop)
     (hrefl : ∀ v, R₀ v v) (hsymm : ∀ a b, R₀ a b → R₀ b a)
     (hη : potential (5 / 2) μ R₀ ≤ 1 / 10000) :
-    ∃ (Ω : Type u) (_ : MeasurableSpace Ω) (P : Measure Ω) (_ : IsProbabilityMeasure P)
-      (X Y : (h : ℕ) → Ω → FullLab V h),
-      (∀ h ω, restrictLab h (X (h + 1) ω) = X h ω) ∧
-      (∀ h ω, restrictLab h (Y (h + 1) ω) = Y h ω) ∧
-      (∀ h, Measurable (fun ω => (X h ω, Y h ω))) ∧
-      (∀ h, P.map (fun ω => (X h ω, Y h ω))
-        = (prodPMF (fullMu μ h) (fullMu μ h)).toMeasure) ∧
-      1 - 16 * potential (5 / 2) μ R₀ ≤ P {ω | ∃ g : List Bool ≃ List Bool, IsTreeAut g ∧
-        ∀ s : List Bool, R₀ (coord (g s).length (X (g s).length ω) (g s))
-          (coord s.length (Y s.length ω) s)} := sorry
+    InfiniteMatching R₀ (fullMu μ) (fullMu μ) (1 - 16 * potential (5 / 2) μ R₀) := sorry
 
 /-! ## The finite class and the complete classification -/
 
-/-- The finite class of Theorem 1.2, geometric input: a connected graph of bounded diameter is
-quasi-isometric to the one-vertex graph. In particular, all finite trees are quasi-isometric to
-one another. -/
+/-- The finite class of Theorem 1.2: a connected graph of bounded diameter is quasi-isometric
+to a point. -/
 theorem audit_bounded_graph_qi_point {V : Type u} (G : SimpleGraph V) (hconn : G.Connected)
     (hbdd : ∃ D : ℕ, ∀ x y, G.dist x y ≤ D) :
     GraphQuasiIsometric G (⊥ : SimpleGraph Unit) := sorry
 
-/-- The finite class of Theorem 1.2, probabilistic input: an offspring distribution with mean
-at most one, other than the deterministic single child `θ(1) = 1`, gives an almost surely
-finite Galton–Watson tree. Hence only the laws admitted in Theorem 1.2 survive with positive
-probability. -/
+/-- Extinction for the finite class of Theorem 1.2: mean at most one implies almost-sure
+finiteness, except for the deterministic one-child law. -/
 theorem audit_extinction_of_not_supercritical {J N : ℕ} (theta : Offspring J) (hJN : J ≤ N)
     (hmean : ¬ theta.IsSupercritical) (h1 : theta 1 ≠ 1) :
     ∀ᵐ c ∂(gwField (N := N) theta), ¬ gwSurvives c := sorry
 
-/-- Theorem 1.2, including the finite class, over the unconditioned laws. Let `θ` and `θ'` be
-finitely supported offspring distributions and consider the trees cut out by independent
-offspring fields. Almost surely, a root-preserving quasi-isometry between the two trees exists
-exactly when both trees are finite, or both are infinite and `SameInfiniteClass θ θ'` holds;
-and any quasi-isometry, root-preserving or not, forces the same alternative. The paper
-conditions both trees on infinite diameter; here that conditioning is expressed through the
-survival events, and the laws are unrestricted. -/
+/-- Theorem 1.2, including the finite class, under independent unconditioned laws.
+Almost surely, quasi-isometry is equivalent to the stated class agreement, and a
+root-preserving map then exists. Conditioning is expressed through the survival events. -/
 theorem audit_full_classification_ae_iff {J J' N N' : ℕ}
     (theta : Offspring J) (hJN : J ≤ N) (theta' : Offspring J') (hJN' : J' ≤ N') :
     ∀ᵐ omega ∂((gwField (N := N) theta).prod (gwField (N := N') theta')),
@@ -492,11 +410,8 @@ theorem audit_full_classification_ae_iff {J J' N N' : ℕ}
 
 /-! ## Mutual embeddability -/
 
-/-- Theorem 1.3, mutual embeddability: a Galton–Watson tree with a finitely supported
-supercritical offspring distribution, conditioned on infinite diameter, almost surely admits a
-quasi-isometric embedding into the binary tree and receives one from it. The binary tree is
-the parent–child graph of all words over a two-letter alphabet, and the conditioning is
-expressed by quantifying over the surviving samples of the unconditioned law. -/
+/-- Theorem 1.3: almost surely on survival, a supercritical sample and the binary tree
+admit quasi-isometric embeddings into one another. -/
 theorem audit_mutual_embeddability {J N : ℕ} (theta : Offspring J) (hJN : J ≤ N)
     (hsup : theta.IsSupercritical) :
     ∀ᵐ c ∂(gwField (N := N) theta), gwSurvives c →
@@ -505,18 +420,15 @@ theorem audit_mutual_embeddability {J N : ℕ} (theta : Offspring J) (hJN : J �
 
 /-! ## Universality in the two-value family -/
 
-/-- Theorem 1.4, almost-sure part. Let every vertex independently have two children with
-probability `t` and one child otherwise. For every `t ∈ [0, 1]`, two independent such trees
-almost surely admit a root-preserving quasi-isometry. -/
+/-- Theorem 1.4: two independent trees of the two-value law almost surely admit a
+root-preserving quasi-isometry, including at `t = 0, 1`. -/
 theorem audit_twovalue_ae_tree_family {t : ℝ} (ht0 : 0 ≤ t) (ht1 : t ≤ 1) :
     ((bernoulliField ht0 ht1).prod (bernoulliField ht0 ht1))
       {ω | ¬ GraphQuasiIsometricRooted (wordGraph (InTree ω.1)) (wordGraph (InTree ω.2))
         ⟨[], InTree.root⟩ ⟨[], InTree.root⟩} = 0 := sorry
 
-/-- Theorem 1.4, the rate (1.1). For `0 < t < 1` there is `D₀` such that, for every `D ≥ D₀`,
-the probability that two independent trees of the two-value family admit no root-preserving
-`(D² + 3)`-quasi-isometry is at most `256 √((1 - t)^(D(2D - 5)))`. For `D ≥ 3` this equals
-`256 θ(1)^(D(D - 5/2))` with `θ(1) = 1 - t`, so the constant `C` of (1.1) is `256`. -/
+/-- Theorem 1.4, the rate (1.1). For `D ≥ 3`, the bound is
+`256 θ(1)^(D(D - 5/2))` with `θ(1) = 1 - t`, so `C = 256`. -/
 theorem audit_twovalue_rate_tree {t : ℝ} (ht0 : 0 < t) (ht1 : t < 1) :
     ∃ D₀ : ℕ, ∀ D : ℕ, D₀ ≤ D →
       ((bernoulliField ht0.le ht1.le).prod (bernoulliField ht0.le ht1.le))
@@ -525,81 +437,45 @@ theorem audit_twovalue_rate_tree {t : ℝ} (ht0 : 0 < t) (ht1 : t < 1) :
               f ⟨[], InTree.root⟩ = ⟨[], InTree.root⟩}
         ≤ ENNReal.ofReal (256 * Real.sqrt ((1 - t) ^ (D * (2 * D - 5)))) := sorry
 
-/-! ## The stopped Markov matching theorem -/
+/-! ## The Markov matching theorem -/
 
-/-- Theorem 6.1, finite-type alternative at finite height. Fix `α ≥ 1` with `λ_α < 1` and
-bounds `H`, `T ≥ 1` and `B ≥ 1`. There are constants `K` and `ε > 0`, depending only on
-`α, H, T, B`, with the following property. Take any model with finitely many types and
-reflexive symmetric compatibility, with a partition into cyclic classes of at most `T` types
-each, transition sums `∑_{j ∈ supp P_t} P_t(j)^(-α) ≤ B`, conditions (M1) and (M2) with return
-bound `H`, and `ζ_α ≤ ε`. Then two independent processes started at types of the same class
-fail to match with probability at most `K ζ_α`, at every height. -/
-theorem audit_markov_matching_finite {α : ℝ} (hα : 1 ≤ α) (hlam : Stopped.lambda α < 1)
+/-- Theorem 6.1, finite-type alternative: matching failure is at most `K ζ_α` within each
+cyclic class, uniformly in height. The constants depend only on `α, H, T, B`. -/
+theorem audit_markov_matching_finite {α : ℝ} (hα : 1 ≤ α) (hlam : Markov.lambda α < 1)
     (H T : ℕ) (hT : 1 ≤ T) (B : ℝ) (hB : 1 ≤ B) :
-    ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} [Fintype I] (M : Stopped.Model V I), M.IsCompat →
-      ∀ {g : ℕ} (Θ : Stopped.Model.Phase M g), (∀ i, Θ.count i ≤ T) →
+    ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} [Fintype I] (M : Markov.Model V I), M.IsCompat →
+      ∀ {g : ℕ} (Θ : Markov.Model.Phase M g), (∀ i, Θ.count i ≤ T) →
       (∀ t, M.inverseSum α t ≤ ENNReal.ofReal B) →
       M.FreshPositive → M.CommonReturns Θ H → M.zeta α ≤ ENNReal.ofReal ε →
       ∀ s t, Θ.θ s = Θ.θ t → ∀ h, M.failProb s t h ≤ ENNReal.ofReal Kc * M.zeta α := sorry
 
-/-- Theorem 6.1, zero-compatible alternative at finite height. Fix `α ≥ 1` with `λ_α < 1`.
-There are constants `K` and `ε > 0`, depending only on `α`, such that for every model with
-reflexive symmetric compatibility, `δ = 0` (that is, `b(0) = 1`) and `ζ_α ≤ ε`, two independent
-processes started at any two types fail to match with probability at most `K ζ_α`, at every
-height. No finiteness, class or return hypothesis is imposed on the types. -/
-theorem audit_markov_matching_zero {α : ℝ} (hα : 1 ≤ α) (hlam : Stopped.lambda α < 1) :
-    ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} (M : Stopped.Model V I), M.IsCompat → M.delta = 0 →
+/-- Theorem 6.1, zero-compatible alternative (`δ = 0`): the bound holds for all types and
+heights, with constants depending only on `α` and no finiteness or return hypothesis. -/
+theorem audit_markov_matching_zero {α : ℝ} (hα : 1 ≤ α) (hlam : Markov.lambda α < 1) :
+    ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} (M : Markov.Model V I), M.IsCompat → M.delta = 0 →
       M.zeta α ≤ ENNReal.ofReal ε → ∀ s t h,
         M.failProb s t h ≤ ENNReal.ofReal Kc * M.zeta α := sorry
 
-/-- Theorem 6.1, finite-type alternative at infinite height. Under the hypotheses of
-`audit_markov_matching_finite`, with a countable state set, let `s` and `t` be types of the
-same class. There is a probability space carrying two sequences of state labellings `X n`,
-`Y n` of all heights, each restricting to the previous one, such that `(X n, Y n)` has the law
-of two independent labellings of height `n` started at `s` and `t`. With probability at least
-`1 - K ζ_α`, one root-fixing automorphism of the infinite binary tree matches their states at
-every vertex. -/
+/-- Theorem 6.1, finite-type alternative at infinite height: with probability at least
+`1 - K ζ_α`, one root-fixing automorphism matches independent processes of same-class types. -/
 theorem audit_markov_matching_finite_infinite {α : ℝ} (hα : 1 ≤ α)
-    (hlam : Stopped.lambda α < 1) (H T : ℕ) (hT : 1 ≤ T) (B : ℝ) (hB : 1 ≤ B) :
+    (hlam : Markov.lambda α < 1) (H T : ℕ) (hT : 1 ≤ T) (B : ℝ) (hB : 1 ≤ B) :
     ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} [Fintype I] [Countable V] [MeasurableSpace V]
       [MeasurableSingletonClass V]
-      (M : Stopped.Model V I), M.IsCompat →
-      ∀ {g : ℕ} (Θ : Stopped.Model.Phase M g), (∀ i, Θ.count i ≤ T) →
+      (M : Markov.Model V I), M.IsCompat →
+      ∀ {g : ℕ} (Θ : Markov.Model.Phase M g), (∀ i, Θ.count i ≤ T) →
       (∀ t, M.inverseSum α t ≤ ENNReal.ofReal B) →
       M.FreshPositive → M.CommonReturns Θ H → M.zeta α ≤ ENNReal.ofReal ε →
       ∀ s t, Θ.θ s = Θ.θ t →
-      ∃ (Omega : Type) (_ : MeasurableSpace Omega) (P : Measure Omega)
-        (_ : IsProbabilityMeasure P) (X Y : (n : ℕ) → Omega → FullLab V n),
-        (∀ n omega, restrictLab n (X (n + 1) omega) = X n omega) ∧
-        (∀ n omega, restrictLab n (Y (n + 1) omega) = Y n omega) ∧
-        (∀ n, Measurable (fun omega => (X n omega, Y n omega))) ∧
-        (∀ n, P.map (fun omega => (X n omega, Y n omega))
-          = (prodPMF (M.rho s n) (M.rho t n)).toMeasure) ∧
-        1 - ENNReal.ofReal Kc * M.zeta α
-          ≤ P {omega | ∃ aut : List Bool ≃ List Bool, IsTreeAut aut ∧
-            ∀ w : List Bool, M.R
-              (coord (aut w).length (X (aut w).length omega) (aut w))
-              (coord w.length (Y w.length omega) w)} := sorry
+      InfiniteMatching M.R (M.rho s) (M.rho t) (1 - ENNReal.ofReal Kc * M.zeta α) := sorry
 
-/-- Theorem 6.1, zero-compatible alternative at infinite height. Under the hypotheses of
-`audit_markov_matching_zero`, with countable state and type sets, the conclusion of
-`audit_markov_matching_finite_infinite` holds for any two types `s` and `t`. -/
+/-- Theorem 6.1, zero-compatible alternative at infinite height: the same conclusion for
+any two types, with countable state and type sets and constants depending only on `α`. -/
 theorem audit_markov_matching_zero_infinite {α : ℝ} (hα : 1 ≤ α)
-    (hlam : Stopped.lambda α < 1) :
+    (hlam : Markov.lambda α < 1) :
     ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} [Countable V] [MeasurableSpace V]
-      [MeasurableSingletonClass V] [Countable I] (M : Stopped.Model V I), M.IsCompat → M.delta = 0 →
+      [MeasurableSingletonClass V] [Countable I] (M : Markov.Model V I), M.IsCompat → M.delta = 0 →
       M.zeta α ≤ ENNReal.ofReal ε → ∀ s t,
-      ∃ (Omega : Type) (_ : MeasurableSpace Omega) (P : Measure Omega)
-        (_ : IsProbabilityMeasure P) (X Y : (n : ℕ) → Omega → FullLab V n),
-        (∀ n omega, restrictLab n (X (n + 1) omega) = X n omega) ∧
-        (∀ n omega, restrictLab n (Y (n + 1) omega) = Y n omega) ∧
-        (∀ n, Measurable (fun omega => (X n omega, Y n omega))) ∧
-        (∀ n, P.map (fun omega => (X n omega, Y n omega))
-          = (prodPMF (M.rho s n) (M.rho t n)).toMeasure) ∧
-        1 - ENNReal.ofReal Kc * M.zeta α
-          ≤ P {omega | ∃ aut : List Bool ≃ List Bool, IsTreeAut aut ∧
-            ∀ w : List Bool, M.R
-              (coord (aut w).length (X (aut w).length omega) (aut w))
-              (coord w.length (Y w.length omega) w)} := sorry
+      InfiniteMatching M.R (M.rho s) (M.rho t) (1 - ENNReal.ofReal Kc * M.zeta α) := sorry
 
 end Challenge

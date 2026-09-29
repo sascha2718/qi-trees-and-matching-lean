@@ -69,7 +69,7 @@ lemma wordGraph_eq_N {N : ℕ} (T : GWWord N → Prop) :
   rw [wordGraph_adj, ChainClasses.wordGraphN_adj]
   exact treeDistN_one.symm
 
-lemma wordGraph_eq_bool (T : Word → Prop) : wordGraph T = ChainClasses.wordGraph T := by
+lemma wordGraph_eq_bool (T : Infrastructure.Word → Prop) : wordGraph T = ChainClasses.wordGraph T := by
   ext u v
   rw [wordGraph_adj]
   exact ChainClasses.treeDist_eq_one_iff.symm
@@ -79,17 +79,17 @@ lemma sampleGraph_eq {N : ℕ} (c : GWWord N → ℕ) :
   rw [Infrastructure.gwTreeGraph_eq, wordGraph_eq_N]
   rfl
 
-lemma twovalue_qi {χ χ' : Word → Bool} {K : ℕ} {f : Word → Word}
-    (hf : Infrastructure.IsQIWith K (InTree χ) (InTree χ') f) (hroot : f [] = []) :
-    ∃ g : {w // InTree χ w} → {w // InTree χ' w},
-      GraphQIWith K (wordGraph (InTree χ)) (wordGraph (InTree χ')) g ∧
-        g ⟨[], InTree.root⟩ = ⟨[], InTree.root⟩ := by
-  have h : ChainClasses.IsQIWith K (InTree χ) (InTree χ') f :=
+lemma twovalue_qi {χ χ' : Infrastructure.Word → Bool} {K : ℕ} {f : Infrastructure.Word → Infrastructure.Word}
+    (hf : Infrastructure.IsQIWith K (Infrastructure.InTree χ) (Infrastructure.InTree χ') f) (hroot : f [] = []) :
+    ∃ g : {w // Infrastructure.InTree χ w} → {w // Infrastructure.InTree χ' w},
+      GraphQIWith K (wordGraph (Infrastructure.InTree χ)) (wordGraph (Infrastructure.InTree χ')) g ∧
+        g ⟨[], Infrastructure.InTree.root⟩ = ⟨[], Infrastructure.InTree.root⟩ := by
+  have h : ChainClasses.IsQIWith K (Infrastructure.InTree χ) (Infrastructure.InTree χ') f :=
     (Infrastructure.isQIWith_iff _ _ _ _).1 hf
-  have hT : ChainClasses.PrefixClosed (InTree χ) := by
+  have hT : ChainClasses.PrefixClosed (Infrastructure.InTree χ) := by
     rw [Infrastructure.inTree_eq]
     exact ChainClasses.prefixClosed_inTree χ
-  have hT' : ChainClasses.PrefixClosed (InTree χ') := by
+  have hT' : ChainClasses.PrefixClosed (Infrastructure.InTree χ') := by
     rw [Infrastructure.inTree_eq]
     exact ChainClasses.prefixClosed_inTree χ'
   refine ⟨ChainClasses.restrictQI h, ?_, ?_⟩
@@ -99,7 +99,7 @@ lemma twovalue_qi {χ χ' : Word → Bool} {K : ℕ} {f : Word → Word}
 
 end Solution.Transport
 
-namespace Challenge.Stopped.Model
+namespace Challenge.Markov.Model
 
 /-- The typed implementation model. Types will be forgotten by `erase`. -/
 def toOld {V I : Type} (M : Model V I) : Solution.Infrastructure.Stopped.Model V I :=
@@ -129,11 +129,11 @@ lemma returns_toOld {V I : Type} (M : Model V I) {g : ℕ} (Θ : Phase M g) (H :
   obtain ⟨n, hn, hf, u, hu, hfu⟩ := h s t hst p hp hpath
   exact ⟨n, hn, hf, u, (reach_toOld M t n).symm ▸ hu, hfu⟩
 
-end Challenge.Stopped.Model
+end Challenge.Markov.Model
 
 namespace Solution.Transport
 
-lemma lambda_eq (α : ℝ) : Challenge.Stopped.lambda α = Infrastructure.Stopped.lambda α := rfl
+lemma lambda_eq (α : ℝ) : Challenge.Markov.lambda α = Infrastructure.Stopped.lambda α := rfl
 
 def erase {V I : Type} : (h : ℕ) → FullLab (I × V) h → FullLab V h
   | 0, x => x.2
@@ -167,7 +167,7 @@ lemma sim_erase {V I : Type} (R : V → V → Prop) (h : ℕ) (x y : FullLab (I 
     simpa only [Equiv.apply_symm_apply] using hp
 
 set_option backward.isDefEq.respectTransparency false in
-lemma old_rho_succ {V I : Type} (M : Challenge.Stopped.Model V I) (t : I) (h : ℕ) :
+lemma old_rho_succ {V I : Type} (M : Challenge.Markov.Model V I) (t : I) (h : ℕ) :
     M.toOld.rho t (h + 1) = (M.rootLaw t).bind fun v =>
       ((M.π t).bind fun j => prodPMF (M.toOld.rho j.1 h) (M.toOld.rho j.2 h)).map
         fun p => ((t, v), p) := by
@@ -188,7 +188,7 @@ lemma old_rho_succ {V I : Type} (M : Challenge.Stopped.Model V I) (t : I) (h : �
     (fun s => Infrastructure.muM M.toOld.kernel s h)
 
 set_option backward.isDefEq.respectTransparency false in
-lemma rho_erase {V I : Type} (M : Challenge.Stopped.Model V I) : ∀ h t,
+lemma rho_erase {V I : Type} (M : Challenge.Markov.Model V I) : ∀ h t,
     (M.toOld.rho t h).map (erase h) = M.rho t h := by
   intro h
   induction h with
@@ -200,7 +200,7 @@ lemma rho_erase {V I : Type} (M : Challenge.Stopped.Model V I) : ∀ h t,
     exact PMF.map_id _
   | succ h ih =>
     intro t
-    rw [old_rho_succ, PMF.map_bind, Challenge.Stopped.Model.rho]
+    rw [old_rho_succ, PMF.map_bind, Challenge.Markov.Model.rho]
     congr 1
     funext v
     rw [PMF.map_comp, PMF.map_bind]
@@ -232,14 +232,14 @@ lemma badDegree_erase {V I : Type} (R : V → V → Prop) (h : ℕ)
   intro y
   simp only [GraphMarkovMatching.badInd, sim_erase]
 
-lemma failProb_eq {V I : Type} (M : Challenge.Stopped.Model V I) (s t : I) (h : ℕ) :
+lemma failProb_eq {V I : Type} (M : Challenge.Markov.Model V I) (s t : I) (h : ℕ) :
     M.failProb s t h = M.toOld.failProb s t h := by
-  unfold Challenge.Stopped.Model.failProb Infrastructure.Stopped.Model.failProb Infrastructure.failureD
+  unfold Challenge.Markov.Model.failProb Infrastructure.Stopped.Model.failProb Infrastructure.failureD
   rw [← rho_erase M h s, GraphMarkovMatching.tsum_map_mul, ← rho_erase M h t]
   exact tsum_congr fun x => congrArg (fun q => M.toOld.rho s h x * q)
     (badDegree_erase M.R h (M.toOld.rho t h) x)
 
-lemma freshPositive_toOld {V I : Type} (M : Challenge.Stopped.Model V I)
+lemma freshPositive_toOld {V I : Type} (M : Challenge.Markov.Model V I)
     (hp : M.FreshPositive) : M.toOld.FreshPositive := by
   intro h s t x hs ht hx
   have hx' : M.rho s h (erase h x) ≠ 0 := by
@@ -249,7 +249,7 @@ lemma freshPositive_toOld {V I : Type} (M : Challenge.Stopped.Model V I)
   rw [← rho_erase M h t, degree_erase] at hd
   exact hd
 
-noncomputable def fullSelection {V I : Type} (M : Challenge.Stopped.Model V I) [Fintype I] :
+noncomputable def fullSelection {V I : Type} (M : Challenge.Markov.Model V I) [Fintype I] :
     Infrastructure.Stopped.Model.Selection M.toOld where
   J t := Finset.univ.filter fun j => M.π t j ≠ 0
   nonempty t := by
@@ -264,7 +264,7 @@ noncomputable def fullSelection {V I : Type} (M : Challenge.Stopped.Model V I) [
     obtain ⟨j, hj, hj'⟩ := hr
     exact ⟨j, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hj⟩, hj'⟩
 
-lemma fullSelection_sum {V I : Type} (M : Challenge.Stopped.Model V I) [Fintype I]
+lemma fullSelection_sum {V I : Type} (M : Challenge.Markov.Model V I) [Fintype I]
     (α : ℝ) (t : I) : (fullSelection M).inverseSum α t = M.inverseSum α t := rfl
 
 end Solution.Transport
@@ -283,8 +283,9 @@ lemma coord_erase {V I : Type} : ∀ h (x : FullLab (I × V) h) w,
     coord h (erase h x) w = (coord h x w).2
   | 0, _, _ => rfl
   | _ + 1, _, [] => rfl
-  | h + 1, x, false :: w => coord_erase h x.2.1 w
-  | h + 1, x, true :: w => coord_erase h x.2.2 w
+  | h + 1, x, c :: w => by
+      by_cases hc : c = 0 <;> simp only [coord, hc, ite_true, ite_false, erase] <;>
+        apply coord_erase
 
 lemma measurable_erase {V I : Type} [MeasurableSpace V] [MeasurableSpace I] :
     ∀ h, Measurable (erase (V := V) (I := I) h)
@@ -294,23 +295,10 @@ lemma measurable_erase {V I : Type} [MeasurableSpace V] [MeasurableSpace I] :
         (((measurable_erase h).comp (measurable_fst.comp measurable_snd)).prodMk
           ((measurable_erase h).comp (measurable_snd.comp measurable_snd)))
 
-/-- Internal notation for transporting a process and its matching event. -/
-def MatchingProcess {S : Type} [MeasurableSpace S] (R : S → S → Prop)
-    (μ ν : (h : ℕ) → PMF (FullLab S h)) (b : ℝ≥0∞) : Prop :=
-  ∃ (Ω : Type) (_ : MeasurableSpace Ω) (P : Measure Ω) (_ : IsProbabilityMeasure P)
-    (X Y : (h : ℕ) → Ω → FullLab S h),
-    (∀ h ω, restrictLab h (X (h + 1) ω) = X h ω) ∧
-    (∀ h ω, restrictLab h (Y (h + 1) ω) = Y h ω) ∧
-    (∀ h, Measurable (fun ω => (X h ω, Y h ω))) ∧
-    (∀ h, P.map (fun ω => (X h ω, Y h ω)) = (prodPMF (μ h) (ν h)).toMeasure) ∧
-    b ≤ P {ω | ∃ aut : List Bool ≃ List Bool, IsTreeAut aut ∧
-      ∀ w, R (coord (aut w).length (X (aut w).length ω) (aut w))
-        (coord w.length (Y w.length ω) w)}
-
 lemma matchingProcess_erase {V I : Type} [MeasurableSpace V] [MeasurableSpace I]
-    (M : Challenge.Stopped.Model V I) (s t : I) (b : ℝ≥0∞)
-    (h : MatchingProcess M.toOld.srel (M.toOld.rho s) (M.toOld.rho t) b) :
-    MatchingProcess M.R (M.rho s) (M.rho t) b := by
+    (M : Challenge.Markov.Model V I) (s t : I) (b : ℝ≥0∞)
+    (h : InfiniteMatching M.toOld.srel (M.toOld.rho s) (M.toOld.rho t) b) :
+    InfiniteMatching M.R (M.rho s) (M.rho t) b := by
   obtain ⟨Ω, inst, P, instP, X, Y, hX, hY, hmeas, hlaw, hbound⟩ := h
   let := inst
   let := instP
@@ -333,6 +321,6 @@ lemma matchingProcess_erase {V I : Type} [MeasurableSpace V] [MeasurableSpace I]
     rintro ω ⟨aut, haut, hw⟩
     refine ⟨aut, haut, fun w => ?_⟩
     simpa only [coord_erase, Infrastructure.Stopped.Model.srel,
-      Challenge.Stopped.Model.toOld] using hw w
+      Challenge.Markov.Model.toOld] using hw w
 
 end Solution.Transport

@@ -1,4 +1,5 @@
 import Solution.Transport
+import Solution.Binary
 
 /-!
 # Proofs of the audited statements
@@ -54,17 +55,9 @@ theorem audit_exists_infinite_tree_matching_graphAut {V : Type u} (μ : PMF V)
     [MeasurableSpace V] [MeasurableSingletonClass V] [Countable V] (R₀ : V → V → Prop)
     (hrefl : ∀ v, R₀ v v) (hsymm : ∀ a b, R₀ a b → R₀ b a)
     (hη : potential (5 / 2) μ R₀ ≤ 1 / 10000) :
-    ∃ (Ω : Type u) (_ : MeasurableSpace Ω) (P : Measure Ω) (_ : IsProbabilityMeasure P)
-      (X Y : (h : ℕ) → Ω → FullLab V h),
-      (∀ h ω, restrictLab h (X (h + 1) ω) = X h ω) ∧
-      (∀ h ω, restrictLab h (Y (h + 1) ω) = Y h ω) ∧
-      (∀ h, Measurable (fun ω => (X h ω, Y h ω))) ∧
-      (∀ h, P.map (fun ω => (X h ω, Y h ω))
-        = (prodPMF (fullMu μ h) (fullMu μ h)).toMeasure) ∧
-      1 - 16 * potential (5 / 2) μ R₀ ≤ P {ω | ∃ g : List Bool ≃ List Bool, IsTreeAut g ∧
-        ∀ s : List Bool, R₀ (coord (g s).length (X (g s).length ω) (g s))
-          (coord s.length (Y s.length ω) s)} := by
+    InfiniteMatching R₀ (fullMu μ) (fullMu μ) (1 - 16 * potential (5 / 2) μ R₀) := by
   rw [Solution.Transport.potential_eq_iid μ R₀ hrefl] at hη ⊢
+  apply Solution.Binary.infiniteMatching
   exact Solution.Infrastructure.audit_exists_infinite_tree_matching_graphAut μ R₀ hrefl hsymm hη
 
 /-! ## The finite class and the complete classification -/
@@ -130,15 +123,20 @@ theorem audit_twovalue_ae_tree_family {t : ℝ} (ht0 : 0 ≤ t) (ht1 : t ≤ 1) 
     ((bernoulliField ht0 ht1).prod (bernoulliField ht0 ht1))
       {ω | ¬ GraphQuasiIsometricRooted (wordGraph (InTree ω.1)) (wordGraph (InTree ω.2))
         ⟨[], InTree.root⟩ ⟨[], InTree.root⟩} = 0 := by
+  rw [← Solution.Binary.field_pair_map ht0 ht1,
+    (Solution.Binary.fieldEquiv.prodCongr Solution.Binary.fieldEquiv).map_apply]
   apply le_antisymm _ zero_le
   calc
-    _ ≤ ((bernoulliField ht0 ht1).prod (bernoulliField ht0 ht1))
-        {ω | ¬ ∃ (K : ℕ) (f : Word → Word),
-          Solution.Infrastructure.IsQIWith K (InTree ω.1) (InTree ω.2) f ∧ f [] = []} := by
+    _ ≤ ((Solution.Infrastructure.bernoulliField ht0 ht1).prod
+        (Solution.Infrastructure.bernoulliField ht0 ht1))
+        {ω | ¬ ∃ (K : ℕ) (f : Solution.Infrastructure.Word → Solution.Infrastructure.Word),
+          Solution.Infrastructure.IsQIWith K (Solution.Infrastructure.InTree ω.1)
+            (Solution.Infrastructure.InTree ω.2) f ∧ f [] = []} := by
       apply measure_mono
       rintro ω h ⟨K, f, hf, hroot⟩
       obtain ⟨g, hg, hgr⟩ := Solution.Transport.twovalue_qi hf hroot
-      exact h ⟨K, g, hg, hgr⟩
+      obtain ⟨g', hg', hgr'⟩ := Solution.Binary.qi hg hgr
+      exact h ⟨K, g', hg', hgr'⟩
     _ = 0 := Solution.Infrastructure.audit_twovalue_ae_tree_family ht0 ht1
 
 /-- Theorem 1.4, the rate (1.1). For `0 < t < 1` there is `D₀` such that, for every `D ≥ D₀`,
@@ -153,11 +151,15 @@ theorem audit_twovalue_rate_tree {t : ℝ} (ht0 : 0 < t) (ht1 : t < 1) :
               f ⟨[], InTree.root⟩ = ⟨[], InTree.root⟩}
         ≤ ENNReal.ofReal (256 * Real.sqrt ((1 - t) ^ (D * (2 * D - 5)))) := by
   obtain ⟨D₀, hD⟩ := Solution.Infrastructure.audit_twovalue_rate_tree ht0 ht1
-  refine ⟨D₀, fun D hd => le_trans (measure_mono ?_) (hD D hd)⟩
+  refine ⟨D₀, fun D hd => ?_⟩
+  rw [← Solution.Binary.field_pair_map ht0.le ht1.le,
+    (Solution.Binary.fieldEquiv.prodCongr Solution.Binary.fieldEquiv).map_apply]
+  refine le_trans (measure_mono ?_) (hD D hd)
   rintro ω h ⟨f, hf, hroot⟩
-  exact h (Solution.Transport.twovalue_qi hf hroot)
+  obtain ⟨g, hg, hgr⟩ := Solution.Transport.twovalue_qi hf hroot
+  exact h (Solution.Binary.qi hg hgr)
 
-/-! ## The stopped Markov matching theorem -/
+/-! ## The Markov matching theorem -/
 
 /-- Theorem 6.1, finite-type alternative at finite height. Fix `α ≥ 1` with `λ_α < 1` and
 bounds `H`, `T ≥ 1` and `B ≥ 1`. There are constants `K` and `ε > 0`, depending only on
@@ -166,10 +168,10 @@ reflexive symmetric compatibility, with a partition into cyclic classes of at mo
 each, transition sums `∑_{j ∈ supp P_t} P_t(j)^(-α) ≤ B`, conditions (M1) and (M2) with return
 bound `H`, and `ζ_α ≤ ε`. Then two independent processes started at types of the same class
 fail to match with probability at most `K ζ_α`, at every height. -/
-theorem audit_markov_matching_finite {α : ℝ} (hα : 1 ≤ α) (hlam : Stopped.lambda α < 1)
+theorem audit_markov_matching_finite {α : ℝ} (hα : 1 ≤ α) (hlam : Markov.lambda α < 1)
     (H T : ℕ) (hT : 1 ≤ T) (B : ℝ) (hB : 1 ≤ B) :
-    ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} [Fintype I] (M : Stopped.Model V I), M.IsCompat →
-      ∀ {g : ℕ} (Θ : Stopped.Model.Phase M g), (∀ i, Θ.count i ≤ T) →
+    ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} [Fintype I] (M : Markov.Model V I), M.IsCompat →
+      ∀ {g : ℕ} (Θ : Markov.Model.Phase M g), (∀ i, Θ.count i ≤ T) →
       (∀ t, M.inverseSum α t ≤ ENNReal.ofReal B) →
       M.FreshPositive → M.CommonReturns Θ H → M.zeta α ≤ ENNReal.ofReal ε →
       ∀ s t, Θ.θ s = Θ.θ t → ∀ h, M.failProb s t h ≤ ENNReal.ofReal Kc * M.zeta α := by
@@ -185,8 +187,8 @@ There are constants `K` and `ε > 0`, depending only on `α`, such that for ever
 reflexive symmetric compatibility, `δ = 0` (that is, `b(0) = 1`) and `ζ_α ≤ ε`, two independent
 processes started at any two types fail to match with probability at most `K ζ_α`, at every
 height. No finiteness, class or return hypothesis is imposed on the types. -/
-theorem audit_markov_matching_zero {α : ℝ} (hα : 1 ≤ α) (hlam : Stopped.lambda α < 1) :
-    ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} (M : Stopped.Model V I), M.IsCompat → M.delta = 0 →
+theorem audit_markov_matching_zero {α : ℝ} (hα : 1 ≤ α) (hlam : Markov.lambda α < 1) :
+    ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} (M : Markov.Model V I), M.IsCompat → M.delta = 0 →
       M.zeta α ≤ ENNReal.ofReal ε → ∀ s t h,
         M.failProb s t h ≤ ENNReal.ofReal Kc * M.zeta α := by
   obtain ⟨Kc, ε, hε, hb⟩ := Solution.Infrastructure.audit_markov_matching_zero hα hlam
@@ -203,62 +205,42 @@ of two independent labellings of height `n` started at `s` and `t`. With probabi
 `1 - K ζ_α`, one root-fixing automorphism of the infinite binary tree matches their states at
 every vertex. -/
 theorem audit_markov_matching_finite_infinite {α : ℝ} (hα : 1 ≤ α)
-    (hlam : Stopped.lambda α < 1) (H T : ℕ) (hT : 1 ≤ T) (B : ℝ) (hB : 1 ≤ B) :
+    (hlam : Markov.lambda α < 1) (H T : ℕ) (hT : 1 ≤ T) (B : ℝ) (hB : 1 ≤ B) :
     ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} [Fintype I] [Countable V] [MeasurableSpace V]
       [MeasurableSingletonClass V]
-      (M : Stopped.Model V I), M.IsCompat →
-      ∀ {g : ℕ} (Θ : Stopped.Model.Phase M g), (∀ i, Θ.count i ≤ T) →
+      (M : Markov.Model V I), M.IsCompat →
+      ∀ {g : ℕ} (Θ : Markov.Model.Phase M g), (∀ i, Θ.count i ≤ T) →
       (∀ t, M.inverseSum α t ≤ ENNReal.ofReal B) →
       M.FreshPositive → M.CommonReturns Θ H → M.zeta α ≤ ENNReal.ofReal ε →
       ∀ s t, Θ.θ s = Θ.θ t →
-      ∃ (Omega : Type) (_ : MeasurableSpace Omega) (P : Measure Omega)
-        (_ : IsProbabilityMeasure P) (X Y : (n : ℕ) → Omega → FullLab V n),
-        (∀ n omega, restrictLab n (X (n + 1) omega) = X n omega) ∧
-        (∀ n omega, restrictLab n (Y (n + 1) omega) = Y n omega) ∧
-        (∀ n, Measurable (fun omega => (X n omega, Y n omega))) ∧
-        (∀ n, P.map (fun omega => (X n omega, Y n omega))
-          = (prodPMF (M.rho s n) (M.rho t n)).toMeasure) ∧
-        1 - ENNReal.ofReal Kc * M.zeta α
-          ≤ P {omega | ∃ aut : List Bool ≃ List Bool, IsTreeAut aut ∧
-            ∀ w : List Bool, M.R
-              (coord (aut w).length (X (aut w).length omega) (aut w))
-              (coord w.length (Y w.length omega) w)} := by
+      InfiniteMatching M.R (M.rho s) (M.rho t) (1 - ENNReal.ofReal Kc * M.zeta α) := by
   obtain ⟨Kc, ε, hε, hb⟩ :=
     Solution.Infrastructure.audit_markov_matching_finite_infinite hα hlam H T hT B hB
   refine ⟨Kc, ε, hε, ?_⟩
   intro V I _ _ _ _ M hc g Θ hT' hB' hFP hCR hζ s t hst
   let : MeasurableSpace I := ⊤
   let : MeasurableSingletonClass I := ⟨fun _ => trivial⟩
-  exact Solution.Transport.matchingProcess_erase M s t _
-    (hb M.toOld (M.toOld_compat hc) Θ.toOld hT' (Solution.Transport.fullSelection M) hB'
-      (Solution.Transport.freshPositive_toOld M hFP) (M.returns_toOld Θ H hCR) hζ s t hst)
+  apply Solution.Transport.matchingProcess_erase M s t _
+  apply Solution.Binary.infiniteMatching
+  exact hb M.toOld (M.toOld_compat hc) Θ.toOld hT' (Solution.Transport.fullSelection M) hB'
+    (Solution.Transport.freshPositive_toOld M hFP) (M.returns_toOld Θ H hCR) hζ s t hst
 
 /-- Theorem 6.1, zero-compatible alternative at infinite height. Under the hypotheses of
 `audit_markov_matching_zero`, with countable state and type sets, the conclusion of
 `audit_markov_matching_finite_infinite` holds for any two types `s` and `t`. -/
 theorem audit_markov_matching_zero_infinite {α : ℝ} (hα : 1 ≤ α)
-    (hlam : Stopped.lambda α < 1) :
+    (hlam : Markov.lambda α < 1) :
     ∃ Kc ε : ℝ, 0 < ε ∧ ∀ {V I : Type} [Countable V] [MeasurableSpace V]
-      [MeasurableSingletonClass V] [Countable I] (M : Stopped.Model V I), M.IsCompat → M.delta = 0 →
+      [MeasurableSingletonClass V] [Countable I] (M : Markov.Model V I), M.IsCompat → M.delta = 0 →
       M.zeta α ≤ ENNReal.ofReal ε → ∀ s t,
-      ∃ (Omega : Type) (_ : MeasurableSpace Omega) (P : Measure Omega)
-        (_ : IsProbabilityMeasure P) (X Y : (n : ℕ) → Omega → FullLab V n),
-        (∀ n omega, restrictLab n (X (n + 1) omega) = X n omega) ∧
-        (∀ n omega, restrictLab n (Y (n + 1) omega) = Y n omega) ∧
-        (∀ n, Measurable (fun omega => (X n omega, Y n omega))) ∧
-        (∀ n, P.map (fun omega => (X n omega, Y n omega))
-          = (prodPMF (M.rho s n) (M.rho t n)).toMeasure) ∧
-        1 - ENNReal.ofReal Kc * M.zeta α
-          ≤ P {omega | ∃ aut : List Bool ≃ List Bool, IsTreeAut aut ∧
-            ∀ w : List Bool, M.R
-              (coord (aut w).length (X (aut w).length omega) (aut w))
-              (coord w.length (Y w.length omega) w)} := by
+      InfiniteMatching M.R (M.rho s) (M.rho t) (1 - ENNReal.ofReal Kc * M.zeta α) := by
   obtain ⟨Kc, ε, hε, hb⟩ := Solution.Infrastructure.audit_markov_matching_zero_infinite hα hlam
   refine ⟨Kc, ε, hε, ?_⟩
   intro V I _ _ _ _ M hc hδ hζ s t
   let : MeasurableSpace I := ⊤
   let : MeasurableSingletonClass I := ⟨fun _ => trivial⟩
-  exact Solution.Transport.matchingProcess_erase M s t _
-    (hb M.toOld (M.toOld_compat hc) hδ hζ s t)
+  apply Solution.Transport.matchingProcess_erase M s t _
+  apply Solution.Binary.infiniteMatching
+  exact hb M.toOld (M.toOld_compat hc) hδ hζ s t
 
 end Challenge

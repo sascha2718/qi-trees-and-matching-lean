@@ -17,6 +17,30 @@ open Challenge
 open scoped ENNReal Classical
 open MeasureTheory
 
+/-! ## Boolean vertex addresses used by the library -/
+
+def coord : (h : ℕ) → FullLab V h → List Bool → V
+  | 0, x, _ => x
+  | _ + 1, x, [] => x.1
+  | h + 1, x, false :: t => coord h x.2.1 t
+  | h + 1, x, true :: t => coord h x.2.2 t
+
+def treeAdj (s t : List Bool) : Prop := (∃ c, t = s ++ [c]) ∨ (∃ c, s = t ++ [c])
+
+def IsTreeAut (g : List Bool ≃ List Bool) : Prop :=
+  g [] = [] ∧ ∀ s t, treeAdj s t ↔ treeAdj (g s) (g t)
+
+abbrev Word : Type := List Bool
+
+inductive InTree (χ : Word → Bool) : Word → Prop
+  | root : InTree χ []
+  | one {v : Word} : InTree χ v → InTree χ (v ++ [false])
+  | two {v : Word} : InTree χ v → χ v = true → InTree χ (v ++ [true])
+
+noncomputable def bernoulliField {t : ℝ} (ht : 0 ≤ t) (ht1 : t ≤ 1) : Measure (Word → Bool) :=
+  Measure.infinitePi (fun _ : Word =>
+    ProbabilityTheory.bernoulliMeasure true false ⟨t, ht, ht1⟩)
+
 /-! ## Shared notions -/
 
 /-- The directed potential `Φ_α(μ → ν; R) = ∑_x μ(x) φ_α(q_ν(x))`. -/
