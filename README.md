@@ -1,206 +1,72 @@
 # The quasi-isometry classes of Galton–Watson trees
 
-This repository contains the Lean 4 formalisation accompanying the classification of bounded-
-support Galton–Watson trees up to quasi-isometry. It includes the probabilistic foundations, two
-matching libraries, the geometric assembly, and the public same-class/different-class
-classification theorems.
+This repository contains the Lean 4 formalisation of *The quasi-isometry classes of
+Galton–Watson trees* by Jayadev S. Athreya and Sascha Troscheit. It develops the classification
+of Galton–Watson trees with finitely supported offspring laws, together with the i.i.d. and
+Markov automorphism-matching theorems used in its proof.
 
-- [Paper: arXiv:2609.23882](https://arxiv.org/abs/2609.23882)
-- [Source repository](https://github.com/sascha2718/qi-trees-and-matching-lean)
+- **Paper:** [arXiv:2609.23882](https://arxiv.org/abs/2609.23882). Theorem numbers below refer
+  to version 2.
+- **Palomar:** [PALOMAR-2026-09-25-000002](https://palomar-registry.org/entry?id=PALOMAR-2026-09-25-000002).
+
+A recent version of the formalisation is archived and machine-checked on Palomar. This
+repository may contain subsequent changes. Significant changes will be uploaded to Palomar
+as new snapshots.
+
+## Formalised results
+
+- **Classification (Theorem 1.2):** the complete quasi-isometry classification for finitely
+  supported offspring laws, including the finite class and the classification on survival.
+- **Mutual embeddability (Theorem 1.3):** almost surely on survival, a supercritical sample
+  and the infinite binary tree admit quasi-isometric embeddings into one another.
+- **Two-value universality (Theorem 1.4):** two independent samples from a fixed offspring
+  law supported on `{1,2}` are almost surely quasi-isometric, with a quantitative bound on
+  the failure probability at a prescribed quasi-isometry constant.
+- **I.i.d. matching (Theorem 5.1):** automorphism matching of independent binary-tree
+  labellings, with finite-height leaf and full bounds and an infinite-tree conclusion.
+- **Markov matching (Theorem 6.1):** matching of typed binary-tree label processes at finite
+  and infinite height, under the finite-type or zero-compatible hypotheses.
+
+The libraries also prove the branching-process foundations, geometric obstructions, pruning
+results and quantitative estimates supporting these theorems. Boundary quasisymmetry, the
+fractal percolation applications and the results on continuous random branching times are
+**not** formalised but follow easily from the prose proofs in the arXiv preprint.
+
+## Statements and proofs
+
+[Challenge.lean](Challenge.lean) states thirteen headline results using Mathlib alone, with
+the definitions needed to read them independently of the proof libraries. Each theorem has
+an intentional `sorry` placeholder. [Solution.lean](Solution.lean) proves these statements
+from the four libraries; the solution and libraries contain no `sorry`.
+
+The Comparator check verifies that the solution proves the same statements with the same
+definitions, using only `propext`, `Classical.choice` and `Quot.sound`. No literature result
+is assumed as an axiom. [comparator.json](comparator.json) specifies the thirteen declarations
+and permitted axioms; the [verification workflow](.github/workflows/build.yml) checks the
+libraries and runs the comparator audit.
+
+Appendix B of the paper and [paper-correspondence.yaml](paper-correspondence.yaml) give the
+detailed correspondence between the paper and Lean, including differences in formulation.
+The [correspondence checker](scripts/check_paper_correspondence.py) checks the declaration
+references against the Lean and manuscript sources.
 
 ## Libraries
 
-The project has four default library targets.
-
-| Library | Role |
+| Library | Contents |
 |---|---|
-| `BranchingProcess` | Galton–Watson trees, conditioning, skeletons, and geometric obstructions |
-| `GraphMatching` | Matching i.i.d. labels on the binary tree by automorphisms |
-| `GraphMarkovMatching` | The general Markov matching theorem and its common-semigroup applications (`Stopped/`) |
-| `ChainClasses` | Chain and shape encodings, transfer, universality, separation, and classification |
+| [BranchingProcess](BranchingProcess.lean) | Galton–Watson trees, extinction, conditioning, skeletons, pruning and geometry |
+| [GraphMatching](GraphMatching.lean) | I.i.d. automorphism matching on the binary tree |
+| [GraphMarkovMatching](GraphMarkovMatching.lean) | Markov matching and common-semigroup applications |
+| [ChainClasses](ChainClasses.lean) | Geometric constructions, universality, separation, classification and embeddings |
 
-The toolchain is pinned to Lean `v4.35.0-rc2`, with Mathlib pinned to the matching release in
-`lakefile.toml`.
+The two matching libraries are mutually independent. `ChainClasses` combines them with
+`BranchingProcess`. The principal classification interface is
+[ChainClasses.Classification](ChainClasses/Classification.lean); each library's root module
+lists its constituent files.
 
-The root modules list the contents of each library:
-[BranchingProcess.lean](BranchingProcess.lean), [GraphMatching.lean](GraphMatching.lean),
-[GraphMarkovMatching.lean](GraphMarkovMatching.lean) and [ChainClasses.lean](ChainClasses.lean).
-The matching libraries are mutually independent; `ChainClasses` combines them with
-`BranchingProcess`. The detailed paper correspondence is in
-[paper-correspondence.yaml](paper-correspondence.yaml) and Appendix B of the paper.
+## Attribution and licence
 
-## Public classification API
+The paper and formalisation were developed together by the same authors. AI tools were used
+extensively in the Lean development.
 
-Import the public façade with:
-
-```lean
-import ChainClasses.Classification
-```
-
-The main declarations below are in the `ChainClasses` namespace.
-
-| Result | Public declaration |
-|---|---|
-| Complete theorem for offspring supported on `{0,1,2}` | `simple_classification` |
-| Eventwise simple-support classification | `simple_classification_ae_iff` |
-| Same-class simple-support conclusion | `simple_same_class_ae` |
-| Different-class simple-support conclusion | `simple_different_class_ae` |
-| Simple-support separation from the ray | `simple_not_ray_ae` |
-| Eventwise classification for packaged conditioned laws | `classification_ae_iff` |
-| Same-class conclusion at general bounded support | `same_class_ae` |
-| Different-class conclusion at general bounded support | `different_class_ae` |
-| Classification expanded for two offspring laws | `offspring_classification_ae_iff` |
-| General separation from the ray | `classification_not_ray_ae` |
-| Complete classification including the finite class, root-preserving | `full_classification_rooted_ae_iff` |
-
-The conditioned declarations concern Galton–Watson laws conditioned on an infinite realisation
-and classify the four infinite classes (R), (F), `(C_Λ)`, and (B). The last declaration is stated
-over the unconditioned laws and includes the finite class `(Fin)`: two independent trees are
-almost surely quasi-isometric exactly when both are finite, or both are infinite with laws in
-the same infinite class.
-
-The façade is split into `ChainClasses.Classification.Simple`,
-`ChainClasses.Classification.Complete`, `ChainClasses.Classification.Finite` and
-`ChainClasses.Classification.Embedding`. The proof implementation remains in
-`ChainClasses.Bushy.Trichotomy`, `ChainClasses.Universality.GeneralTrichotomy`, and
-`ChainClasses.Universality.ChainSeparationProof`. The last façade module proves the mutual
-embeddability theorem `embedding_hierarchy_ae`: on survival, a sample of a finitely supported
-supercritical law almost surely admits quasi-isometric embeddings into the binary tree and from
-it. It rests on the pruning lemma of `BranchingProcess.Pruning`, applied along the skeleton
-descent in `ChainClasses.Universality.ConcentratedPruning`, and on the classification, and
-it records the strict hierarchy `Fin ≺ Ray ≺ Supercritical` of quasi-isometric embeddability.
-
-## The audited statements
-
-`Challenge.lean` states thirteen theorems over Mathlib alone, and `comparator.json` selects exactly
-these for the audit. All are in the `Challenge` namespace. Compatibility of two labels means that
-they are equal or adjacent in the label graph, `η_α` is the one-site potential of the label law,
-and `ζ_α` is the one-site defect of a Markov model.
-
-| Declaration | Statement |
-|---|---|
-| `audit_graph_leaf_matching_bound` | Labels are drawn i.i.d. from a law `μ` on the vertices of a graph `G`. If the potential `η_{5/2}` is at most `1/256`, two independent labellings of the leaves of the binary tree of height `h` fail to be matched by an automorphism with probability at most `(253/256)^h η_{5/2}`. |
-| `audit_graph_full_matching_bound` | In the same setting with every vertex labelled, and `η_{5/2}` at most `10⁻⁴`, the failure probability is at most `16 η_{5/2}` at every height. |
-| `audit_exists_infinite_tree_matching_graphAut` | For a reflexive symmetric compatibility relation with `η_{5/2}` at most `10⁻⁴` there is a probability space carrying two independent consistent labellings of the binary trees of all heights, with the i.i.d. laws, on which some root-fixing automorphism of the infinite binary tree matches the labels at every vertex with probability at least `1 - 16 η_{5/2}`. |
-| `audit_bounded_graph_qi_point` | A connected graph of bounded diameter is quasi-isometric to the one-vertex graph. |
-| `audit_extinction_of_not_supercritical` | A finitely supported offspring law of mean at most one, other than the deterministic single child, gives an almost surely finite tree. |
-| `audit_full_classification_ae_iff` | For two independent Galton–Watson trees with finitely supported offspring laws, almost surely a root-preserving quasi-isometry exists exactly when both trees are finite, or both are infinite and the two laws lie in the same infinite class; otherwise there is almost surely no quasi-isometry at all, root-preserving or not. The infinite classes are the ray `θ(1) = 1`, the laws with `θ(0) = θ(1) = 0`, the chain laws `θ(0) = 0 < θ(1) < 1` grouped by the additive submonoid generated by their shifted support, and the laws with `θ(0) > 0`. |
-| `audit_mutual_embeddability` | For a finitely supported supercritical offspring law, almost surely on survival the sample tree admits a quasi-isometric embedding into the binary tree `𝒩(2)` and receives a quasi-isometric embedding of the binary tree. A quasi-isometric embedding satisfies the two metric inequalities of a quasi-isometry without coarse density. |
-| `audit_twovalue_ae_tree_family` | Two independent trees whose vertices have two children with probability `t` and one child otherwise are almost surely quasi-isometric by a root-preserving map, for every `t` in `[0,1]`. |
-| `audit_twovalue_rate_tree` | For `0 < t < 1` there is a threshold above which the probability that no root-preserving `(D²+3)`-quasi-isometry exists is at most `256 √((1-t)^{D(2D-5)})`. |
-| `audit_markov_matching_finite` | For `α ≥ 1` with `λ_α < 1` and bounds `H`, `T`, `B` there are constants `K` and `ε > 0` such that every model with at most `T` types per cyclic class, transition inverse sums at most `B`, fresh positivity, common returns within `H`, and defect `ζ_α` at most `ε`, has any two types of the same class failing to match with probability at most `K ζ_α`, at every height. |
-| `audit_markov_matching_zero` | For `α ≥ 1` with `λ_α < 1` there are constants `K` and `ε > 0` such that every model with `δ = 0` and defect `ζ_α` at most `ε` has every pair of types failing to match with probability at most `K ζ_α`, at every height, with no finite-type or return hypothesis. |
-| `audit_markov_matching_finite_infinite` | Under the hypotheses of the finite-type statement, two independent consistent processes of same-class types are carried by a probability space on which one root-fixing automorphism of the infinite binary tree matches their states at every vertex with probability at least `1 - K ζ_α`. |
-| `audit_markov_matching_zero_infinite` | The same conclusion under the zero-compatible hypotheses, for any two of countably many types. |
-
-The constants of the two Markov alternatives depend only on `α, H, T, B` and on `α` respectively,
-and are uniform over models and heights.
-
-## Build and audit
-
-Run commands from the repository root. To build all four libraries:
-
-```bash
-lake build
-```
-
-`Challenge.lean` states the audited results using Mathlib alone. `Solution.lean` proves them
-from the four libraries, with its definitions and proof transports in `Solution/`.
-
-The judge is `lake comparator`, which ships in the pinned toolchain together with the kernels
-it replays through, so the audit needs no separately built verifier. The
-[local audit runner](comparator-audit.sh) wraps it:
-
-```bash
-./comparator-audit.sh
-```
-
-It builds Challenge and Solution, compares their statements and definitions, checks the
-permitted axioms, and replays the exported proofs through Lean's kernel and, under
-`--paranoid`, through the bundled independent kernels. A separate
-`lake build Challenge Solution` is useful during development but is not a prerequisite.
-
-The judge builds and exports the project inside a `bwrap` sandbox: `/` is bound read-only, the
-invoking user's home directories are covered, only `.lake` is writable, and the build, the
-export and the kernels run in an empty network namespace. Only dependency resolution reaches
-the network. `bubblewrap` is therefore required, and needs unprivileged user namespaces or to
-be installed setuid root; `COMPARATOR_BWRAP` selects a particular binary. The sandbox is what
-the verdict rests on, so the runner does not offer to disable it, and a host without
-bubblewrap, macOS included, cannot run the audit.
-
-Palomar registers the toolchain's bundled kernels itself: it ignores `enable_nanoda` in a
-submitted `comparator.json` and rejects `external_kernels` there. The runner therefore judges
-against a generated copy of the configuration that names `nanoda_bin` and `con-ron` by their
-absolute paths under `lean --print-prefix`, so a local run and the registry's run reach the
-same verdict. This follows
-[PalomarTemplate's `scripts/verify-comparator.sh`](https://github.com/PalomarRegistry/PalomarTemplate/blob/main/scripts/verify-comparator.sh).
-
-The [CI comparator job](.github/workflows/build.yml) is the reference form: it uses a separate
-checkout, compiles no project code before the judge sees `Solution.lean`, installs bubblewrap
-and relaxes `kernel.apparmor_restrict_unprivileged_userns` on the disposable runner, because
-Ubuntu 24.04 restricts the user namespaces `bwrap` needs.
-
-The challenge imports Mathlib alone and contains only statement vocabulary and theorem holes;
-Solution and the libraries contain the proofs. The comparator permits only `propext`,
-`Classical.choice` and `Quot.sound`, and the proofs of the thirteen statements depend on no
-other axiom; in particular, no literature result is assumed as an axiom.
-
-The GitHub Actions workflow builds the libraries and runs the comparator audit.
-
-To check that every labelled manuscript declaration is accounted for in the
-paper--Lean correspondence manifest, that every listed Lean name occurs as a source
-declaration, and that the thirteen headline names agree across the challenge, solution,
-comparator, and formalisation metadata, run
-
-```bash
-python3 -B scripts/check_paper_correspondence.py
-```
-
-This is a dependency-free static source check. It does not invoke Lean or LaTeX and
-does not replace `lake build` or the comparator audit. In particular, dependency-minimality
-of the definitions in `Challenge.lean` still requires semantic review in Lean's elaborated
-environment.
-
-This check also needs the manuscript sources: it reads the files listed in
-`paper-correspondence.yaml`, together with `appendices.tex`, from the **parent directory of
-the Lean checkout**. The author's layout is a manuscript repository containing this checkout
-as `lean/`. A standalone clone supplies the Lean source but not those parent-directory files.
-Reproducing the correspondence check requires the matching manuscript version in that layout;
-the Lean library build and comparator audit do not require the manuscript sources.
-
-The challenge uses one unrestricted automorphism family for both matching theorems, states
-the Markov laws directly on state labels, and uses the full transition-support bound from the
-paper. Its Markov vocabulary is in `Challenge.Markov`, and its vertex addresses are words over
-`Fin N`, including `Fin 2` for binary trees. The two-value and general classification results
-share the parent-child graph and quasi-isometry definitions. Only an upper offspring-support
-bound is required; positive mass at that bound is not a hypothesis. The boundary and fractal
-applications and the continuous branching-time results are outside the formalised scope,
-as disclosed in the manuscript.
-
-## Provenance and process
-
-The formalised results are the matching theorems and the classification of "The quasi-isometry
-classes of Galton–Watson trees" by Jayadev S. Athreya and Sascha Troscheit,
-[arXiv:2609.23882](https://arxiv.org/abs/2609.23882). Theorem numbers in this repository refer
-to version 2 of that paper. Its Appendix B records the statement-by-statement correspondence
-with the Lean declarations. The formalisation and the paper were developed together by the same
-authors, and no novelty is claimed here beyond what the paper claims. No earlier formalisation
-of these results, in Lean or in another system, is known to the authors.
-
-AI tools were used extensively in the Lean development, following the principles of the Leiden
-Declaration on the responsible use of artificial intelligence in research. Agentic sessions in
-Claude Code, with Claude Opus and Claude Fable, wrote, refactored and repaired library proofs
-against a fixed statement surface; agentic sessions in Codex, with Sol and Astra, formalised
-arguments in Lean; an earlier AI-assisted workflow produced an intermediate formalisation that
-the present development supersedes; and interactive assistance was used for individual arguments
-and for copy-editing. The authors designed the statements and reviewed `Challenge.lean`,
-`Solution.lean` and the comparator configuration, verified every non-human part of the
-development and accept full responsibility for its contents. The Lean code has had no
-independent human review.
-
-`formalization.yaml` records the sources, licence, classification codes, scope, divergences and
-production process in the mathlib-initiative v0.4 self-reporting format.
-
-## License
-
-Apache License 2.0. See [`LICENSE`](LICENSE).
+The Lean development is distributed under the [Apache License 2.0](LICENSE).
