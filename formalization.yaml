@@ -11,12 +11,13 @@ project:
     Lean 4 formalisation of the automorphism-matching theorems and the quasi-isometry
     classification of Galton–Watson trees from the paper "The quasi-isometry classes of
     Galton–Watson trees" by Jayadev S. Athreya and Sascha Troscheit (arXiv:2609.23882). The
-    audited statements are: the i.i.d. matching theorem on the binary tree,
-    the general Markov matching theorem for
-    typed label processes on the binary tree, in its finite-type and zero-compatible forms,
+    audited statements are: the i.i.d. matching theorem on the binary tree (Theorem 5.1),
+    the general Markov matching theorem for typed label processes on the binary tree,
+    in its finite-type and zero-compatible forms (Theorem 6.1),
     the complete classification, up to quasi-isometry, of Galton–Watson
-    trees with finitely supported offspring law conditioned on infinite diameter,
-    the mutual embeddability theorem.
+    trees with finitely supported offspring law conditioned on infinite diameter (Theorem 1.2),
+    the mutual embeddability theorem (Theorem 1.3), and two-value universality with its quantitative rate
+    (Theorem 1.4).
     The statements are made in Challenge.lean over Mathlib alone and
     discharged by Solution.lean from four library targets.
   authors:
