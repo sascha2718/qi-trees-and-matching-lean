@@ -113,7 +113,6 @@ import ChainClasses.Engine.ProfileGeometry
 import ChainClasses.Engine.ProfileAssembly
 import ChainClasses.Engine.BushyProfileBridge
 import ChainClasses.Engine.QuantisedProfiles
-import ChainClasses.Engine.EngineBridge
 import ChainClasses.Engine.ChainEngineBridge
 
 -- ## Universality and the classification (`trichotomy.tex`)

@@ -22,8 +22,12 @@ The project has four default library targets.
 The toolchain is pinned to Lean `v4.35.0-rc2`, with Mathlib pinned to the matching release in
 `lakefile.toml`.
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for the module map, representation choices and
-proof-maintenance notes. [CHALLENGE_REVIEW.md](CHALLENGE_REVIEW.md) records dated audit evidence.
+The root modules list the contents of each library:
+[BranchingProcess.lean](BranchingProcess.lean), [GraphMatching.lean](GraphMatching.lean),
+[GraphMarkovMatching.lean](GraphMarkovMatching.lean) and [ChainClasses.lean](ChainClasses.lean).
+The matching libraries are mutually independent; `ChainClasses` combines them with
+`BranchingProcess`. The detailed paper correspondence is in
+[paper-correspondence.yaml](paper-correspondence.yaml) and Appendix B of the paper.
 
 ## Public classification API
 
@@ -164,12 +168,6 @@ as `lean/`. A standalone clone supplies the Lean source but not those parent-dir
 Reproducing the correspondence check requires the matching manuscript version in that layout;
 the Lean library build and comparator audit do not require the manuscript sources.
 
-On the author's workstation, `.lake/packages` is an untracked symlink to the package directory
-of `~/Documents/lean/mathematics_in_lean`. Dependency resolution can therefore modify another
-project's checkouts. Do not run `lake update` or edit the toolchain/dependency configuration as
-routine maintenance in that layout. A fresh clone uses the tracked dependency configuration
-without this machine-specific symlink.
-
 The challenge uses one unrestricted automorphism family for both matching theorems, states
 the Markov laws directly on state labels, and uses the full transition-support bound from the
 paper. Its Markov vocabulary is in `Challenge.Markov`, and its vertex addresses are words over
@@ -184,7 +182,7 @@ as disclosed in the manuscript.
 The formalised results are the matching theorems and the classification of "The quasi-isometry
 classes of Galton–Watson trees" by Jayadev S. Athreya and Sascha Troscheit,
 [arXiv:2609.23882](https://arxiv.org/abs/2609.23882). Theorem numbers in this repository refer
-to version 1 of that paper. Its Appendix B records the statement-by-statement correspondence
+to version 2 of that paper. Its Appendix B records the statement-by-statement correspondence
 with the Lean declarations. The formalisation and the paper were developed together by the same
 authors, and no novelty is claimed here beyond what the paper claims. No earlier formalisation
 of these results, in Lean or in another system, is known to the authors.

@@ -6,7 +6,7 @@ import Mathlib
 This file repeats the definitions of `Challenge.lean`, with the same names, types and values,
 so that the solution does not import the challenge. Comparator checks that the
 definitions used by the thirteen theorems agree between the two modules. Theorem, equation and
-condition numbers refer to version 1 of arXiv:2609.23882.
+condition numbers refer to version 2 of arXiv:2609.23882.
 -/
 
 namespace Challenge

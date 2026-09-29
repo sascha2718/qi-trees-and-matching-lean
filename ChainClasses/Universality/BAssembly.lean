@@ -1,11 +1,11 @@
 import ChainClasses.Universality.SampleAssembly
 
 /-!
-`thm:hairy-general` of `trichotomy.tex`, the deterministic geometry: the alignment of the
-The geometry is built in four modules: `CascadeEncoding`, `AssemblyAut`, `SampleAssembly`
-and this one, which states the deterministic core; the account below covers all four.
+`thm:hairy-general` of `trichotomy.tex`, the deterministic geometry. The geometry is built
+in four modules: `CascadeEncoding`, `AssemblyAut`, `SampleAssembly` and this one, which
+states the deterministic core; the account below covers all four.
 
-two label fields lives on `𝔹`, not on the reduced skeletons, and the assembly that the
+The alignment of the two label fields lives on `𝔹`, not on the reduced skeletons, and the assembly that the
 glued transfer of `thm:general-glued` runs over is the `𝔹`-assembly, the shape of a
 skeleton vertex placed at its cascade root and a one-vertex shape at every forced slot.
 Four deterministic facts carry the proof from there to a quasi-isometry of the samples.
@@ -17,9 +17,9 @@ sample being chosen by the letter map of that vertex, which sends the bush indic
 neck vertex to its dying children in letter order and the neck or copy indices after them
 to its surviving children.  The cascade encoding enters abstractly, as a map of skeleton
 addresses to binary words appending one nonempty slot word of length at most `L` per
-edge, the slots of one vertex pairwise prefix-incomparable; `EngineBridge` instantiates
-it with the engine's cascades.  Reading the copies at their encodings is then an
-`L`-quasi-isometry of the skeleton assembly onto the `𝔹`-assembly, the neck sums of
+edge, the slots of one vertex pairwise prefix-incomparable; `Profile.profileEnc` in
+`Engine/ProfileGeometry` instantiates it with the binary profiles. Reading the copies at
+their encodings is then an `L`-quasi-isometry of the skeleton assembly onto the `𝔹`-assembly, the neck sums of
 `eq:assembly-anc` and `eq:assembly-div` over `𝔹` exceeding those over the skeleton by the
 number of internal cascade vertices crossed.  An automorphism of `𝔹` matching the shape
 labels relabels one `𝔹`-assembly onto the other, and `thm:glued-transfer` at general

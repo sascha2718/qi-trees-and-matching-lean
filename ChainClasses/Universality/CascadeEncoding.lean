@@ -155,8 +155,8 @@ address `u` over `Fin N` is encoded by a binary word `enc u`, the child `u ++ [i
 slot word `slot u i` appended to it.  The arity field `k` cuts the skeleton out of the
 `N`-ary tree as `sample k`, and the slots of one vertex are nonempty, of length at most
 `L`, and pairwise prefix-incomparable, so the encoding is injective and reflects the
-prefix order on the skeleton.  `EngineBridge` instantiates this with the engine's
-cascades. -/
+prefix order on the skeleton.  `Profile.profileEnc` in `Engine/ProfileGeometry`
+instantiates this with the binary profiles. -/
 structure CascadeEnc (N L : ℕ) where
   /-- The arity field: `u ++ [i]` is a skeleton address iff `u` is and `i < k u`. -/
   k : GWord N → ℕ

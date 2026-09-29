@@ -8,15 +8,14 @@ presentations and their return bounds provide the common-core applications.
 `Support` contains the shared scalar, product, tree and probability mathematics.
 `Potential` contains directed and restricted potentials and their degree and moment
 identities. `Process` contains the generic tree-law recursion and consistency facts.
-`Models` retains the balanced and composite counter models used as examples of the
-profile theorem, without the former matching proof for those models.
+`Models` contains the balanced counter laws used by the prescribed-profile obstruction
+in `Stopped.ProfileObstruction`.
 
 `Stopped.Transfer` applies finite estimates on any probability space with the specified
 finite state or typed marginals. `Stopped.Perturbation` gives finite-height continuity
 under changes to the root and child-pair laws.
 -/
 
-import GraphMarkovMatching.Models.Composite
 import GraphMarkovMatching.Models.Counter
 import GraphMarkovMatching.Models.Examples
 import GraphMarkovMatching.Potential.Degrees
@@ -57,7 +56,6 @@ import GraphMarkovMatching.Stopped.Mixture
 import GraphMarkovMatching.Stopped.Model
 import GraphMarkovMatching.Stopped.Moments
 import GraphMarkovMatching.Stopped.Numerics
-import GraphMarkovMatching.Stopped.Original
 import GraphMarkovMatching.Stopped.Paths
 import GraphMarkovMatching.Stopped.Perturbation
 import GraphMarkovMatching.Stopped.Presentation

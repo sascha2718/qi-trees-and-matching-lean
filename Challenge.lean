@@ -4,7 +4,7 @@ import Mathlib
 # The quasi-isometry classes of Galton–Watson trees
 
 Thirteen statements from J. S. Athreya and S. Troscheit,
-*The quasi-isometry classes of Galton–Watson trees*, arXiv:2609.23882v1.
+*The quasi-isometry classes of Galton–Watson trees*, arXiv:2609.23882v2.
 Theorem, equation and condition numbers refer to that version.
 
 Vertices are words over `Fin N`, with `0, …, N-1` representing the paper's children

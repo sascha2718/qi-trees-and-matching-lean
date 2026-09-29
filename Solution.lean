@@ -6,7 +6,7 @@ import Solution.Binary
 
 Proofs of the thirteen theorems stated in `Challenge.lean`, for J. S. Athreya and S. Troscheit,
 *The quasi-isometry classes of Galton–Watson trees*, arXiv:2609.23882. Theorem, equation and
-condition numbers refer to version 1 of that paper. Each proof applies the corresponding
+condition numbers refer to version 2 of that paper. Each proof applies the corresponding
 theorem of `Solution.Infrastructure`, which is proved from the four libraries, through the
 identifications of `Solution.Transport`. `Solution.Definitions` repeats the challenge
 vocabulary without importing `Challenge.lean`.
