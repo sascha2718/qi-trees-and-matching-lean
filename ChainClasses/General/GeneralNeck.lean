@@ -1,4 +1,8 @@
-import ChainClasses.General.GeneralShapeIID
+module
+
+public import ChainClasses.General.GeneralShapeIID
+
+@[expose] public section
 
 /-! Unary-neck survival, memorylessness, and the null event of an infinite neck.
 These facts concern the original reduced skeleton and do not use a presentation. -/

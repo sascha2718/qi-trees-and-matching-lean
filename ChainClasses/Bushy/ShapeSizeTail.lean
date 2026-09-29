@@ -1,5 +1,9 @@
-import ChainClasses.Bushy.ShapeMassBush
-import ChainClasses.Shape.ShapeShrink
+module
+
+public import ChainClasses.Bushy.ShapeMassBush
+public import ChainClasses.Shape.ShapeShrink
+
+@[expose] public section
 
 /-!
 `sec:shape-harris` of `matching_classes_simple.tex`:

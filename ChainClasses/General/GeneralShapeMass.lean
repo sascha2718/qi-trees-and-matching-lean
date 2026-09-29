@@ -1,6 +1,10 @@
-import ChainClasses.General.GeneralBushPoint
-import ChainClasses.General.GeneralShapeIID
-import ChainClasses.General.GeneralNeck
+module
+
+public import ChainClasses.General.GeneralBushPoint
+public import ChainClasses.General.GeneralShapeIID
+public import ChainClasses.General.GeneralNeck
+
+@[expose] public section
 
 /-!
 `thm:mass-uniform` and `thm:conditional-explicit` of `matching_classes_general.tex`:

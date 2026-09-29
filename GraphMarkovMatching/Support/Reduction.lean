@@ -1,8 +1,12 @@
+module
+
 /-
 The mean bad degree is below the potential: `meanBad_le_Phi` converts a
 potential bound into a failure probability bound.
 -/
-import GraphMarkovMatching.Support.Contraction
+public import GraphMarkovMatching.Support.Contraction
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Support
 

@@ -1,8 +1,12 @@
-import ChainClasses.General.GeneralDecomposition
-import ChainClasses.Shape.ContractAddr
-import ChainClasses.Shape.ShapeMetric
-import ChainClasses.Scalar.Bushy
-import ChainClasses.General.GeneralConstants
+module
+
+public import ChainClasses.General.GeneralDecomposition
+public import ChainClasses.Shape.ContractAddr
+public import ChainClasses.Shape.ShapeMetric
+public import ChainClasses.Scalar.Bushy
+public import ChainClasses.General.GeneralConstants
+
+@[expose] public section
 
 /-!
 `sec:general-shapes` and `thm:cross-relabel` of `matching_classes_general.tex`: the

@@ -1,3 +1,5 @@
+module
+
 /-
 `thm:embedding-hierarchy` of `prelims.tex`, proved in `quasi_isometric_embeddings.tex`:
 a Galton-Watson tree with a finitely supported supercritical offspring law, conditioned
@@ -27,9 +29,11 @@ a bushy sample is not needed.
   `qiEmbeddable_rayGraph_of_survives`, `ae_not_qiEmbeddable_rayGraph`: the strict
   comparisons `Fin ≺ Ray ≺ Supercritical`.
 -/
-import ChainClasses.Classification.Finite
-import ChainClasses.Universality.FullTree
-import ChainClasses.Universality.ConcentratedPruning
+public import ChainClasses.Classification.Finite
+public import ChainClasses.Universality.FullTree
+public import ChainClasses.Universality.ConcentratedPruning
+
+@[expose] public section
 
 /-! ### The concentrated representative -/
 

@@ -1,4 +1,8 @@
-import ChainClasses.Universality.AssemblyAut
+module
+
+public import ChainClasses.Universality.AssemblyAut
+
+@[expose] public section
 
 /-!
 `thm:hairy-general`, the deterministic geometry, third part: letterwise translations of

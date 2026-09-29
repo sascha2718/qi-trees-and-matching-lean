@@ -1,5 +1,9 @@
-import GraphMarkovMatching.Stopped.Presentation
-import Mathlib.Logic.Encodable.Basic
+module
+
+public import GraphMarkovMatching.Stopped.Presentation
+public import Mathlib.Logic.Encodable.Basic
+
+@[expose] public section
 
 /-! Binary profiles with their sampled arities retained for the finite law calculation.
 The arity is auxiliary information; the matching model forgets it at fresh vertices. -/

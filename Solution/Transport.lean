@@ -1,6 +1,10 @@
+module
+
 /- Proofs identifying the concise challenge vocabulary with the library representations. -/
-import Solution.Infrastructure
-import GraphMarkovMatching.Stopped.Projection
+public import Solution.Infrastructure
+public import GraphMarkovMatching.Stopped.Projection
+
+@[expose] public section
 
 open scoped ENNReal Classical
 open MeasureTheory Challenge

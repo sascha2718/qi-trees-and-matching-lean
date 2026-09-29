@@ -1,5 +1,9 @@
-import Mathlib.Tactic
-import Mathlib.Analysis.SpecificLimits.Basic
+module
+
+public import Mathlib.Tactic
+public import Mathlib.Analysis.SpecificLimits.Basic
+
+@[expose] public section
 
 /-!
 `sec:shape-harris` of `matching_classes_simple.tex`: the two mass bounds of

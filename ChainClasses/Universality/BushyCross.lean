@@ -1,5 +1,9 @@
-import ChainClasses.Bushy.Trichotomy
-import ChainClasses.General.GeneralHarris
+module
+
+public import ChainClasses.Bushy.Trichotomy
+public import ChainClasses.General.GeneralHarris
+
+@[expose] public section
 
 /-!
 The law-level bushy comparison used in the bushy-universality proposition

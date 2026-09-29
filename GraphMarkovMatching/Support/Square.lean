@@ -1,3 +1,5 @@
+module
+
 /-
 The symmetrised square `R^□` of a relation and the setup for the
 contraction lemma.
@@ -15,7 +17,9 @@ This file fixes the definitions and the structural facts:
 The degree identities and the contraction estimate itself are in
 `Contraction.lean`.
 -/
-import GraphMarkovMatching.Support.Product
+public import GraphMarkovMatching.Support.Product
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Support
 

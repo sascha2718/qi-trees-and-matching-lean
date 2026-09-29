@@ -1,6 +1,10 @@
-import ChainClasses.General.GeneralCoupling
-import ChainClasses.General.GeneralShapeTail
-import ChainClasses.General.GeneralShrinkScale
+module
+
+public import ChainClasses.General.GeneralCoupling
+public import ChainClasses.General.GeneralShapeTail
+public import ChainClasses.General.GeneralShrinkScale
+
+@[expose] public section
 
 /-!
 `thm:relabel` and `thm:cross-relabel` of `matching_classes_general.tex`, the coupling

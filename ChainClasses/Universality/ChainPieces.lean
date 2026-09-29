@@ -1,6 +1,10 @@
-import ChainClasses.Universality.SampleAssembly
-import ChainClasses.Regime.ChainNeckLaw
-import ChainClasses.Chain.Coupling
+module
+
+public import ChainClasses.Universality.SampleAssembly
+public import ChainClasses.Regime.ChainNeckLaw
+public import ChainClasses.Chain.Coupling
+
+@[expose] public section
 
 /-!
 Bare-neck shapes and the marked metric comparison used by the direct chain application.

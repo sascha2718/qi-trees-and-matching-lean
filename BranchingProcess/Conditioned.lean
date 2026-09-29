@@ -1,3 +1,5 @@
+module
+
 /-
 `sec:gw-trees` of `prelims.tex` and `thm:harris` of `matching_classes_simple.tex`:
 the law of the sample conditioned on survival, and the first structural step of the
@@ -34,8 +36,10 @@ children of the root into a product event and the count into a binomial sum.
 The alphabet has to be wide enough to carry the law: every statement about the measure
 hypothesises `J ≤ N`, as in `Law`.
 -/
-import BranchingProcess.Law
-import Mathlib.Probability.ConditionalProbability
+public import BranchingProcess.Law
+public import Mathlib.Probability.ConditionalProbability
+
+@[expose] public section
 
 namespace BranchingProcess
 

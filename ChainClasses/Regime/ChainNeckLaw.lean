@@ -1,4 +1,8 @@
-import ChainClasses.General.GeneralShapeIID
+module
+
+public import ChainClasses.General.GeneralShapeIID
+
+@[expose] public section
 
 /-! Joint laws of the original reduced neck lengths and arities. The argument only
 requires positive survival probability and therefore includes zero-extinction laws. -/

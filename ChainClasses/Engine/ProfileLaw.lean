@@ -1,5 +1,9 @@
-import ChainClasses.Engine.ProfileKernel
-import ChainClasses.General.GeneralLabelField
+module
+
+public import ChainClasses.Engine.ProfileKernel
+public import ChainClasses.General.GeneralLabelField
+
+@[expose] public section
 
 /-! Identification of a bounded-profile encoding from the product law on finite
 prefix-closed probes of the reduced skeleton. -/

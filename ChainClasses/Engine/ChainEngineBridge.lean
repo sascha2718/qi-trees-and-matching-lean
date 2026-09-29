@@ -1,5 +1,9 @@
-import ChainClasses.Engine.QuantisedProfiles
-import ChainClasses.Regime.DirectChainLabels
+module
+
+public import ChainClasses.Engine.QuantisedProfiles
+public import ChainClasses.Regime.DirectChainLabels
+
+@[expose] public section
 
 /-! Direct matching for the original reduced arity laws of chain offspring processes.
 The common atomic profiles and their positive probability floor are chosen once, before

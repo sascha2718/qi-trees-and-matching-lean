@@ -1,3 +1,5 @@
+module
+
 /-
 Countable Jensen for `φ_α`, the mixture step of the one-step bounds
 (`Process/Descent.lean`, `Composite/Assembly.lean`, and
@@ -20,7 +22,9 @@ if the mixture charges a component with bad degree `1`, the right side is `⊤`
 and the bound is trivial, which is exactly how mismatch patterns are meant to
 be handled a level up.
 -/
-import GraphMarkovMatching.Potential.Directed
+public import GraphMarkovMatching.Potential.Directed
+
+@[expose] public section
 
 namespace GraphMarkovMatching
 

@@ -1,7 +1,11 @@
-import ChainClasses.Bushy.AssemblyRelabel
-import ChainClasses.Chain.CrossLaw
-import ChainClasses.Scalar.Bushy
-import ChainClasses.Bushy.ShapeIID
+module
+
+public import ChainClasses.Bushy.AssemblyRelabel
+public import ChainClasses.Chain.CrossLaw
+public import ChainClasses.Scalar.Bushy
+public import ChainClasses.Bushy.ShapeIID
+
+@[expose] public section
 
 /-!
 The proposition labelled `thm:hairy` in `gw_classes_simple.tex`, whose printed

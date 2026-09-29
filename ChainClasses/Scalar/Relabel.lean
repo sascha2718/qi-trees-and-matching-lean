@@ -1,7 +1,11 @@
-import Mathlib.Tactic
-import Mathlib.Analysis.SpecificLimits.Basic
-import Mathlib.Analysis.Normed.Ring.InfiniteSum
-import ChainClasses.Scalar.ShapeMass
+module
+
+public import Mathlib.Tactic
+public import Mathlib.Analysis.SpecificLimits.Basic
+public import Mathlib.Analysis.Normed.Ring.InfiniteSum
+public import ChainClasses.Scalar.ShapeMass
+
+@[expose] public section
 
 /-!
 `sec:general-relabel` of `matching_classes_general.tex`: the transport

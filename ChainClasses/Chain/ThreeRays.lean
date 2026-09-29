@@ -1,7 +1,11 @@
-import Mathlib.Tactic
-import ChainClasses.Chain.WordGraph
-import ChainClasses.Chain.Converse
-import ChainClasses.TwoValue
+module
+
+public import Mathlib.Tactic
+public import ChainClasses.Chain.WordGraph
+public import ChainClasses.Chain.Converse
+public import ChainClasses.TwoValue
+
+@[expose] public section
 
 /-!
 `thm:three-rays` for the sample tree of `sec:encoding`, and with it the ray

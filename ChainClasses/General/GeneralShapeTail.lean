@@ -1,8 +1,12 @@
-import ChainClasses.General.GeneralShapeMass
-import ChainClasses.Bushy.ShapeLabelLaw
-import ChainClasses.General.GeneralHarris
-import BranchingProcess.Progeny
-import ChainClasses.Scalar.ShapeMass
+module
+
+public import ChainClasses.General.GeneralShapeMass
+public import ChainClasses.Bushy.ShapeLabelLaw
+public import ChainClasses.General.GeneralHarris
+public import BranchingProcess.Progeny
+public import ChainClasses.Scalar.ShapeMass
+
+@[expose] public section
 
 /-!
 `thm:mass-uniform` of `matching_classes_general.tex`, the tail clause: under every

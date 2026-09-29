@@ -1,3 +1,5 @@
+module
+
 /-
 Isomorphism invariance of the potential `Φ`. `sec:reduction` of
 `graph_matching_selfcontained.tex` identifies
@@ -13,7 +15,9 @@ Given `e : X ≃ Y`, transport `(μ, R)` on `X` to `(μ', R')` on `Y` by
 quantity (`rE`, `qE`, `q`, `Φ`) transports, and reflexivity/symmetry are
 preserved. The proofs are all a single `tsum` reindexing by `Equiv.tsum_eq`.
 -/
-import GraphMatching.Potential
+public import GraphMatching.Potential
+
+@[expose] public section
 
 namespace GraphMatching
 

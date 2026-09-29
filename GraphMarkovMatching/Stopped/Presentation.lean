@@ -1,3 +1,5 @@
+module
+
 /-
 The Markov model of a common-core presentation (`markov_matching_applications.tex`,
 `sec:common-presentations`, `sec:types-degrees`): two arity laws `ν_L, ν_R` with finite supports, a
@@ -26,8 +28,10 @@ core arities using the one-term expression `C σ a = D a`.
 
 The phases and the return bound `thm:bounded-return` are in `Returns.lean`.
 -/
-import GraphMarkovMatching.Stopped.Paths
-import GraphMarkovMatching.Stopped.Profiles
+public import GraphMarkovMatching.Stopped.Paths
+public import GraphMarkovMatching.Stopped.Profiles
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

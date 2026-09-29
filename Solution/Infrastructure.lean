@@ -1,12 +1,16 @@
+module
+
 /- Typed process constructions and library transports used internally by Solution.
 The challenge itself imports Mathlib alone and contains none of this proof infrastructure. -/
-import Solution.Definitions
-import GraphMarkovMatching.Stopped.Main
-import GraphMatching.Graph
-import GraphMatching.Kolmogorov
-import GraphMatching.AutBridge
-import ChainClasses.Classification
-import ChainClasses.TwoValue
+public import Solution.Definitions
+public import GraphMarkovMatching.Stopped.Main
+public import GraphMatching.Graph
+public import GraphMatching.Kolmogorov
+public import GraphMatching.AutBridge
+public import ChainClasses.Classification
+public import ChainClasses.TwoValue
+
+@[expose] public section
 
 universe u
 

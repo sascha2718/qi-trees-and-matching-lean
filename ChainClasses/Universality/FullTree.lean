@@ -1,7 +1,11 @@
-import Mathlib.Tactic
-import ChainClasses.General.GeneralCascade
-import ChainClasses.Universality.GeneralObstructions
-import ChainClasses.Chain.WordGraph
+module
+
+public import Mathlib.Tactic
+public import ChainClasses.General.GeneralCascade
+public import ChainClasses.Universality.GeneralObstructions
+public import ChainClasses.Chain.WordGraph
+
+@[expose] public section
 
 /-!
 `thm:bushy` of `prelims.tex`: a rooted subtree of `𝒩(N)` in which every vertex has at

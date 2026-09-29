@@ -1,3 +1,5 @@
+module
+
 /-
 Numerical evaluation of the scalar constants of `markov_matching_applications.tex`
 (`sec:exponent-values`: `sec:exponent-range`, `sec:exponent-four-thirds`,
@@ -32,8 +34,10 @@ and on the characterisation of `K_α(0)` as the maximum of `q (1-q)^α` (`Kfun_b
 `Kfun_attained`), which makes `K_α(0)` strictly decreasing without differentiating
 `α^α/(α+1)^{α+1}`.
 -/
-import GraphMarkovMatching.Stopped.Scalar
-import GraphMarkovMatching.Stopped.FourLaw
+public import GraphMarkovMatching.Stopped.Scalar
+public import GraphMarkovMatching.Stopped.FourLaw
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

@@ -1,3 +1,5 @@
+module
+
 /-
 `sec:reduction` of `graph_matching_selfcontained.tex`: the tree layer for leaf
 labellings. Following design decision D4, `Aut(𝔹_h)` is **defined** as the swap
@@ -15,7 +17,9 @@ With this definition the leaf recursion `eq:leaf-rec`,
 is proved (`leafSim_succ`): it is `SquareRel (≈^leaf_h)`. The measure recursion
 `μ_{h+1} = μ_h ⊗ μ_h` is definitional. Reflexivity and symmetry propagate.
 -/
-import GraphMatching.Square
+public import GraphMatching.Square
+
+@[expose] public section
 
 namespace GraphMatching
 

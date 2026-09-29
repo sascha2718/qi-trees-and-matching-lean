@@ -1,9 +1,13 @@
-import ChainClasses.Bushy.ShapeEtaBlock
-import ChainClasses.Bushy.ShapeEtaSelf
-import ChainClasses.General.GeneralShapeTail
-import ChainClasses.General.GeneralShapeCoupling
-import ChainClasses.General.GeneralShrinkScale
-import ChainClasses.General.GeneralShapeMetric
+module
+
+public import ChainClasses.Bushy.ShapeEtaBlock
+public import ChainClasses.Bushy.ShapeEtaSelf
+public import ChainClasses.General.GeneralShapeTail
+public import ChainClasses.General.GeneralShapeCoupling
+public import ChainClasses.General.GeneralShrinkScale
+public import ChainClasses.General.GeneralShapeMetric
+
+@[expose] public section
 
 /-!
 `thm:relabel` (`it:relabel-eta`) and

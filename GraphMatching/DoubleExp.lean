@@ -1,3 +1,5 @@
+module
+
 /-
 `thm:double-exp` of `graph_matching_selfcontained.tex`, the double-exponential tail.
 For `D ≥ 5` and the law `p_j = e^{-D^j}` (`j ≥ 1`), `p_0 = 1 - ∑_{j≥1} e^{-D^j}` on
@@ -13,8 +15,10 @@ and `∑_{k≥3} a_k` (`badDeg_zero`/`badDeg_one`). Writing `η_{𝖯,α} = ofRe
 ≤ β`, `∑_{j≥2} T_j ≤ 2β` sum to `4β`, and `4β < 10⁻⁴` since `e^{12} > 40000`
 (`exp_twelve_gt`).
 -/
-import GraphMatching.Examples
-import Mathlib.Analysis.Complex.ExponentialBounds
+public import GraphMatching.Examples
+public import Mathlib.Analysis.Complex.ExponentialBounds
+
+@[expose] public section
 
 namespace GraphMatching
 open scoped ENNReal Classical

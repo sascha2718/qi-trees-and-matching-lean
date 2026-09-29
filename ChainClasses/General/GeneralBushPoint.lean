@@ -1,7 +1,11 @@
-import Mathlib.Data.Set.Finite.List
-import ChainClasses.General.GeneralShapeLaw
-import ChainClasses.Shape.ContractAddr
-import BranchingProcess.Progeny
+module
+
+public import Mathlib.Data.Set.Finite.List
+public import ChainClasses.General.GeneralShapeLaw
+public import ChainClasses.Shape.ContractAddr
+public import BranchingProcess.Progeny
+
+@[expose] public section
 
 /-!
 `thm:mass-uniform` of `matching_classes_general.tex`, the bush factors: the point mass

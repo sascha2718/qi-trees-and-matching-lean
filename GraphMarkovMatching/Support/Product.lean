@@ -1,3 +1,5 @@
+module
+
 /-
 The product of relations:
 
@@ -11,7 +13,9 @@ The constant `5` is `2 * alpha`, and the proof is: the good set of
 whence `phi q <= phi q1 * r2^(-alpha) + phi q2 * r1^(-alpha)`; then apply
 `rpow_neg_alpha_le` to each `r^(-alpha)` and use independence.
 -/
-import GraphMarkovMatching.Support.Potential
+public import GraphMarkovMatching.Support.Potential
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Support
 

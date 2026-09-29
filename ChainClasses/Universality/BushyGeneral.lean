@@ -1,5 +1,9 @@
-import ChainClasses.Engine.BushyProfileBridge
-import ChainClasses.Engine.ProfileGeometry
+module
+
+public import ChainClasses.Engine.BushyProfileBridge
+public import ChainClasses.Engine.ProfileGeometry
+
+@[expose] public section
 
 /-!
 Direct universality for arbitrary bounded bushy offspring laws: the

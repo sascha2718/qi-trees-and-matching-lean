@@ -1,8 +1,12 @@
+module
+
 /-
 Marginal consistency of Markov tree laws and the full-group infinite matching relation.
 -/
-import GraphMarkovMatching.Process.Basic
-import GraphMarkovMatching.Support.Measure
+public import GraphMarkovMatching.Process.Basic
+public import GraphMarkovMatching.Support.Measure
+
+@[expose] public section
 
 namespace GraphMarkovMatching
 

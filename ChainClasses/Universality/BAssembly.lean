@@ -1,4 +1,8 @@
-import ChainClasses.Universality.SampleAssembly
+module
+
+public import ChainClasses.Universality.SampleAssembly
+
+@[expose] public section
 
 /-!
 `thm:hairy-general` of `trichotomy.tex`, the deterministic geometry. The geometry is built

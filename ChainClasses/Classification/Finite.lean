@@ -1,3 +1,5 @@
+module
+
 /-
 The finite class and the complete classification.
 
@@ -8,11 +10,13 @@ and the complete classification over the unconditioned product law: two independ
 are almost surely quasi-isometric exactly when both are finite, or both are infinite and the
 two laws lie in the same infinite class.
 -/
-import BranchingProcess.Geometry
-import BranchingProcess.Law
-import BranchingProcess.Conditioned
-import ChainClasses.Classification.Complete
-import ChainClasses.Universality.GeneralObstructions
+public import BranchingProcess.Geometry
+public import BranchingProcess.Law
+public import BranchingProcess.Conditioned
+public import ChainClasses.Classification.Complete
+public import ChainClasses.Universality.GeneralObstructions
+
+@[expose] public section
 
 open MeasureTheory
 

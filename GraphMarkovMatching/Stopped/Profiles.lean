@@ -1,3 +1,5 @@
+module
+
 /-
 Binary profiles and their composites (`markov_matching_applications.tex`,
 `sec:common-presentations`): full binary trees with marked graft roots.
@@ -16,9 +18,11 @@ Binary profiles and their composites (`markov_matching_applications.tex`,
 
 The Markov model built from these profiles is in `Presentation.lean`.
 -/
-import Mathlib.Data.Finset.Basic
-import Mathlib.Data.Nat.Log
-import Mathlib.Tactic
+public import Mathlib.Data.Finset.Basic
+public import Mathlib.Data.Nat.Log
+public import Mathlib.Tactic
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

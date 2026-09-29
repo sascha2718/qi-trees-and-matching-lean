@@ -1,3 +1,5 @@
+module
+
 /-
 `thm:harris` of `matching_classes_simple.tex` in its joint form, at general bounded
 support: conditionally on the skeleton, the decorations are independent conjugate
@@ -32,7 +34,9 @@ conjugate samples.
   identity as a law on trees**: the dying subtrees enter through their sampled trees,
   and each factor is the conjugate tree law, by `bushTreeLaw_eq_treeLaw`.
 -/
-import BranchingProcess.Decorated
+public import BranchingProcess.Decorated
+
+@[expose] public section
 
 namespace BranchingProcess
 

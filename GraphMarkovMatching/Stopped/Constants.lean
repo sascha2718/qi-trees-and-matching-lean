@@ -1,3 +1,5 @@
+module
+
 /-
 The one-site quantities of `arbitrary_offspring_matching.tex` (`eq:root-defect`
 and `sec:independent-root`) and their bounds:
@@ -11,7 +13,9 @@ and `sec:independent-root`) and their bounds:
 * `e0_le_eta_div`, `fRoot_le_eta_div`, `delta_le_eta_div`, `zeta_le_eta_div`: the bounds
   through `η` when `μ(0) ≥ p > 0`.
 -/
-import GraphMarkovMatching.Stopped.Model
+public import GraphMarkovMatching.Stopped.Model
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

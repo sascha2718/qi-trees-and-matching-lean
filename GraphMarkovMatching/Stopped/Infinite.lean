@@ -1,3 +1,5 @@
+module
+
 /-
 The infinite-tree conclusion of `arbitrary_offspring_matching.tex` (`sec:completion`, the
 König step).  Two independent infinite samples of the Markov label model, started at the
@@ -14,10 +16,12 @@ at infinite height.
 * `trajPair_infFail_eq`, `trajPair_infFail_le`, `trajPair_infMatch_ge`: the infinite
   failure probability is the supremum of the finite ones, and the bounds it inherits.
 -/
-import GraphMarkovMatching.Stopped.Paths
-import GraphMarkovMatching.Support.Trajectory
-import GraphMarkovMatching.Support.Measure
-import GraphMarkovMatching.Process.Consistency
+public import GraphMarkovMatching.Stopped.Paths
+public import GraphMarkovMatching.Support.Trajectory
+public import GraphMarkovMatching.Support.Measure
+public import GraphMarkovMatching.Process.Consistency
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

@@ -1,4 +1,8 @@
-import ChainClasses.Bushy.ShapeEtaSelf
+module
+
+public import ChainClasses.Bushy.ShapeEtaSelf
+
+@[expose] public section
 
 /-!
 `sec:shape-coupling` and the bushy-universality proposition labelled

@@ -1,3 +1,5 @@
+module
+
 /-
 `sec:contraction` of `graph_matching_selfcontained.tex`, the row-bound `eq:row-bound`: the
 first-term pointwise estimate in the proof of the contraction `thm:contraction`.
@@ -26,7 +28,9 @@ the only `rpow` facts used are `chord`, `L_bound`, `Real.rpow_le_rpow`
 (base monotonicity) and the `Real.div_rpow`/`Real.rpow_neg` bookkeeping that
 turns `(s/(1+d))^{-α}` into `(1+d)^α/s^α`.
 -/
-import GraphMatching.Maxima
+public import GraphMatching.Maxima
+
+@[expose] public section
 
 namespace GraphMatching
 

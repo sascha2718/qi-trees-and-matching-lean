@@ -1,5 +1,9 @@
-import ChainClasses.Scalar.ShapeCoupling
-import ChainClasses.Bushy.ShapeCouplingCross
+module
+
+public import ChainClasses.Scalar.ShapeCoupling
+public import ChainClasses.Bushy.ShapeCouplingCross
+
+@[expose] public section
 
 /-!
 `sec:shape-coupling` of `gw_classes_simple.tex`: the cascade of `thm:shape-coupling`, the

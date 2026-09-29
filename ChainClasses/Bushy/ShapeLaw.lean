@@ -1,4 +1,8 @@
-import ChainClasses.Bushy.ShapeDecomposition
+module
+
+public import ChainClasses.Bushy.ShapeDecomposition
+
+@[expose] public section
 
 /-!
 `sec:shape-harris` of `matching_classes_simple.tex`: the law of `thm:shape-iid` on the

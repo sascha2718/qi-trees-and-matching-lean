@@ -1,3 +1,5 @@
+module
+
 /-
 The scalar functions of `arbitrary_offspring_matching.tex` (`eq:mean-constants`,
 `eq:four-law-constants`) and the pointwise inequalities of the four-law
@@ -22,8 +24,10 @@ The parameters `L`, `K`, `L0` enter the four-law contraction as hypotheses (the 
 `le_Lfun`, `Kfun_bound`, `le_Lfun` at `β = 0`), so that rational surrogates can replace
 the exact maxima in numerical instances.
 -/
-import GraphMarkovMatching.Support.Phi
-import GraphMarkovMatching.Potential.Directed
+public import GraphMarkovMatching.Support.Phi
+public import GraphMarkovMatching.Potential.Directed
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

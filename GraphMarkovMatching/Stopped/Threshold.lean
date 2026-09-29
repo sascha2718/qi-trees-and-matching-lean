@@ -1,3 +1,5 @@
+module
+
 /-
 The scalar threshold analysis used in `arbitrary_offspring_matching.tex` (Section 19),
 with explicit constants from `markov_matching_applications.tex`
@@ -22,8 +24,10 @@ threshold `ε⁰_K`.
 
 Everything is pure real analysis; no model enters.
 -/
-import GraphMarkovMatching.Stopped.Paths
-import GraphMarkovMatching.Stopped.Scalar
+public import GraphMarkovMatching.Stopped.Paths
+public import GraphMarkovMatching.Stopped.Scalar
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

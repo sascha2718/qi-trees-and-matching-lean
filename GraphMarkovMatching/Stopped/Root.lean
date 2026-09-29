@@ -1,3 +1,5 @@
+module
+
 /-
 The independent root of `arbitrary_offspring_matching.tex` (`sec:independent-root`): the
 restricted potential at height `h+1` is at most `ζ + A_μ Q` whenever the child-pair
@@ -6,8 +8,10 @@ restricted potential is at most `Q`, using the root identity
 `1 + α Q` of the child pair, and the independence of the source root state from its
 children.  The height-zero potentials are at most `ζ`.
 -/
-import GraphMarkovMatching.Stopped.Moments
-import GraphMarkovMatching.Stopped.Scalar
+public import GraphMarkovMatching.Stopped.Moments
+public import GraphMarkovMatching.Stopped.Scalar
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

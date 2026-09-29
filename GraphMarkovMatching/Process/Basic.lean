@@ -1,3 +1,5 @@
+module
+
 /-
 Abstract Markov label systems: a state space `S` with a child kernel `P : S → PMF (S × S)`, the height-`n` tree law `muM`
 started from a frozen root state, and the pair mixture `pairMix` that the
@@ -20,9 +22,11 @@ Design notes:
   `tsum` in `ℝ≥0∞` and is unconditionally covered by Fubini's theorem as in
   the support layer.
 -/
-import GraphMarkovMatching.Support.Tree
-import Mathlib.Probability.ProbabilityMassFunction.Monad
-import Mathlib.Probability.ProbabilityMassFunction.Constructions
+public import GraphMarkovMatching.Support.Tree
+public import Mathlib.Probability.ProbabilityMassFunction.Monad
+public import Mathlib.Probability.ProbabilityMassFunction.Constructions
+
+@[expose] public section
 
 namespace GraphMarkovMatching
 

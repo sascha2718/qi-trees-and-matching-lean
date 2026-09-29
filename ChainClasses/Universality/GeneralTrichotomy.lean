@@ -1,9 +1,13 @@
-import ChainClasses.Universality.GeneralObstructions
-import ChainClasses.Universality.FullTree
-import ChainClasses.Universality.BushyGeneral
-import ChainClasses.Engine.ChainEngineBridge
-import ChainClasses.Universality.ChainGeneral
-import ChainClasses.Bushy.Trichotomy
+module
+
+public import ChainClasses.Universality.GeneralObstructions
+public import ChainClasses.Universality.FullTree
+public import ChainClasses.Universality.BushyGeneral
+public import ChainClasses.Engine.ChainEngineBridge
+public import ChainClasses.Universality.ChainGeneral
+public import ChainClasses.Bushy.Trichotomy
+
+@[expose] public section
 
 /-!
 Core assembly for `thm:trichotomy` of `prelims.tex`, the complete quasi-isometry classification

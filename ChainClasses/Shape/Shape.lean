@@ -1,4 +1,8 @@
-import Mathlib.Tactic
+module
+
+public import Mathlib.Tactic
+
+@[expose] public section
 
 /-!
 `sec:shape-harris` of `matching_classes_simple.tex`: `def:shape`, the shapes

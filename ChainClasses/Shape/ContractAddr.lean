@@ -1,5 +1,9 @@
-import Mathlib.Tactic
-import ChainClasses.Shape.ContractTree
+module
+
+public import Mathlib.Tactic
+public import ChainClasses.Shape.ContractTree
+
+@[expose] public section
 
 /-!
 `sec:shape-net` of `matching_classes_simple.tex`: `thm:dilution`, the step that

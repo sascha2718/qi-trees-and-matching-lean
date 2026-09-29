@@ -1,5 +1,9 @@
-import Solution.Transport
-import Solution.Binary
+module
+
+public import Solution.Transport
+public import Solution.Binary
+
+@[expose] public section
 
 /-!
 # Proofs of the audited statements

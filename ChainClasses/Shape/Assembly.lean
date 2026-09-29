@@ -1,6 +1,10 @@
-import Mathlib.Tactic
-import ChainClasses.Scalar.GluedTransfer
-import ChainClasses.Shape.ShapeMetric
+module
+
+public import Mathlib.Tactic
+public import ChainClasses.Scalar.GluedTransfer
+public import ChainClasses.Shape.ShapeMetric
+
+@[expose] public section
 
 /-!
 `sec:shape-harris` and `sec:shape-transfer` of `matching_classes_simple.tex`:

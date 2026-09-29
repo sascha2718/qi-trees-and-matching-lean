@@ -1,3 +1,5 @@
+module
+
 /-
 The two maxima of `graph_matching_selfcontained.tex`, `eq:lambda-max` and `eq:kappa`.
 
@@ -38,7 +40,9 @@ at the critical points `t = 2/7` and `t = 2/3`. This works only because `2*alpha
 is the integer `5`; it is the reason the two rational bounds, and not the exact
 maxima, are what the development carries.
 -/
-import GraphMatching.Phi
+public import GraphMatching.Phi
+
+@[expose] public section
 
 namespace GraphMatching
 

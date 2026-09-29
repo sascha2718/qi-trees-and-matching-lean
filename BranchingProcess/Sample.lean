@@ -1,3 +1,5 @@
+module
+
 /-
 `sec:gw-trees` of `prelims.tex`: the deterministic layer of a Galton-Watson tree.  A
 field of offspring counts `c : Word N → ℕ` cuts out of the ambient `N`-ary tree the
@@ -17,10 +19,12 @@ later, through a random field `c`, and no measure theory appears here.
 * `exists_skeleton_ray`: a ray inside the skeleton out of any of its vertices, an
   isometric copy of `ℕ` by `exists_isometric_skeleton_ray`.
 -/
-import BranchingProcess.Word
-import Mathlib.Data.List.Induction
-import Mathlib.Data.Nat.Dist
-import Mathlib.Data.Set.Finite.Lattice
+public import BranchingProcess.Word
+public import Mathlib.Data.List.Induction
+public import Mathlib.Data.Nat.Dist
+public import Mathlib.Data.Set.Finite.Lattice
+
+@[expose] public section
 
 namespace BranchingProcess
 

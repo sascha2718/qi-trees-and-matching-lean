@@ -1,3 +1,5 @@
+module
+
 /-
 The row bound (the first-term pointwise estimate in the proof of the
 contraction lemma), at a free exponent `α ≥ 1`.
@@ -22,7 +24,9 @@ Two-case split:
 The coefficients stay symbolic throughout; no rational surrogates or
 numeric checks are needed.
 -/
-import GraphMarkovMatching.Support.Phi
+public import GraphMarkovMatching.Support.Phi
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Support
 

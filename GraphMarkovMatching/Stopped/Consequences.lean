@@ -1,3 +1,5 @@
+module
+
 /-
 The explicit consequences of `thm:markov-matching` in `markov_matching_applications.tex` at the
 rational parameters of `sec:two-exponent-values` and `sec:exponent-four-thirds`.
@@ -16,8 +18,10 @@ rational parameters of `sec:two-exponent-values` and `sec:exponent-four-thirds`.
   the exponents `4/3` and `2` from the rational parameters, in both alternatives, with no
   numerical optimisation.
 -/
-import GraphMarkovMatching.Stopped.Main
-import GraphMarkovMatching.Stopped.Numerics
+public import GraphMarkovMatching.Stopped.Main
+public import GraphMarkovMatching.Stopped.Numerics
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

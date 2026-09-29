@@ -1,3 +1,5 @@
+module
+
 /-
 `thm:concentrated-regular-subtree` under the conditioned law: a sample of an offspring
 law concentrated at a large arity almost surely contains, on survival, a retained
@@ -37,9 +39,11 @@ root of the subtree at its second child be retained; the splitting at the root m
 * `ae_exists_spine_retained`, `ae_exists_spine_binary`: almost surely some `1^n 2` is
   a retained vertex of the sample, and the binary tree embeds below it.
 -/
-import BranchingProcess.Pruning
-import BranchingProcess.Embedding
-import ChainClasses.Universality.GeneralObstructions
+public import BranchingProcess.Pruning
+public import BranchingProcess.Embedding
+public import ChainClasses.Universality.GeneralObstructions
+
+@[expose] public section
 
 namespace ChainClasses
 

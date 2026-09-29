@@ -1,5 +1,9 @@
-import ChainClasses.Engine.SkeletonPatterns
-import ChainClasses.Engine.ProfileMatching
+module
+
+public import ChainClasses.Engine.SkeletonPatterns
+public import ChainClasses.Engine.ProfileMatching
+
+@[expose] public section
 
 /-! The direct bushy application: both reduced laws charge two, and every balanced
 profile uses this same binary core. No relation between the two offspring bounds is needed. -/

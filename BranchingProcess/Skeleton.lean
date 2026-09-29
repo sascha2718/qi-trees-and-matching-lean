@@ -1,3 +1,5 @@
+module
+
 /-
 `thm:harris` of `matching_classes_simple.tex` and `thm:harris-general` of
 `matching_classes_general.tex` beyond the root: **the Harris decomposition**.  Conditioned
@@ -75,7 +77,9 @@ The alphabet has to be wide enough to carry the law, so `J ≤ N` runs through t
 statements as in `Law` and `Conditioned`, together with `q < 1` for the skeleton, without
 which the conditioning is on a null event, and `0 < q` for the bushes.
 -/
-import BranchingProcess.Conditioned
+public import BranchingProcess.Conditioned
+
+@[expose] public section
 
 namespace BranchingProcess
 

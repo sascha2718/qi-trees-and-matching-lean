@@ -1,3 +1,5 @@
+module
+
 /-
 The branching semigroup of a set of arities and its atoms (`markov_matching_applications.tex`,
 `sec:common-presentations`, "The common generators"): pure additive combinatorics of
@@ -16,14 +18,16 @@ The branching semigroup of a set of arities and its atoms (`markov_matching_appl
 * `example_atoms`: the example of `sec:common-presentations` with the nonnested supports
   `{4, 6, 7}` and `{4, 6, 9}`.
 -/
-import Mathlib.Algebra.Group.Submonoid.Basic
-import Mathlib.Algebra.Group.Submonoid.Membership
-import Mathlib.Algebra.Group.Submonoid.BigOperators
-import Mathlib.Algebra.Order.BigOperators.Group.List
-import Mathlib.Data.Finset.Basic
-import Mathlib.Data.Set.Card
-import Mathlib.Data.Nat.ModEq
-import Mathlib.Tactic
+public import Mathlib.Algebra.Group.Submonoid.Basic
+public import Mathlib.Algebra.Group.Submonoid.Membership
+public import Mathlib.Algebra.Group.Submonoid.BigOperators
+public import Mathlib.Algebra.Order.BigOperators.Group.List
+public import Mathlib.Data.Finset.Basic
+public import Mathlib.Data.Set.Card
+public import Mathlib.Data.Nat.ModEq
+public import Mathlib.Tactic
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

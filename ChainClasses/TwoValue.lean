@@ -1,8 +1,12 @@
-import ChainClasses.Chain.Eta
-import ChainClasses.Chain.GWInstance
-import ChainClasses.Chain.Isometry
-import ChainClasses.Chain.Transfer
-import GraphMatching.Kolmogorov
+module
+
+public import ChainClasses.Chain.Eta
+public import ChainClasses.Chain.GWInstance
+public import ChainClasses.Chain.Isometry
+public import ChainClasses.Chain.Transfer
+public import GraphMatching.Kolmogorov
+
+@[expose] public section
 
 /-!
 `thm:twovalue` of `prelims.tex`, assembled as in `sec:proof-main` of

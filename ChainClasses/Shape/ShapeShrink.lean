@@ -1,5 +1,9 @@
-import Mathlib.Tactic
-import ChainClasses.Shape.ShapeMetric
+module
+
+public import Mathlib.Tactic
+public import ChainClasses.Shape.ShapeMetric
+
+@[expose] public section
 
 /-!
 The two geometric steps of `sec:shapes` that the metric on realisations makes

@@ -1,3 +1,5 @@
+module
+
 /-
 The obstruction for preassigned profiles of `markov_matching_applications.tex`
 (`sec:profile-obstruction`): equal branching semigroups alone do not ensure matching for
@@ -19,10 +21,12 @@ state law `μ_t = (1/2) δ₀ + (1/2 - t) δ₁ + t δ₂` have
 The last paragraph of the section, the law `(1-t) δ₂ + t δ₁` with `η_α = 0` and `b(0) = t`,
 is `etaG_muTwoOne_eq_zero` and `rE_zero_muTwoOne`.
 -/
-import GraphMarkovMatching.Stopped.Paths
-import GraphMarkovMatching.Models.Counter
-import GraphMarkovMatching.Models.Examples
-import GraphMarkovMatching.Support.Trajectory
+public import GraphMarkovMatching.Stopped.Paths
+public import GraphMarkovMatching.Models.Counter
+public import GraphMarkovMatching.Models.Examples
+public import GraphMarkovMatching.Support.Trajectory
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

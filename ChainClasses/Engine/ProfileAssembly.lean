@@ -1,4 +1,8 @@
-import ChainClasses.Engine.ProfileGeometry
+module
+
+public import ChainClasses.Engine.ProfileGeometry
+
+@[expose] public section
 
 /-! Gluing compatible labelled pieces after an arbitrary bounded-profile encoding. -/
 

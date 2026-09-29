@@ -1,9 +1,13 @@
-import Mathlib.Tactic
-import Mathlib.Analysis.SpecificLimits.Basic
-import Mathlib.Analysis.Calculus.Deriv.Pow
-import Mathlib.Analysis.Calculus.Deriv.Add
-import Mathlib.Analysis.Calculus.Deriv.Mul
-import ChainClasses.Scalar.Harris
+module
+
+public import Mathlib.Tactic
+public import Mathlib.Analysis.SpecificLimits.Basic
+public import Mathlib.Analysis.Calculus.Deriv.Pow
+public import Mathlib.Analysis.Calculus.Deriv.Add
+public import Mathlib.Analysis.Calculus.Deriv.Mul
+public import ChainClasses.Scalar.Harris
+
+@[expose] public section
 
 /-!
 `sec:general-classes` of `matching_classes_general.tex`: the arithmetic of

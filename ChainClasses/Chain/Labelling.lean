@@ -1,5 +1,9 @@
-import Mathlib.Tactic
-import ChainClasses.Chain.Encoding
+module
+
+public import Mathlib.Tactic
+public import ChainClasses.Chain.Encoding
+
+@[expose] public section
 
 /-!
 `sec:transfer` of `matching_classes_simple.tex`, the abstract-labelling layer:

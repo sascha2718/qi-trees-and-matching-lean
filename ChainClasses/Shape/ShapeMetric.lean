@@ -1,8 +1,12 @@
-import Mathlib.Tactic
-import Mathlib.Data.Nat.Nth
-import ChainClasses.Chain.Labelling
-import ChainClasses.Scalar.MarkedQI
-import ChainClasses.Shape.Shape
+module
+
+public import Mathlib.Tactic
+public import Mathlib.Data.Nat.Nth
+public import ChainClasses.Chain.Labelling
+public import ChainClasses.Scalar.MarkedQI
+public import ChainClasses.Shape.Shape
+
+@[expose] public section
 
 /-!
 `sec:shape-harris` and `sec:shape-net` of `matching_classes_simple.tex`: the

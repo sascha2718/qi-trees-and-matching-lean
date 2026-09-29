@@ -1,3 +1,5 @@
+module
+
 /-
 The facts of the one-law contraction lemma that the restricted four-law
 and its callers reuse:
@@ -12,7 +14,9 @@ and its callers reuse:
 The contraction lemma itself, with its pointwise split and averaging
 machinery, is kept in `Archive/Support/Contraction.lean`.
 -/
-import GraphMarkovMatching.Support.Square
+public import GraphMarkovMatching.Support.Square
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Support
 

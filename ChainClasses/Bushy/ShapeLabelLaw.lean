@@ -1,4 +1,8 @@
-import ChainClasses.Bushy.Universality
+module
+
+public import ChainClasses.Bushy.Universality
+
+@[expose] public section
 
 /-!
 `sec:shape-harris` of `matching_classes_simple.tex` and `thm:hairy` of

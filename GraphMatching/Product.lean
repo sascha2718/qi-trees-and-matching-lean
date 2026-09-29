@@ -1,3 +1,5 @@
+module
+
 /-
 `sec:contraction` of `graph_matching_selfcontained.tex`: `thm:product`, the product of
 relations.
@@ -12,7 +14,9 @@ The constant `5` is `2 * alpha`, and the paper's proof is: the good set of
 whence `phi q <= phi q1 * r2^(-alpha) + phi q2 * r1^(-alpha)`; then apply
 `eq:W-bound` to each `r^(-alpha)` and use independence.
 -/
-import GraphMatching.Potential
+public import GraphMatching.Potential
+
+@[expose] public section
 
 namespace GraphMatching
 

@@ -1,3 +1,5 @@
+module
+
 /-
 Lemma 23.1, the probabilistic assertions of the pruning: the exact
 binomial recursion (23.1) for the probability that the root survives
@@ -28,8 +30,10 @@ prefix-closed set of words, the sample side of which is `sampleMeasure_subset_sa
 * `retainedTreeLaw_eq_treeLaw`: **the retained descendant tree is a Galton-Watson tree** with
   law `Offspring.pruned`.
 -/
-import BranchingProcess.Pruning
-import BranchingProcess.Skeleton
+public import BranchingProcess.Pruning
+public import BranchingProcess.Skeleton
+
+@[expose] public section
 
 namespace BranchingProcess
 

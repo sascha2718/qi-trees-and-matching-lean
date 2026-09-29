@@ -1,3 +1,5 @@
+module
+
 /-
 `thm:concentrated-regular-subtree` of `quasi_isometric_embeddings.tex`: pruning a
 Galton-Watson tree whose offspring law is concentrated at a large arity `J` leaves,
@@ -37,7 +39,9 @@ binomial lower tail is bounded by the union bound over the patterns of at most
 * `exists_binary_embedding_of_retainedInf`, `survives_of_retainedInf`: the case `k = 2`,
   the isometric copy of `𝔹 = 𝒩(2)` below a retained vertex of the sample.
 -/
-import BranchingProcess.Conditioned
+public import BranchingProcess.Conditioned
+
+@[expose] public section
 
 namespace BranchingProcess
 

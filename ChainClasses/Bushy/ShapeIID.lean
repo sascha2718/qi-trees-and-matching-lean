@@ -1,4 +1,8 @@
-import ChainClasses.Bushy.ShapeSplitLaw
+module
+
+public import ChainClasses.Bushy.ShapeSplitLaw
+
+@[expose] public section
 
 /-!
 Section 10.1 of `matching_classes_simple.tex`: **Proposition 10.3** in full.

@@ -1,6 +1,10 @@
-import ChainClasses.General.GeneralShapeShrink
-import ChainClasses.General.GeneralShapeMass
-import ChainClasses.Shape.AddrMetric
+module
+
+public import ChainClasses.General.GeneralShapeShrink
+public import ChainClasses.General.GeneralShapeMass
+public import ChainClasses.Shape.AddrMetric
+
+@[expose] public section
 
 /-!
 `thm:shape-shrink` of `gw_classes_simple.tex` at general arity, the moves after the

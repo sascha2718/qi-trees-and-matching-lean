@@ -1,3 +1,5 @@
+module
+
 /-
 The calculus of quasi-isometric embeddings behind `sec:embedding-hierarchy`: the
 deterministic comparisons the embedding theorem and the strict hierarchy
@@ -16,7 +18,9 @@ deterministic comparisons the embedding theorem and the strict hierarchy
   embeds into every graph carrying one.  With `not_qiEmbeddable_rayGraph` of
   `Geometry` this is the comparison `Ray ≺ Supercritical`.
 -/
-import BranchingProcess.Geometry
+public import BranchingProcess.Geometry
+
+@[expose] public section
 
 namespace BranchingProcess
 

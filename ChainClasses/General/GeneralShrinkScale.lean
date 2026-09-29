@@ -1,6 +1,10 @@
-import Mathlib.Tactic
-import ChainClasses.General.GeneralContraction
-import ChainClasses.General.GeneralShrink
+module
+
+public import Mathlib.Tactic
+public import ChainClasses.General.GeneralContraction
+public import ChainClasses.General.GeneralShrink
+
+@[expose] public section
 
 /-!
 `sec:general-relabel` of `matching_classes_general.tex`: the shrinking map of

@@ -1,3 +1,5 @@
+module
+
 /-
 The two limitations of `markov_matching_applications.tex` (`sec:contraction-lower-bound`,
 `sec:extension-limits`):
@@ -18,8 +20,10 @@ The two limitations of `markov_matching_applications.tex` (`sec:contraction-lowe
 The laws on finite types are handled through their real weight vectors
 (`qE_eq_ofReal_sum`, `PhiDres_eq_ofReal_sum`, `PhiD_eq_ofReal_sum`).
 -/
-import GraphMarkovMatching.Stopped.Paths
-import GraphMarkovMatching.Stopped.Scalar
+public import GraphMarkovMatching.Stopped.Paths
+public import GraphMarkovMatching.Stopped.Scalar
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

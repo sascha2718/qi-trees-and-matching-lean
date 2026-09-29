@@ -1,3 +1,5 @@
+module
+
 /-
 The restricted potentials, zero events, phases, possible paths, stopping predicate and
 transition selections of `arbitrary_offspring_matching.tex` (`sec:restricted-potential`,
@@ -18,7 +20,9 @@ In formal field and lemma names, `charged` means simply "has nonzero mass
 under the relevant PMF".  The prose below usually says "positive-mass" to
 make that meaning explicit.
 -/
-import GraphMarkovMatching.Stopped.Constants
+public import GraphMarkovMatching.Stopped.Constants
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

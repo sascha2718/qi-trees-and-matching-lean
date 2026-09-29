@@ -1,4 +1,8 @@
-import ChainClasses.Bushy.ShapeCouplingBuild
+module
+
+public import ChainClasses.Bushy.ShapeCouplingBuild
+
+@[expose] public section
 
 /-!
 `sec:shape-coupling` and `thm:hairy` of `gw_classes_simple.tex` at the

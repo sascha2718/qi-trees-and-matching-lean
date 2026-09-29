@@ -1,5 +1,9 @@
-import ChainClasses.General.GeneralShapeMetric
-import ChainClasses.Bushy.ShapeCouplingBuild
+module
+
+public import ChainClasses.General.GeneralShapeMetric
+public import ChainClasses.Bushy.ShapeCouplingBuild
+
+@[expose] public section
 
 /-!
 `thm:relabel` and `thm:cross-relabel` of `matching_classes_general.tex`: the cascade

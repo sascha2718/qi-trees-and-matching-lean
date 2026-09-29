@@ -1,3 +1,5 @@
+module
+
 /-
 `sec:gw-trees` of `prelims.tex`: the law of the Galton-Watson sample.  The
 offspring layer of `Offspring` and the genealogy of `Sample` are joined here:
@@ -30,11 +32,13 @@ The alphabet has to be wide enough to carry the law: the theorems of the last
 three groups hypothesise `J ≤ N`, without which a vertex of the sample keeps
 only its first `N` children.
 -/
-import BranchingProcess.Offspring
-import BranchingProcess.Sample
-import BranchingProcess.Field
-import Mathlib.Probability.ProbabilityMassFunction.Basic
-import Mathlib.Topology.Order.MonotoneConvergence
+public import BranchingProcess.Offspring
+public import BranchingProcess.Sample
+public import BranchingProcess.Field
+public import Mathlib.Probability.ProbabilityMassFunction.Basic
+public import Mathlib.Topology.Order.MonotoneConvergence
+
+@[expose] public section
 
 namespace BranchingProcess
 

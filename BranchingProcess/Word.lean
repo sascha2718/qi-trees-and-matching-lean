@@ -1,3 +1,5 @@
+module
+
 /-
 `sec:words` of `prelims.tex`: the ambient `N`-ary tree `𝒩(N)`, whose vertices are the
 finite words over an `N`-letter alphabet and whose edges join `v` to `v ++ [j]`. Pure
@@ -16,8 +18,10 @@ word combinatorics, no probability.
   term of `Descriptive.tree (Fin N)`; `Subtree.wedge_mem`, `Subtree.mem_subAt` and
   `treeDist_append_left` bridge that interface to the metric layer above.
 -/
-import Mathlib.SetTheory.Descriptive.Tree
-import Mathlib.Tactic
+public import Mathlib.SetTheory.Descriptive.Tree
+public import Mathlib.Tactic
+
+@[expose] public section
 
 namespace BranchingProcess
 

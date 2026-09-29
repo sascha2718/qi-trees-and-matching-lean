@@ -1,5 +1,9 @@
-import ChainClasses.General.GeneralShape
-import BranchingProcess.Harris
+module
+
+public import ChainClasses.General.GeneralShape
+public import BranchingProcess.Harris
+
+@[expose] public section
 
 /-!
 `sec:general-relabel` of `matching_classes_general.tex`: the deterministic layer of

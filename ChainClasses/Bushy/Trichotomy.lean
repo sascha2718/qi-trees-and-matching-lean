@@ -1,5 +1,9 @@
-import ChainClasses.Bushy.Bushes
-import ChainClasses.Bushy.ShapeCouplingBuild
+module
+
+public import ChainClasses.Bushy.Bushes
+public import ChainClasses.Bushy.ShapeCouplingBuild
+
+@[expose] public section
 
 /-!
 Implementation of `thm:trichotomy-simple` of `gw_classes_simple.tex`, the quasi-isometry

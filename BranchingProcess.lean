@@ -1,3 +1,5 @@
+module
+
 /-
 The branching-process foundation: Galton-Watson trees over an `N`-ary
 alphabet, their offspring laws, extinction, and the decomposition of a
@@ -49,17 +51,17 @@ it; nothing here consumes `ChainClasses`, `GraphMatching` or
   law conditioned to be at least `m`, under the law conditioned on a retained
   root.
 -/
-import BranchingProcess.Word
-import BranchingProcess.Offspring
-import BranchingProcess.Sample
-import BranchingProcess.Law
-import BranchingProcess.Conditioned
-import BranchingProcess.Skeleton
-import BranchingProcess.Decorated
-import BranchingProcess.Harris
-import BranchingProcess.Progeny
-import BranchingProcess.Field
-import BranchingProcess.Geometry
-import BranchingProcess.Embedding
-import BranchingProcess.Pruning
-import BranchingProcess.PrunedTree
+public import BranchingProcess.Word
+public import BranchingProcess.Offspring
+public import BranchingProcess.Sample
+public import BranchingProcess.Law
+public import BranchingProcess.Conditioned
+public import BranchingProcess.Skeleton
+public import BranchingProcess.Decorated
+public import BranchingProcess.Harris
+public import BranchingProcess.Progeny
+public import BranchingProcess.Field
+public import BranchingProcess.Geometry
+public import BranchingProcess.Embedding
+public import BranchingProcess.Pruning
+public import BranchingProcess.PrunedTree

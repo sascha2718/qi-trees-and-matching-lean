@@ -1,8 +1,12 @@
-import Mathlib.Tactic
-import ChainClasses.Scalar.GluedTransfer
-import ChainClasses.Shape.Assembly
-import ChainClasses.General.GeneralShapeShrink
-import ChainClasses.Shape.AddrMetric
+module
+
+public import Mathlib.Tactic
+public import ChainClasses.Scalar.GluedTransfer
+public import ChainClasses.Shape.Assembly
+public import ChainClasses.General.GeneralShapeShrink
+public import ChainClasses.Shape.AddrMetric
+
+@[expose] public section
 
 /-!
 `sec:general-relabel` of `matching_classes_general.tex`, item `thm:general-glued`:

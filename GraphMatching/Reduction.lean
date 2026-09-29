@@ -1,3 +1,5 @@
+module
+
 /-
 `sec:reduction` of `graph_matching_selfcontained.tex`, the reduction (`thm:reduction`).
 
@@ -20,8 +22,10 @@ them is `thm:reduction` as the paper states it (`leaf_matching_boundA`,
 The failure probability of matching two independent labellings is the mean bad degree
 `𝔼[q]`, and `q ≤ φ_α(q)` gives `𝔼[q] ≤ Φ_h`. The `α = 5/2` instances close the file.
 -/
-import GraphMatching.Tree
-import GraphMatching.Contraction
+public import GraphMatching.Tree
+public import GraphMatching.Contraction
+
+@[expose] public section
 
 namespace GraphMatching
 

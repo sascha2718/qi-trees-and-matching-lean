@@ -1,3 +1,5 @@
+module
+
 /-
 The Markov label models of `arbitrary_offspring_matching.tex` (`sec:markov-proof`):
 a countable state space `V` with a compatibility relation `R`, a distinguished
@@ -28,10 +30,12 @@ König/trajectory endpoints.
 The one-site quantities are in `Constants.lean`; the restricted potentials, the
 zero events, the phases, the paths and the selections in `Paths.lean`.
 -/
-import GraphMarkovMatching.Potential.Restricted
-import GraphMarkovMatching.Process.Recursion
-import GraphMarkovMatching.Potential.Degrees
-import GraphMarkovMatching.Process.Consistency
+public import GraphMarkovMatching.Potential.Restricted
+public import GraphMarkovMatching.Process.Recursion
+public import GraphMarkovMatching.Potential.Degrees
+public import GraphMarkovMatching.Process.Consistency
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

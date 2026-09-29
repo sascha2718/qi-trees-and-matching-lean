@@ -1,12 +1,16 @@
-import ChainClasses.General.GeneralAssembly
-import ChainClasses.General.GeneralShrink
-import ChainClasses.General.GeneralDecomposition
-import ChainClasses.General.GeneralShapeTail
-import ChainClasses.General.GeneralBushPoint
-import ChainClasses.Bushy.AssemblyRelabel
-import ChainClasses.Bushy.ShapeDecomposition
-import ChainClasses.General.GeneralCascade
-import ChainClasses.Universality.BushyCross
+module
+
+public import ChainClasses.General.GeneralAssembly
+public import ChainClasses.General.GeneralShrink
+public import ChainClasses.General.GeneralDecomposition
+public import ChainClasses.General.GeneralShapeTail
+public import ChainClasses.General.GeneralBushPoint
+public import ChainClasses.Bushy.AssemblyRelabel
+public import ChainClasses.Bushy.ShapeDecomposition
+public import ChainClasses.General.GeneralCascade
+public import ChainClasses.Universality.BushyCross
+
+@[expose] public section
 
 /-!
 `thm:hairy-general` of `trichotomy.tex`, the deterministic geometry, first part: binary

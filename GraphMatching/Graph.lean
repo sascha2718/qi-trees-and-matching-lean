@@ -1,3 +1,5 @@
+module
+
 /-
 `sec:graph` of `graph_matching_selfcontained.tex`: the graph specialisation.
 The compatibility rule (`eq:compat`) `v ~ w ⟺ d_G(v,w) ≤ 1` is, for a simple
@@ -16,8 +18,10 @@ is exactly `Φ_0 = Φ(compat, μ)` (`etaG_eq_Phi`). `thm:matching` is then `thm:
 read off through this identity (`graph_leaf_matching_bound`,
 `graph_full_matching_bound`).
 -/
-import GraphMatching.Reduction
-import Mathlib.Combinatorics.SimpleGraph.Basic
+public import GraphMatching.Reduction
+public import Mathlib.Combinatorics.SimpleGraph.Basic
+
+@[expose] public section
 
 namespace GraphMatching
 

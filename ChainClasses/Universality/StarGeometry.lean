@@ -1,4 +1,8 @@
-import ChainClasses.Universality.GeneralObstructions
+module
+
+public import ChainClasses.Universality.GeneralObstructions
+
+@[expose] public section
 
 /-!
 The geometry behind `thm:chain-separation` (`prelims.tex`): prefix and wedge helpers, the

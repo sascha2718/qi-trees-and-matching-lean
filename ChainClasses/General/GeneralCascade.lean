@@ -1,6 +1,10 @@
-import Mathlib.Tactic
-import ChainClasses.Chain.WordGraph
-import BranchingProcess.Word
+module
+
+public import Mathlib.Tactic
+public import ChainClasses.Chain.WordGraph
+public import BranchingProcess.Word
+
+@[expose] public section
 
 /-!
 `thm:bushy` (the coding in its proof) of `matching_classes_general.tex`: the cascade

@@ -1,3 +1,5 @@
+module
+
 /-
 `thm:harris`\labelcref{it:harris-bushes} of `matching_classes_simple.tex` in its joint
 form: the surviving and the dying subtrees of one root at once.
@@ -25,7 +27,9 @@ survivors, as `rankOf` does, the dying ones by their letter.
   `thm:shape-iid` are built from; the surviving child can be any of the `j` letters,
   which is the factor `j` in the weight `θ_j j q^{j-1}`.
 -/
-import BranchingProcess.Skeleton
+public import BranchingProcess.Skeleton
+
+@[expose] public section
 
 namespace BranchingProcess
 

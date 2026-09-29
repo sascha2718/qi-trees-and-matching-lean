@@ -1,3 +1,5 @@
+module
+
 /-
 The weight `φ_α` of `graph_matching_selfcontained.tex`, `eq:alpha`, together with the
 elementary facts the rest of the development needs:
@@ -15,9 +17,11 @@ The `rpow` at exponent `5/2` is the main obstacle to automation in this file.
 `rpow_alpha_eq_sqrt_pow` is the bridge that turns `φ` into a rational function of
 `s`, which is what makes `Maxima.lean` tractable.
 -/
-import Mathlib.Analysis.SpecialFunctions.Pow.Real
-import Mathlib.Analysis.Convex.SpecificFunctions.Basic
-import Mathlib.Tactic
+public import Mathlib.Analysis.SpecialFunctions.Pow.Real
+public import Mathlib.Analysis.Convex.SpecificFunctions.Basic
+public import Mathlib.Tactic
+
+@[expose] public section
 
 namespace GraphMatching
 

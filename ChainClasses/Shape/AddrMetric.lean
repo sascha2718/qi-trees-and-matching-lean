@@ -1,5 +1,9 @@
-import Mathlib.Tactic
-import ChainClasses.Shape.ContractAddr
+module
+
+public import Mathlib.Tactic
+public import ChainClasses.Shape.ContractAddr
+
+@[expose] public section
 
 /-!
 The address layer of `sec:general-relabel` of `matching_classes_general.tex`: the

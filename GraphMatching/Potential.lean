@@ -1,3 +1,5 @@
+module
+
 /-
 `sec:contraction` of `graph_matching_selfcontained.tex`: the countable probability
 space `(X, μ)` with a symmetric reflexive relation `R`, the bad and good
@@ -12,9 +14,11 @@ Design:
   unconditionally summable, which is what the paper gets from Fubini's theorem.
 * `Φ` lands in `ℝ≥0∞` since the paper explicitly allows `Φ = ∞`.
 -/
-import GraphMatching.Phi
-import Mathlib.Probability.ProbabilityMassFunction.Basic
-import Mathlib.Topology.Algebra.InfiniteSum.ENNReal
+public import GraphMatching.Phi
+public import Mathlib.Probability.ProbabilityMassFunction.Basic
+public import Mathlib.Topology.Algebra.InfiniteSum.ENNReal
+
+@[expose] public section
 
 namespace GraphMatching
 

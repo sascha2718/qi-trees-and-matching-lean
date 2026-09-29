@@ -1,4 +1,8 @@
-import ChainClasses.Universality.ChainSeparationProof
+module
+
+public import ChainClasses.Universality.ChainSeparationProof
+
+@[expose] public section
 
 /-!
 # Complete classification for conditioned infinite Galton--Watson trees

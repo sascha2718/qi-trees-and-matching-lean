@@ -1,4 +1,8 @@
-import ChainClasses.Chain.Transfer
+module
+
+public import ChainClasses.Chain.Transfer
+
+@[expose] public section
 
 /-!
 `thm:transfer` of `matching_classes_simple.tex` at a real constant: multiplicative

@@ -1,5 +1,9 @@
-import ChainClasses.Bushy.ShapeLaw
-import BranchingProcess.Decorated
+module
+
+public import ChainClasses.Bushy.ShapeLaw
+public import BranchingProcess.Decorated
+
+@[expose] public section
 
 /-!
 `sec:shape-harris` of `matching_classes_simple.tex`: the law of the shape at the root,

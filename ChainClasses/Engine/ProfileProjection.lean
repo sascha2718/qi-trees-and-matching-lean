@@ -1,5 +1,9 @@
-import ChainClasses.Engine.ProfileLaw
-import GraphMarkovMatching.Stopped.PresentationLaws
+module
+
+public import ChainClasses.Engine.ProfileLaw
+public import GraphMarkovMatching.Stopped.PresentationLaws
+
+@[expose] public section
 
 /-! Forgetting the auxiliary arity information identifies the profile encoding with the
 state law of the common-profile Markov model. -/

@@ -1,6 +1,10 @@
-import ChainClasses.Chain.ThreeRays
-import ChainClasses.Bushy.ShapeLabelLaw
-import ChainClasses.Bushy.ShapeEtaSelf
+module
+
+public import ChainClasses.Chain.ThreeRays
+public import ChainClasses.Bushy.ShapeLabelLaw
+public import ChainClasses.Bushy.ShapeEtaSelf
+
+@[expose] public section
 
 /-!
 `thm:regime-obstructions` (`it:obstr-bushes`) of `gw_classes_simple.tex`:

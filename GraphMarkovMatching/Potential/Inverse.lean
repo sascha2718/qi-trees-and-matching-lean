@@ -1,7 +1,11 @@
+module
+
 /-
 Inverse powers of good degrees and their elementary potential bounds.
 -/
-import GraphMarkovMatching.Potential.Directed
+public import GraphMarkovMatching.Potential.Directed
+
+@[expose] public section
 
 namespace GraphMarkovMatching
 

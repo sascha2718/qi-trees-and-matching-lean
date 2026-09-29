@@ -1,6 +1,10 @@
-import BranchingProcess.Progeny
-import ChainClasses.Scalar.ShapeEta
-import ChainClasses.Bushy.ShapeMassPoint
+module
+
+public import BranchingProcess.Progeny
+public import ChainClasses.Scalar.ShapeEta
+public import ChainClasses.Bushy.ShapeMassPoint
+
+@[expose] public section
 
 /-!
 `sec:shape-harris` of `matching_classes_simple.tex`: the two inputs `thm:shape-mass` takes

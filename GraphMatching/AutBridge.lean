@@ -1,3 +1,5 @@
+module
+
 /-
 The bridge of design decision D4 (`graph_matching_selfcontained.tex`, `sec:setup`): the
 swap group `Aut h` is the automorphism group of the rooted binary tree as a graph.
@@ -28,8 +30,10 @@ is one root-fixing automorphism of the infinite tree.
 * `exists_infinite_tree_matching_graphAut`: the infinite-tree case of `thm:matching` with
   the conclusion quantified over graph automorphisms of the infinite tree.
 -/
-import GraphMatching.Kolmogorov
-import Mathlib.Combinatorics.SimpleGraph.Maps
+public import GraphMatching.Kolmogorov
+public import Mathlib.Combinatorics.SimpleGraph.Maps
+
+@[expose] public section
 
 namespace GraphMatching
 

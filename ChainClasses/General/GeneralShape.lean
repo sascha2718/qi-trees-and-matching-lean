@@ -1,5 +1,9 @@
-import Mathlib.Tactic
-import ChainClasses.Shape.Dilution
+module
+
+public import Mathlib.Tactic
+public import ChainClasses.Shape.Dilution
+
+@[expose] public section
 
 /-!
 `sec:general-shapes` of `matching_classes_general.tex`: `def:shape-general`,

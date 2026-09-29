@@ -1,3 +1,5 @@
+module
+
 /-
 `sec:gw-trees` of `prelims.tex` and `thm:shape-mass` of `matching_classes_simple.tex`:
 a finite sample, the probability that the tree is exactly a prescribed one, and the
@@ -45,7 +47,10 @@ exponential moment: the truncations of the sample satisfy the progeny recursion
 The alphabet has to be wide enough to carry the law, so `J ≤ N` runs through the
 statements about the moment as it does in `Law`.
 -/
-import BranchingProcess.Skeleton
+public import BranchingProcess.Skeleton
+import Mathlib.Probability.Independence.Integration
+
+@[expose] public section
 
 namespace BranchingProcess
 

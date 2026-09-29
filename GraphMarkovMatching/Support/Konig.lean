@@ -1,3 +1,5 @@
+module
+
 /-
 The infinite-tree König step for `G_k`. A restricted automorphism of `𝔹_{n+1}` restricts to one
 of `𝔹_n` at the same phase (`restrictAutK`), and restriction preserves matching
@@ -7,8 +9,10 @@ infinite, finitely-branching tree; Kőnig's infinity lemma
 (`exists_seq_forall_proj_of_forall_finite`) provides a compatible branch
 `(σ_n)`, whose common extension matches every vertex of the infinite tree.
 -/
-import GraphMarkovMatching.Support.Tree
-import Mathlib.Order.KonigLemma
+public import GraphMarkovMatching.Support.Tree
+public import Mathlib.Order.KonigLemma
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Support
 

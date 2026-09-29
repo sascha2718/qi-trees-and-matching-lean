@@ -1,10 +1,14 @@
-import ChainClasses.Chain.Quantise
-import Mathlib.Tactic
-import Mathlib.Analysis.SpecialFunctions.Log.Base
-import Mathlib.MeasureTheory.Measure.Prod
-import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
-import Mathlib.MeasureTheory.Integral.Lebesgue.Countable
-import Mathlib.MeasureTheory.Constructions.BorelSpace.Order
+module
+
+public import ChainClasses.Chain.Quantise
+public import Mathlib.Tactic
+public import Mathlib.Analysis.SpecialFunctions.Log.Base
+public import Mathlib.MeasureTheory.Measure.Prod
+public import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
+public import Mathlib.MeasureTheory.Integral.Lebesgue.Countable
+public import Mathlib.MeasureTheory.Constructions.BorelSpace.Order
+
+@[expose] public section
 
 /-!
 `thm:chain-coupling` of `matching_classes_simple.tex`: `thm:chain-coupling`,

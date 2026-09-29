@@ -1,7 +1,11 @@
+module
+
 /-
 Directed potentials restricted to positive degree, their inverse moments and overlap identities.
 -/
-import GraphMarkovMatching.Support.Pairing
+public import GraphMarkovMatching.Support.Pairing
+
+@[expose] public section
 
 namespace GraphMarkovMatching
 

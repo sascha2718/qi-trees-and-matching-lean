@@ -1,3 +1,5 @@
+module
+
 /-
 The unweighted stopped expansion of `arbitrary_offspring_matching.tex`
 (`sec:unweighted`, `thm:explicit-zero-bound`).
@@ -17,7 +19,9 @@ equal-phase pairs otherwise. The pairwise bounds below give the corresponding un
   `δ_{1,h} ≤ S_H δ + S_H T² (max_{j<h} δ_{1,j})²`;
 * `z_le_fixed`: any `Z` with `S_H (δ + T² Z²) ≤ Z` bounds every equal-phase `Model.z s t h`.
 -/
-import GraphMarkovMatching.Stopped.Moments
+public import GraphMarkovMatching.Stopped.Moments
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

@@ -1,5 +1,9 @@
-import ChainClasses.Engine.ReducedProfiles
-import Mathlib.Algebra.Group.Submonoid.Membership
+module
+
+public import ChainClasses.Engine.ReducedProfiles
+public import Mathlib.Algebra.Group.Submonoid.Membership
+
+@[expose] public section
 
 /-! Two explicit chain offspring laws with the same unary mass and distinct reduced
 branching semigroups. -/

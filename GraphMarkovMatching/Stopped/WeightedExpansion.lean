@@ -1,3 +1,5 @@
+module
+
 /-
 The weighted stopped expansion of `arbitrary_offspring_matching.tex`
 (`sec:weighted-mass`, `thm:explicit-weighted-bound`): one inverse-degree weight `W_{u,h}` is
@@ -13,7 +15,9 @@ carried through the stopped expansion of an impossible comparison.
   every equal-phase weighted zero integral at height `h` is at most `E(M)` of
   `eq:explicit-weighted-error`, given the potentials at heights below `h`.
 -/
-import GraphMarkovMatching.Stopped.ZeroExpansion
+public import GraphMarkovMatching.Stopped.ZeroExpansion
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

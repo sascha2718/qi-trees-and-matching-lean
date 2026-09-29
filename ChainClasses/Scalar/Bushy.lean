@@ -1,5 +1,9 @@
-import Mathlib.Tactic
-import ChainClasses.Scalar.MarkedQI
+module
+
+public import Mathlib.Tactic
+public import ChainClasses.Scalar.MarkedQI
+
+@[expose] public section
 
 /-!
 `sec:shape-coupling` and the proposition labelled `thm:hairy` in

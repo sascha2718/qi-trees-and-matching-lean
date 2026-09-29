@@ -1,7 +1,9 @@
-import ChainClasses.Classification.Simple
-import ChainClasses.Classification.Complete
-import ChainClasses.Classification.Finite
-import ChainClasses.Classification.Embedding
+module
+
+public import ChainClasses.Classification.Simple
+public import ChainClasses.Classification.Complete
+public import ChainClasses.Classification.Finite
+public import ChainClasses.Classification.Embedding
 
 /-!
 # Public quasi-isometry classification API

@@ -1,7 +1,11 @@
+module
+
 /-
 Monotonicity in the potential exponent and admissible scalar parameters at larger exponents.
 -/
-import GraphMarkovMatching.Stopped.Consequences
+public import GraphMarkovMatching.Stopped.Consequences
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

@@ -1,7 +1,11 @@
+module
+
 /-
 Good degrees under pure laws, maps and mixtures, and independent product laws.
 -/
-import GraphMarkovMatching.Potential.Directed
+public import GraphMarkovMatching.Potential.Directed
+
+@[expose] public section
 
 namespace GraphMarkovMatching
 

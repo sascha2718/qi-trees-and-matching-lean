@@ -1,6 +1,10 @@
-import ChainClasses.Engine.SkeletonPatterns
-import ChainClasses.Engine.ProfileMatching
-import ChainClasses.Chain.Eta
+module
+
+public import ChainClasses.Engine.SkeletonPatterns
+public import ChainClasses.Engine.ProfileMatching
+public import ChainClasses.Chain.Eta
+
+@[expose] public section
 
 /-! Quantised geometric labels for a fixed pair of original arity laws. All profile
 data and the core probabilities are fixed before the geometric scale is chosen. -/

@@ -1,5 +1,9 @@
-import Mathlib.Tactic
-import ChainClasses.General.GeneralShape
+module
+
+public import Mathlib.Tactic
+public import ChainClasses.General.GeneralShape
+
+@[expose] public section
 
 /-!
 `sec:general-relabel` of `matching_classes_general.tex`,

@@ -1,4 +1,8 @@
-import Solution.Infrastructure
+module
+
+public import Solution.Infrastructure
+
+@[expose] public section
 
 /-! Transports between the `Fin 2` vertex addresses in the challenge and the Boolean
 addresses used by the matching and two-value libraries. -/

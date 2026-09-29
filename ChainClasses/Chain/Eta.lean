@@ -1,5 +1,9 @@
-import GraphMatching.DoubleExp
-import ChainClasses.Chain.Quantise
+module
+
+public import GraphMatching.DoubleExp
+public import ChainClasses.Chain.Quantise
+
+@[expose] public section
 
 /-!
 `thm:eta-bound` of `gw_classes_simple.tex`: the potential of the

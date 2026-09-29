@@ -1,3 +1,5 @@
+module
+
 /-
 `sec:reduction` of `graph_matching_selfcontained.tex`, the infinite-tree / measure step.
 Two independent infinite labelled trees carry, at each finite level `h`, the pair
@@ -15,13 +17,15 @@ i.i.d. failure probability). Both hold for the standard Kolmogorov / product
 measure on the infinite tree; `hfail` is exactly the statement that the level-`h`
 projections are two independent `fullMu`-labellings.
 -/
-import GraphMatching.Konig
-import GraphMatching.Reduction
-import Mathlib.Algebra.Order.Module.Field
-import Mathlib.Data.EReal.Inv
-import Mathlib.Tactic.Measurability
-import Mathlib.MeasureTheory.Measure.Typeclasses.Probability
-import Mathlib.Probability.ProbabilityMassFunction.Constructions
+public import GraphMatching.Konig
+public import GraphMatching.Reduction
+public import Mathlib.Algebra.Order.Module.Field
+public import Mathlib.Data.EReal.Inv
+public import Mathlib.Tactic.Measurability
+public import Mathlib.MeasureTheory.Measure.Typeclasses.Probability
+public import Mathlib.Probability.ProbabilityMassFunction.Constructions
+
+@[expose] public section
 
 namespace GraphMatching
 

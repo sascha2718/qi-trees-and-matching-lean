@@ -1,6 +1,10 @@
-import ChainClasses.Universality.StarSeparation
-import ChainClasses.Universality.GeneralTrichotomy
-import Mathlib.Probability.Independence.ZeroOne
+module
+
+public import ChainClasses.Universality.StarSeparation
+public import ChainClasses.Universality.GeneralTrichotomy
+public import Mathlib.Probability.Independence.ZeroOne
+
+@[expose] public section
 
 /-!
 The probabilistic layer of `thm:chain-separation` (`prelims.tex`) and the discharge of

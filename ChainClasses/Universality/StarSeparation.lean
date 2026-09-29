@@ -1,4 +1,8 @@
-import ChainClasses.Universality.StarGeometry
+module
+
+public import ChainClasses.Universality.StarGeometry
+
+@[expose] public section
 
 /-!
 The deterministic core of `thm:chain-separation` (`prelims.tex`): a sample carrying an

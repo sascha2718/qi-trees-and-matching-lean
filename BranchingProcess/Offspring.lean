@@ -1,3 +1,5 @@
+module
+
 /-
 `sec:gw-trees` of `prelims.tex`: the offspring layer of a Galton-Watson
 branching process.  An offspring law with support in `{0,…,J}`, bundled with
@@ -23,13 +25,15 @@ as the least fixed point of the generating function in `[0,1]`.
   positive probability, the hypothesis carried by every offspring law of
   `thm:trichotomy`.
 -/
-import Mathlib.Tactic
-import Mathlib.Algebra.Ring.GeomSum
-import Mathlib.Analysis.Calculus.Deriv.Add
-import Mathlib.Analysis.Calculus.Deriv.Mul
-import Mathlib.Analysis.Calculus.Deriv.Pow
-import Mathlib.Topology.Order.IntermediateValue
-import Mathlib.Topology.Order.Monotone
+public import Mathlib.Tactic
+public import Mathlib.Algebra.Ring.GeomSum
+public import Mathlib.Analysis.Calculus.Deriv.Add
+public import Mathlib.Analysis.Calculus.Deriv.Mul
+public import Mathlib.Analysis.Calculus.Deriv.Pow
+public import Mathlib.Topology.Order.IntermediateValue
+public import Mathlib.Topology.Order.Monotone
+
+@[expose] public section
 
 namespace BranchingProcess
 

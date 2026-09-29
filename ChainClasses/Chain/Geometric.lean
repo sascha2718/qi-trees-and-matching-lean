@@ -1,8 +1,12 @@
-import ChainClasses.Chain.Encoding
-import ChainClasses.Chain.Quantise
-import Mathlib.Tactic
-import Mathlib.Probability.Independence.Basic
-import Mathlib.Analysis.SpecificLimits.Basic
+module
+
+public import ChainClasses.Chain.Encoding
+public import ChainClasses.Chain.Quantise
+public import Mathlib.Tactic
+public import Mathlib.Probability.Independence.Basic
+public import Mathlib.Analysis.SpecificLimits.Basic
+
+@[expose] public section
 
 /-!
 Lemma 9.2 of `matching_classes_simple.tex`, the probabilistic layer of the

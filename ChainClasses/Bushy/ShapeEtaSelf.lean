@@ -1,7 +1,11 @@
-import ChainClasses.Bushy.ShapeEtaBlock
-import ChainClasses.Bushy.ShapeSizeTail
-import ChainClasses.Bushy.ShapeCouplingSelf
-import ChainClasses.Shape.Binarise
+module
+
+public import ChainClasses.Bushy.ShapeEtaBlock
+public import ChainClasses.Bushy.ShapeSizeTail
+public import ChainClasses.Bushy.ShapeCouplingSelf
+public import ChainClasses.Shape.Binarise
+
+@[expose] public section
 
 /-!
 `sec:shape-eta` and `thm:hairy` of `gw_classes_simple.tex`: the potential

@@ -1,3 +1,5 @@
+module
+
 /-
 The i.i.d. product measure on the infinite tree (the Kolmogorov construction of
 `sec:reduction`). Rather than an abstract Kolmogorov extension, this uses Mathlib's
@@ -16,8 +18,10 @@ consistent under restriction, jointly measurable, and carry the pair law
 `fullMu μ h × fullMu μ h` at every height, and `P(some automorphism matches
 every vertex) ≥ 1 - 16Φ₀`.
 -/
-import GraphMatching.Measure
-import Mathlib.Probability.ProductMeasure
+public import GraphMatching.Measure
+public import Mathlib.Probability.ProductMeasure
+
+@[expose] public section
 
 namespace GraphMatching
 open scoped ENNReal Classical

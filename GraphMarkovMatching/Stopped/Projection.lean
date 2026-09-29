@@ -1,7 +1,11 @@
+module
+
 /-
 State projections of typed tree labellings and elementary probability-law transports.
 -/
-import GraphMarkovMatching.Stopped.Model
+public import GraphMarkovMatching.Stopped.Model
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

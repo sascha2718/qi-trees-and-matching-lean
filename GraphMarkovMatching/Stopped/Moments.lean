@@ -1,3 +1,5 @@
+module
+
 /-
 The moment estimates of `arbitrary_offspring_matching.tex`, `sec:restricted-potential`,
 `sec:positive-degrees`, and the root contributions of `sec:independent-root`:
@@ -14,7 +16,9 @@ The moment estimates of `arbitrary_offspring_matching.tex`, `sec:restricted-pote
   when `δ = 0`;
 * `root_incompatible_le`, `root_compatible_le`: the averaged root factors `f` and `R_μ`.
 -/
-import GraphMarkovMatching.Stopped.Paths
+public import GraphMarkovMatching.Stopped.Paths
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

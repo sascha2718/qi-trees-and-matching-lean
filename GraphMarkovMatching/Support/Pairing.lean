@@ -1,9 +1,13 @@
+module
+
 /-
 Good and bad degrees for the two possible pairings of two independent coordinates.
 -/
-import GraphMarkovMatching.Potential.Degrees
-import GraphMarkovMatching.Potential.Inverse
-import GraphMarkovMatching.Support.Contraction
+public import GraphMarkovMatching.Potential.Degrees
+public import GraphMarkovMatching.Potential.Inverse
+public import GraphMarkovMatching.Support.Contraction
+
+@[expose] public section
 
 namespace GraphMarkovMatching
 

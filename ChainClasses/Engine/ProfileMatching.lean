@@ -1,6 +1,10 @@
-import ChainClasses.Engine.ProfileProjection
-import GraphMarkovMatching.Stopped.Application
-import GraphMarkovMatching.Stopped.Transfer
+module
+
+public import ChainClasses.Engine.ProfileProjection
+public import GraphMarkovMatching.Stopped.Application
+public import GraphMarkovMatching.Stopped.Transfer
+
+@[expose] public section
 
 /-! The common-profile matching theorem on the original geometric probability space. -/
 

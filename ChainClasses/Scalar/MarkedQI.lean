@@ -1,4 +1,8 @@
-import Mathlib.Tactic
+module
+
+public import Mathlib.Tactic
+
+@[expose] public section
 
 /-!
 `sec:shape-net` of `matching_classes_simple.tex`: the abstract content of

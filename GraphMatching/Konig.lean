@@ -1,3 +1,5 @@
+module
+
 /-
 `sec:reduction` of `graph_matching_selfcontained.tex`, the infinite-tree / König step.
 An automorphism of `𝔹_{h+1}` restricts to one of `𝔹_h` (`restrictAut`), and this
@@ -11,8 +13,10 @@ compatible branch `(σ_h)`, whose common extension matches every vertex.
 (the `⊇` direction). The measure-theoretic `P(M) = lim P(𝓜_h)` (continuity from
 above) is the remaining, standard, step.
 -/
-import GraphMatching.Tree
-import Mathlib.Order.KonigLemma
+public import GraphMatching.Tree
+public import Mathlib.Order.KonigLemma
+
+@[expose] public section
 
 namespace GraphMatching
 

@@ -1,4 +1,8 @@
-import ChainClasses.Bushy.ShapeRootLaw
+module
+
+public import ChainClasses.Bushy.ShapeRootLaw
+
+@[expose] public section
 
 /-!
 `sec:shape-harris` of `matching_classes_simple.tex`: the shape at the root jointly with

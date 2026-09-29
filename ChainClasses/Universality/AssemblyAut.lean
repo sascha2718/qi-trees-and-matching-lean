@@ -1,4 +1,8 @@
-import ChainClasses.Universality.CascadeEncoding
+module
+
+public import ChainClasses.Universality.CascadeEncoding
+
+@[expose] public section
 
 /-!
 `thm:hairy-general`, the deterministic geometry, second part: relabelling an assembly along

@@ -1,9 +1,13 @@
+module
+
 /-
 Finite-height continuity of arbitrary binary Markov tree laws under changes of their
 root and child-pair laws. These estimates also apply at a parameter boundary where a
 common-core presentation ceases to satisfy its positive-mass assumptions.
 -/
-import GraphMarkovMatching.Stopped.Unbounded
+public import GraphMarkovMatching.Stopped.Unbounded
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

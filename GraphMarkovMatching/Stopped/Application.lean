@@ -1,3 +1,5 @@
+module
+
 /-
 The application of `thm:markov-matching` to two product laws with a common core
 (`markov_matching_applications.tex`, `sec:common-presentations`,
@@ -25,9 +27,11 @@ The application of `thm:markov-matching` to two product laws with a common core
 * `Presentation.exists_floor`, `presentation_matching_auto`, `two_laws_matching`: the floor
   is automatically positive for a fixed pair of laws, and the headline "In particular".
 -/
-import GraphMarkovMatching.Stopped.Main
-import GraphMarkovMatching.Stopped.Returns
-import GraphMarkovMatching.Stopped.Semigroup
+public import GraphMarkovMatching.Stopped.Main
+public import GraphMarkovMatching.Stopped.Returns
+public import GraphMarkovMatching.Stopped.Semigroup
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

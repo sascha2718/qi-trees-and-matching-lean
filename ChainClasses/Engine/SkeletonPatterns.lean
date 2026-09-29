@@ -1,7 +1,11 @@
-import ChainClasses.Engine.ReducedProfiles
-import ChainClasses.General.GeneralLabelField
-import ChainClasses.General.GeneralShapeEta
-import GraphMarkovMatching.Stopped.Exponent
+module
+
+public import ChainClasses.Engine.ReducedProfiles
+public import ChainClasses.General.GeneralLabelField
+public import ChainClasses.General.GeneralShapeEta
+public import GraphMarkovMatching.Stopped.Exponent
+
+@[expose] public section
 
 /-! Product laws and almost-sure support on the original reduced skeleton. -/
 

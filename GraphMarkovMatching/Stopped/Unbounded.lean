@@ -1,3 +1,5 @@
+module
+
 /-
 Finite-height stability under truncation: two Markov models over the same states with the
 same fresh types whose kernels are within
@@ -28,8 +30,10 @@ type which is nonincreasing along charged transitions (hereditary), and the conc
 carries `d s + d t` for the initial types `s`, `t`. For a presentation `d` is the tail mass of
 the type's side, which the kernel preserves, so `d (freshL σ) = t_σ(N)`.
 -/
-import GraphMarkovMatching.Stopped.Presentation
-import GraphMarkovMatching.Stopped.Semigroup
+public import GraphMarkovMatching.Stopped.Presentation
+public import GraphMarkovMatching.Stopped.Semigroup
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

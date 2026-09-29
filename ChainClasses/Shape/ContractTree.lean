@@ -1,5 +1,9 @@
-import Mathlib.Tactic
-import ChainClasses.Shape.Contraction
+module
+
+public import Mathlib.Tactic
+public import ChainClasses.Shape.Contraction
+
+@[expose] public section
 
 /-!
 `thm:dilution`, the contraction as a concrete tree: the parts of the greedy cut

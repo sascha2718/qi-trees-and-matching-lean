@@ -1,3 +1,5 @@
+module
+
 /-
 The headline theorem of `arbitrary_offspring_matching.tex`: Theorem 6.1 assembled
 from the height induction (`Induction.lean`), the König step (`Infinite.lean`) and the
@@ -21,9 +23,11 @@ and the explicit constants are in the proof of Proposition 21.1 in
 * `markov_matching_of_lambda`, `markov_matching_zero_of_lambda`: Theorem 6.1 as
   stated, in terms of the exponent condition alone.
 -/
-import GraphMarkovMatching.Stopped.Induction
-import GraphMarkovMatching.Stopped.Infinite
-import GraphMarkovMatching.Stopped.Threshold
+public import GraphMarkovMatching.Stopped.Induction
+public import GraphMarkovMatching.Stopped.Infinite
+public import GraphMarkovMatching.Stopped.Threshold
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 
@@ -135,20 +139,21 @@ private lemma betaMin_spec {α : ℝ} (hα : 1 ≤ α) :
 minimising `β`, `u = 1/2`, `L = L_α(β)`, `K = K_α(β)`, `L0 = L_α`). -/
 noncomputable def ofLambda {α : ℝ} (hα : 1 ≤ α) (h : lambda α < 1) : Params where
   α := α
-  β := betaMin hα
+  β := private betaMin hα
   u := 1 / 2
-  L := Lfun α (betaMin hα)
-  K := Kfun α (betaMin hα)
+  L := private Lfun α (betaMin hα)
+  K := private Kfun α (betaMin hα)
   L0 := Lfun α 0
   hα := hα
-  hβ0 := (betaMin_spec hα).1
-  hβ1 := (betaMin_spec hα).2.1
+  hβ0 := by exact (betaMin_spec hα).1
+  hβ1 := by exact (betaMin_spec hα).2.1
   hu0 := by norm_num
   hu1 := by norm_num
-  hL := fun q hq0 hq1 => le_Lfun (by linarith) (betaMin_spec hα).1 hq0 hq1
-  hK := fun q hq0 hq1 => Kfun_bound hα (betaMin_spec hα).1 (betaMin_spec hα).2.1 hq0 hq1
+  hL := by exact fun q hq0 hq1 => le_Lfun (by linarith) (betaMin_spec hα).1 hq0 hq1
+  hK := by exact fun q hq0 hq1 => Kfun_bound hα (betaMin_spec hα).1 (betaMin_spec hα).2.1 hq0 hq1
   hL0 := fun q hq0 hq1 => le_Lfun (by linarith) le_rfl hq0 hq1
   ha := by
+    change 2 * (Lfun α (betaMin hα) + Kfun α (betaMin hα)) < 1
     have := (betaMin_spec hα).2.2.1
     linarith
 

@@ -1,7 +1,11 @@
-import Mathlib.Tactic
-import ChainClasses.General.GeneralShapeMetric
-import ChainClasses.General.GeneralDilution
-import ChainClasses.Shape.AddrMetric
+module
+
+public import Mathlib.Tactic
+public import ChainClasses.General.GeneralShapeMetric
+public import ChainClasses.General.GeneralDilution
+public import ChainClasses.Shape.AddrMetric
+
+@[expose] public section
 
 /-!
 `thm:general-dilution` of `matching_classes_general.tex`: `thm:dilution` at general

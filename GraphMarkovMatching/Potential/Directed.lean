@@ -1,3 +1,5 @@
+module
+
 /-
 Directed potentials for two probability laws and a compatibility relation.
 Two changes against the `Phi` of the support layer:
@@ -15,8 +17,10 @@ Two changes against the `Phi` of the support layer:
 The `badInd` normal form `q_ν(z) = ∑' y, ν y · 𝟙[z ⋡ y]` makes the bad degree
 linear in the column law, which is how the kernel mixture enters the step.
 -/
-import GraphMarkovMatching.Process.Sim
-import GraphMarkovMatching.Support.Potential
+public import GraphMarkovMatching.Process.Sim
+public import GraphMarkovMatching.Support.Potential
+
+@[expose] public section
 
 namespace GraphMarkovMatching
 

@@ -1,7 +1,11 @@
-import Mathlib.Tactic
-import ChainClasses.Shape.Dilution
-import ChainClasses.Shape.ShapeMetric
-import ChainClasses.Chain.WordGraph
+module
+
+public import Mathlib.Tactic
+public import ChainClasses.Shape.Dilution
+public import ChainClasses.Shape.ShapeMetric
+public import ChainClasses.Chain.WordGraph
+
+@[expose] public section
 
 /-!
 `thm:dilution`, the geometric step: contracting the realisation of a shape

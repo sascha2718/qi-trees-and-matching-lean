@@ -1,3 +1,5 @@
+module
+
 /-
 The matching relation over the full automorphism group: `fullSim R₀ n` is
 matchability of two labellings of `𝔹_n` by some rooted automorphism. The
@@ -10,7 +12,9 @@ is the `k = 1` swap-phase recursion. This file restates the recursion through
 the typed wrappers `leaf`/`branch` (pointwise, as an `Iff`), and proves that
 matching forces root compatibility, the fact behind the kernel-mismatch layer.
 -/
-import GraphMarkovMatching.Process.Basic
+public import GraphMarkovMatching.Process.Basic
+
+@[expose] public section
 
 namespace GraphMarkovMatching
 

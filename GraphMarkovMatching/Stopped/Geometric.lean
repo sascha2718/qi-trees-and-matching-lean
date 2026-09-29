@@ -1,3 +1,5 @@
+module
+
 /-
 The one-site estimates used by the chain and bushy applications: the chain-law calculation
 behind `thm:eta-bound`, the abstract shape-law calculation behind `thm:shape-eta`, and the
@@ -26,10 +28,12 @@ probability-one passage used in `thm:cross-law` and `thm:hairy`.
   `prob_eq_one_of_eventually_le`), with no independence, nesting or coupling between the
   scales.
 -/
-import GraphMarkovMatching.Stopped.Constants
-import Mathlib.Analysis.SpecificLimits.Basic
-import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
-import Mathlib.Analysis.SpecialFunctions.Pow.Continuity
+public import GraphMarkovMatching.Stopped.Constants
+public import Mathlib.Analysis.SpecificLimits.Basic
+public import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
+public import Mathlib.Analysis.SpecialFunctions.Pow.Continuity
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

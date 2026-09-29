@@ -1,3 +1,5 @@
+module
+
 /-
 `thm:transversal` of `graph_matching_selfcontained.tex`: the `2 × 2` transversal.
 
@@ -9,7 +11,9 @@ Indices are `Bool` rather than `Fin 2`: in the application (proof of
 `thm:contraction`) the array is `cell (i,j) good ↔ x i R Y j`, indexed by the two
 `x`'s and the two `Y`'s, and `Bool` keeps the case split cheap for `decide`.
 -/
-import Mathlib.Tactic
+public import Mathlib.Tactic
+
+@[expose] public section
 
 namespace GraphMatching
 

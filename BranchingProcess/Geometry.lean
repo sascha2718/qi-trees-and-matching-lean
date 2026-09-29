@@ -1,3 +1,5 @@
+module
+
 /-
 The coarse geometry of trees behind `thm:bush-separation` and `thm:three-rays`
 of `gw_classes_simple.tex`.  Both propositions are deterministic statements
@@ -33,11 +35,13 @@ about arbitrary infinite trees, and both are proved here over Mathlib's
   for quasi-isometric embeddings and hence for quasi-isometries; the argument
   uses only the two metric inequalities.
 -/
-import Mathlib.Combinatorics.SimpleGraph.Acyclic
-import Mathlib.Combinatorics.SimpleGraph.Metric
-import Mathlib.Combinatorics.SimpleGraph.Ends.Defs
-import Mathlib.Data.Nat.Dist
-import Mathlib.Tactic
+public import Mathlib.Combinatorics.SimpleGraph.Acyclic
+public import Mathlib.Combinatorics.SimpleGraph.Metric
+public import Mathlib.Combinatorics.SimpleGraph.Ends.Defs
+public import Mathlib.Data.Nat.Dist
+public import Mathlib.Tactic
+
+@[expose] public section
 
 namespace BranchingProcess
 

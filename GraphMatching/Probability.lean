@@ -1,5 +1,9 @@
-import GraphMatching.AutBridge
-import Mathlib.Analysis.SpecificLimits.Basic
+module
+
+public import GraphMatching.AutBridge
+public import Mathlib.Analysis.SpecificLimits.Basic
+
+@[expose] public section
 
 /-!
 The exact full-labelling probability recursion and its scalar failure criterion:

@@ -1,6 +1,10 @@
-import Mathlib.Tactic
-import Mathlib.Analysis.SpecificLimits.Basic
-import Mathlib.Analysis.SpecialFunctions.Pow.Real
+module
+
+public import Mathlib.Tactic
+public import Mathlib.Analysis.SpecificLimits.Basic
+public import Mathlib.Analysis.SpecialFunctions.Pow.Real
+
+@[expose] public section
 
 /-!
 `sec:shape-eta` of `gw_classes_simple.tex`: the potential bound

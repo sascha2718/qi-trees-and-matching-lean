@@ -1,6 +1,10 @@
-import Mathlib.Tactic
-import ChainClasses.Shape.ContractTree
-import ChainClasses.Shape.ShapeShrink
+module
+
+public import Mathlib.Tactic
+public import ChainClasses.Shape.ContractTree
+public import ChainClasses.Shape.ShapeShrink
+
+@[expose] public section
 
 /-!
 `thm:shape-shrink` (`it:shape-shrink`) of `gw_classes_simple.tex`: the

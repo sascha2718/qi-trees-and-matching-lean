@@ -1,4 +1,8 @@
-import Mathlib.NumberTheory.FrobeniusNumber
+module
+
+public import Mathlib.NumberTheory.FrobeniusNumber
+
+@[expose] public section
 
 namespace GraphMarkovMatching
 

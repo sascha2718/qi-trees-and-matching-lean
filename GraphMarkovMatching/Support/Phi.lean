@@ -1,3 +1,5 @@
+module
+
 /-
 The weight `φ_α t = t / (1-t)^α` at a *free* exponent `α`, together with the
 elementary facts the support layer needs:
@@ -12,10 +14,12 @@ The exponent is a variable throughout.  The chord is proved from concavity
 of `log` (both endpoint values of `z ↦ log(1+c_α z) + α log(1-z)` on
 `[0,1/2]` vanish), which works for every `α ≥ 0`.
 -/
-import Mathlib.Analysis.SpecialFunctions.Pow.Real
-import Mathlib.Analysis.SpecialFunctions.Log.Basic
-import Mathlib.Analysis.Convex.SpecificFunctions.Basic
-import Mathlib.Tactic
+public import Mathlib.Analysis.SpecialFunctions.Pow.Real
+public import Mathlib.Analysis.SpecialFunctions.Log.Basic
+public import Mathlib.Analysis.Convex.SpecificFunctions.Basic
+public import Mathlib.Tactic
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Support
 

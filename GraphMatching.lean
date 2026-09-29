@@ -1,3 +1,5 @@
+module
+
 /-
 `GraphMatching`: the i.i.d. matching theorem over a countable label graph
 (`graph_matching_selfcontained.tex`), at the exponent `α = 5/2`.
@@ -24,22 +26,22 @@
 * `Probability`  the exact full-labelling probability recursion, moment bounds and
                  scalar failure criterion in `prelims.tex`
 -/
-import GraphMatching.Phi
-import GraphMatching.Maxima
-import GraphMatching.Transversal
-import GraphMatching.Potential
-import GraphMatching.Product
-import GraphMatching.Square
-import GraphMatching.RowBound
-import GraphMatching.Contraction
-import GraphMatching.Transport
-import GraphMatching.Tree
-import GraphMatching.Reduction
-import GraphMatching.Konig
-import GraphMatching.Graph
-import GraphMatching.Examples
-import GraphMatching.DoubleExp
-import GraphMatching.Measure
-import GraphMatching.Kolmogorov
-import GraphMatching.AutBridge
-import GraphMatching.Probability
+public import GraphMatching.Phi
+public import GraphMatching.Maxima
+public import GraphMatching.Transversal
+public import GraphMatching.Potential
+public import GraphMatching.Product
+public import GraphMatching.Square
+public import GraphMatching.RowBound
+public import GraphMatching.Contraction
+public import GraphMatching.Transport
+public import GraphMatching.Tree
+public import GraphMatching.Reduction
+public import GraphMatching.Konig
+public import GraphMatching.Graph
+public import GraphMatching.Examples
+public import GraphMatching.DoubleExp
+public import GraphMatching.Measure
+public import GraphMatching.Kolmogorov
+public import GraphMatching.AutBridge
+public import GraphMatching.Probability

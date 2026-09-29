@@ -1,3 +1,5 @@
+module
+
 /-
 `sec:contraction` of `graph_matching_selfcontained.tex`, the symmetrised square `R^□`
 of `eq:square`, and the setup for the contraction `thm:contraction`.
@@ -15,7 +17,9 @@ This file (M6a) fixes the definitions and the structural facts:
 The degree identities `eq:R-exact`, `eq:Q-union` and the contraction estimate
 itself are M6b-e.
 -/
-import GraphMatching.Product
+public import GraphMatching.Product
+
+@[expose] public section
 
 namespace GraphMatching
 

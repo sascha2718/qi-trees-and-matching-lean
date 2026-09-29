@@ -1,3 +1,5 @@
+module
+
 /-
 Uniform finite-height matching bounds pass to the infinite tree. Restriction makes the
 finite matching events decrease; König's lemma identifies their intersection with the
@@ -8,12 +10,14 @@ The probability space and consistent measurable level projections are arbitrary.
 `Support.Trajectory` constructs such a space from consistent finite laws, while
 `Stopped.Transfer` applies the estimate on a prescribed probability space.
 -/
-import GraphMarkovMatching.Support.Konig
-import Mathlib.Algebra.Order.Module.Field
-import Mathlib.Data.EReal.Inv
-import Mathlib.Tactic.Measurability
-import Mathlib.MeasureTheory.Measure.Typeclasses.Probability
-import Mathlib.Probability.ProbabilityMassFunction.Constructions
+public import GraphMarkovMatching.Support.Konig
+public import Mathlib.Algebra.Order.Module.Field
+public import Mathlib.Data.EReal.Inv
+public import Mathlib.Tactic.Measurability
+public import Mathlib.MeasureTheory.Measure.Typeclasses.Probability
+public import Mathlib.Probability.ProbabilityMassFunction.Constructions
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Support
 

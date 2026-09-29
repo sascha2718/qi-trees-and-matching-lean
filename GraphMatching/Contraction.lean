@@ -1,3 +1,5 @@
+module
+
 /-
 `sec:contraction` of `graph_matching_selfcontained.tex`, the contraction `thm:contraction`
 (eqs `eq:one-step`,`eq:strict`). This assembles the pieces proved in `Square.lean` (the good and
@@ -18,8 +20,10 @@ Built in stages:
   `𝔼[c·W(X₀)W(X₁)] = 𝔼_Y[H(Y)²]`;
 * the combination.
 -/
-import GraphMatching.Square
-import GraphMatching.RowBound
+public import GraphMatching.Square
+public import GraphMatching.RowBound
+
+@[expose] public section
 
 namespace GraphMatching
 

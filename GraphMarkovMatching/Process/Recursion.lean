@@ -1,7 +1,11 @@
+module
+
 /-
 Root factorisation of matching degrees in a Markov tree law.
 -/
-import GraphMarkovMatching.Potential.Degrees
+public import GraphMarkovMatching.Potential.Degrees
+
+@[expose] public section
 
 namespace GraphMarkovMatching
 

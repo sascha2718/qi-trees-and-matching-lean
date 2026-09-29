@@ -1,4 +1,8 @@
-import Mathlib.Tactic
+module
+
+public import Mathlib.Tactic
+
+@[expose] public section
 
 /-!
 `sec:general-shapes` of `matching_classes_general.tex`: the obstruction of

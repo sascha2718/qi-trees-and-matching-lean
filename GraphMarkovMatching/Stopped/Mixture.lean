@@ -1,3 +1,5 @@
+module
+
 /-
 Averaging the transitions in `arbitrary_offspring_matching.tex` (`sec:averaging`):
 the zero-mixture convexity lemma `thm:zero-mixture-convexity`, and the bound `Q(M)` on the
@@ -9,9 +11,11 @@ error).
 The four-law contraction enters as a hypothesis `hfour`, quantified over the process laws
 at height `h`, so that this module does not depend on `FourLaw.lean`.
 -/
-import GraphMarkovMatching.Stopped.Moments
-import GraphMarkovMatching.Stopped.FourLaw
-import GraphMarkovMatching.Potential.Jensen
+public import GraphMarkovMatching.Stopped.Moments
+public import GraphMarkovMatching.Stopped.FourLaw
+public import GraphMarkovMatching.Potential.Jensen
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

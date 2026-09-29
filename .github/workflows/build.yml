@@ -33,6 +33,10 @@ jobs:
           path: project
           persist-credentials: false
 
+      - name: Check Lean module headers
+        working-directory: project
+        run: python3 scripts/check_module_headers.py
+
       # Mathlib arrives through `lake exe cache get`; this caches our own oleans,
       # which are the expensive part of a rebuild.
       - name: Cache the library build output
@@ -75,6 +79,10 @@ jobs:
         with:
           path: project
           persist-credentials: false
+
+      - name: Check Lean module headers
+        working-directory: project
+        run: python3 scripts/check_module_headers.py
 
       # Install Lean only. In particular, do not compile project code or restore
       # a project .lake cache before Comparator sees Solution.lean.

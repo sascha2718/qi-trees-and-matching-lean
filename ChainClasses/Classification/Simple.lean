@@ -1,4 +1,8 @@
-import ChainClasses.Bushy.Trichotomy
+module
+
+public import ChainClasses.Bushy.Trichotomy
+
+@[expose] public section
 
 /-!
 # Classification for offspring supported on `{0,1,2}`

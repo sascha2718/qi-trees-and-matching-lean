@@ -1,5 +1,9 @@
-import ChainClasses.General.GeneralShapeTail
-import GraphMarkovMatching.Stopped.Application
+module
+
+public import ChainClasses.General.GeneralShapeTail
+public import GraphMarkovMatching.Stopped.Application
+
+@[expose] public section
 
 /-!
 The original reduced arity laws and their common binary profiles. The arity laws,

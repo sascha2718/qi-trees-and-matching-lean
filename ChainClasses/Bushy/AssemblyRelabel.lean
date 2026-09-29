@@ -1,5 +1,9 @@
-import ChainClasses.Shape.Assembly
-import ChainClasses.Chain.Isometry
+module
+
+public import ChainClasses.Shape.Assembly
+public import ChainClasses.Chain.Isometry
+
+@[expose] public section
 
 /-!
 `thm:hairy` of `gw_classes_simple.tex`: the deterministic core of

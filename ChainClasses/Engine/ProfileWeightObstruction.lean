@@ -1,12 +1,16 @@
-import ChainClasses.Engine.ProfileMatching
-import ChainClasses.Engine.ProfileAssembly
-import ChainClasses.Engine.ChainWitnesses
-import ChainClasses.Universality.ChainPieces
-import ChainClasses.Regime.DirectChainLabels
-import ChainClasses.Chain.Eta
-import ChainClasses.Universality.ChainGeneral
-import ChainClasses.Universality.ChainSeparationProof
-import GraphMarkovMatching.Stopped.Perturbation
+module
+
+public import ChainClasses.Engine.ProfileMatching
+public import ChainClasses.Engine.ProfileAssembly
+public import ChainClasses.Engine.ChainWitnesses
+public import ChainClasses.Universality.ChainPieces
+public import ChainClasses.Regime.DirectChainLabels
+public import ChainClasses.Chain.Eta
+public import ChainClasses.Universality.ChainGeneral
+public import ChainClasses.Universality.ChainSeparationProof
+public import GraphMarkovMatching.Stopped.Perturbation
+
+@[expose] public section
 
 /-! The common-core weight obstruction: finite-profile laws remain continuous when a
 positive core mass tends to zero, even though the limiting arity supports need not have

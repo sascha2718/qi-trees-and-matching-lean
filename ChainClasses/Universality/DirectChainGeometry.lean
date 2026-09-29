@@ -1,6 +1,10 @@
-import ChainClasses.Engine.ProfileAssembly
-import ChainClasses.Universality.ChainPieces
-import ChainClasses.Regime.DirectChainLabels
+module
+
+public import ChainClasses.Engine.ProfileAssembly
+public import ChainClasses.Universality.ChainPieces
+public import ChainClasses.Regime.DirectChainLabels
+
+@[expose] public section
 
 /-! The original chain pieces are bare necks. Compatible quantised lengths give marked
 comparisons of size proportional to the square of the scale, also at inserted vertices. -/

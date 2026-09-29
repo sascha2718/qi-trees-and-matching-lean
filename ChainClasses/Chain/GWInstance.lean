@@ -1,5 +1,9 @@
-import ChainClasses.Chain.Geometric
-import BranchingProcess.Field
+module
+
+public import ChainClasses.Chain.Geometric
+public import BranchingProcess.Field
+
+@[expose] public section
 
 /-!
 The chain half of Lemma 9.2 of `matching_classes_simple.tex` on a concrete

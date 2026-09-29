@@ -1,3 +1,5 @@
+module
+
 /-
 The four-law contraction of `arbitrary_offspring_matching.tex`
 (`thm:four-law-contraction`): for two source laws
@@ -31,8 +33,10 @@ Organisation of the proof:
   normalisation;
 * `fourLaw_contraction`: the assembly.
 -/
-import GraphMarkovMatching.Stopped.Scalar
-import GraphMarkovMatching.Potential.Restricted
+public import GraphMarkovMatching.Stopped.Scalar
+public import GraphMarkovMatching.Potential.Restricted
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

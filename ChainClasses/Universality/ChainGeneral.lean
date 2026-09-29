@@ -1,6 +1,10 @@
-import ChainClasses.Engine.ChainEngineBridge
-import ChainClasses.Universality.BushyGeneral
-import ChainClasses.Universality.DirectChainGeometry
+module
+
+public import ChainClasses.Engine.ChainEngineBridge
+public import ChainClasses.Universality.BushyGeneral
+public import ChainClasses.Universality.DirectChainGeometry
+
+@[expose] public section
 
 /-! Chain universality from common atomic profiles for the original reduced laws.
 The profiles and their core probabilities are fixed, while quantisation makes the label

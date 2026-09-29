@@ -1,6 +1,10 @@
-import ChainClasses.Chain.GWInstance
-import ChainClasses.Chain.Transfer
-import Mathlib.Probability.BorelCantelli
+module
+
+public import ChainClasses.Chain.GWInstance
+public import ChainClasses.Chain.Transfer
+public import Mathlib.Probability.BorelCantelli
+
+@[expose] public section
 
 /-!
 `thm:bottleneck` and the binary-tree half of `thm:converse` of `prelims.tex`:

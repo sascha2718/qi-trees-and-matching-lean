@@ -1,5 +1,9 @@
-import ChainClasses.Bushy.ShapeLabelLaw
-import ChainClasses.Scalar.ShapeMass
+module
+
+public import ChainClasses.Bushy.ShapeLabelLaw
+public import ChainClasses.Scalar.ShapeMass
+
+@[expose] public section
 
 /-!
 `sec:shape-harris` of `matching_classes_simple.tex`:

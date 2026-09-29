@@ -1,5 +1,9 @@
-import ChainClasses.Scalar.ShapeEta
-import GraphMatching.Graph
+module
+
+public import ChainClasses.Scalar.ShapeEta
+public import GraphMatching.Graph
+
+@[expose] public section
 
 /-!
 `sec:shape-coupling` of `gw_classes_simple.tex`: the potential bound

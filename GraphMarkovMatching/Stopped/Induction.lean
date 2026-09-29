@@ -1,3 +1,5 @@
+module
+
 /-
 The height induction of `arbitrary_offspring_matching.tex` (`sec:completion`): the scalar
 barrier `ζ + A_μ Q(M) ≤ M` of `eq:scalar-barrier-condition` propagates the bound `M` on
@@ -16,9 +18,11 @@ root (`P_succ_le`).
 * `P_le_zero`, `failProb_le_zero`: the zero-compatible alternative, with the failure bound
   `M` for every pair.
 -/
-import GraphMarkovMatching.Stopped.WeightedExpansion
-import GraphMarkovMatching.Stopped.Mixture
-import GraphMarkovMatching.Stopped.Root
+public import GraphMarkovMatching.Stopped.WeightedExpansion
+public import GraphMarkovMatching.Stopped.Mixture
+public import GraphMarkovMatching.Stopped.Root
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

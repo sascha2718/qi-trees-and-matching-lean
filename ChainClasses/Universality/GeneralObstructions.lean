@@ -1,10 +1,14 @@
-import ChainClasses.General.GeneralCascade
-import ChainClasses.General.GeneralShapeIID
-import ChainClasses.General.GeneralNeck
-import ChainClasses.Bushy.Trichotomy
-import BranchingProcess.Geometry
-import BranchingProcess.Harris
-import Mathlib.Data.Set.Finite.List
+module
+
+public import ChainClasses.General.GeneralCascade
+public import ChainClasses.General.GeneralShapeIID
+public import ChainClasses.General.GeneralNeck
+public import ChainClasses.Bushy.Trichotomy
+public import BranchingProcess.Geometry
+public import BranchingProcess.Harris
+public import Mathlib.Data.Set.Finite.List
+
+@[expose] public section
 
 /-!
 `thm:regime-obstructions-general` of `trichotomy.tex`: the regimes of an offspring

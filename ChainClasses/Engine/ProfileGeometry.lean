@@ -1,8 +1,12 @@
-import ChainClasses.Universality.CascadeEncoding
-import ChainClasses.Engine.ProfileMatching
-import ChainClasses.Universality.BAssembly
-import ChainClasses.Universality.GeneralObstructions
-import ChainClasses.General.GeneralShapeEta
+module
+
+public import ChainClasses.Universality.CascadeEncoding
+public import ChainClasses.Engine.ProfileMatching
+public import ChainClasses.Universality.BAssembly
+public import ChainClasses.Universality.GeneralObstructions
+public import ChainClasses.General.GeneralShapeEta
+
+@[expose] public section
 
 /-! The ordered leaf slots and geometric encoding of finite full binary profiles.
 This supplies the deterministic interface in `thm:profile-encoding`. -/

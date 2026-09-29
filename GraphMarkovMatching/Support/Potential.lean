@@ -1,3 +1,5 @@
+module
+
 /-
 The countable probability space `(X, μ)` with a symmetric reflexive relation
 `R`, the bad and good degrees `q` and `r`, and the potential `Φ(R,μ)`.
@@ -11,9 +13,11 @@ Design:
   unconditionally summable by Fubini's theorem.
 * `Φ` lands in `ℝ≥0∞`: the value `Φ = ∞` is meaningful and allowed.
 -/
-import GraphMarkovMatching.Support.Phi
-import Mathlib.Probability.ProbabilityMassFunction.Basic
-import Mathlib.Topology.Algebra.InfiniteSum.ENNReal
+public import GraphMarkovMatching.Support.Phi
+public import Mathlib.Probability.ProbabilityMassFunction.Basic
+public import Mathlib.Topology.Algebra.InfiniteSum.ENNReal
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Support
 

@@ -1,3 +1,5 @@
+module
+
 /-
 The concrete probability space carrying an i.i.d. field of coordinates indexed
 by an arbitrary type. The space is the function type `ι → α`, the measure is the
@@ -16,8 +18,10 @@ library; the offspring and label fields instantiate it.
 * `exists_bernoulli_field`: the packaging theorem, the existence of a probability
   space carrying an independent family of Bernoulli(`t`) coordinates.
 -/
-import Mathlib.Probability.Distributions.Bernoulli
-import Mathlib.Probability.Independence.InfinitePi
+public import Mathlib.Probability.Distributions.Bernoulli
+public import Mathlib.Probability.Independence.InfinitePi
+
+@[expose] public section
 
 namespace BranchingProcess
 

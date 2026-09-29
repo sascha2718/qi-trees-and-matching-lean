@@ -1,4 +1,8 @@
-import ChainClasses.General.GeneralCoupling
+module
+
+public import ChainClasses.General.GeneralCoupling
+
+@[expose] public section
 
 /-!
 `thm:relabel` (`it:relabel-law`) of `matching_classes_general.tex`: the

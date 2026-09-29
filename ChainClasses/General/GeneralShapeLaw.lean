@@ -1,5 +1,9 @@
-import ChainClasses.General.GeneralDecomposition
-import ChainClasses.Bushy.ShapeRootLaw
+module
+
+public import ChainClasses.General.GeneralDecomposition
+public import ChainClasses.Bushy.ShapeRootLaw
+
+@[expose] public section
 
 /-!
 `sec:general-relabel` of `matching_classes_general.tex`: the law of the shape at the

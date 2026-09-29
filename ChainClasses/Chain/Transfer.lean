@@ -1,5 +1,9 @@
-import Mathlib.Tactic
-import ChainClasses.Chain.Labelling
+module
+
+public import Mathlib.Tactic
+public import ChainClasses.Chain.Labelling
+
+@[expose] public section
 
 /-!
 `thm:transfer` of `matching_classes_simple.tex`, the Transfer lemma: multiplicative

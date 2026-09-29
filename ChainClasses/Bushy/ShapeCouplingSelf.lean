@@ -1,5 +1,9 @@
-import ChainClasses.Bushy.ShapeLabelLaw
-import ChainClasses.Shape.ShapeShrink
+module
+
+public import ChainClasses.Bushy.ShapeLabelLaw
+public import ChainClasses.Shape.ShapeShrink
+
+@[expose] public section
 
 /-!
 `sec:shape-coupling` and `thm:hairy` of `gw_classes_simple.tex`: the label

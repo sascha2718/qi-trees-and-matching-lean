@@ -1,8 +1,12 @@
+module
+
 /-
 Balanced counter laws and their finite-tree recursion and consistency.
 -/
-import GraphMarkovMatching.Process.Recursion
-import GraphMarkovMatching.Process.Consistency
+public import GraphMarkovMatching.Process.Recursion
+public import GraphMarkovMatching.Process.Consistency
+
+@[expose] public section
 
 namespace GraphMarkovMatching
 

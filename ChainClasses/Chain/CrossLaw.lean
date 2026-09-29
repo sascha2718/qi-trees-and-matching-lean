@@ -1,6 +1,11 @@
-import ChainClasses.Chain.Coupling
-import ChainClasses.TwoValue
-import ChainClasses.Chain.TransferReal
+module
+
+public import ChainClasses.Chain.Coupling
+public import ChainClasses.TwoValue
+public import ChainClasses.Chain.TransferReal
+import Mathlib.Probability.Independence.Integration
+
+@[expose] public section
 
 /-!
 `thm:cross-law` of `gw_classes_simple.tex`, assembled as in `thm:cross-law`:

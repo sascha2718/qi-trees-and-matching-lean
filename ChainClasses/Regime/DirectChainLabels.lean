@@ -1,7 +1,11 @@
-import ChainClasses.Regime.ChainNeckLaw
-import ChainClasses.Engine.SkeletonPatterns
-import ChainClasses.Regime.UniformField
-import ChainClasses.Chain.Coupling
+module
+
+public import ChainClasses.Regime.ChainNeckLaw
+public import ChainClasses.Engine.SkeletonPatterns
+public import ChainClasses.Regime.UniformField
+public import ChainClasses.Chain.Coupling
+
+@[expose] public section
 
 /-! Quantised labels on the original reduced necks. The arity distribution is the
 original reduced law and is independent of the geometric quantisation scale. -/

@@ -1,3 +1,5 @@
+module
+
 /-
 The trajectory measure behind the infinite-tree matching theorems.
 
@@ -21,8 +23,10 @@ holds at every point and not only almost surely.
 * `trajPairLab`, `trajPairLab_map_consLab`: **two independent samples**: the product of two
   trajectory measures, whose pair of level processes has the product law at every height.
 -/
-import GraphMarkovMatching.Support.Measure
-import Mathlib.Probability.Kernel.IonescuTulcea.Traj
+public import GraphMarkovMatching.Support.Measure
+public import Mathlib.Probability.Kernel.IonescuTulcea.Traj
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Support
 

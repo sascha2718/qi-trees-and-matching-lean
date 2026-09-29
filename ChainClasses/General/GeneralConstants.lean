@@ -1,4 +1,8 @@
-import ChainClasses.Scalar.MarkedQI
+module
+
+public import ChainClasses.Scalar.MarkedQI
+
+@[expose] public section
 
 /-!
 The scalar constants of the general document: the comparability composition of the

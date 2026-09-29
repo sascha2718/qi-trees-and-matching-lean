@@ -1,5 +1,9 @@
-import ChainClasses.Regime.UniformField
-import ChainClasses.General.GeneralShapeCoupling
+module
+
+public import ChainClasses.Regime.UniformField
+public import ChainClasses.General.GeneralShapeCoupling
+
+@[expose] public section
 
 /-!
 `thm:relabel` (`it:relabel-law`), `thm:product-form` of

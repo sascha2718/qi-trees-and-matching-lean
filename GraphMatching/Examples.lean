@@ -1,3 +1,5 @@
+module
+
 /-
 `sec:integer` of `graph_matching_selfcontained.tex`, plus the star example at the end
 of `sec:graph`. The path graph `𝖯` on `ℤ≥0` (`|j-k| ≤ 1`) is a concrete instance of
@@ -9,7 +11,9 @@ vertex `o`, then `η_{G,α}(μ) ≤ ε₀/(1-ε₀)^{5/2}`.
 The double-exponential `thm:double-exp` (a specific law with `η_{𝖯,α} ≤ 4 e^{-D(D-5/2)}`)
 is the remaining numeric piece.
 -/
-import GraphMatching.Graph
+public import GraphMatching.Graph
+
+@[expose] public section
 
 namespace GraphMatching
 

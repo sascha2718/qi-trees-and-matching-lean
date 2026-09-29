@@ -1,6 +1,10 @@
-import Mathlib.Tactic
-import Mathlib.Analysis.SpecialFunctions.Pow.Real
-import ChainClasses.Shape.Shape
+module
+
+public import Mathlib.Tactic
+public import Mathlib.Analysis.SpecialFunctions.Pow.Real
+public import ChainClasses.Shape.Shape
+
+@[expose] public section
 
 /-!
 `sec:shape-net` of `matching_classes_simple.tex`: `thm:dilution`, entropy

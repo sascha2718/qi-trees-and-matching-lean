@@ -1,8 +1,12 @@
+module
+
 /-
 The elementary counter laws used in the preassigned-profile obstruction.
 -/
-import GraphMarkovMatching.Models.Counter
-import Mathlib.Probability.Distributions.Uniform
+public import GraphMarkovMatching.Models.Counter
+public import Mathlib.Probability.Distributions.Uniform
+
+@[expose] public section
 
 namespace GraphMarkovMatching
 

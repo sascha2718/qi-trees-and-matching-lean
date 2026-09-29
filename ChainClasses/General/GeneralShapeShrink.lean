@@ -1,4 +1,8 @@
-import ChainClasses.General.GeneralShapeMetric
+module
+
+public import ChainClasses.General.GeneralShapeMetric
+
+@[expose] public section
 
 /-!
 `sec:general-relabel` of `matching_classes_general.tex`: `thm:shape-connected` at

@@ -1,3 +1,5 @@
+module
+
 /-
 The phases and the return bound of `markov_matching_applications.tex` (`sec:return-times`, "Available
 fresh return times", `thm:bounded-return`) for the Markov model of a common-core
@@ -21,8 +23,10 @@ presentation.
   `returnThreshold_bound`: `thm:bounded-return` with `H = c_Γ + 2ℓ`, the depth-one case
   `H = 2ℓ`, and the explicit return threshold `g (a_0 - 1)(b_0 - 1)`.
 -/
-import GraphMarkovMatching.Stopped.Presentation
-import GraphMarkovMatching.Support.Arithmetic
+public import GraphMarkovMatching.Stopped.Presentation
+public import GraphMarkovMatching.Support.Arithmetic
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

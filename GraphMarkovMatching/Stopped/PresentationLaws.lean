@@ -1,8 +1,12 @@
+module
+
 /-
 Root and child laws of a finite common-core profile presentation.
 -/
-import GraphMarkovMatching.Stopped.Presentation
-import GraphMarkovMatching.Stopped.Projection
+public import GraphMarkovMatching.Stopped.Presentation
+public import GraphMarkovMatching.Stopped.Projection
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

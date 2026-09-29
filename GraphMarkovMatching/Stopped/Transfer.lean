@@ -1,9 +1,13 @@
+module
+
 /-
 Transfer of a uniform finite-height matching bound to any probability space carrying
 two consistent Markov labellings with the specified independent finite marginals.
 -/
-import GraphMarkovMatching.Stopped.Projection
-import GraphMarkovMatching.Stopped.Infinite
+public import GraphMarkovMatching.Stopped.Projection
+public import GraphMarkovMatching.Stopped.Infinite
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Stopped
 

@@ -1,8 +1,12 @@
-import Mathlib.Tactic
-import ChainClasses.Chain.Encoding
-import ChainClasses.Chain.Labelling
-import ChainClasses.Chain.Transfer
-import BranchingProcess.Geometry
+module
+
+public import Mathlib.Tactic
+public import ChainClasses.Chain.Encoding
+public import ChainClasses.Chain.Labelling
+public import ChainClasses.Chain.Transfer
+public import BranchingProcess.Geometry
+
+@[expose] public section
 
 /-!
 The bridge between the two settings in which this project speaks of

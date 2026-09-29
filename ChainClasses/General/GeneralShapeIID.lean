@@ -1,4 +1,8 @@
-import ChainClasses.General.GeneralShapeLaw
+module
+
+public import ChainClasses.General.GeneralShapeLaw
+
+@[expose] public section
 
 /-!
 `sec:general-relabel` of `matching_classes_general.tex`: **`thm:conditional-iid`** in

@@ -1,6 +1,10 @@
-import Mathlib.Tactic
-import Mathlib.Analysis.SpecificLimits.Basic
-import Mathlib.Probability.ProbabilityMassFunction.Basic
+module
+
+public import Mathlib.Tactic
+public import Mathlib.Analysis.SpecificLimits.Basic
+public import Mathlib.Probability.ProbabilityMassFunction.Basic
+
+@[expose] public section
 
 /-!
 `sec:quantisation` of `matching_classes_simple.tex`: the level map, the level

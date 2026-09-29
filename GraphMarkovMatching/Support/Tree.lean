@@ -1,3 +1,5 @@
+module
+
 /-
 The `G_k` tree layer: full labellings of `𝔹_n`, the restricted automorphism
 group, and the phase recursions.
@@ -24,7 +26,9 @@ The recursions proved here:
 together with reflexivity/symmetry propagation and the product-measure
 recursions, all definitional or by the `SquareRel`/`ProdRel` lemmas.
 -/
-import GraphMarkovMatching.Support.Square
+public import GraphMarkovMatching.Support.Square
+
+@[expose] public section
 
 namespace GraphMarkovMatching.Support
 

@@ -1,5 +1,9 @@
-import ChainClasses.Shape.Assembly
-import BranchingProcess.Skeleton
+module
+
+public import ChainClasses.Shape.Assembly
+public import BranchingProcess.Skeleton
+
+@[expose] public section
 
 /-!
 `sec:shape-harris` of `matching_classes_simple.tex`: the deterministic half of
